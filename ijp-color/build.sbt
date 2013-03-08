@@ -27,8 +27,6 @@ resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repos
 libraryDependencies += "org.scalafx" %% "scalafx" % "1.0.0-M2-SNAPSHOT"
 
 // Test dependencies
-libraryDependencies += "junit" % "junit" % "4.11" % "test"
-
 libraryDependencies += "org.scalatest" %% "scalatest" % "1.9.1" % "test"
 
 // Add JavaFX 2 to the unmanaged classpath
