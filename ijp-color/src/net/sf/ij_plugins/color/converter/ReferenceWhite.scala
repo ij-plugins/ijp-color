@@ -65,6 +65,7 @@ object ReferenceWhite {
   /** F11 (ASTM E308-01) */
   val F11 = ReferenceWhite("F11", x = 1.00962, z = 0.64350)
 
+  /** All predefined reference whites. */
   val values = List(A, B, C, D50, D55, D65, D75, E, F2, F7, F11)
 }
 
