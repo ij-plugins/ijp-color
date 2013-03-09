@@ -34,7 +34,7 @@ object ColorConverterModel {
 
 class ColorConverterModel {
 
-  val referenceWhite      = new ObjectProperty(this, "referenceWhite", ReferenceWhite.D50)
+  val referenceWhite      = new ObjectProperty(this, "referenceWhite", ReferenceWhite.D65)
   val rgbWorkingSpace     = new ObjectProperty(this, "rgbWorkingSpace", RGBWorkingSpace.sRGB)
   val gamma               = new ObjectProperty(this, "gamma", Gamma.sRGB)
   val chromaticAdaptation = new ObjectProperty[Option[ChromaticAdaptation]](
