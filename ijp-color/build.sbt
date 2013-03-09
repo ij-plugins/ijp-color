@@ -23,8 +23,12 @@ scalacOptions += "-deprecation"
 // Point to location of a snapshot repositiry for ScalaFX
 resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
 
+resolvers += "ImageJ Releases" at "http://maven.imagej.net/content/repositories/releases/"
+
 // ScalaFX dedpendency
 libraryDependencies += "org.scalafx" %% "scalafx" % "1.0.0-M2-SNAPSHOT"
+
+libraryDependencies += "net.imagej" % "ij" % "1.47h"
 
 // Test dependencies
 libraryDependencies += "org.scalatest" %% "scalatest" % "1.9.1" % "test"
