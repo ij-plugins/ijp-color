@@ -30,6 +30,8 @@ libraryDependencies += "org.scalafx" %% "scalafx" % "1.0.0-M2-SNAPSHOT"
 
 libraryDependencies += "net.imagej" % "ij" % "1.47h"
 
+libraryDependencies += "org.apache.commons" % "commons-math3" % "3.1.1"
+
 // Test dependencies
 libraryDependencies += "org.scalatest" %% "scalatest" % "1.9.1" % "test"
 
