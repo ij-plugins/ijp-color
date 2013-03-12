@@ -20,22 +20,23 @@
  * Latest release available at http://sourceforge.net/projects/ij-plugins/
  */
 
-package net.sf.ij_plugins.color.converter.ui
+package net.sf.ij_plugins.color.calibration.ui
 
+import ij.ImagePlus
 import net.sf.ij_plugins.color.ColorFXUI
 import scalafx.Includes._
 import scalafx.application.JFXApp
 import scalafx.application.JFXApp.PrimaryStage
 import scalafx.scene.Scene
 
-object ColorConverterApp extends JFXApp {
+/** ColorCalibrator UI Demo. */
+object ColorCalibratorUIDemo extends JFXApp {
 
-  stage = new PrimaryStage {
-    title = "IJP Color Converter"
-    scene = new Scene {
-      val model = new ColorConverterModel()
-      root = new ColorConverterView(model).pane
+  stage = new PrimaryStage() {
+    title = "Color Calibrator UI Demo"
+    scene = new Scene(new ColorCalibratorView(new ColorCalibratorModel(new ImagePlus(), this))) {
       stylesheets ++= ColorFXUI.stylesheets
     }
   }
+
 }

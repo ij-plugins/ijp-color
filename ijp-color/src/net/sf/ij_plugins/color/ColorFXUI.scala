@@ -20,22 +20,28 @@
  * Latest release available at http://sourceforge.net/projects/ij-plugins/
  */
 
-package net.sf.ij_plugins.color.converter.ui
+package net.sf.ij_plugins.color
 
-import net.sf.ij_plugins.color.ColorFXUI
-import scalafx.Includes._
-import scalafx.application.JFXApp
-import scalafx.application.JFXApp.PrimaryStage
-import scalafx.scene.Scene
+import java.net.URL
 
-object ColorConverterApp extends JFXApp {
+/** Helper methods for creation of UI in `net.sf.ij_plugins.color` module. */
+object ColorFXUI {
+  /** Return string representing URL to stylesheet used by `ColorFXUI` user interface.
+    *
+    * Returns empty string if stylesheet is not present.
+    */
+  def stylesheets: Seq[String] = List(
+    "modena.css",
+    "ijp-color.css"
+  ).flatMap(check(_).map(_.toExternalForm))
 
-  stage = new PrimaryStage {
-    title = "IJP Color Converter"
-    scene = new Scene {
-      val model = new ColorConverterModel()
-      root = new ColorConverterView(model).pane
-      stylesheets ++= ColorFXUI.stylesheets
+  private def check(name: String): Option[URL] = {
+    val stylesheetURL = getClass.getResource(name)
+    if (stylesheetURL != null)
+      Some(stylesheetURL)
+    else {
+      println("Cannot load stylesheet: '" + name + "' relative  to class: " + getClass + ".")
+      None
     }
   }
 }

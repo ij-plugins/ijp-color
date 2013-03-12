@@ -20,22 +20,22 @@
  * Latest release available at http://sourceforge.net/projects/ij-plugins/
  */
 
-package net.sf.ij_plugins.color.converter.ui
+package net.sf.ij_plugins.color.calibration
 
-import net.sf.ij_plugins.color.ColorFXUI
-import scalafx.Includes._
-import scalafx.application.JFXApp
-import scalafx.application.JFXApp.PrimaryStage
-import scalafx.scene.Scene
 
-object ColorConverterApp extends JFXApp {
+/** Three polynomials representing mapping for three color bands. */
+case class CubicPolynomialTriple(band1: CubicPolynomial,
+                                 band2: CubicPolynomial,
+                                 band3: CubicPolynomial) {
 
-  stage = new PrimaryStage {
-    title = "IJP Color Converter"
-    scene = new Scene {
-      val model = new ColorConverterModel()
-      root = new ColorConverterView(model).pane
-      stylesheets ++= ColorFXUI.stylesheets
-    }
+  /** Convert triplet `src` in source color space to triplet `dest` space to destination color space.
+    *
+    * @param src  array of size 3 representing triplet of colors in source color space.
+    * @param dest array of size 3 representing triplet of colors in destination color space.
+    */
+  def evaluate(src: Array[Double], dest: Array[Double]) {
+    dest(0) = band1.evaluate(src)
+    dest(1) = band2.evaluate(src)
+    dest(2) = band3.evaluate(src)
   }
 }

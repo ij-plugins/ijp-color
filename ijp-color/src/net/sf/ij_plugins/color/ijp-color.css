@@ -20,22 +20,29 @@
  * Latest release available at http://sourceforge.net/projects/ij-plugins/
  */
 
-package net.sf.ij_plugins.color.converter.ui
+#ijp-button {
+    -fx-padding: 0.5em 1.5em 0.5em 1.5em;
+    -fx-font-weight: bold;
+    /*-fx-font-size: 1.08em;*/
+    /*-fx-background-radius: 4;*/
+    /*-fx-border-color: #000000;*/
+    /*-fx-border-width: 4; */
+}
 
-import net.sf.ij_plugins.color.ColorFXUI
-import scalafx.Includes._
-import scalafx.application.JFXApp
-import scalafx.application.JFXApp.PrimaryStage
-import scalafx.scene.Scene
+#ijp-image-title {
+    -fx-font-size: 1.5em;
+    /*-fx-text-fill: #ddd;*/
+    -fx-text-fill: derive(-fx-text-background-color, 75%);
+    -fx-padding: 1;
+}
 
-object ColorConverterApp extends JFXApp {
+#ijp-label {
+    -fx-text-fill: derive(-fx-text-background-color, 75%);
+}
 
-  stage = new PrimaryStage {
-    title = "IJP Color Converter"
-    scene = new Scene {
-      val model = new ColorConverterModel()
-      root = new ColorConverterView(model).pane
-      stylesheets ++= ColorFXUI.stylesheets
-    }
-  }
+#ijp-separator {
+    -fx-padding: 1em 0.0833em 0em 0.0833em;
+    -fx-font-size: 1.25em;
+    -fx-font-style: oblique;
+    -fx-text-fill: derive(-fx-text-background-color, 120%);
 }

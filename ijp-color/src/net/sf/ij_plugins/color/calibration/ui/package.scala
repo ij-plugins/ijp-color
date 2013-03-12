@@ -20,22 +20,25 @@
  * Latest release available at http://sourceforge.net/projects/ij-plugins/
  */
 
-package net.sf.ij_plugins.color.converter.ui
+package net.sf.ij_plugins.color.calibration
 
-import net.sf.ij_plugins.color.ColorFXUI
-import scalafx.Includes._
-import scalafx.application.JFXApp
-import scalafx.application.JFXApp.PrimaryStage
-import scalafx.scene.Scene
+import java.awt.Shape
+import java.awt.geom.Path2D
+import net.sf.ij_plugins.color.calibration.chart.ColorChip
+import scalafx.geometry.Point2D
 
-object ColorConverterApp extends JFXApp {
+package object ui {
+  def toShape(chips: Seq[ColorChip]): Shape = {
+    val shape = new Path2D.Double
+    for (chip <- chips) shape.append(outlineToShape(chip.outline.toArray), false)
+    shape
+  }
 
-  stage = new PrimaryStage {
-    title = "IJP Color Converter"
-    scene = new Scene {
-      val model = new ColorConverterModel()
-      root = new ColorConverterView(model).pane
-      stylesheets ++= ColorFXUI.stylesheets
-    }
+  def outlineToShape(outline: Array[Point2D]): Shape = {
+    val path: Path2D = new Path2D.Double
+    path.moveTo(outline.head.x, outline.head.y)
+    outline.tail.foreach(point => path.lineTo(point.x, point.y))
+    path.closePath()
+    path
   }
 }

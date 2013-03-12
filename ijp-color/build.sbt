@@ -2,7 +2,7 @@ name := "ijp-color"
 
 organization := "ij-plugins.sf.net"
 
-version := "0.1.0"
+version := "0.2.0-SNAPSHOT"
 
 scalaVersion := "2.9.3"
 
@@ -29,6 +29,10 @@ resolvers += "ImageJ Releases" at "http://maven.imagej.net/content/repositories/
 libraryDependencies += "org.scalafx" %% "scalafx" % "1.0.0-M2-SNAPSHOT"
 
 libraryDependencies += "net.imagej" % "ij" % "1.47h"
+
+libraryDependencies += "org.apache.commons" % "commons-math3" % "3.1.1"
+
+libraryDependencies += "org.jfxtras" % "jfxtras-labs" % "2.2-r4"
 
 // Test dependencies
 libraryDependencies += "org.scalatest" %% "scalatest" % "1.9.1" % "test"

@@ -31,7 +31,7 @@ import scalafx.collections.ObservableBuffer
 import scalafx.event.ActionEvent
 import scalafx.geometry.{Pos, Insets}
 import scalafx.scene.Node
-import scalafx.scene.control.{Label, ChoiceBox, Button}
+import scalafx.scene.control.{ChoiceBox, Label, Button}
 import scalafx.scene.layout.GridPane
 import scalafx.util.StringConverter
 
@@ -46,6 +46,7 @@ class ColorConverterView(val model: ColorConverterModel) {
   lazy val pane = createGidPane()
 
   private val buttonXYZ = new Button {
+    id = "ijp-button"
     text = "XYZ"
     maxWidth = Double.MaxValue
     onAction = (e: ActionEvent) => {
@@ -55,6 +56,7 @@ class ColorConverterView(val model: ColorConverterModel) {
   }
 
   private val buttonLab = new Button {
+    id = "ijp-button"
     text = "L*a*b*"
     maxWidth = Double.MaxValue
     onAction = (e: ActionEvent) => {
@@ -64,6 +66,7 @@ class ColorConverterView(val model: ColorConverterModel) {
   }
 
   private val buttonRGB = new Button {
+    id = "ijp-button"
     text = "RGB"
     maxWidth = Double.MaxValue
     onAction = (e: ActionEvent) => {
@@ -86,7 +89,10 @@ class ColorConverterView(val model: ColorConverterModel) {
         gp.add(n2, 1, row, nbColumns - 1, 1)
       } else {
         gp.add(n2, 1, row, nbColumns - 2, 1)
-        gp.add(new Label(xLabel.get), nbColumns - 1, row, 1, 1)
+        gp.add(new Label {
+          id = "ijp-label"
+          text = xLabel.get
+        }, nbColumns - 1, row, 1, 1)
       }
     }
 
@@ -100,8 +106,10 @@ class ColorConverterView(val model: ColorConverterModel) {
       converter.map(cb.converter = _)
       gp.add(
         new Label {
+          id = "ijp-label"
           text = label
           alignment = Pos.CENTER_RIGHT
+          alignmentInParent = Pos.CENTER_RIGHT
         },
         0, row
       )
@@ -124,11 +132,14 @@ class ColorConverterView(val model: ColorConverterModel) {
     row += 1
 
     addChoiceBox(row, "RGB Model", model.rgbWorkingSpace, RGBWorkingSpace.values)
-    gp.add(new Label("Gamma") {
+    gp.add(new Label {
+      id = "ijp-label"
+      text = "Gamma"
       alignment = Pos.CENTER_RIGHT
     }, 2, row)
     gp.add(
       new Label {
+        id = "ijp-label"
         text <== new jfxbb.StringBinding {
           super.bind(model.rgbWorkingSpace)
 
@@ -138,6 +149,7 @@ class ColorConverterView(val model: ColorConverterModel) {
             case _ => "L*"
           }
         }
+        alignment = Pos.CENTER_LEFT
       },
       3, row
     )

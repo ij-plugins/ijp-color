@@ -20,22 +20,16 @@
  * Latest release available at http://sourceforge.net/projects/ij-plugins/
  */
 
-package net.sf.ij_plugins.color.converter.ui
+package net.sf.ij_plugins.color.calibration
 
-import net.sf.ij_plugins.color.ColorFXUI
-import scalafx.Includes._
-import scalafx.application.JFXApp
-import scalafx.application.JFXApp.PrimaryStage
-import scalafx.scene.Scene
+import ij.process.ColorProcessor
 
-object ColorConverterApp extends JFXApp {
-
-  stage = new PrimaryStage {
-    title = "IJP Color Converter"
-    scene = new Scene {
-      val model = new ColorConverterModel()
-      root = new ColorConverterView(model).pane
-      stylesheets ++= ColorFXUI.stylesheets
-    }
-  }
-}
+/** Represents color mapping results:
+  * <ul>
+  * <li>corrected image</li>
+  * <li>number of values in result images that have to be clipped to be in 0 to 255 range.</li>
+  * </ul>
+  */
+case class RGBMappingResult(image: ColorProcessor,
+                            clippingLow: Array[Long],
+                            clippingHigh: Array[Long])

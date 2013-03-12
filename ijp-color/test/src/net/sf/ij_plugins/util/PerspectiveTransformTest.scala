@@ -20,22 +20,35 @@
  * Latest release available at http://sourceforge.net/projects/ij-plugins/
  */
 
-package net.sf.ij_plugins.color.converter.ui
+package net.sf.ij_plugins.util
 
-import net.sf.ij_plugins.color.ColorFXUI
-import scalafx.Includes._
-import scalafx.application.JFXApp
-import scalafx.application.JFXApp.PrimaryStage
-import scalafx.scene.Scene
+import org.scalatest.FlatSpec
+import org.scalatest.matchers.ShouldMatchers._
+import scalafx.geometry.Point2D
 
-object ColorConverterApp extends JFXApp {
+class PerspectiveTransformTest extends FlatSpec {
 
-  stage = new PrimaryStage {
-    title = "IJP Color Converter"
-    scene = new Scene {
-      val model = new ColorConverterModel()
-      root = new ColorConverterView(model).pane
-      stylesheets ++= ColorFXUI.stylesheets
-    }
+  "PerspectiveTransform" should "transform points" in {
+
+    // Reference quad
+    val referenceQuad = Array(
+      new Point2D(0, 0),
+      new Point2D(6, 0),
+      new Point2D(6, 4),
+      new Point2D(0, 4)
+    )
+
+    val deformedQuad = Array(
+      new Point2D(207, 95),
+      new Point2D(461, 132),
+      new Point2D(436, 312),
+      new Point2D(198, 255)
+    )
+
+    val alignmentTransform = PerspectiveTransform.quadToQuad(referenceQuad, deformedQuad)
+    val pm = alignmentTransform.transform(new Point2D(3, 2))
+
+    pm.x should be(317.07786 plusOrMinus 0.00001)
+    pm.y should be(199.30959 plusOrMinus 0.00001)
   }
 }

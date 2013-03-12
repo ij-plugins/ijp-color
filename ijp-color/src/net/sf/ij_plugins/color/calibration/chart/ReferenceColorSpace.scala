@@ -20,22 +20,22 @@
  * Latest release available at http://sourceforge.net/projects/ij-plugins/
  */
 
-package net.sf.ij_plugins.color.converter.ui
+package net.sf.ij_plugins.color.calibration.chart
 
-/** Helper methods for creation of UI in `net.sf.ij_plugins.color` module. */
-object ColorFXUI {
-  /** Return string representing URL to stylesheet used by `ColorFXUI` user interface.
-    *
-    * Returns empty string if stylesheet is not present.
-    */
-  def stylesheet: Seq[String] = {
-    val stylesheetFileName = "modena.css"
-    val stylesheetURL = getClass.getResource(stylesheetFileName)
-    if (stylesheetURL != null)
-      Array(stylesheetURL.toExternalForm)
-    else {
-      println("Cannot load stylesheet: " + stylesheetFileName + " relative  class: " + getClass + ".")
-      Array[String]()
-    }
-  }
+/** Color spaces used for creation of reference color values. */
+sealed case class ReferenceColorSpace(name: String) {
+  override def toString = name
+
+  def bands: Array[String] = toString.toArray.takeRight(3).map(_.toString)
+}
+
+/** Enumeration of supported reference color spacesa. */
+object ReferenceColorSpace {
+  /** CIE XYZ color space */
+  val XYZ  = ReferenceColorSpace("XYZ")
+  /** sRGB color space */
+  val sRGB = ReferenceColorSpace("sRGB")
+
+  /** All refined reference color spaces. */
+  val values = List(XYZ, sRGB)
 }
