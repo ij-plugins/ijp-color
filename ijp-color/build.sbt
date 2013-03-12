@@ -32,6 +32,8 @@ libraryDependencies += "net.imagej" % "ij" % "1.47h"
 
 libraryDependencies += "org.apache.commons" % "commons-math3" % "3.1.1"
 
+libraryDependencies += "org.jfxtras" % "jfxtras-labs" % "2.2-r4"
+
 // Test dependencies
 libraryDependencies += "org.scalatest" %% "scalatest" % "1.9.1" % "test"
 
