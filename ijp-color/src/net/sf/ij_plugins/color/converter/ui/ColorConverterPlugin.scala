@@ -35,7 +35,7 @@ object ColorConverterPlugin {
   private var dialogStage: Option[Stage] = None
 }
 
-/** Simple color convertion calculator. */
+/** Simple color conversion calculator. */
 class ColorConverterPlugin extends PlugIn {
 
   private final val Title = "IJP Color Calculator"
@@ -55,7 +55,7 @@ class ColorConverterPlugin extends PlugIn {
             title = Title
             scene = new Scene {
               title = Title
-              icons.add(IJTools.imageJIconAsFXImage)
+              icons += IJTools.imageJIconAsFXImage
               root = new ColorConverterView(new ColorConverterModel()).pane
               stylesheets ++= ColorFXUI.stylesheets
             }
