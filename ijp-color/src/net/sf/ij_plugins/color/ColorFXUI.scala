@@ -20,7 +20,9 @@
  * Latest release available at http://sourceforge.net/projects/ij-plugins/
  */
 
-package net.sf.ij_plugins.color.converter.ui
+package net.sf.ij_plugins.color
+
+import java.net.URL
 
 /** Helper methods for creation of UI in `net.sf.ij_plugins.color` module. */
 object ColorFXUI {
@@ -28,14 +30,18 @@ object ColorFXUI {
     *
     * Returns empty string if stylesheet is not present.
     */
-  def stylesheet: Seq[String] = {
-    val stylesheetFileName = "modena.css"
-    val stylesheetURL = getClass.getResource(stylesheetFileName)
+  def stylesheets: Seq[String] = List(
+    "modena.css",
+    "ijp-color.css"
+  ).flatMap(check(_).map(_.toExternalForm))
+
+  private def check(name: String): Option[URL] = {
+    val stylesheetURL = getClass.getResource(name)
     if (stylesheetURL != null)
-      Array(stylesheetURL.toExternalForm)
+      Some(stylesheetURL)
     else {
-      println("Cannot load stylesheet: " + stylesheetFileName + " relative  class: " + getClass + ".")
-      Array[String]()
+      println("Cannot load stylesheet: '" + name + "' relative  to class: " + getClass + ".")
+      None
     }
   }
 }

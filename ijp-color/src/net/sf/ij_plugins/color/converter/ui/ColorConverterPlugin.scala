@@ -24,6 +24,7 @@ package net.sf.ij_plugins.color.converter.ui
 
 import ij.plugin.PlugIn
 import javafx.embed.swing.JFXPanel
+import net.sf.ij_plugins.color.ColorFXUI
 import net.sf.ij_plugins.util.IJTools
 import scalafx.Includes._
 import scalafx.application.Platform
@@ -56,7 +57,7 @@ class ColorConverterPlugin extends PlugIn {
               title = Title
               icons.add(IJTools.imageJIconAsFXImage)
               root = new ColorConverterView(new ColorConverterModel()).pane
-              stylesheets ++= ColorFXUI.stylesheet
+              stylesheets ++= ColorFXUI.stylesheets
             }
           }
         )
