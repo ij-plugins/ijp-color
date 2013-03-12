@@ -47,7 +47,6 @@ class ColorValueUI {
 
   val color = new ObjectProperty[ColorTriple](this, "color", new Color123())
   color.onChange {
-    println("Color changed: " + color())
     updating = true
     try {
       band1NTF.setNumber(color()(0))

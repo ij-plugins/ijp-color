@@ -26,7 +26,6 @@ import ij.process._
 import net.sf.ij_plugins.color.calibration.ColorCalibrator._
 import net.sf.ij_plugins.color.calibration.MappingMethod._
 import net.sf.ij_plugins.color.calibration.chart.{ReferenceColorSpace, ColorChart}
-import net.sf.ij_plugins.util.IJTools
 import net.sf.ij_plugins.util._
 
 /** Color calibration helper methods */
@@ -124,7 +123,6 @@ object ColorCalibrator {
         maxDelta = math.max(d, maxDelta)
       }
       // TODO: return results for each tested method
-      println(method.toString + ": " + maxDelta)
       if (maxDelta < minError) {
         minError = maxDelta
         bestMethod = method
