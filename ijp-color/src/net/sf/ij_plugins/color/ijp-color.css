@@ -32,7 +32,7 @@
 #ijp-image-title {
     -fx-font-size: 1.5em;
     /*-fx-text-fill: #ddd;*/
-    -fx-text-fill: derive(-fx-text-background-color, 95%);
+    -fx-text-fill: derive(-fx-text-background-color, 75%);
     -fx-padding: 1;
 }
 
@@ -44,5 +44,5 @@
     -fx-padding: 1em 0.0833em 0em 0.0833em;
     -fx-font-size: 1.25em;
     -fx-font-style: oblique;
-    -fx-text-fill: derive(-fx-text-background-color, 75%);
+    -fx-text-fill: derive(-fx-text-background-color, 120%);
 }

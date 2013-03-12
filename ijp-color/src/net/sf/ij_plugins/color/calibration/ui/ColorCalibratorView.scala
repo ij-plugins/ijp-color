@@ -176,33 +176,19 @@ class ColorCalibratorView(model: ColorCalibratorModel) extends jfxsl.StackPane {
     getChildren.addAll(gp)
   }
 
-  //  /** */
-  //  def addSeparator(gp: GridPane, row: Int, label: String) {
-  //    gp.add(new HBox {
-  //      content = List(
-  //        new Label(label),
-  //        new Separator {
-  //          margin = Insets(0, 0, 0, 10)
-  //          hgrow = Priority.ALWAYS
-  //          alignment = Pos.CENTER
-  //        }
-  //      )
-  //    }, 0, row, GridPane.REMAINING, 1)
-  //
-  //  }
-
   private def separator(labelText: String): HBox = {
     new HBox {
       val label = new Label(labelText) {
         id = "ijp-separator"
       }
       content = List(
-        label //,
-        //        new Separator {
-        //          id = "ijp-separator"
-        //          margin = Insets(10, 0, 5, 10)
-        //          hgrow = Priority.ALWAYS
-        //        }
+        label,
+        new Separator {
+          id = "ijp-separator"
+          margin = Insets(10, 0, 5, 10)
+          hgrow = Priority.ALWAYS
+          alignment = Pos.TOP_CENTER
+        }
       )
     }
   }
