@@ -26,7 +26,7 @@ resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repos
 resolvers += "ImageJ Releases" at "http://maven.imagej.net/content/repositories/releases/"
 
 // ScalaFX dedpendency
-libraryDependencies += "org.scalafx" %% "scalafx" % "1.0.0-M2-SNAPSHOT"
+libraryDependencies += "org.scalafx" %% "scalafx" % "1.0.0-M2"
 
 libraryDependencies += "net.imagej" % "ij" % "1.47h"
 
