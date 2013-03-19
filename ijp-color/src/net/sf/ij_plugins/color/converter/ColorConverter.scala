@@ -34,6 +34,13 @@ object ColorConverter {
 }
 
 /** Color converter based on information given at [[http://www.brucelindbloom.com brucelindbloom.com]].
+  *
+  * Conversion between CIE XYZ and sRGB is defined in the IEC 619602-1 standard
+  * [[http://www.colour.org/tc8-05/Docs/colorspace/61966-2-1.pdf]],
+  * though it uses approximated coefficients (compared to Lindbloom).
+  *
+  * Conversion between CIE XYZ and reference white points are defined in NIST E308 standard.
+  *
   * @param refWhite reference white for CIE XYZ color space.
   * @param rgbSpace RGB working space (may have different reference white).
   * @param chromaticAdaptation chromatic adaptation used for conversions from/to RGB.
