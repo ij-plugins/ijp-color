@@ -35,7 +35,11 @@ import scalafx.geometry.Point2D
   * @param nbRows number of rows
   * @param chips chip names and CIE L*a*b* / D65 color values, row by row, starting at (0,0) or top left corner.
   */
-final class GridColorChart(val name: String, val nbColumns: Int, val nbRows: Int, val chips: List[(String, Lab)]) extends ColorChart {
+final class GridColorChart(val name: String,
+                           val nbColumns: Int,
+                           val nbRows: Int,
+                           val chips: List[(String, Lab)]
+                              ) extends ColorChart {
 
   /** Reference grid on which reference color chips are located. */
   val referenceGrid: ChartGrid = new ChartGrid(nbColumns, nbRows)
