@@ -22,11 +22,10 @@
 
 package net.sf.ij_plugins.color.calibration.ui
 
-import ij.ImagePlus._
 import ij.gui.{Roi, PolygonRoi}
 import ij.measure.ResultsTable
-import ij.process.{FloatProcessor, ColorProcessor}
-import ij.{ImageStack, IJ, ImagePlus}
+import ij.process.ColorProcessor
+import ij.{IJ, ImagePlus}
 import java.awt.{BasicStroke, Polygon, Color}
 import javafx.beans.property.ReadOnlyBooleanWrapper
 import javafx.scene.control.Dialogs
@@ -35,7 +34,6 @@ import net.sf.ij_plugins.color.ColorFXUI
 import net.sf.ij_plugins.color.calibration.chart.{ReferenceColorSpace, ColorCharts}
 import net.sf.ij_plugins.color.calibration.{ColorCalibrator, MappingMethod}
 import net.sf.ij_plugins.util._
-import net.sf.ij_plugins.util.{IJTools, PerspectiveTransform}
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
 import scalafx.Includes._
 import scalafx.beans.property._
@@ -158,46 +156,24 @@ class ColorCalibratorModel(val image: ImagePlus, parentStage: Stage) {
     // Compute color mapping coefficients
     val corrector = new ColorCalibrator(chart(), referenceColorSpace(), mappingMethod())
 
-    val fit: ColorCalibrator.CalibrationFit = (image.getType, image.getStackSize) match {
-      case (COLOR_RGB, 1) => {
-        val src = image.getProcessor.asInstanceOf[ColorProcessor]
-        val fit = corrector.computeCalibrationMapping(chipMarginPercent() / 100d, src)
-        // Correct the image
-        val dest = corrector.map(src)
-        new ImagePlus(image.getTitle + "+corrected_" + referenceColorSpace(), dest).show()
-        fit
-      }
-      case (GRAY8 | ImagePlus.GRAY16 | ImagePlus.GRAY16, 3) => {
-        val src = (1 to 3).map(image.getStack.getProcessor(_)).toArray
-        val fit = corrector.computeCalibrationMapping(chipMarginPercent() / 100d, src)
-        // Correct the image
-        val dest = corrector.map(src)
-        val stack = new ImageStack(image.getWidth, image.getHeight)
-        (referenceColorSpace().bands zip dest).foreach(v => stack.addSlice(v._1, v._2))
-        new ImagePlus(image.getTitle + "+corrected_" + referenceColorSpace(), stack).show()
-        referenceColorSpace() match {
-          case ReferenceColorSpace.sRGB => new ImagePlus(image.getTitle + "+corrected", IJTools.mergeRGB(dest)).show()
-          case ReferenceColorSpace.XYZ => {
-            val converter = chart().colorConverter
-            val destDefault = (1 to 3).map(_ => new FloatProcessor(image.getWidth, image.getHeight)).toArray
-            val n = image.getWidth * image.getHeight
-            for (i <- 0 until n) {
-              val rgb = converter.xyz2RGB(dest(0).getf(i), dest(1).getf(i), dest(2).getf(i))
-              destDefault(0).setf(i, rgb.r.toFloat)
-              destDefault(1).setf(i, rgb.g.toFloat)
-              destDefault(2).setf(i, rgb.b.toFloat)
-            }
-            new ImagePlus(image.getTitle + "+corrected", IJTools.mergeRGB(destDefault)).show()
-          }
-        }
-        fit
-      }
-      case _ => {
-        showError("Unsupported image.",
-          "Input image must be either single slice RGB image or three slice gray level image.")
+    val fit = try {
+      corrector.computeCalibrationMapping(chipMarginPercent() / 100d, image)
+    } catch {
+      case t: Throwable => {
+        showError("Error while computing color calibration.", t.getMessage, t)
         return
       }
     }
+
+    val correctedImage = try {
+      corrector.map(image)
+    } catch {
+      case t: Throwable => {
+        showError("Error while color correcting the image.", t.getMessage, t)
+        return
+      }
+    }
+    correctedImage.show()
 
     if (IJ.debugMode) {
       // Show table with expected measured and corrected values

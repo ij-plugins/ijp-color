@@ -22,11 +22,14 @@
 
 package net.sf.ij_plugins.color.calibration
 
+import ij.ImagePlus._
 import ij.process._
+import ij.{ImageStack, ImagePlus}
 import net.sf.ij_plugins.color.calibration.ColorCalibrator._
 import net.sf.ij_plugins.color.calibration.MappingMethod._
 import net.sf.ij_plugins.color.calibration.chart.{ReferenceColorSpace, ColorChart}
 import net.sf.ij_plugins.util._
+import scala.Some
 
 /** Color calibration helper methods */
 object ColorCalibrator {
@@ -174,6 +177,8 @@ class ColorCalibrator(val chart: ColorChart,
 
   private var _mapping: Option[CubicPolynomialTriple] = None
 
+  def mapping: Option[CubicPolynomialTriple] = _mapping
+
   /** Estimate calibration coefficient. This method does not clip reference color values.
     *
     * @param bands input image bands to measure observed color value of chart's chips.
@@ -218,6 +223,29 @@ class ColorCalibrator(val chart: ColorChart,
     val corrected = observed.map(o => applyMapping(_mapping.get, o))
 
     CalibrationFit(reference = reference, observed = observed, corrected = corrected, _mapping.get)
+  }
+
+  /** Estimate calibration coefficients. Reference color values will be clipped if reference color space is RGB and
+    * `clipReferenceRGB` is true.
+    *
+    * @param image input image to measure observed color value of chart's chips.
+    * @param chipMargin border excluded from each chip while measuring observed color, as a fraction of chip length/width.
+    * @throws ColorException if one of the calibration mapping functions cannot be computed.
+    * @throws IllegalArgumentException if input image is not RGB or not a three slice stack of gray level images.
+    */
+  def computeCalibrationMapping(chipMargin: Double, image: ImagePlus): CalibrationFit = {
+    (image.getType, image.getStackSize) match {
+      case (COLOR_RGB, 1) => {
+        val src = image.getProcessor.asInstanceOf[ColorProcessor]
+        computeCalibrationMapping(chipMargin, src)
+      }
+      case (GRAY8 | ImagePlus.GRAY16 | ImagePlus.GRAY16, 3) => {
+        val src = (1 to 3).map(image.getStack.getProcessor(_)).toArray
+        computeCalibrationMapping(chipMargin, src)
+      }
+      case _ =>
+        throw new IllegalArgumentException("Input image must be either single slice RGB image or three slice gray level image.")
+    }
   }
 
   /** Color calibrate input image `src`, use default color space.
@@ -280,6 +308,50 @@ class ColorCalibrator(val chart: ColorChart,
           destDefault(2).setf(i, rgb.b.toFloat)
         }
         IJTools.mergeRGB(destDefault)
+      }
+      case _ => throw new IllegalArgumentException("Unsupported reference color space '" + referenceColorSpace + "'.")
+    }
+  }
+
+  /** Color calibrate input `image`.
+    *
+    * Calibration mapping must be computed before calling this method.
+    * It is critical to only use this method on the same type of an image as it was used for
+    * computing the calibration mapping.
+
+    * @param image image to be calibrated.
+    * @return calibrated image.
+    * @throws IllegalArgumentException if the mapping was not yet computed or input image of of incorrect type.
+    * @see #computeCalibrationMapping(chipMargin: Double, image: ColorProcessor)
+    */
+  def map(image: ImagePlus): ImagePlus = {
+    (image.getType, image.getStackSize) match {
+      case (COLOR_RGB, 1) => {
+        val src = image.getProcessor.asInstanceOf[ColorProcessor]
+        val dest = map(src)
+        new ImagePlus(image.getTitle + "+corrected_" + referenceColorSpace, dest)
+      }
+      case (GRAY8 | ImagePlus.GRAY16 | ImagePlus.GRAY16, 3) => {
+        val src = (1 to 3).map(image.getStack.getProcessor(_)).toArray
+        val dest = map(src)
+        val stack = new ImageStack(image.getWidth, image.getHeight)
+        (referenceColorSpace.bands zip dest).foreach(v => stack.addSlice(v._1, v._2))
+        new ImagePlus(image.getTitle + "+corrected_" + referenceColorSpace, stack).show()
+        referenceColorSpace match {
+          case ReferenceColorSpace.sRGB => new ImagePlus(image.getTitle + "+corrected", IJTools.mergeRGB(dest))
+          case ReferenceColorSpace.XYZ => {
+            val converter = chart.colorConverter
+            val destDefault = (1 to 3).map(_ => new FloatProcessor(image.getWidth, image.getHeight)).toArray
+            val n = image.getWidth * image.getHeight
+            for (i <- 0 until n) {
+              val rgb = converter.xyz2RGB(dest(0).getf(i), dest(1).getf(i), dest(2).getf(i))
+              destDefault(0).setf(i, rgb.r.toFloat)
+              destDefault(1).setf(i, rgb.g.toFloat)
+              destDefault(2).setf(i, rgb.b.toFloat)
+            }
+            new ImagePlus(image.getTitle + "+corrected", IJTools.mergeRGB(destDefault))
+          }
+        }
       }
       case _ => throw new IllegalArgumentException("Unsupported reference color space '" + referenceColorSpace + "'.")
     }
