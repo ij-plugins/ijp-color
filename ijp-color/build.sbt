@@ -2,7 +2,7 @@ name := "ijp-color"
 
 organization := "ij-plugins.sf.net"
 
-version := "0.2.0-SNAPSHOT"
+version := "0.2.1-SNAPSHOT"
 
 scalaVersion := "2.9.3"
 
@@ -34,12 +34,12 @@ libraryDependencies += "org.apache.commons" % "commons-math3" % "3.1.1"
 
 libraryDependencies += "org.jfxtras" % "jfxtras-labs" % "2.2-r4"
 
-// Test dependencies
-libraryDependencies += "org.scalatest" %% "scalatest" % "1.9.1" % "test"
-
 // Add JavaFX 2 to the unmanaged classpath
 // For Java 7 update 06+ the JFXRT JAR is part of the Java Runtime Environment
 unmanagedJars in Compile += Attributed.blank(file(System.getenv("JAVA_HOME") + "/jre/lib/jfxrt.jar"))
+
+// Test dependencies
+libraryDependencies += "org.scalatest" %% "scalatest" % "1.9.1" % "test"
 
 //
 // Optimize loops using ScalaCL compiler plugin
