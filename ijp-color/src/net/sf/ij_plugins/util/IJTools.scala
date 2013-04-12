@@ -76,7 +76,7 @@ object IJTools {
     * @see #splitRGB
     */
   def mergeRGB(src: Array[ByteProcessor]): ColorProcessor = {
-    validateSameDimensions(src, 3)
+    validateSameTypeAndDimensions(src, 3)
 
     val width = src(0).getWidth
     val height = src(0).getHeight
@@ -98,7 +98,7 @@ object IJTools {
     * @see #splitRGB
     */
   def mergeRGB(src: Array[FloatProcessor]): ColorProcessor = {
-    validateSameDimensions(src, 3)
+    validateSameTypeAndDimensions(src, 3)
 
     mergeRGB(Array.range(0, 3).map(src(_).convertToByte(false).asInstanceOf[ByteProcessor]))
   }
@@ -172,5 +172,21 @@ object IJTools {
     val height = src(0).getHeight
     require(src.forall(width == _.getWidth), "All input images have to have the same width: " + src.map(_.getWidth).mkString(","))
     require(src.forall(height == _.getHeight), "All input images have to have the same height: " + src.map(_.getHeight).mkString(","))
+  }
+
+  /**
+   *
+   * @param src images to validate
+   * @param length expected number of images
+   * @tparam T  image processor type
+   * @throws IllegalArgumentException if the images in the array are not of the same dimension.
+   */
+  @inline
+  def validateSameTypeAndDimensions[T <: ImageProcessor](src: Array[T], length: Int) {
+    validateSameDimensions(src, length)
+    if (length > 1) {
+      val t = src(0).getClass
+      require(src.tail.forall(_.getClass == t), "All input images must be of the same type.")
+    }
   }
 }
