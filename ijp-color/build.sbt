@@ -2,7 +2,7 @@ name := "ijp-color"
 
 organization := "ij-plugins.sf.net"
 
-version := "0.2.1-SNAPSHOT"
+version := "0.3.0-SNAPSHOT"
 
 scalaVersion := "2.9.3"
 
