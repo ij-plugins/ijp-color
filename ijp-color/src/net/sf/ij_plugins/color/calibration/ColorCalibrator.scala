@@ -22,9 +22,9 @@
 
 package net.sf.ij_plugins.color.calibration
 
+import ij.ImagePlus
 import ij.ImagePlus._
 import ij.process._
-import ij.{ImageStack, ImagePlus}
 import net.sf.ij_plugins.color.calibration.ColorCalibrator._
 import net.sf.ij_plugins.color.calibration.MappingMethod._
 import net.sf.ij_plugins.color.calibration.chart.{ReferenceColorSpace, ColorChart}
@@ -268,22 +268,28 @@ class ColorCalibrator(val chart: ColorChart,
     }
   }
 
-  /** Color calibrate input image `src`, use default color space.
+  /** Color calibrate input image `src` three-band image to the `referenceColorSpace`.
     *
-    * Calibration mapping must be computed before calling this method.
+    * Calibration mapping must be computed or set before calling this method.
     * It is critical to only use this method on the same type of an image as it was used for
     * computing the calibration mapping.
     *
+    * The input image slices must be of a a grey level type: `ByteProcessor`, `ShortProcessor`, or `FloatProcessor`.
+    * Value calibration is ignored.
+    *
     * @param src image to be calibrated.
     * @return calibrated image in the `referenceColorSpace`.
-    * @throws IllegalArgumentException if the mapping was not yet computed or
-    *                                  the images in the array are not of the same dimension.
-    * @see #computeCalibrationMapping[T <: ImageProcessor](chipMargin: Double, bands: Array[T])
+    * @throws IllegalArgumentException if the mapping is not set or
+    *                                  the images in the array are not of the same type and dimension.
     */
   def map[T <: ImageProcessor](src: Array[T]): Array[FloatProcessor] = {
     // Sanity checks
     validate()
-    IJTools.validateSameDimensions(src, 3)
+    IJTools.validateSameTypeAndDimensions(src, 3)
+    require(
+      src(0).isInstanceOf[ByteProcessor] | src(0).isInstanceOf[ShortProcessor] | src(0).isInstanceOf[FloatProcessor],
+      "The input image slices must be of a a grey level type: `ByteProcessor`, `ShortProcessor`, or `FloatProcessor`, got: " + src(0).getClass
+    )
 
     val width = src(0).getWidth
     val height = src(0).getHeight
@@ -302,35 +308,18 @@ class ColorCalibrator(val chart: ColorChart,
 
   /** Color calibrate input image `src`, convert result to sRGB color space.
     *
-    * Calibration mapping must be computed before calling this method.
+    * Calibration mapping must be set before calling this method.
     * It is critical to only use this method on the same type of an image as it was used for
     * computing the calibration mapping.
 
     * @param src image to be calibrated.
     * @return converted image in sRGB color space.
-    * @throws IllegalArgumentException if the mapping was not yet computed or
-    *                                  the images in the array are not of the same dimension.
-    * @see #computeCalibrationMapping(chipMargin: Double, image: ColorProcessor)
+    * @throws IllegalArgumentException if the mapping was not set.
+    * @see #map[T <: ImageProcessor](src: Array[T])
     */
-  def map(src: ColorProcessor): ColorProcessor = {
+  def map(src: ColorProcessor): Array[FloatProcessor] = {
     validate()
-    val destDefault = map(IJTools.splitRGB(src))
-    referenceColorSpace match {
-      case ReferenceColorSpace.sRGB => IJTools.mergeRGB(destDefault)
-      case ReferenceColorSpace.XYZ => {
-        // Convert XYZ to sRGB
-        val converter = chart.colorConverter
-        val n = destDefault(0).getWidth * destDefault(0).getHeight
-        for (i <- 0 until n) {
-          val rgb = converter.xyz2RGB(destDefault(0).getf(i), destDefault(1).getf(i), destDefault(2).getf(i))
-          destDefault(0).setf(i, rgb.r.toFloat)
-          destDefault(1).setf(i, rgb.g.toFloat)
-          destDefault(2).setf(i, rgb.b.toFloat)
-        }
-        IJTools.mergeRGB(destDefault)
-      }
-      case _ => throw new IllegalArgumentException("Unsupported reference color space '" + referenceColorSpace + "'.")
-    }
+    map(IJTools.splitRGB(src))
   }
 
   /** Color calibrate input `image`.
@@ -344,34 +333,15 @@ class ColorCalibrator(val chart: ColorChart,
     * @throws IllegalArgumentException if the mapping was not yet computed or input image of of incorrect type.
     * @see #computeCalibrationMapping(chipMargin: Double, image: ColorProcessor)
     */
-  def map(image: ImagePlus): ImagePlus = {
+  def map(image: ImagePlus): Array[FloatProcessor] = {
     (image.getType, image.getStackSize) match {
       case (COLOR_RGB, 1) => {
         val src = image.getProcessor.asInstanceOf[ColorProcessor]
-        val dest = map(src)
-        new ImagePlus(image.getTitle + "+corrected_" + referenceColorSpace, dest)
+        map(src)
       }
       case (GRAY8 | ImagePlus.GRAY16 | ImagePlus.GRAY16, 3) => {
         val src = (1 to 3).map(image.getStack.getProcessor(_)).toArray
-        val dest = map(src)
-        val stack = new ImageStack(image.getWidth, image.getHeight)
-        (referenceColorSpace.bands zip dest).foreach(v => stack.addSlice(v._1, v._2))
-        new ImagePlus(image.getTitle + "+corrected_" + referenceColorSpace, stack).show()
-        referenceColorSpace match {
-          case ReferenceColorSpace.sRGB => new ImagePlus(image.getTitle + "+corrected", IJTools.mergeRGB(dest))
-          case ReferenceColorSpace.XYZ => {
-            val converter = chart.colorConverter
-            val destDefault = (1 to 3).map(_ => new FloatProcessor(image.getWidth, image.getHeight)).toArray
-            val n = image.getWidth * image.getHeight
-            for (i <- 0 until n) {
-              val rgb = converter.xyz2RGB(dest(0).getf(i), dest(1).getf(i), dest(2).getf(i))
-              destDefault(0).setf(i, rgb.r.toFloat)
-              destDefault(1).setf(i, rgb.g.toFloat)
-              destDefault(2).setf(i, rgb.b.toFloat)
-            }
-            new ImagePlus(image.getTitle + "+corrected", IJTools.mergeRGB(destDefault))
-          }
-        }
+        map(src)
       }
       case _ => throw new IllegalArgumentException("Unsupported reference color space '" + referenceColorSpace + "'.")
     }

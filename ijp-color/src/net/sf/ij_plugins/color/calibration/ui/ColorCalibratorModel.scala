@@ -25,7 +25,7 @@ package net.sf.ij_plugins.color.calibration.ui
 import ij.gui.{Roi, PolygonRoi}
 import ij.measure.ResultsTable
 import ij.process.ColorProcessor
-import ij.{IJ, ImagePlus}
+import ij.{ImageStack, IJ, ImagePlus}
 import java.awt.{BasicStroke, Polygon, Color}
 import javafx.beans.property.ReadOnlyBooleanWrapper
 import javafx.scene.control.Dialogs
@@ -165,7 +165,7 @@ class ColorCalibratorModel(val image: ImagePlus, parentStage: Stage) {
       }
     }
 
-    val correctedImage = try {
+    val correctedBands = try {
       corrector.map(image)
     } catch {
       case t: Throwable => {
@@ -173,6 +173,36 @@ class ColorCalibratorModel(val image: ImagePlus, parentStage: Stage) {
         return
       }
     }
+
+    // Show floating point stack in the reference color space
+    val correctedInReference = {
+      val stack = new ImageStack(image.getWidth, image.getHeight)
+      (corrector.referenceColorSpace.bands zip correctedBands).foreach(v => stack.addSlice(v._1, v._2))
+      new ImagePlus(image.getTitle + "+corrected_" + referenceColorSpace(), stack)
+    }
+    correctedInReference.show()
+
+    // Convert corrected image to sRGB
+    val correctedImage: ImagePlus = referenceColorSpace() match {
+      case ReferenceColorSpace.sRGB => new ImagePlus("", IJTools.mergeRGB(correctedBands))
+      case ReferenceColorSpace.XYZ => {
+        // Convert XYZ to sRGB
+        val cp = new ColorProcessor(correctedBands(0).getWidth, correctedBands(0).getHeight)
+        val converter = corrector.chart.colorConverter
+        val n = correctedBands(0).getWidth * correctedBands(0).getHeight
+        for (i <- (0 until n).par) {
+          val rgb = converter.xyz2RGB(correctedBands(0).getf(i), correctedBands(1).getf(i), correctedBands(2).getf(i))
+          val r = clipUInt8(rgb.r)
+          val g = clipUInt8(rgb.g)
+          val b = clipUInt8(rgb.b)
+          val color = ((r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF) << 0)
+          cp.set(i, color)
+        }
+        new ImagePlus("", cp)
+      }
+      case _ => throw new IllegalArgumentException("Unsupported reference color space '" + referenceColorSpace() + "'.")
+    }
+    correctedImage.setTitle(image.getTitle + "+corrected_" + referenceColorSpace() + "+sRGB")
     correctedImage.show()
 
     if (IJ.debugMode) {
