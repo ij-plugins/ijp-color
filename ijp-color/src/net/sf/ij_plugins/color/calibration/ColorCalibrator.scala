@@ -46,6 +46,17 @@ object ColorCalibrator {
                             corrected: Array[Array[Double]],
                             mapping: CubicPolynomialTriple)
 
+  /** Create instance of ColorCalibrator */
+  def apply(chart: ColorChart,
+            referenceColorSpace: ReferenceColorSpace,
+            mappingMethod: MappingMethod.Value,
+            clipReferenceRGB: Boolean = true,
+            mapping: Option[CubicPolynomialTriple] = None): ColorCalibrator = {
+    val c = new ColorCalibrator(chart, referenceColorSpace, mappingMethod, clipReferenceRGB)
+    c.mapping = mapping
+    c
+  }
+
   /** Compute coefficients of a polynomial color mapping between the reference and observed colors.
     *
     * @param reference Desired color values.
@@ -177,7 +188,16 @@ class ColorCalibrator(val chart: ColorChart,
 
   private var _mapping: Option[CubicPolynomialTriple] = None
 
+  /** Color calibration mapping to a standard color space indicated by `referenceColorSpace`.
+    *
+    * It is computed by `computeCalibrationMapping` methods.
+    */
   def mapping: Option[CubicPolynomialTriple] = _mapping
+
+  def mapping_=(m: Option[CubicPolynomialTriple]) {
+    require(m != null)
+    _mapping = m
+  }
 
   /** Estimate calibration coefficient. This method does not clip reference color values.
     *
