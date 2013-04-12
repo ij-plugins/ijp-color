@@ -64,5 +64,6 @@ package object util {
     * Values less than 0 will be set to 0.
     * Values greater than 255 will be set to 255.
     */
+  @inline
   def clipUInt8(v: Double): Int = math.max(math.min(math.round(v).toInt, 255), 0)
 }
