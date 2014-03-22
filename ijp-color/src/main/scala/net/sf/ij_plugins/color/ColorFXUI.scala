@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2013 Jarek Sacha
+ * Copyright (C) 2002-2014 Jarek Sacha
  * Author's email: jsacha at users dot sourceforge dot net
  *
  * This library is free software; you can redistribute it and/or
@@ -38,7 +38,6 @@ object ColorFXUI {
    * Returns empty string if stylesheet is not present.
    */
   def stylesheets: Seq[String] = List(
-    "modena.css",
     "ijp-color.css"
   ).flatMap(check(_).map(_.toExternalForm))
 

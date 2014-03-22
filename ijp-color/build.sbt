@@ -8,11 +8,9 @@ organization := "ij-plugins.sf.net"
 
 version := "0.5.0-SNAPSHOT"
 
-crossScalaVersions := Seq("2.10.3", "2.9.3")
+crossScalaVersions := Seq("2.10.3")
 
 scalaVersion := crossScalaVersions.value.head
-
-unmanagedJars in Compile += Attributed.blank(file(scala.util.Properties.javaHome) / "lib" / "jfxrt.jar")
 
 // append -deprecation to the options passed to the Scala compiler
 scalacOptions ++= Seq("-unchecked", "-deprecation", "-optimize", "-Xlint")
@@ -24,30 +22,15 @@ resolvers ++= Seq(
 )
 
 libraryDependencies ++= Seq(
-  "org.scalafx" %% "scalafx" % "1.0.0-M7",
-  "net.imagej" % "ij" % "1.47v",
+  "net.imagej"         % "ij"            % "1.47v",
   "org.apache.commons" % "commons-math3" % "3.2",
-  "org.jfxtras" % "jfxtras-labs" % "2.2-r5"
+  "org.controlsfx"     % "controlsfx"    % "8.0.5",
+  "org.jfxtras"        % "jfxtras-labs"  % "8.0-r1",
+  "org.scalafx"       %% "scalafx"       % "8.0.0-R4"
 )
 
 // Test dependencies
-libraryDependencies += "org.scalatest" %% "scalatest" % "1.9.2" % "test"
-
-//
-// Optimize loops using ScalaCL compiler plugin
-//
-resolvers += "NativeLibs4Java Repository" at "http://nativelibs4java.sourceforge.net/maven/"
-
-autoCompilerPlugins := true
-
-//addCompilerPlugin("com.nativelibs4java" % "scalacl-compiler-plugin" % "0.2")
-
-libraryDependencies ++= {
-  if (scalaVersion.value.startsWith("2.9."))
-    Seq(compilerPlugin("com.nativelibs4java" % "scalacl-compiler-plugin" % "0.2"))
-  else
-    Seq.empty
-}
+libraryDependencies += "org.scalatest" %% "scalatest" % "2.1.0" % "test"
 
 // Fork a new JVM for 'run' and 'test:run'
 fork := true

@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2013 Jarek Sacha
+ * Copyright (C) 2002-2014 Jarek Sacha
  * Author's email: jsacha at users dot sourceforge dot net
  *
  * This library is free software; you can redistribute it and/or
@@ -23,7 +23,7 @@
 package net.sf.ij_plugins.color.calibration.ui
 
 import javafx.scene.{layout => jfxsl}
-import jfxtras.labs.scene.control.ListSpinner
+import jfxtras.scene.control.ListSpinner
 import net.sf.ij_plugins.color.calibration.chart.{ReferenceColorSpace, GridColorChart, ColorCharts}
 import scalafx.Includes._
 import scalafx.collections.ObservableBuffer
@@ -107,7 +107,7 @@ class ColorCalibratorView(model: ColorCalibratorModel) extends jfxsl.StackPane {
     val marginsListSpinner = new ListSpinner[Int](0, 49)
     marginsListSpinner.valueProperty() = model.chipMarginPercent()
     marginsListSpinner.valueProperty <==> model.chipMarginPercent
-    marginsListSpinner.arrowDirectionProperty().set(ListSpinner.ArrowDirection.VERTICAL)
+//    marginsListSpinner.arrowDirectionProperty().set(ListSpinner.ArrowDirection.VERTICAL)
     gp.addRow(row,
       new Label("Chip margin %") {
         id = "ijp-label"

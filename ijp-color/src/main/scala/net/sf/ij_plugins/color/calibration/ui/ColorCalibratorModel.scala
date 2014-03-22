@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2013 Jarek Sacha
+ * Copyright (C) 2002-2014 Jarek Sacha
  * Author's email: jsacha at users dot sourceforge dot net
  *
  * This library is free software; you can redistribute it and/or
@@ -28,7 +28,6 @@ import ij.process.{FloatProcessor, ColorProcessor}
 import ij.{ImageStack, IJ, ImagePlus}
 import java.awt.{BasicStroke, Polygon, Color}
 import javafx.beans.property.ReadOnlyBooleanWrapper
-import javafx.scene.control.Dialogs
 import javafx.scene.{chart => jfxsc}
 import net.sf.ij_plugins.color.calibration.chart.{ReferenceColorSpace, ColorCharts}
 import net.sf.ij_plugins.color.calibration.regression.MappingMethod
@@ -38,6 +37,7 @@ import net.sf.ij_plugins.color.converter.ColorTriple.Lab
 import net.sf.ij_plugins.color.{DeltaE, ColorFXUI}
 import net.sf.ij_plugins.util._
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
+import org.controlsfx.dialog.Dialogs
 import scalafx.Includes._
 import scalafx.beans.property._
 import scalafx.collections.ObservableBuffer
@@ -457,12 +457,21 @@ class ColorCalibratorModel(val image: ImagePlus, parentStage: Stage) {
   }
 
   private def showError(summary: String, message: String, t: Throwable) {
-    if (t != null) t.printStackTrace()
-    Dialogs.showErrorDialog(parentStage, message, summary, "Error", t)
+    Dialogs.create().
+      owner(parentStage.delegate).
+      title("Error").
+      masthead(summary).
+      message(message).
+      showException(t)
   }
 
   private def showError(summary: String, message: String) {
-    showError(summary, message, null)
+    Dialogs.create().
+      owner(parentStage.delegate).
+      title("Error").
+      masthead(summary).
+      message(message).
+      showError()
   }
 
 }
