@@ -6,7 +6,7 @@ name := "ijp-color"
 
 organization := "ij-plugins.sf.net"
 
-version := "0.4.0"
+version := "0.5.0-SNAPSHOT"
 
 crossScalaVersions := Seq("2.10.3", "2.9.3")
 
