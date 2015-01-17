@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2014 Jarek Sacha
+ * Copyright (C) 2002-2015 Jarek Sacha
  * Author's email: jsacha at users dot sourceforge dot net
  *
  * This library is free software; you can redistribute it and/or
@@ -23,17 +23,19 @@
 package net.sf.ij_plugins.color.calibration.ui
 
 import javafx.scene.{layout => jfxsl}
+
 import jfxtras.scene.control.ListSpinner
-import net.sf.ij_plugins.color.calibration.chart.{ReferenceColorSpace, GridColorChart, ColorCharts}
+import net.sf.ij_plugins.color.calibration.chart.{ColorCharts, GridColorChart, ReferenceColorSpace}
+import net.sf.ij_plugins.color.calibration.regression.MappingMethod
+
 import scalafx.Includes._
 import scalafx.collections.ObservableBuffer
 import scalafx.event.ActionEvent
 import scalafx.geometry.{Insets, Pos}
 import scalafx.scene.control.Label._
 import scalafx.scene.control._
-import scalafx.scene.layout.{Priority, HBox, GridPane}
-import scalafx.scene.text.{FontWeight, Font}
-import net.sf.ij_plugins.color.calibration.regression.MappingMethod
+import scalafx.scene.layout.{GridPane, HBox, Priority}
+import scalafx.scene.text.{Font, FontWeight}
 
 class ColorCalibratorView(model: ColorCalibratorModel) extends jfxsl.StackPane {
 
@@ -59,11 +61,11 @@ class ColorCalibratorView(model: ColorCalibratorModel) extends jfxsl.StackPane {
     //
     val imageTitleLabel = new Label() {
       id = "ijp-image-title"
-      hgrow = Priority.ALWAYS
+      hgrow = Priority.Always
       maxWidth = Double.MaxValue
       text <== model.imageTitle
-      alignment = Pos.CENTER
-      alignmentInParent = Pos.CENTER
+      alignment = Pos.Center
+      alignmentInParent = Pos.Center
     }
     gp.add(imageTitleLabel, 0, row, GridPane.REMAINING, 1)
     row += 1
@@ -91,7 +93,7 @@ class ColorCalibratorView(model: ColorCalibratorModel) extends jfxsl.StackPane {
     gp.addRow(row,
       new Label("Type") {
         id = "ijp-label"
-        alignmentInParent = Pos.CENTER_RIGHT
+        alignmentInParent = Pos.CenterRight
       },
       chartTypeChoiceBox,
       renderReferenceChartSplitButton
@@ -111,7 +113,7 @@ class ColorCalibratorView(model: ColorCalibratorModel) extends jfxsl.StackPane {
     gp.addRow(row,
       new Label("Chip margin %") {
         id = "ijp-label"
-        alignmentInParent = Pos.CENTER_RIGHT
+        alignmentInParent = Pos.CenterRight
       },
       marginsListSpinner
     )
@@ -121,7 +123,7 @@ class ColorCalibratorView(model: ColorCalibratorModel) extends jfxsl.StackPane {
       id = "ijp-button"
       text = "Load location from ROI"
       onAction = (ae: ActionEvent) => {model.onLoadLocationFromROI()}
-      alignmentInParent = Pos.CENTER
+      alignmentInParent = Pos.Center
     }
     gp.add(importROIButton, 0, row, GridPane.REMAINING, 1)
     row += 1
@@ -138,7 +140,7 @@ class ColorCalibratorView(model: ColorCalibratorModel) extends jfxsl.StackPane {
     gp.addRow(row,
       new Label("Reference") {
         id = "ijp-label"
-        alignmentInParent = Pos.CENTER_RIGHT
+        alignmentInParent = Pos.CenterRight
         tooltip = Tooltip("Reference color space")
       },
       referenceColorSpaceChoiceBox,
@@ -157,7 +159,7 @@ class ColorCalibratorView(model: ColorCalibratorModel) extends jfxsl.StackPane {
     gp.addRow(row,
       new Label("Mapping method") {
         id = "ijp-label"
-        alignmentInParent = Pos.CENTER_RIGHT
+        alignmentInParent = Pos.CenterRight
       },
       mappingMethodChoiceBox,
       suggestCalibrationOptionsButton
@@ -172,10 +174,10 @@ class ColorCalibratorView(model: ColorCalibratorModel) extends jfxsl.StackPane {
       disable <== !model.chipValuesObserved
     }
     gp.add(calibrateButton, 0, row, GridPane.REMAINING, 1)
-    calibrateButton.alignmentInParent = Pos.CENTER
+    calibrateButton.alignmentInParent = Pos.Center
     calibrateButton.font = {
       val f = calibrateButton.font()
-      Font.font(f.family, FontWeight.BOLD, f.size)
+      Font.font(f.family, FontWeight.Bold, f.size)
     }
     row += 1
 
@@ -194,8 +196,8 @@ class ColorCalibratorView(model: ColorCalibratorModel) extends jfxsl.StackPane {
         new Separator {
           id = "ijp-separator"
           margin = Insets(10, 0, 5, 10)
-          hgrow = Priority.ALWAYS
-          alignment = Pos.TOP_CENTER
+          hgrow = Priority.Always
+          alignment = Pos.TopCenter
         }
       )
     }

@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2013 Jarek Sacha
+ * Copyright (C) 2002-2015 Jarek Sacha
  * Author's email: jsacha at users dot sourceforge dot net
  *
  * This library is free software; you can redistribute it and/or
@@ -23,8 +23,10 @@
 package net.sf.ij_plugins.color.converter.ui
 
 import java.text.DecimalFormat
+
 import net.sf.ij_plugins.color.converter.ColorTriple
 import net.sf.ij_plugins.color.converter.ColorTriple.Color123
+
 import scalafx.Includes._
 import scalafx.beans.property.ObjectProperty
 import scalafx.geometry.Pos
@@ -42,7 +44,7 @@ class ColorValueUI {
   private var updating = false
 
   allBands.foreach(_.prefColumnCount = 6)
-  allBands.foreach(_.setAlignment(Pos.CENTER_RIGHT))
+  allBands.foreach(_.setAlignment(Pos.CenterRight))
   allBands.foreach(_.numberProperty().onChange(updateColor()))
 
   val color = new ObjectProperty[ColorTriple](this, "color", new Color123())

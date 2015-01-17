@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2013 Jarek Sacha
+ * Copyright (C) 2002-2015 Jarek Sacha
  * Author's email: jsacha at users dot sourceforge dot net
  *
  * This library is free software; you can redistribute it and/or
@@ -23,7 +23,8 @@
 package net.sf.ij_plugins.util
 
 import org.scalatest.FlatSpec
-import org.scalatest.matchers.ShouldMatchers._
+import org.scalatest.Matchers._
+
 import scalafx.geometry.Point2D
 
 class PerspectiveTransformTest extends FlatSpec {
@@ -48,7 +49,7 @@ class PerspectiveTransformTest extends FlatSpec {
     val alignmentTransform = PerspectiveTransform.quadToQuad(referenceQuad, deformedQuad)
     val pm = alignmentTransform.transform(new Point2D(3, 2))
 
-    pm.x should be(317.07786 plusOrMinus 0.00001)
-    pm.y should be(199.30959 plusOrMinus 0.00001)
+    pm.x should be(317.07786 +- 0.00001)
+    pm.y should be(199.30959 +- 0.00001)
   }
 }

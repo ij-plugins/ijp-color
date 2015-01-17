@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2013 Jarek Sacha
+ * Copyright (C) 2002-2015 Jarek Sacha
  * Author's email: jsacha at users dot sourceforge dot net
  *
  * This library is free software; you can redistribute it and/or
@@ -22,10 +22,10 @@
 
 package net.sf.ij_plugins.color.converter
 
-import net.sf.ij_plugins.color.converter.ColorTriple.{RGB, XYZ, Lab}
+import net.sf.ij_plugins.color.converter.ColorTriple.{Lab, RGB, XYZ}
 import net.sf.ij_plugins.color.converter.RGBWorkingSpace.AdobeRGB1998
 import org.scalatest.FlatSpec
-import org.scalatest.matchers.ShouldMatchers._
+import org.scalatest.Matchers._
 
 /**
  * @author Jarek Sacha
@@ -84,9 +84,9 @@ class ColorConverterTest extends FlatSpec {
 
     val rgb = RGB(178 / 255d, 217 / 255d, 18 / 255d)
     val lab = converter.toLab(rgb)
-    lab.l should be(80.4570 plusOrMinus 0.0001)
-    lab.a should be(-45.3046 plusOrMinus 0.0001)
-    lab.b should be(80.6919 plusOrMinus 0.0001)
+    lab.l should be(80.4570 +- 0.0001)
+    lab.a should be(-45.3046 +- 0.0001)
+    lab.b should be(80.6919 +- 0.0001)
   }
 
   it should "convert L*a*b* to RGB" in {
@@ -94,9 +94,9 @@ class ColorConverterTest extends FlatSpec {
 
     val lab = Lab(80.4570, -45.3046, 80.6919)
     val rgb = converter.toRGB(lab)
-    rgb.r should be(178.0 plusOrMinus 0.0001)
-    rgb.g should be(217.0 plusOrMinus 0.0001)
-    rgb.b should be(18.0 plusOrMinus 0.0001)
+    rgb.r should be(178.0 +- 0.0001)
+    rgb.g should be(217.0 +- 0.0001)
+    rgb.b should be(18.0 +- 0.0001)
   }
 
 
@@ -105,9 +105,9 @@ class ColorConverterTest extends FlatSpec {
 
     val rgb = RGB(178 / 255d, 217 / 255d, 18 / 255d)
     val xyz = converter.rgbToXYZ(rgb.r, rgb.g, rgb.b)
-    xyz.x should be(0.392179 plusOrMinus 0.00001)
-    xyz.y should be(0.574946 plusOrMinus 0.00001)
-    xyz.z should be(0.064729 plusOrMinus 0.00001)
+    xyz.x should be(0.392179 +- 0.00001)
+    xyz.y should be(0.574946 +- 0.00001)
+    xyz.z should be(0.064729 +- 0.00001)
   }
 
   it should "convert (RGB) to XYZ" in {
@@ -115,9 +115,9 @@ class ColorConverterTest extends FlatSpec {
 
     val rgb = RGB(178 / 255d, 217 / 255d, 18 / 255d)
     val xyz = converter.toXYZ(rgb)
-    xyz.x should be(0.392179 plusOrMinus 0.00001)
-    xyz.y should be(0.574946 plusOrMinus 0.00001)
-    xyz.z should be(0.064729 plusOrMinus 0.00001)
+    xyz.x should be(0.392179 +- 0.00001)
+    xyz.y should be(0.574946 +- 0.00001)
+    xyz.z should be(0.064729 +- 0.00001)
   }
 
 
@@ -127,9 +127,9 @@ class ColorConverterTest extends FlatSpec {
 
     val rgb = RGB(178 / 255d, 217 / 255d, 18 / 255d)
     val xyz = converter.rgbToXYZ(rgb.r, rgb.g, rgb.b)
-    xyz.x should be(0.392179 * xyzScale plusOrMinus 0.00001 * xyzScale)
-    xyz.y should be(0.574946 * xyzScale plusOrMinus 0.00001 * xyzScale)
-    xyz.z should be(0.064729 * xyzScale plusOrMinus 0.00001 * xyzScale)
+    xyz.x should be(0.392179 * xyzScale +- 0.00001 * xyzScale)
+    xyz.y should be(0.574946 * xyzScale +- 0.00001 * xyzScale)
+    xyz.z should be(0.064729 * xyzScale +- 0.00001 * xyzScale)
   }
 
 
@@ -138,9 +138,9 @@ class ColorConverterTest extends FlatSpec {
 
     val rgb = RGB(178, 217, 18)
     val xyz = converter.rgbToXYZ(rgb.r, rgb.g, rgb.b)
-    xyz.x should be(0.392179 plusOrMinus 0.00001)
-    xyz.y should be(0.574946 plusOrMinus 0.00001)
-    xyz.z should be(0.064729 plusOrMinus 0.00001)
+    xyz.x should be(0.392179 +- 0.00001)
+    xyz.y should be(0.574946 +- 0.00001)
+    xyz.z should be(0.064729 +- 0.00001)
   }
 
 
@@ -152,9 +152,9 @@ class ColorConverterTest extends FlatSpec {
 
     val rgb = RGB(178, 217, 18)
     val xyz = converter.rgbToXYZ(rgb.r, rgb.g, rgb.b)
-    xyz.x should be(0.420844 plusOrMinus 0.00001)
-    xyz.y should be(0.579957 plusOrMinus 0.00001)
-    xyz.z should be(0.053712 plusOrMinus 0.00001)
+    xyz.x should be(0.420844 +- 0.00001)
+    xyz.y should be(0.579957 +- 0.00001)
+    xyz.z should be(0.053712 +- 0.00001)
   }
 
   it should "convert XYZ to L*a*b*" in {
@@ -164,9 +164,9 @@ class ColorConverterTest extends FlatSpec {
       val xyz = xyzColorChecker(i)
       val expectedLab = labColorChecker(i)
       val actualLab = converter.toLab(xyz)
-      actualLab.l should be(expectedLab.l plusOrMinus 0.001)
-      actualLab.a should be(expectedLab.a plusOrMinus 0.001)
-      actualLab.b should be(expectedLab.b plusOrMinus 0.001)
+      actualLab.l should be(expectedLab.l +- 0.001)
+      actualLab.a should be(expectedLab.a +- 0.001)
+      actualLab.b should be(expectedLab.b +- 0.001)
     }
   }
 }

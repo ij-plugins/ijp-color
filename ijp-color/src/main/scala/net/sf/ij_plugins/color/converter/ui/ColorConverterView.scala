@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2013 Jarek Sacha
+ * Copyright (C) 2002-2015 Jarek Sacha
  * Author's email: jsacha at users dot sourceforge dot net
  *
  * This library is free software; you can redistribute it and/or
@@ -23,15 +23,17 @@
 package net.sf.ij_plugins.color.converter.ui
 
 import javafx.beans.{binding => jfxbb}
+
 import net.sf.ij_plugins.color.converter._
 import net.sf.ij_plugins.color.converter.ui.ColorConverterModel.Update
+
 import scalafx.Includes._
 import scalafx.beans.property.ObjectProperty
 import scalafx.collections.ObservableBuffer
 import scalafx.event.ActionEvent
-import scalafx.geometry.{Pos, Insets}
+import scalafx.geometry.{Insets, Pos}
 import scalafx.scene.Node
-import scalafx.scene.control.{ChoiceBox, Label, Button}
+import scalafx.scene.control.{Button, ChoiceBox, Label}
 import scalafx.scene.layout.GridPane
 import scalafx.util.StringConverter
 
@@ -108,8 +110,8 @@ class ColorConverterView(val model: ColorConverterModel) {
         new Label {
           id = "ijp-label"
           text = label
-          alignment = Pos.CENTER_RIGHT
-          alignmentInParent = Pos.CENTER_RIGHT
+          alignment = Pos.CenterRight
+          alignmentInParent = Pos.CenterRight
         },
         0, row
       )
@@ -135,7 +137,7 @@ class ColorConverterView(val model: ColorConverterModel) {
     gp.add(new Label {
       id = "ijp-label"
       text = "Gamma"
-      alignment = Pos.CENTER_RIGHT
+      alignment = Pos.CenterRight
     }, 2, row)
     gp.add(
       new Label {
@@ -149,7 +151,7 @@ class ColorConverterView(val model: ColorConverterModel) {
             case _ => "L*"
           }
         }
-        alignment = Pos.CENTER_LEFT
+        alignment = Pos.CenterLeft
       },
       3, row
     )
@@ -158,12 +160,10 @@ class ColorConverterView(val model: ColorConverterModel) {
     addChoiceBox(row, "Adaptation", model.chromaticAdaptation,
       None :: ChromaticAdaptation.values.map(Some(_)).toList,
       Some(
-        StringConverter.toStringConverter[Option[ChromaticAdaptation]](
-          (v: Option[ChromaticAdaptation]) => v match {
-            case Some(o) => o.toString
-            case None => "None"
-          }
-        )
+        StringConverter.toStringConverter[Option[ChromaticAdaptation]] {
+          case Some(o) => o.toString
+          case None    => "None"
+        }
       )
     )
     row += 1
