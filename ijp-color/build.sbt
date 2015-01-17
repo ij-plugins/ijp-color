@@ -4,7 +4,8 @@ organization := "ij-plugins.sf.net"
 
 version := "0.5.0-SNAPSHOT"
 
-crossScalaVersions := Seq("2.10.4")
+crossScalaVersions := Seq("2.11.5", "2.10.4")
+scalaVersion <<= crossScalaVersions { versions => versions.head}
 
 scalaVersion := crossScalaVersions.value.head
 

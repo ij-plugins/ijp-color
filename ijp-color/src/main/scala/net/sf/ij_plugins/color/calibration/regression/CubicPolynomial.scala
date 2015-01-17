@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2013 Jarek Sacha
+ * Copyright (C) 2002-2015 Jarek Sacha
  * Author's email: jsacha at users dot sourceforge dot net
  *
  * This library is free software; you can redistribute it and/or
@@ -51,7 +51,7 @@ case class CubicPolynomial(intercept: Double = .0,
     *
     * @param coeff coefficient array.
     */
-  def this(coeff: Array[Double], regressionResult: Option[Regression.Result] = None) {
+  def this(coeff: Array[Double], regressionResult: Option[Regression.Result]) {
     this(coeff(0), coeff(1), coeff(2), coeff(3), coeff(4), coeff(5), coeff(6),
       coeff(7), coeff(8), coeff(9), coeff(10), coeff(11), coeff(12), coeff(13), regressionResult
     )
@@ -83,19 +83,19 @@ case class CubicPolynomial(intercept: Double = .0,
   /** Map of the coefficient where values are coefficient names, same as in the constructor. */
   def toMap: scala.collection.mutable.LinkedHashMap[String, Double] =
     scala.collection.mutable.LinkedHashMap[String, Double](
-      ("intercept" -> intercept),
-      ("a" -> a),
-      ("b" -> b),
-      ("c" -> c),
-      ("aa" -> aa),
-      ("ab" -> ab),
-      ("ac" -> ac),
-      ("bb" -> bb),
-      ("bc" -> bc),
-      ("cc" -> cc),
-      ("aaa" -> aaa),
-      ("abc" -> abc),
-      ("bbb" -> bbb),
-      ("ccc" -> ccc)
+      "intercept" -> intercept,
+      "a" -> a,
+      "b" -> b,
+      "c" -> c,
+      "aa" -> aa,
+      "ab" -> ab,
+      "ac" -> ac,
+      "bb" -> bb,
+      "bc" -> bc,
+      "cc" -> cc,
+      "aaa" -> aaa,
+      "abc" -> abc,
+      "bbb" -> bbb,
+      "ccc" -> ccc
     )
 }
