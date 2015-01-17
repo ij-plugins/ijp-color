@@ -1,14 +1,10 @@
-// sbt-imagej configuration keys
-
-import ImageJKeys._
-
 name := "ijp-color"
 
 organization := "ij-plugins.sf.net"
 
 version := "0.5.0-SNAPSHOT"
 
-crossScalaVersions := Seq("2.10.3")
+crossScalaVersions := Seq("2.10.4")
 
 scalaVersion := crossScalaVersions.value.head
 
@@ -22,15 +18,15 @@ resolvers ++= Seq(
 )
 
 libraryDependencies ++= Seq(
-  "net.imagej"         % "ij"            % "1.47v",
-  "org.apache.commons" % "commons-math3" % "3.2",
-  "org.controlsfx"     % "controlsfx"    % "8.0.5",
-  "org.jfxtras"        % "jfxtras-labs"  % "8.0-r1",
-  "org.scalafx"       %% "scalafx"       % "8.0.0-R4"
+  "net.imagej"         % "ij"            % "1.48v",
+  "org.apache.commons" % "commons-math3" % "3.4.1",
+  "org.controlsfx"     % "controlsfx"    % "8.20.8",
+  "org.jfxtras"        % "jfxtras-labs"  % "8.0-r3",
+  "org.scalafx"       %% "scalafx"       % "8.0.20-R6"
 )
 
 // Test dependencies
-libraryDependencies += "org.scalatest" %% "scalatest" % "2.1.0" % "test"
+libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.3" % "test"
 
 // Fork a new JVM for 'run' and 'test:run'
 fork := true
@@ -50,13 +46,10 @@ javaOptions += "-Xmx1G"
 // Set the prompt (for this build) to include the project id.
 shellPrompt in ThisBuild := { state => "sbt:" + Project.extract(state).currentRef.project + "> "}
 
-// sbt-imagej plugin
-ijSettings
-
+// Enable and customize `sbt-imagej` plugin
+enablePlugins(SbtImageJ)
 ijRuntimeSubDir := "sandbox"
-
 ijPluginsSubDir := "ij-plugins"
-
-ijExclusions += """nativelibs4java\S*"""
-
+ijCleanBeforePrepareRun := true
+// Instruct `clean` to delete created plugins subdirectory created by `ijRun`/`ijPrepareRun`.
 cleanFiles += ijPluginsDir.value
