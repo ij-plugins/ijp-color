@@ -22,14 +22,15 @@
 
 package net.sf.ij_plugins.color.converter
 
-import net.sf.ij_plugins.color.converter.ColorTriple.{RGB, Lab, XYZ}
+import net.sf.ij_plugins.color.converter.ColorTriple.{Lab, RGB, XYZ}
+
 import scala.math.pow
 
 /** Color conversion constants */
 object ColorConverter {
 
-  val kE  = 216.0 / 24389.0
-  val kK  = 24389.0 / 27.0
+  val kE = 216.0 / 24389.0
+  val kK = 24389.0 / 27.0
   val kKE = 8.0
 }
 
@@ -220,22 +221,19 @@ final class ColorConverter(val refWhite: ReferenceWhite = ReferenceWhite.D65,
 
   private def compand(linear: Double): Double = {
     rgbSpace match {
-      case RGBWorkingSpace.sRGB => {
+      case RGBWorkingSpace.sRGB =>
         assert(rgbSpace.gamma < 0)
         val (l, sign) = if (linear < 0.0) (-linear, -1.0) else (linear, 1.0)
         val c = if (l <= 0.0031308) l * 12.92 else 1.055 * math.pow(l, 1.0 / 2.4) - 0.055
         c * sign
-      }
-      case RGBWorkingSpace.ECIRGBv2 => {
+      case RGBWorkingSpace.ECIRGBv2 =>
         assert(rgbSpace.gamma == 0)
         val (l, sign) = if (linear < 0.0) (-linear, -1.0) else (linear, 1.0)
         val c = if (l <= (216.0 / 24389.0)) l * 24389.0 / 2700.0 else 1.16 * math.pow(l, 1.0 / 3.0) - 0.16
         c * sign
-      }
-      case _ => {
+      case _ =>
         assert(rgbSpace.gamma > 0)
         if (linear >= 0.0) math.pow(linear, 1.0 / rgbSpace.gamma) else -math.pow(-linear, 1.0 / rgbSpace.gamma)
-      }
     }
   }
 

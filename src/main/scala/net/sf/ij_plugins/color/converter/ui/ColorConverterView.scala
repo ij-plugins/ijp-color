@@ -41,9 +41,9 @@ import scalafx.util.StringConverter
 class ColorConverterView(val model: ColorConverterModel) {
 
   private val nbColumns = 5
-  private val xyzUI     = new ColorValueUI()
-  private val labUI     = new ColorValueUI()
-  private val rgbUI     = new ColorValueUI()
+  private val xyzUI = new ColorValueUI()
+  private val labUI = new ColorValueUI()
+  private val rgbUI = new ColorValueUI()
 
   lazy val pane = createGidPane()
 
@@ -87,7 +87,7 @@ class ColorConverterView(val model: ColorConverterModel) {
 
     def addColorUI(row: Int, n1: Node, n2: Node, xLabel: Option[String] = None) {
       gp.add(n1, 0, row, 1, 1)
-      if (None == xLabel) {
+      if (xLabel.isEmpty) {
         gp.add(n2, 1, row, nbColumns - 1, 1)
       } else {
         gp.add(n2, 1, row, nbColumns - 2, 1)
@@ -146,8 +146,8 @@ class ColorConverterView(val model: ColorConverterModel) {
           super.bind(model.rgbWorkingSpace)
 
           protected def computeValue(): String = model.rgbWorkingSpace().gamma match {
-            case g if (g > 0) => model.rgbWorkingSpace().gamma.toString
-            case g if (g < 0) => "sRGB"
+            case g if g > 0 => model.rgbWorkingSpace().gamma.toString
+            case g if g < 0 => "sRGB"
             case _ => "L*"
           }
         }
@@ -158,11 +158,11 @@ class ColorConverterView(val model: ColorConverterModel) {
     row += 1
 
     addChoiceBox(row, "Adaptation", model.chromaticAdaptation,
-      None :: ChromaticAdaptation.values.map(Some(_)).toList,
+      None :: ChromaticAdaptation.values.map(Some(_)),
       Some(
         StringConverter.toStringConverter[Option[ChromaticAdaptation]] {
           case Some(o) => o.toString
-          case None    => "None"
+          case None => "None"
         }
       )
     )

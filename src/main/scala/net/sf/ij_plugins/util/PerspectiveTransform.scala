@@ -22,7 +22,7 @@
 
 package net.sf.ij_plugins.util
 
-import java.awt.geom.{AffineTransform, Point2D, NoninvertibleTransformException}
+import java.awt.geom.{AffineTransform, NoninvertibleTransformException, Point2D}
 
 /** Factory methods for creating projective transforms. */
 object PerspectiveTransform {
@@ -344,7 +344,7 @@ final class PerspectiveTransform(val m00: Double = 1, val m01: Double = 0, val m
 
   /** Returns the determinant of the matrix representation of the transform. */
   def getDeterminant: Double = {
-    ((m00 * ((m11 * m22) - (m12 * m21))) - (m01 * ((m10 * m22) - (m12 * m20))) + (m02 * ((m10 * m21) - (m11 * m20))))
+    (m00 * ((m11 * m22) - (m12 * m21))) - (m01 * ((m10 * m22) - (m12 * m20))) + (m02 * ((m10 * m21) - (m11 * m20)))
   }
 
   /** Retrieves the 9 specifiable values in the 3x3 affine transformation matrix into a 2-dimensional array of double
@@ -665,25 +665,26 @@ final class PerspectiveTransform(val m00: Double = 1, val m01: Double = 0, val m
 
   override def toString: String = {
     "Perspective transform matrix\n" +
-        m00 + "\t" + m01 + "\t" + m02 + "\n" +
-        m10 + "\t" + m11 + "\t" + m12 + "\n" +
-        m20 + "\t" + m21 + "\t" + m22 + "\n"
+      m00 + "\t" + m01 + "\t" + m02 + "\n" +
+      m10 + "\t" + m11 + "\t" + m12 + "\n" +
+      m20 + "\t" + m21 + "\t" + m22 + "\n"
   }
 
   /** Returns `true` if this is an identity transform, `false` otherwise. */
   def isIdentity: Boolean = {
     m01 == 0.0 && m02 == 0.0 && m10 == 0.0 && m12 == 0.0 && m20 == 0.0 && m21 == 0.0 && m22 != 0.0 &&
-        m00 / m22 == 1.0 && m11 / m22 == 1.0
+      m00 / m22 == 1.0 && m11 / m22 == 1.0
   }
 
   override def equals(obj: Any): Boolean = {
-    if (!(obj.isInstanceOf[PerspectiveTransform])) {
+    if (!obj.isInstanceOf[PerspectiveTransform]) {
       return false
     }
     val a = obj.asInstanceOf[PerspectiveTransform]
-    ((m00 == a.m00) && (m10 == a.m10) && (m20 == a.m20) &&
-        (m01 == a.m01) && (m11 == a.m11) && (m21 == a.m21) &&
-        (m02 == a.m02) && (m12 == a.m12) && (m22 == a.m22))
+
+    (m00 == a.m00) && (m10 == a.m10) && (m20 == a.m20) &&
+      (m01 == a.m01) && (m11 == a.m11) && (m21 == a.m21) &&
+      (m02 == a.m02) && (m12 == a.m12) && (m22 == a.m22)
   }
 
   override def hashCode(): Int = (m00 + m01 + m02 + m10 + m11 + m12 + m20 + m21 + m22).hashCode()

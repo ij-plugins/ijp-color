@@ -22,12 +22,14 @@
 
 package net.sf.ij_plugins.color.calibration.ui
 
-import ij.ImagePlus.{COLOR_RGB, GRAY8, GRAY16, GRAY32}
-import ij.plugin.PlugIn
-import ij.{ImageListener, ImagePlus, IJ}
 import javafx.embed.swing.JFXPanel
+
+import ij.ImagePlus.{COLOR_RGB, GRAY16, GRAY32, GRAY8}
+import ij.plugin.PlugIn
+import ij.{IJ, ImageListener, ImagePlus}
 import net.sf.ij_plugins.color.ColorFXUI
 import net.sf.ij_plugins.util.IJTools
+
 import scalafx.Includes._
 import scalafx.application.Platform
 import scalafx.scene.Scene
@@ -87,11 +89,11 @@ class ColorCalibratorPlugin extends PlugIn {
   def setupImageListener() {
     ImagePlus.addImageListener(new ImageListener {
       def imageUpdated(imp: ImagePlus) {
-        if (image.exists(_ == imp)) {handleImageUpdated()}
+        if (image.contains(imp)) {handleImageUpdated()}
       }
 
       def imageClosed(imp: ImagePlus) {
-        if (image.exists(_ == imp)) {handleImageClosed()}
+        if (image.contains(imp)) {handleImageClosed()}
       }
 
       def imageOpened(imp: ImagePlus) {}

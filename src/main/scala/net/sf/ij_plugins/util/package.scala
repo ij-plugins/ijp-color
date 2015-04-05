@@ -36,7 +36,7 @@ package object util {
     assert(b != null)
     assert(a.length == b.length)
     var sum: Double = 0
-    for (i <- 0 until a.length) {
+    for (i <- a.indices) {
       val d = a(i) - b(i)
       sum += d * d
     }
@@ -52,7 +52,7 @@ package object util {
   def clipUInt8(a: Array[Double]): Array[Int] = {
     assert(a != null)
     val r = new Array[Int](a.length)
-    for (i <- 0 until a.length) {
+    for (i <- a.indices) {
       r(i) = clipUInt8(a(i))
     }
     r
@@ -67,7 +67,7 @@ package object util {
   def clipUInt8D(a: Array[Double]): Array[Double] = {
     assert(a != null)
     val r = new Array[Double](a.length)
-    for (i <- 0 until a.length) {
+    for (i <- a.indices) {
       r(i) = clipUInt8D(a(i))
     }
     r

@@ -22,9 +22,10 @@
 
 package net.sf.ij_plugins.util
 
-import ij.gui.{Roi, PolygonRoi}
-import ij.process.{ImageProcessor, FloatProcessor, ColorProcessor, ByteProcessor}
+import ij.gui.{PolygonRoi, Roi}
+import ij.process.{ByteProcessor, ColorProcessor, FloatProcessor, ImageProcessor}
 import ij.{IJ, ImageJ}
+
 import scalafx.geometry.Point2D
 import scalafx.scene.image.Image
 
@@ -108,7 +109,7 @@ object IJTools {
     } else {
       val srcBps: Array[ByteProcessor] = splitRGB(src.asInstanceOf[ColorProcessor])
       val destFps: Array[FloatProcessor] = new Array[FloatProcessor](3)
-      for (i <- 0 until srcBps.length) {
+      for (i <- srcBps.indices) {
         destFps(i) = srcBps(i).convertToFloat.asInstanceOf[FloatProcessor]
         srcBps(i) = null
       }
@@ -120,7 +121,7 @@ object IJTools {
     val x = new Array[Float](outline.length)
     val y = new Array[Float](outline.length)
 
-    for (i <- 0 until outline.length) {
+    for (i <- outline.indices) {
       val p = outline(i)
       x(i) = p.getX.asInstanceOf[Float]
       y(i) = p.getY.asInstanceOf[Float]
@@ -148,7 +149,7 @@ object IJTools {
     */
   def measureColor[T <: ImageProcessor](tri: Array[T], roi: Roi): Array[Double] = {
     val color: Array[Double] = new Array[Double](tri.length)
-    for (i <- 0 until tri.length) {
+    for (i <- tri.indices) {
       tri(i).setRoi(roi)
       color(i) = tri(i).getStatistics.mean
     }
@@ -166,7 +167,7 @@ object IJTools {
   def validateSameDimensions[T <: ImageProcessor](src: Array[T], length: Int) {
     require(src != null, "Input cannot be null.")
     require(src.length == length, "Input array has to have " + length + " elements.")
-    require(src.forall(_ != null), "Input array cannot have null entries.")
+    require(!src.contains(null), "Input array cannot have null entries.")
     val width = src(0).getWidth
     val height = src(0).getHeight
     require(src.forall(width == _.getWidth), "All input images have to have the same width: " + src.map(_.getWidth).mkString(","))

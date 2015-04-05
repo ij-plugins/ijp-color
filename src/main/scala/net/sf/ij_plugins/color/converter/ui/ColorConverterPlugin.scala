@@ -22,10 +22,12 @@
 
 package net.sf.ij_plugins.color.converter.ui
 
-import ij.plugin.PlugIn
 import javafx.embed.swing.JFXPanel
+
+import ij.plugin.PlugIn
 import net.sf.ij_plugins.color.ColorFXUI
 import net.sf.ij_plugins.util.IJTools
+
 import scalafx.Includes._
 import scalafx.application.Platform
 import scalafx.scene.Scene
@@ -47,7 +49,7 @@ class ColorConverterPlugin extends PlugIn {
     new JFXPanel()
 
     if (ColorConverterPlugin.dialogStage.isDefined) {
-      Platform.runLater {ColorConverterPlugin.dialogStage.foreach(_.show)}
+      Platform.runLater {ColorConverterPlugin.dialogStage.foreach(_.show())}
     } else {
       Platform.runLater {
         ColorConverterPlugin.dialogStage = Some(
@@ -61,7 +63,7 @@ class ColorConverterPlugin extends PlugIn {
             }
           }
         )
-        ColorConverterPlugin.dialogStage.foreach(_.show)
+        ColorConverterPlugin.dialogStage.foreach(_.show())
       }
     }
   }

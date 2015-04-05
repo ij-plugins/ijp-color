@@ -61,11 +61,6 @@ object ColorFXUI {
 
   private def check(name: String): Option[URL] = {
     val stylesheetURL = getClass.getResource(name)
-    if (stylesheetURL != null)
-      Some(stylesheetURL)
-    else {
-      println("Cannot load stylesheet: '" + name + "' relative  to class: " + getClass + "")
-      None
-    }
+    Option(stylesheetURL)
   }
 }
