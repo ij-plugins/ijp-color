@@ -40,7 +40,7 @@
               fork="true"
               failonerror="true">
             <jvmarg line="-Dfile.encoding=UTF8 -Xmx1G -Xss1M -XX:+CMSClassUnloadingEnabled -XX:MaxPermSize=256m -Djava.net.useSystemProxies=true"/>
-            <arg line="ijp-color/ijPrepareRun"/>
+            <arg line="ijPrepareRun"/>
         </java>
     </target>
 

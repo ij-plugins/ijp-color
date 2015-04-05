@@ -24,7 +24,6 @@ package net.sf.ij_plugins.color.calibration.ui
 
 import javafx.scene.{layout => jfxsl}
 
-import jfxtras.scene.control.ListSpinner
 import net.sf.ij_plugins.color.calibration.chart.{ColorCharts, GridColorChart, ReferenceColorSpace}
 import net.sf.ij_plugins.color.calibration.regression.MappingMethod
 
@@ -33,6 +32,7 @@ import scalafx.collections.ObservableBuffer
 import scalafx.event.ActionEvent
 import scalafx.geometry.{Insets, Pos}
 import scalafx.scene.control.Label._
+import scalafx.scene.control.SpinnerValueFactory.IntegerSpinnerValueFactory
 import scalafx.scene.control._
 import scalafx.scene.layout.{GridPane, HBox, Priority}
 import scalafx.scene.text.{Font, FontWeight}
@@ -106,16 +106,21 @@ class ColorCalibratorView(model: ColorCalibratorModel) extends jfxsl.StackPane {
     gp.add(separator("Actual Chart"), 0, row, GridPane.REMAINING, 1)
     row += 1
 
-    val marginsListSpinner = new ListSpinner[Int](0, 49)
-    marginsListSpinner.valueProperty() = model.chipMarginPercent()
-    marginsListSpinner.valueProperty <==> model.chipMarginPercent
-//    marginsListSpinner.arrowDirectionProperty().set(ListSpinner.ArrowDirection.VERTICAL)
+    val marginsSpinner = {
+      val valueFactory = new IntegerSpinnerValueFactory(0, 49) {
+        value = model.chipMarginPercent()
+        value <==> model.chipMarginPercent
+      }
+      new Spinner[Integer](valueFactory) {
+        editable = true
+      }
+    }
     gp.addRow(row,
       new Label("Chip margin %") {
         id = "ijp-label"
         alignmentInParent = Pos.CenterRight
       },
-      marginsListSpinner
+      marginsSpinner
     )
     row += 1
 
@@ -135,8 +140,8 @@ class ColorCalibratorView(model: ColorCalibratorModel) extends jfxsl.StackPane {
       items = ObservableBuffer(ReferenceColorSpace.values)
       value <==> model.referenceColorSpace
     }
-    val enableExtrInfoCB = new CheckBox("Show extra info")
-    model.showExtraInfo <==> enableExtrInfoCB.selected
+    val enableExtraInfoCB = new CheckBox("Show extra info")
+    model.showExtraInfo <==> enableExtraInfoCB.selected
     gp.addRow(row,
       new Label("Reference") {
         id = "ijp-label"
@@ -144,7 +149,7 @@ class ColorCalibratorView(model: ColorCalibratorModel) extends jfxsl.StackPane {
         tooltip = Tooltip("Reference color space")
       },
       referenceColorSpaceChoiceBox,
-      enableExtrInfoCB
+      enableExtraInfoCB
     )
     row += 1
 
@@ -191,7 +196,7 @@ class ColorCalibratorView(model: ColorCalibratorModel) extends jfxsl.StackPane {
       val label = new Label(labelText) {
         id = "ijp-separator"
       }
-      content = List(
+      children = List(
         label,
         new Separator {
           id = "ijp-separator"

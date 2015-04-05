@@ -25,9 +25,9 @@ package net.sf.ij_plugins.color
 import java.net.URL
 
 import scalafx.Includes._
-import scalafx.stage.Stage
-import scalafx.scene.{Scene, Node}
 import scalafx.scene.layout.StackPane
+import scalafx.scene.{Node, Scene}
+import scalafx.stage.Stage
 
 /** Helper methods for creation of UI in `net.sf.ij_plugins.color` module. */
 object ColorFXUI {
@@ -51,7 +51,7 @@ object ColorFXUI {
       title = windowTitle
       scene = new Scene {
         root = new StackPane {
-          content = node
+          children = node
           stylesheets ++= ColorFXUI.stylesheets
         }
       }

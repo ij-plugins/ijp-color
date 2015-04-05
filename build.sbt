@@ -4,7 +4,7 @@ organization := "ij-plugins.sf.net"
 
 version := "0.5.0-SNAPSHOT"
 
-crossScalaVersions := Seq("2.11.5", "2.10.4")
+crossScalaVersions := Seq("2.11.6", "2.10.5")
 scalaVersion <<= crossScalaVersions { versions => versions.head}
 
 scalaVersion := crossScalaVersions.value.head
@@ -20,10 +20,8 @@ resolvers ++= Seq(
 
 libraryDependencies ++= Seq(
   "net.imagej"         % "ij"            % "1.48v",
-  "org.apache.commons" % "commons-math3" % "3.4.1",
-  "org.controlsfx"     % "controlsfx"    % "8.20.8",
-  "org.jfxtras"        % "jfxtras-labs"  % "8.0-r3",
-  "org.scalafx"       %% "scalafx"       % "8.0.20-R6"
+  "org.apache.commons" % "commons-math3" % "3.5",
+  "org.scalafx"       %% "scalafx"       % "8.0.40-R8"
 )
 
 // Test dependencies

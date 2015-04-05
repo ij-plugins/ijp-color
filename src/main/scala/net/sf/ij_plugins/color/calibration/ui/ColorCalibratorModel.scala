@@ -22,29 +22,32 @@
 
 package net.sf.ij_plugins.color.calibration.ui
 
-import ij.gui.{Roi, PolygonRoi}
-import ij.measure.ResultsTable
-import ij.process.{FloatProcessor, ColorProcessor}
-import ij.{ImageStack, IJ, ImagePlus}
-import java.awt.{BasicStroke, Polygon, Color}
-import javafx.beans.property.ReadOnlyBooleanWrapper
+import java.awt.{BasicStroke, Color, Polygon}
+import java.io.{PrintWriter, StringWriter}
 import javafx.scene.{chart => jfxsc}
-import net.sf.ij_plugins.color.calibration.chart.{ReferenceColorSpace, ColorCharts}
+
+import ij.gui.{PolygonRoi, Roi}
+import ij.measure.ResultsTable
+import ij.process.{ColorProcessor, FloatProcessor}
+import ij.{IJ, ImagePlus, ImageStack}
+import net.sf.ij_plugins.color.calibration.chart.{ColorCharts, ReferenceColorSpace}
 import net.sf.ij_plugins.color.calibration.regression.MappingMethod
-import net.sf.ij_plugins.color.calibration.{LOOCrossValidation, Corrector, toPolygonROI, ColorCalibrator}
+import net.sf.ij_plugins.color.calibration.{ColorCalibrator, Corrector, LOOCrossValidation, toPolygonROI}
 import net.sf.ij_plugins.color.converter.ColorConverter
 import net.sf.ij_plugins.color.converter.ColorTriple.Lab
-import net.sf.ij_plugins.color.{DeltaE, ColorFXUI}
+import net.sf.ij_plugins.color.{ColorFXUI, DeltaE}
 import net.sf.ij_plugins.util._
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
-import org.controlsfx.dialog.Dialogs
+
 import scalafx.Includes._
 import scalafx.beans.property._
 import scalafx.collections.ObservableBuffer
 import scalafx.geometry.Point2D
 import scalafx.scene.Scene
 import scalafx.scene.chart._
-import scalafx.scene.layout.StackPane
+import scalafx.scene.control.Alert.AlertType
+import scalafx.scene.control.{Alert, Label, TextArea}
+import scalafx.scene.layout.{GridPane, Priority, StackPane}
 import scalafx.stage.Stage
 
 
@@ -56,7 +59,7 @@ class ColorCalibratorModel(val image: ImagePlus, parentStage: Stage) {
   val imageTitle = new StringProperty(this, "imageTitle", image.getTitle)
   val referenceColorSpace = new ObjectProperty(this, "referenceColorSpace", ReferenceColorSpace.sRGB)
   val referenceChart = new ObjectProperty(this, "chart", ColorCharts.GretagMacbethColorChecker)
-  val chipMarginPercent = new ObjectProperty[Int](this, "chipMargin", 20)
+  val chipMarginPercent = new ObjectProperty[Integer](this, "chipMargin", 20)
   val mappingMethod = new ObjectProperty(this, "mappingMethod", MappingMethod.LinearCrossBand)
   val clipReferenceRGB = new BooleanProperty(this, "clipReferenceRGB", true)
   val showExtraInfo = new BooleanProperty(this, "showExtraInfo", false)
@@ -406,7 +409,7 @@ class ColorCalibratorModel(val image: ImagePlus, parentStage: Stage) {
       title = chartTitle
       scene = new Scene {
         root = new StackPane {
-          content = scatterChart
+          children = scatterChart
           stylesheets ++= ColorFXUI.stylesheets
         }
       }
@@ -457,21 +460,46 @@ class ColorCalibratorModel(val image: ImagePlus, parentStage: Stage) {
   }
 
   private def showError(summary: String, message: String, t: Throwable) {
-    Dialogs.create().
-      owner(parentStage.delegate).
-      title("Error").
-      masthead(summary).
-      message(message).
-      showException(t)
+    // Extract exception text
+    val exceptionText = {
+      val sw = new StringWriter()
+      val pw = new PrintWriter(sw)
+      t.printStackTrace(pw)
+      sw.toString
+    }
+    val label = new Label("The exception stacktrace was:")
+    val textArea = new TextArea {
+      text = exceptionText
+      editable = false
+      wrapText = true
+      maxWidth = Double.MaxValue
+      maxHeight = Double.MaxValue
+      vgrow = Priority.Always
+      hgrow = Priority.Always
+    }
+    val expContent = new GridPane {
+      maxWidth = Double.MaxValue
+      add(label, 0, 0)
+      add(textArea, 0, 1)
+    }
+
+    new Alert(AlertType.Error) {
+      initOwner(parentStage)
+      title = "Error"
+      headerText = summary
+      contentText = message
+      // Set expandable Exception into the dialog pane.
+      dialogPane().expandableContent = expContent
+    }.showAndWait()
   }
 
   private def showError(summary: String, message: String) {
-    Dialogs.create().
-      owner(parentStage.delegate).
-      title("Error").
-      masthead(summary).
-      message(message).
-      showError()
+    new Alert(AlertType.Error) {
+      initOwner(parentStage)
+      title = "Error"
+      headerText = summary
+      contentText = message
+    }.showAndWait()
   }
 
 }

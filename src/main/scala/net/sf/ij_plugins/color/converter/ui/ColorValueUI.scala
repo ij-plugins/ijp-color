@@ -36,7 +36,7 @@ import scalafx.scene.layout.HBox
 /** Row of number text fields holding color band values. */
 class ColorValueUI {
 
-  private val format   = new DecimalFormat("0.000000")
+  private val format = new DecimalFormat("0.000000")
   private val band1NTF = new DoubleNumberTextField(0, format)
   private val band2NTF = new DoubleNumberTextField(0, format)
   private val band3NTF = new DoubleNumberTextField(0, format)
@@ -61,7 +61,7 @@ class ColorValueUI {
 
 
   val control = new HBox {
-    content +=(band1NTF, band2NTF, band3NTF)
+    children +=(band1NTF, band2NTF, band3NTF)
   }
 
   private def updateColor() {
