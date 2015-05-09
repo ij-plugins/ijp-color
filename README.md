@@ -5,4 +5,4 @@ Operations on color spaces and color images. Can be used as a stang alone librar
 
 This is a part of [IJ Plugins Project](http://ij-plugins.sourceforge.net/).
 
-[![Build Status](https://travis-ci.org/ij-plugins/ijp-color.svg?branch=SFX-2)](https://travis-ci.org/ij-plugins/ijp-color)
+[![Build Status](https://travis-ci.org/ij-plugins/ijp-color.svg?branch=develop)](https://travis-ci.org/ij-plugins/ijp-color)
