@@ -4,7 +4,7 @@ organization := "ij-plugins.sf.net"
 
 version := "0.5.0-SNAPSHOT"
 
-crossScalaVersions := Seq("2.11.6", "2.10.5")
+crossScalaVersions := Seq("2.11.7", "2.10.5")
 scalaVersion <<= crossScalaVersions { versions => versions.head}
 
 scalaVersion := crossScalaVersions.value.head
@@ -25,7 +25,7 @@ libraryDependencies ++= Seq(
 )
 
 // Test dependencies
-libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.3" % "test"
+libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.5" % "test"
 
 // Fork a new JVM for 'run' and 'test:run'
 fork := true
