@@ -1,6 +1,5 @@
 name := "ijp-color"
-
-organization := "ij-plugins.sf.net"
+organization := "net.sf.ij-plugins"
 
 version := "0.5.0-SNAPSHOT"
 
