@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2013 Jarek Sacha
+ * Copyright (C) 2002-2015 Jarek Sacha
  * Author's email: jsacha at users dot sourceforge dot net
  *
  * This library is free software; you can redistribute it and/or
@@ -42,7 +42,6 @@ object Regression {
     * @param standard    array of expected output values.
     * @param observation array of input values
     * @return linear fit coefficients
-    * @throws ColorException if problem is ill defined
     * @see #regression(double[], double[][], boolean)
     */
   def regression(standard: Array[Double], observation: Array[Array[Double]]): Regression.Result = {
@@ -56,11 +55,12 @@ object Regression {
     * @param noIntercept true means the model is to be estimated without an intercept term
     * @return linear fit coefficients
     */
-  def regression(standard: Array[Double], observation: Array[Array[Double]], noIntercept: Boolean
-                    ): Regression.Result = {
-    require(observation != null)
-    require(standard != null)
+  def regression(standard: Array[Double], observation: Array[Array[Double]], noIntercept: Boolean): Regression.Result = {
+    require(standard != null, "Argument `standard` cannot be null.")
+    require(observation != null, "Argument `observation` cannot be null.")
     require(observation.length == standard.length)
+    require(observation.length == standard.length, s"observation.length=${observation.length} must equal standard.length=${standard.length}.")
+    require(observation.length > observation(0).length, s"observation.length=${observation.length} must be greater than observation(0).length={observation(0).length}.")
 
     val regression = new OLSMultipleLinearRegression()
     regression.setNoIntercept(noIntercept)
@@ -80,14 +80,8 @@ object Regression {
    * @param standard    reference values.
    * @param observation observed values.
    * @return linear fit coefficients.
-   * @throws ColorMatchException if regression fails.
    */
   def createLinear(standard: Array[Double], observation: Array[Array[Double]]): Regression.Result = {
-    require(observation != null)
-    require(standard != null)
-    require(observation.length == standard.length)
-    require(observation.length >= observation(0).length + 1)
-
     regression(standard, observation, noIntercept = false)
   }
 }
