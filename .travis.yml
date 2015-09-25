@@ -21,3 +21,9 @@ branches:
   only:
     - master
     - develop
+
+# Work around for default old version of Java provided by Travis CI
+addons:
+  apt:
+    packages:
+      - oracle-java8-installer
