@@ -3,7 +3,7 @@ organization := "net.sf.ij-plugins"
 
 version := "0.5.0-SNAPSHOT"
 
-crossScalaVersions := Seq("2.11.7", "2.10.5")
+crossScalaVersions := Seq("2.11.7")
 scalaVersion <<= crossScalaVersions { versions => versions.head}
 
 scalaVersion := crossScalaVersions.value.head
@@ -14,11 +14,11 @@ scalacOptions ++= Seq("-unchecked", "-deprecation", "-optimize", "-Xlint")
 // Point to location of a snapshot repository for ScalaFX
 resolvers ++= Seq(
   "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
-  "ImageJ Releases" at "http://maven.imagej.net/content/repositories/releases/"
+  "ImageJ Releases"        at "http://maven.imagej.net/content/repositories/releases/"
 )
 
 libraryDependencies ++= Seq(
-  "net.imagej"         % "ij"            % "1.48v",
+  "net.imagej"         % "ij"            % "1.49v",
   "org.apache.commons" % "commons-math3" % "3.5",
   "org.scalafx"       %% "scalafx"       % "8.0.40-R8"
 )
