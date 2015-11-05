@@ -22,11 +22,11 @@
 
 package net.sf.ij_plugins.color.calibration.chart
 
-import net.sf.ij_plugins.color.converter.{ColorConverter, ColorTriple}
 import ij.process.FloatProcessor
+import net.sf.ij_plugins.color.converter.{ColorConverter, ColorTriple}
 
 /** Color spaces used for creation of reference color values. */
-sealed case class ReferenceColorSpace(name: String) {
+sealed abstract class ReferenceColorSpace(name: String) {
   override def toString = name
 
   def bands: Array[String] = toString.toArray.takeRight(3).map(_.toString)
@@ -70,12 +70,12 @@ sealed case class ReferenceColorSpace(name: String) {
   }
 }
 
-/** Enumeration of supported reference color spacesa. */
+/** Enumeration of supported reference color spaces. */
 object ReferenceColorSpace {
   /** CIE XYZ color space */
-  val XYZ = ReferenceColorSpace("XYZ")
+  case object XYZ extends ReferenceColorSpace("XYZ")
   /** sRGB color space */
-  val sRGB = ReferenceColorSpace("sRGB")
+  case object sRGB extends ReferenceColorSpace("sRGB")
 
   /** All refined reference color spaces. */
   val values = List(XYZ, sRGB)

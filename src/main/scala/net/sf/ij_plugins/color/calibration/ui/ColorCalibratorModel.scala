@@ -57,7 +57,7 @@ class ColorCalibratorModel(val image: ImagePlus, parentStage: Stage) {
   require(parentStage != null, "Argument `parentStage` cannot be null.")
 
   val imageTitle = new StringProperty(this, "imageTitle", image.getTitle)
-  val referenceColorSpace = new ObjectProperty(this, "referenceColorSpace", ReferenceColorSpace.sRGB)
+  val referenceColorSpace = new ObjectProperty[ReferenceColorSpace](this, "referenceColorSpace", ReferenceColorSpace.sRGB)
   val referenceChart = new ObjectProperty(this, "chart", ColorCharts.GretagMacbethColorChecker)
   val chipMarginPercent = new ObjectProperty[Integer](this, "chipMargin", 20)
   val mappingMethod = new ObjectProperty(this, "mappingMethod", MappingMethod.LinearCrossBand)
