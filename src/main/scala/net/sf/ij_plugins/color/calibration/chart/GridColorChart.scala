@@ -25,6 +25,7 @@ package net.sf.ij_plugins.color.calibration.chart
 import ij.process.ImageProcessor
 import net.sf.ij_plugins.color.converter.ColorTriple.Lab
 import net.sf.ij_plugins.util.IJTools
+
 import scala.collection.immutable
 import scalafx.geometry.Point2D
 
@@ -35,7 +36,7 @@ import scalafx.geometry.Point2D
   * @param nbColumns number of columns
   * @param nbRows number of rows
   * @param chips chip names and CIE L*a*b* / D65 color values, row by row, starting at (0,0) or top left corner.
-  * @param chipMargin reduction of chip from their maximun size on the grid (as fraction of its width or height).
+  * @param chipMargin reduction of chip from their maximum size on the grid (as fraction of its width or height).
   *                   Value of the margin must be between 0 and 0.5.
   */
 final class GridColorChart(val name: String,
@@ -108,7 +109,7 @@ final class GridColorChart(val name: String,
   /** Color chips with alignment transform applied to their outline. */
   def alignedChips: immutable.IndexedSeq[ColorChip] = referenceChips.map {
     c => new ColorChip(c.name, c.color, alignmentTransform.transform(c.outline))
-  }.toIndexedSeq
+  }
 
   override def toString = name
 
@@ -120,14 +121,14 @@ final class GridColorChart(val name: String,
 
   /** Creates a copy of this chart in which some chips cn be enabled/disabled.
     *
-    * @param enabled array with indexes corresponding to ones retured by `referenceColor` methods.
+    * @param enabled array with indexes corresponding to ones returned by `referenceColor` methods.
     *                If value is `true` chip with corresponding index is enabled, if `false` it is disabled.
     * @return
     */
   def copyWithEnableChips(enabled: Array[Boolean]): GridColorChart = {
     val enabledCount: Int = this.enabled.count(_ == true)
-    require(enabledCount == enabled.size,
-      "Expecting " + enabledCount + " elements in the input array, got " + enabled.size)
+    require(enabledCount == enabled.length,
+      "Expecting " + enabledCount + " elements in the input array, got " + enabled.length)
 
     // Determine indices of enabled chips
     val thisEnabledWithIndex = this.enabled.zipWithIndex.filter {case (e, i) => enabled(i)}

@@ -22,7 +22,7 @@
 
 package net.sf.ij_plugins.color.calibration.regression
 
-import MappingMethod._
+import net.sf.ij_plugins.color.calibration.regression.MappingMethod._
 import org.apache.commons.math3.linear.MatrixUtils
 
 /** Factory creating mapping between a reference and observed values using various
@@ -102,7 +102,7 @@ object MappingFactory {
     require(observed.length >= 2, "Linear fit needs at least 2 observations, got " + observed.length)
 
     val data = Array.ofDim[Double](observed.length, 1)
-    for (i <- 0 until observed.length) {
+    for (i <- observed.indices) {
       data(i)(0) = observed(i)
     }
     Regression.regression(standard, data, noIntercept = false)
@@ -121,7 +121,7 @@ object MappingFactory {
     require(observation.length >= 10, "Quadratic cross-band fit needs at least 10 observations, got " + observation.length)
     val data = Array.ofDim[Double](observation.length, 9)
 
-    for (i <- 0 until observation.length) {
+    for (i <- observation.indices) {
       val o: Array[Double] = observation(i)
       assert(o.length == 3)
       val a = o(0)
@@ -173,7 +173,7 @@ object MappingFactory {
     validateStandardAndObserved(standard, observed)
     require(observed.length >= 3, "Quadratic fit needs at least 3 observations, got " + observed.length)
     val data: Array[Array[Double]] = Array.ofDim[Double](observed.length, 2)
-    for (i <- 0 until observed.length) {
+    for (i <- observed.indices) {
       val o: Double = observed(i)
       data(i)(0) = o
       data(i)(1) = o * o
@@ -186,7 +186,7 @@ object MappingFactory {
     require(observed.length >= 14, "Cubic cross-band fit needs at least 14 observations, got " + observed.length)
     val data: Array[Array[Double]] = Array.ofDim[Double](observed.length, 13)
 
-    for (i <- 0 until observed.length) {
+    for (i <- observed.indices) {
       val o: Array[Double] = observed(i)
       assert(o.length == 3)
       val a = o(0)
@@ -246,7 +246,7 @@ object MappingFactory {
     require(observed.length >= 4, "Cubic fit needs at least 4 observations, got " + observed.length)
     val data: Array[Array[Double]] = Array.ofDim[Double](observed.length, 3)
 
-    for (i <- 0 until observed.length) {
+    for (i <- observed.indices) {
       val o: Double = observed(i)
       data(i)(0) = o
       data(i)(1) = o * o

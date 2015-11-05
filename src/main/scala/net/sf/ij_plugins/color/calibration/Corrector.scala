@@ -24,7 +24,7 @@ package net.sf.ij_plugins.color.calibration
 
 import ij.ImagePlus
 import ij.ImagePlus._
-import ij.gui.{Roi, PolygonRoi}
+import ij.gui.{PolygonRoi, Roi}
 import ij.process._
 import net.sf.ij_plugins.color.calibration.regression.CubicPolynomialTriple
 import net.sf.ij_plugins.util.IJTools
@@ -199,7 +199,7 @@ class Corrector(val poly: CubicPolynomialTriple) {
     val dest = new Array[FloatProcessor](3)
     val destPixels = new Array[Array[Float]](3)
 
-    for (band <- 0 until src.length) {
+    for (band <- src.indices) {
       srcPixels(band) = src(band).getPixels.asInstanceOf[Array[Float]]
       dest(band) = new FloatProcessor(src(band).getWidth, src(band).getHeight)
       destPixels(band) = dest(band).getPixels.asInstanceOf[Array[Float]]
@@ -234,7 +234,7 @@ class Corrector(val poly: CubicPolynomialTriple) {
     val width = src(0).getWidth
     val height = src(0).getHeight
 
-    for (i <- 0 until src.length) {
+    for (i <- src.indices) {
       require(width == src(i).getWidth, "All bands must have the same width == " + width)
       require(height == src(i).getHeight, "All bands must have the same height == " + height)
     }

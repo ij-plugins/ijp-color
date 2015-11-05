@@ -23,8 +23,8 @@
 package net.sf.ij_plugins.image
 
 import ij.plugin.Duplicator
-import ij.process.{FloatProcessor, StackConverter, ImageConverter, ColorProcessor}
-import ij.{ImageStack, ImagePlus}
+import ij.process.{ColorProcessor, FloatProcessor, ImageConverter, StackConverter}
+import ij.{ImagePlus, ImageStack}
 
 /** Represents image with multiple values per pixel. */
 class VectorImage(private val src: ImagePlus) {
@@ -51,7 +51,7 @@ class VectorImage(private val src: ImagePlus) {
 
   def get(index: Int): Array[Float] = {
     val r = new Array[Float](pixels.length)
-    for (i <- 0 until pixels.length) {
+    for (i <- pixels.indices) {
       r(i) = pixels(i)(index)
     }
     r
@@ -59,7 +59,7 @@ class VectorImage(private val src: ImagePlus) {
 
   def getDouble(index: Int): Array[Double] = {
     val r = new Array[Double](pixels.length)
-    for (i <- 0 until pixels.length) {
+    for (i <- pixels.indices) {
       r(i) = pixels(i)(index)
     }
     r
@@ -67,14 +67,14 @@ class VectorImage(private val src: ImagePlus) {
 
   def set(index: Int, value: Array[Float]) {
     require(pixels.length == value.length)
-    for (i <- 0 until pixels.length) {
+    for (i <- pixels.indices) {
       pixels(i)(index) = value(i)
     }
   }
 
   def set(index: Int, value: Array[Double]) {
     require(pixels.length == value.length)
-    for (i <- 0 until pixels.length) {
+    for (i <- pixels.indices) {
       pixels(i)(index) = value(i).toFloat
     }
   }

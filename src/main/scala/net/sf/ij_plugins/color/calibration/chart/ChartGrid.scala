@@ -65,7 +65,7 @@ final class ChartGrid(nbColumns: Int, nbRows: Int) {
     )
   }
 
-  /** Points outlining the chart: top-left, top-right, botton-right, and bottom-left. */
+  /** Points outlining the chart: top-left, top-right, bottom-right, and bottom-left. */
   def outline: Array[Point2D] = Array(
     new Point2D(0, 0),
     new Point2D(nbColumns, 0),

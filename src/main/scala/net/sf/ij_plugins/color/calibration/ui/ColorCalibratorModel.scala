@@ -116,7 +116,7 @@ class ColorCalibratorModel(val image: ImagePlus, parentStage: Stage) {
   def onShowReferenceColors() {
     val rt = new ResultsTable()
     val chips = referenceChart().referenceChips
-    for (i <- 0 until chips.length) {
+    for (i <- chips.indices) {
       rt.incrementCounter()
       rt.setLabel(chips(i).name, i)
       val lab = chips(i).color
@@ -251,7 +251,7 @@ class ColorCalibratorModel(val image: ImagePlus, parentStage: Stage) {
       // Show table with expected measured and corrected values
       val rtColor = new ResultsTable()
       val chips = chart.referenceChips
-      for (i <- 0 until chips.length) {
+      for (i <- chips.indices) {
         rtColor.incrementCounter()
         rtColor.setLabel(chips(i).name, i)
         rtColor.setValue("Reference 0", i, IJ.d2s(fit.reference(i)(0), 4))
@@ -293,7 +293,7 @@ class ColorCalibratorModel(val image: ImagePlus, parentStage: Stage) {
         val chips = chart.referenceChips
         //      val before = new DescriptiveStatistics()
         val after = new DescriptiveStatistics()
-        for (i <- 0 until chips.length) {
+        for (i <- chips.indices) {
           //        before.addValue(ColorUtils.delta(fit.reference(i), fit.observed(i)))
           after.addValue(delta(fit.reference(i), fit.corrected(i)))
         }
@@ -399,7 +399,7 @@ class ColorCalibratorModel(val image: ImagePlus, parentStage: Stage) {
           }
       }
       val chips = referenceChart().referenceChips
-      for (i <- 0 until chips.length; b <- 0 to 2) {
+      for (i <- chips.indices; b <- 0 to 2) {
         bands(b).data.get += XYChart.Data[Number, Number](x(i)(b), y(i)(b))
       }
       bands.foreach(answer.add(_))
@@ -419,11 +419,11 @@ class ColorCalibratorModel(val image: ImagePlus, parentStage: Stage) {
 
   private def showResidualScatterChart(x: Array[Array[Double]], y: Array[Array[Double]], chartTitle: String) {
     val dy = new Array[Array[Double]](x.length)
-    for (i <- 0 until x.length) {
+    for (i <- x.indices) {
       val xi = x(i)
       val yi = y(i)
       val dd = new Array[Double](xi.length)
-      for (j <- 0 until xi.length) {
+      for (j <- xi.indices) {
         dd(j) = math.abs(yi(j) - xi(j))
       }
       dy(i) = dd

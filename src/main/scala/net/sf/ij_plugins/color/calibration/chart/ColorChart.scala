@@ -22,9 +22,10 @@
 
 package net.sf.ij_plugins.color.calibration.chart
 
-import ij.process.{ImageProcessor, ColorProcessor}
-import net.sf.ij_plugins.color.converter.{RGBWorkingSpace, ColorConverter, ReferenceWhite}
-import net.sf.ij_plugins.util.{PerspectiveTransform, IJTools}
+import ij.process.{ColorProcessor, ImageProcessor}
+import net.sf.ij_plugins.color.converter.{ColorConverter, RGBWorkingSpace, ReferenceWhite}
+import net.sf.ij_plugins.util.{IJTools, PerspectiveTransform}
+
 import scala.collection.immutable
 
 /** Generic color chart.
@@ -98,7 +99,7 @@ trait ColorChart {
 
   /** Creates a copy of this chart in which some chips cn be enabled/disabled.
     *
-    * @param enabled array with indexes corresponding to ones retured by `referenceColor` methods.
+    * @param enabled array with indexes corresponding to ones returned by `referenceColor` methods.
     *                If value is `true` chip with corresponding index is enabled, if `false` it is disabled.
     * @return
     */
