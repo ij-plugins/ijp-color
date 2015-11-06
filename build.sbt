@@ -20,7 +20,7 @@ resolvers ++= Seq(
 libraryDependencies ++= Seq(
   "net.imagej"         % "ij"            % "1.49v",
   "org.apache.commons" % "commons-math3" % "3.5",
-  "org.scalafx"       %% "scalafx"       % "8.0.40-R8"
+  "org.scalafx" %% "scalafx" % "8.0.60-R9"
 )
 
 // Test dependencies
