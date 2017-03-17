@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2015 Jarek Sacha
+ * Copyright (C) 2002-2017 Jarek Sacha
  * Author's email: jsacha at users dot sourceforge dot net
  *
  * This library is free software; you can redistribute it and/or
@@ -45,7 +45,7 @@ class ColorCalibratorView(model: ColorCalibratorModel) extends jfxsl.StackPane {
   createContent()
 
 
-  def createContent() {
+  def createContent(): Unit = {
 
     val gp = new GridPane {
       padding = Insets(10)
@@ -67,13 +67,13 @@ class ColorCalibratorView(model: ColorCalibratorModel) extends jfxsl.StackPane {
       alignment = Pos.Center
       alignmentInParent = Pos.Center
     }
-    gp.add(imageTitleLabel, 0, row, GridPane.REMAINING, 1)
+    gp.add(imageTitleLabel, 0, row, GridPane.Remaining, 1)
     row += 1
 
     //
     // Reference chart
     //
-    gp.add(separator("Reference Chart"), 0, row, GridPane.REMAINING, 1)
+    gp.add(separator("Reference Chart"), 0, row, GridPane.Remaining, 1)
     row += 1
 
     val chartTypeChoiceBox = new ChoiceBox[GridColorChart] {
@@ -103,7 +103,7 @@ class ColorCalibratorView(model: ColorCalibratorModel) extends jfxsl.StackPane {
     //
     // Actual chart
     //
-    gp.add(separator("Actual Chart"), 0, row, GridPane.REMAINING, 1)
+    gp.add(separator("Actual Chart"), 0, row, GridPane.Remaining, 1)
     row += 1
 
     val marginsSpinner = {
@@ -130,10 +130,10 @@ class ColorCalibratorView(model: ColorCalibratorModel) extends jfxsl.StackPane {
       onAction = (ae: ActionEvent) => {model.onLoadLocationFromROI()}
       alignmentInParent = Pos.Center
     }
-    gp.add(importROIButton, 0, row, GridPane.REMAINING, 1)
+    gp.add(importROIButton, 0, row, GridPane.Remaining, 1)
     row += 1
 
-    gp.add(separator("Calibration"), 0, row, GridPane.REMAINING, 1)
+    gp.add(separator("Calibration"), 0, row, GridPane.Remaining, 1)
     row += 1
 
     val referenceColorSpaceChoiceBox = new ChoiceBox[ReferenceColorSpace] {
@@ -178,7 +178,7 @@ class ColorCalibratorView(model: ColorCalibratorModel) extends jfxsl.StackPane {
       onAction = (ae: ActionEvent) => {model.onCalibrate()}
       disable <== !model.chipValuesObserved
     }
-    gp.add(calibrateButton, 0, row, GridPane.REMAINING, 1)
+    gp.add(calibrateButton, 0, row, GridPane.Remaining, 1)
     calibrateButton.alignmentInParent = Pos.Center
     calibrateButton.font = {
       val f = calibrateButton.font()

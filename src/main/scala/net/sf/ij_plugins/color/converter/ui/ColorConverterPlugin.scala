@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2013 Jarek Sacha
+ * Copyright (C) 2002-2017 Jarek Sacha
  * Author's email: jsacha at users dot sourceforge dot net
  *
  * This library is free software; you can redistribute it and/or
@@ -22,10 +22,9 @@
 
 package net.sf.ij_plugins.color.converter.ui
 
-import javafx.embed.swing.JFXPanel
-
 import ij.plugin.PlugIn
 import net.sf.ij_plugins.color.ColorFXUI
+import net.sf.ij_plugins.fx._
 import net.sf.ij_plugins.util.IJTools
 
 import scalafx.Includes._
@@ -43,10 +42,9 @@ class ColorConverterPlugin extends PlugIn {
   private final val Title = "IJP Color Calculator"
 
 
-  def run(arg: String) {
+  def run(arg: String): Unit = {
 
-    // Create JFXPanel to force initialization of JavaFX.
-    new JFXPanel()
+    initializeFX()
 
     if (ColorConverterPlugin.dialogStage.isDefined) {
       Platform.runLater {ColorConverterPlugin.dialogStage.foreach(_.show())}

@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2015 Jarek Sacha
+ * Copyright (C) 2002-2017 Jarek Sacha
  * Author's email: jsacha at users dot sourceforge dot net
  *
  * This library is free software; you can redistribute it and/or
@@ -28,14 +28,14 @@ import org.scalatest.FlatSpec
 import org.scalatest.Matchers._
 
 /**
- * @author Jarek Sacha
- * @since 10/16/12 8:14 PM 
- */
+  * @author Jarek Sacha
+  * @since 10/16/12 8:14 PM
+  */
 class ColorConverterTest extends FlatSpec {
   /**
-   * From http://www.brucelindbloom.com/downloads/ColorCheckerSpreadsheets.zip, assumes D65 and 2 degree observer
-   */
-  private val labColorChecker : Array[Lab] = Array(
+    * From http://www.brucelindbloom.com/downloads/ColorCheckerSpreadsheets.zip, assumes D65 and 2 degree observer
+    */
+  private val labColorChecker: Array[Lab] = Array(
     Lab(37.257, 12.752, 14.852),
     Lab(65.959, 13.538, 17.198),
     Lab(50.585, -1.579, -21.292),
@@ -61,23 +61,23 @@ class ColorConverterTest extends FlatSpec {
     Lab(20.522, 0.352, -0.201)
   )
   /**
-   * Converted to XYZ from using http://www.brucelindbloom.com/iPhone/ColorConv.html
-   * D65, no adaptation, x100.
-   */
-  private val xyzColorChecker : Array[XYZ] = Array(
+    * Converted to XYZ from using http://www.brucelindbloom.com/iPhone/ColorConv.html
+    * D65, no adaptation, x100.
+    */
+  private val xyzColorChecker: Array[XYZ] = Array(
     XYZ(0.108176, 0.096773, 0.062064),
     XYZ(0.375276, 0.352709, 0.260194),
     XYZ(0.176810, 0.189128, 0.343071)
   )
-  /**
-   * Converted sRGB from using http://www.brucelindbloom.com/iPhone/ColorConv.html
-   * D65, no adaptation, x255.
-   */
-  private val srgbColorChecker: Array[RGB] = Array(
-    RGB(114.8130, 79.5373, 64.3926),
-    RGB(194.7544, 150.8414, 130.2082),
-    RGB(93.7033, 122.8897, 156.3199)
-  )
+  //  /**
+  //    * Converted sRGB from using http://www.brucelindbloom.com/iPhone/ColorConv.html
+  //    * D65, no adaptation, x255.
+  //    */
+  //  private val srgbColorChecker: Array[RGB] = Array(
+  //    RGB(114.8130, 79.5373, 64.3926),
+  //    RGB(194.7544, 150.8414, 130.2082),
+  //    RGB(93.7033, 122.8897, 156.3199)
+  //  )
 
   "Color Converter" should "convert RGB to L*a*b*" in {
     val converter = new ColorConverter(ReferenceWhite.D50, AdobeRGB1998, None, rgbScale = 1, xyzScale = 1)
@@ -160,7 +160,7 @@ class ColorConverterTest extends FlatSpec {
   it should "convert XYZ to L*a*b*" in {
     val converter = new ColorConverter(ReferenceWhite.D65, RGBWorkingSpace.sRGB, None, xyzScale = 1)
 
-    for (i <- 0 until xyzColorChecker.length) {
+    for (i <- xyzColorChecker.indices) {
       val xyz = xyzColorChecker(i)
       val expectedLab = labColorChecker(i)
       val actualLab = converter.toLab(xyz)
@@ -169,4 +169,22 @@ class ColorConverterTest extends FlatSpec {
       actualLab.b should be(expectedLab.b +- 0.001)
     }
   }
+
+  it should "convert XYZ to L*a*b* (Purple 1)" in {
+    val converter = new ColorConverter(
+      refWhite = ReferenceWhite.D65,
+      rgbSpace = RGBWorkingSpace.sRGB,
+      chromaticAdaptation = None,
+      xyzScale = 100,
+      rgbScale = 255)
+
+    val xyz = XYZ(9.31, 7.11, 15.33)
+    // Expected values computed using http://www.brucelindbloom.com/index.html?ColorCalculator.html
+    val expectedLab = Lab(32.0560, 23.3458, -21.1905)
+    val actualLab = converter.toLab(xyz)
+    actualLab.l should be(expectedLab.l +- 0.0001)
+    actualLab.a should be(expectedLab.a +- 0.0001)
+    actualLab.b should be(expectedLab.b +- 0.0001)
+  }
+
 }

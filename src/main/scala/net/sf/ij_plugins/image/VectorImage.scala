@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2013 Jarek Sacha
+ * Copyright (C) 2002-2017 Jarek Sacha
  * Author's email: jsacha at users dot sourceforge dot net
  *
  * This library is free software; you can redistribute it and/or
@@ -65,14 +65,14 @@ class VectorImage(private val src: ImagePlus) {
     r
   }
 
-  def set(index: Int, value: Array[Float]) {
+  def set(index: Int, value: Array[Float]): Unit = {
     require(pixels.length == value.length)
     for (i <- pixels.indices) {
       pixels(i)(index) = value(i)
     }
   }
 
-  def set(index: Int, value: Array[Double]) {
+  def set(index: Int, value: Array[Double]): Unit = {
     require(pixels.length == value.length)
     for (i <- pixels.indices) {
       pixels(i)(index) = value(i).toFloat

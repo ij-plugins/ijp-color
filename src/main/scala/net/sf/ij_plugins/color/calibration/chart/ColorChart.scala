@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2013 Jarek Sacha
+ * Copyright (C) 2002-2017 Jarek Sacha
  * Author's email: jsacha at users dot sourceforge dot net
  *
  * This library is free software; you can redistribute it and/or
@@ -61,7 +61,7 @@ trait ColorChart {
   /** Alignment between the reference chips and chips found in the actual chart. */
   final def alignmentTransform: PerspectiveTransform = _alignmentTransform
 
-  final def alignmentTransform_=(transform: PerspectiveTransform) {
+  final def alignmentTransform_=(transform: PerspectiveTransform): Unit = {
     require(transform != null, "Argument 'transform' cannot be null.")
     _alignmentTransform = transform
   }

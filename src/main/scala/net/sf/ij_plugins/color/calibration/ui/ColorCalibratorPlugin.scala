@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2013 Jarek Sacha
+ * Copyright (C) 2002-2017 Jarek Sacha
  * Author's email: jsacha at users dot sourceforge dot net
  *
  * This library is free software; you can redistribute it and/or
@@ -22,12 +22,11 @@
 
 package net.sf.ij_plugins.color.calibration.ui
 
-import javafx.embed.swing.JFXPanel
-
 import ij.ImagePlus.{COLOR_RGB, GRAY16, GRAY32, GRAY8}
 import ij.plugin.PlugIn
 import ij.{IJ, ImageListener, ImagePlus}
 import net.sf.ij_plugins.color.ColorFXUI
+import net.sf.ij_plugins.fx._
 import net.sf.ij_plugins.util.IJTools
 
 import scalafx.Includes._
@@ -44,7 +43,7 @@ class ColorCalibratorPlugin extends PlugIn {
   private var dialogStage: Option[Stage] = None
 
 
-  def run(arg: String) {
+  def run(arg: String): Unit = {
 
     // Check is image is available
     image = Some(IJ.getImage)
@@ -64,8 +63,7 @@ class ColorCalibratorPlugin extends PlugIn {
 
     setupImageListener()
 
-    // Create JFXPanel to force initialization of JavaFX.
-    new JFXPanel()
+    initializeFX()
 
     Platform.runLater {
       // Create dialog
@@ -86,21 +84,21 @@ class ColorCalibratorPlugin extends PlugIn {
     }
   }
 
-  def setupImageListener() {
+  def setupImageListener(): Unit = {
     ImagePlus.addImageListener(new ImageListener {
-      def imageUpdated(imp: ImagePlus) {
+      def imageUpdated(imp: ImagePlus): Unit = {
         if (image.contains(imp)) {handleImageUpdated()}
       }
 
-      def imageClosed(imp: ImagePlus) {
+      def imageClosed(imp: ImagePlus): Unit = {
         if (image.contains(imp)) {handleImageClosed()}
       }
 
-      def imageOpened(imp: ImagePlus) {}
+      def imageOpened(imp: ImagePlus): Unit = {}
     })
   }
 
-  def handleImageUpdated() {
+  def handleImageUpdated(): Unit = {
     // Update image title
     Platform.runLater {
       model.foreach(m => {
@@ -111,7 +109,7 @@ class ColorCalibratorPlugin extends PlugIn {
     }
   }
 
-  def handleImageClosed() {
+  def handleImageClosed(): Unit = {
     Platform.runLater {
       model.foreach(_.resetROI())
       dialogStage.foreach(_.hide())

@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2015 Jarek Sacha
+ * Copyright (C) 2002-2017 Jarek Sacha
  * Author's email: jsacha at users dot sourceforge dot net
  *
  * This library is free software; you can redistribute it and/or
@@ -74,7 +74,7 @@ class ColorValueUI {
     children +=(band1NTF, band2NTF, band3NTF)
   }
 
-  private def updateColor() {
+  private def updateColor(): Unit = {
     if (!updating) {
       val numbers = allBands.map(_.model.value())
       // Check if ready

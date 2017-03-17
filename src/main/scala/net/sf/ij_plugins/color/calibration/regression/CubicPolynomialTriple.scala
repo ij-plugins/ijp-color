@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2013 Jarek Sacha
+ * Copyright (C) 2002-2017 Jarek Sacha
  * Author's email: jsacha at users dot sourceforge dot net
  *
  * This library is free software; you can redistribute it and/or
@@ -33,7 +33,7 @@ case class CubicPolynomialTriple(band1: CubicPolynomial,
     * @param src  array of size 3 representing triplet of colors in source color space.
     * @param dest array of size 3 representing triplet of colors in destination color space.
     */
-  def evaluate(src: Array[Double], dest: Array[Double]) {
+  def evaluate(src: Array[Double], dest: Array[Double]): Unit = {
     dest(0) = band1.evaluate(src)
     dest(1) = band2.evaluate(src)
     dest(2) = band3.evaluate(src)

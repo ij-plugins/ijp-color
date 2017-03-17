@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2014 Jarek Sacha
+ * Copyright (C) 2002-2017 Jarek Sacha
  * Author's email: jsacha at users dot sourceforge dot net
  *
  * This library is free software; you can redistribute it and/or
@@ -46,7 +46,7 @@ object ColorFXUI {
    * @param node node to show.
    * @param windowTitle window title.
    */
-  def showInNewWindow(node: Node, windowTitle: String) {
+  def showInNewWindow(node: Node, windowTitle: String): Unit = {
     val dialogStage = new Stage() {
       title = windowTitle
       scene = new Scene {

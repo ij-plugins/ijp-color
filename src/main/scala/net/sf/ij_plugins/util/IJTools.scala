@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2013 Jarek Sacha
+ * Copyright (C) 2002-2017 Jarek Sacha
  * Author's email: jsacha at users dot sourceforge dot net
  *
  * This library is free software; you can redistribute it and/or
@@ -164,7 +164,7 @@ object IJTools {
    * @throws IllegalArgumentException if the images in the array are not of the same dimension.
    */
   @inline
-  def validateSameDimensions[T <: ImageProcessor](src: Array[T], length: Int) {
+  def validateSameDimensions[T <: ImageProcessor](src: Array[T], length: Int): Unit = {
     require(src != null, "Input cannot be null.")
     require(src.length == length, "Input array has to have " + length + " elements.")
     require(!src.contains(null), "Input array cannot have null entries.")
@@ -182,7 +182,7 @@ object IJTools {
    * @throws IllegalArgumentException if the images in the array are not of the same dimension.
    */
   @inline
-  def validateSameTypeAndDimensions[T <: ImageProcessor](src: Array[T], length: Int) {
+  def validateSameTypeAndDimensions[T <: ImageProcessor](src: Array[T], length: Int): Unit = {
     validateSameDimensions(src, length)
     if (length > 1) {
       val t = src(0).getClass

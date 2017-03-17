@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2013 Jarek Sacha
+ * Copyright (C) 2002-2017 Jarek Sacha
  * Author's email: jsacha at users dot sourceforge dot net
  *
  * This library is free software; you can redistribute it and/or
@@ -23,6 +23,7 @@
 package net.sf.ij_plugins.color.calibration.chart
 
 import org.scalatest.FlatSpec
+
 import scalafx.geometry.Point2D
 
 /**
@@ -88,7 +89,7 @@ class ChartGridSpec extends FlatSpec {
   }
 
 
-  def assertEquals(expected: Point2D, actual: Point2D, tolerance: Double) {
+  def assertEquals(expected: Point2D, actual: Point2D, tolerance: Double): Unit = {
     assert(math.abs(expected.x - actual.x) <= tolerance, "Expecting x=" + expected.x + ", got " + actual.x)
     assert(math.abs(expected.y - actual.y) <= tolerance, "Expecting y=" + expected.y + ", got " + actual.y)
   }

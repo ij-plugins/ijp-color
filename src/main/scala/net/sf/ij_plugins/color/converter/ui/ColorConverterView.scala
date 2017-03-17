@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2015 Jarek Sacha
+ * Copyright (C) 2002-2017 Jarek Sacha
  * Author's email: jsacha at users dot sourceforge dot net
  *
  * This library is free software; you can redistribute it and/or
@@ -85,7 +85,7 @@ class ColorConverterView(val model: ColorConverterModel) {
       // gridLinesVisible = true
     }
 
-    def addColorUI(row: Int, n1: Node, n2: Node, xLabel: Option[String] = None) {
+    def addColorUI(row: Int, n1: Node, n2: Node, xLabel: Option[String] = None): Unit = {
       gp.add(n1, 0, row, 1, 1)
       if (xLabel.isEmpty) {
         gp.add(n2, 1, row, nbColumns - 1, 1)
@@ -99,7 +99,7 @@ class ColorConverterView(val model: ColorConverterModel) {
     }
 
     def addChoiceBox[T <: AnyRef](row: Int, label: String, property: ObjectProperty[T], values: List[T],
-                                  converter: Option[StringConverter[T]] = None) {
+                                  converter: Option[StringConverter[T]] = None): Unit = {
       val v = ObservableBuffer(values)
       val cb = new ChoiceBox[T] {
         value = property()
@@ -171,7 +171,7 @@ class ColorConverterView(val model: ColorConverterModel) {
     gp
   }
 
-  private def update(colors: Update) {
+  private def update(colors: Update): Unit = {
     labUI.color() = colors.lab
     xyzUI.color() = colors.xyz
     rgbUI.color() = colors.rgb

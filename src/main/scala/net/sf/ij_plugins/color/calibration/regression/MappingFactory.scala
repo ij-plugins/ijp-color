@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2013 Jarek Sacha
+ * Copyright (C) 2002-2017 Jarek Sacha
  * Author's email: jsacha at users dot sourceforge dot net
  *
  * This library is free software; you can redistribute it and/or
@@ -266,19 +266,19 @@ object MappingFactory {
     new CubicPolynomial(alpha14, Option(rr))
   }
 
-  private def validateStandardAndObserved(standard: Array[Double], observed: Array[Double]) {
+  private def validateStandardAndObserved(standard: Array[Double], observed: Array[Double]): Unit = {
     require(observed != null)
     require(standard != null)
     require(observed.length == standard.length, "Number of Standard and Observed values are not equal reference.length='" + standard.length + "' observed.length='" + observed.length + "'")
   }
 
-  private def validateStandardAndObserved(standard: Array[Double], observation: Array[Array[Double]]) {
+  private def validateStandardAndObserved(standard: Array[Double], observation: Array[Array[Double]]): Unit = {
     require(standard != null)
     require(observation != null)
     require(observation.length == standard.length)
   }
 
-  private def validateStandardAndObserved(standard: Array[Array[Double]], observed: Array[Array[Double]]) {
+  private def validateStandardAndObserved(standard: Array[Array[Double]], observed: Array[Array[Double]]): Unit = {
     require(observed != null)
     require(standard != null)
     require(observed.length == standard.length,

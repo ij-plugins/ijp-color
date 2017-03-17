@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2014 Jarek Sacha
+ * Copyright (C) 2002-2017 Jarek Sacha
  * Author's email: jsacha at users dot sourceforge dot net
  *
  * This library is free software; you can redistribute it and/or
@@ -71,7 +71,7 @@ class ColorCalibratorModel(val image: ImagePlus, parentStage: Stage) {
   private def currentChart = referenceChart().copyWithNewChipMargin(chipMargin)
 
 
-  def onRenderReferenceChart() {
+  def onRenderReferenceChart(): Unit = {
     val scale = 80
     val margin = 0.1 * scale
 
@@ -113,7 +113,7 @@ class ColorCalibratorModel(val image: ImagePlus, parentStage: Stage) {
     imp.show()
   }
 
-  def onShowReferenceColors() {
+  def onShowReferenceColors(): Unit = {
     val rt = new ResultsTable()
     val chips = referenceChart().referenceChips
     for (i <- chips.indices) {
@@ -136,7 +136,7 @@ class ColorCalibratorModel(val image: ImagePlus, parentStage: Stage) {
   }
 
 
-  def onLoadLocationFromROI() {
+  def onLoadLocationFromROI(): Unit = {
 
     // Load ROI
     val points = loadROI()
@@ -155,14 +155,14 @@ class ColorCalibratorModel(val image: ImagePlus, parentStage: Stage) {
     chipValuesObservedWrapper.set(true)
   }
 
-  def resetROI() {
+  def resetROI(): Unit = {
     // Create alignment transform
     referenceChart().alignmentTransform = new PerspectiveTransform()
     image.setOverlay(null)
     chipValuesObservedWrapper.set(false)
   }
 
-  def onSuggestCalibrationOptions() {
+  def onSuggestCalibrationOptions(): Unit = {
     val chart = currentChart
 
     val methods = MappingMethod.values.toList
@@ -188,7 +188,7 @@ class ColorCalibratorModel(val image: ImagePlus, parentStage: Stage) {
 
     createBarChart()
 
-    def createBarChart() {
+    def createBarChart(): Unit = {
       val categories = hSorted.map(m => m._1 + " + " + m._2).toSeq
       val values = hSorted.map(_._3).toSeq
 
@@ -211,7 +211,7 @@ class ColorCalibratorModel(val image: ImagePlus, parentStage: Stage) {
 
   }
 
-  def onCalibrate() {
+  def onCalibrate(): Unit = {
 
     // Compute color mapping coefficients
     val chart = currentChart
@@ -385,7 +385,7 @@ class ColorCalibratorModel(val image: ImagePlus, parentStage: Stage) {
   }
 
 
-  private def showScatterChart(x: Array[Array[Double]], y: Array[Array[Double]], chartTitle: String) {
+  private def showScatterChart(x: Array[Array[Double]], y: Array[Array[Double]], chartTitle: String): Unit = {
     // Create plot
     val xAxis = new NumberAxis()
     val yAxis = new NumberAxis()
@@ -417,7 +417,7 @@ class ColorCalibratorModel(val image: ImagePlus, parentStage: Stage) {
     dialogStage.show()
   }
 
-  private def showResidualScatterChart(x: Array[Array[Double]], y: Array[Array[Double]], chartTitle: String) {
+  private def showResidualScatterChart(x: Array[Array[Double]], y: Array[Array[Double]], chartTitle: String): Unit = {
     val dy = new Array[Array[Double]](x.length)
     for (i <- x.indices) {
       val xi = x(i)
@@ -459,7 +459,7 @@ class ColorCalibratorModel(val image: ImagePlus, parentStage: Stage) {
     Some(List(p0, p1, p2, p3))
   }
 
-  private def showError(summary: String, message: String, t: Throwable) {
+  private def showError(summary: String, message: String, t: Throwable): Unit = {
     // Extract exception text
     val exceptionText = {
       val sw = new StringWriter()
@@ -493,7 +493,7 @@ class ColorCalibratorModel(val image: ImagePlus, parentStage: Stage) {
     }.showAndWait()
   }
 
-  private def showError(summary: String, message: String) {
+  private def showError(summary: String, message: String): Unit = {
     new Alert(AlertType.Error) {
       initOwner(parentStage)
       title = "Error"
