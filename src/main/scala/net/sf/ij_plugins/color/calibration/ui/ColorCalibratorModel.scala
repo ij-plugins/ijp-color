@@ -24,6 +24,7 @@ package net.sf.ij_plugins.color.calibration.ui
 
 import java.awt.{BasicStroke, Color, Polygon}
 import java.io.{PrintWriter, StringWriter}
+import javafx.beans.property.ReadOnlyBooleanProperty
 import javafx.scene.{chart => jfxsc}
 
 import ij.gui.{PolygonRoi, Roi}
@@ -65,7 +66,7 @@ class ColorCalibratorModel(val image: ImagePlus, parentStage: Stage) {
   val showExtraInfo = new BooleanProperty(this, "showExtraInfo", false)
 
   private val chipValuesObservedWrapper = new ReadOnlyBooleanWrapper(this, "chipValuesObserved", false)
-  val chipValuesObserved = chipValuesObservedWrapper.getReadOnlyProperty
+  val chipValuesObserved: ReadOnlyBooleanProperty = chipValuesObservedWrapper.getReadOnlyProperty
 
   private def chipMargin: Double = chipMarginPercent() / 100d
   private def currentChart = referenceChart().copyWithNewChipMargin(chipMargin)
@@ -335,7 +336,7 @@ class ColorCalibratorModel(val image: ImagePlus, parentStage: Stage) {
           stats.addValue(d)
 
           rt.incrementCounter()
-          rt.addLabel("Color Name", chip.name)
+          rt.addValue("Color Name", chip.name)
           rt.addValue("Expected L*", chip.color.l)
           rt.addValue("Expected a*", chip.color.a)
           rt.addValue("Expected b*", chip.color.b)

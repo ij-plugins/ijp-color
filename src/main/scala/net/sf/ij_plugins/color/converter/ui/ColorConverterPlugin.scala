@@ -26,9 +26,9 @@ import ij.plugin.PlugIn
 import net.sf.ij_plugins.color.ColorFXUI
 import net.sf.ij_plugins.fx._
 import net.sf.ij_plugins.util.IJTools
+import org.scalafx.extras.onFX
 
 import scalafx.Includes._
-import scalafx.application.Platform
 import scalafx.scene.Scene
 import scalafx.stage.Stage
 
@@ -45,11 +45,10 @@ class ColorConverterPlugin extends PlugIn {
   def run(arg: String): Unit = {
 
     initializeFX()
-
-    if (ColorConverterPlugin.dialogStage.isDefined) {
-      Platform.runLater {ColorConverterPlugin.dialogStage.foreach(_.show())}
-    } else {
-      Platform.runLater {
+    onFX {
+      if (ColorConverterPlugin.dialogStage.isDefined) {
+        ColorConverterPlugin.dialogStage.foreach(_.show())
+      } else {
         ColorConverterPlugin.dialogStage = Some(
           new Stage {
             title = Title

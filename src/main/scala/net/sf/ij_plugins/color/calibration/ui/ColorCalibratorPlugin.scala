@@ -28,9 +28,9 @@ import ij.{IJ, ImageListener, ImagePlus}
 import net.sf.ij_plugins.color.ColorFXUI
 import net.sf.ij_plugins.fx._
 import net.sf.ij_plugins.util.IJTools
+import org.scalafx.extras._
 
 import scalafx.Includes._
-import scalafx.application.Platform
 import scalafx.scene.Scene
 import scalafx.stage.Stage
 
@@ -65,7 +65,7 @@ class ColorCalibratorPlugin extends PlugIn {
 
     initializeFX()
 
-    Platform.runLater {
+    onFX {
       // Create dialog
       dialogStage = Some(
         new Stage {
@@ -84,35 +84,36 @@ class ColorCalibratorPlugin extends PlugIn {
     }
   }
 
-  def setupImageListener(): Unit = {
-    ImagePlus.addImageListener(new ImageListener {
-      def imageUpdated(imp: ImagePlus): Unit = {
-        if (image.contains(imp)) {handleImageUpdated()}
-      }
+  private def setupImageListener(): Unit = {
+    ImagePlus.addImageListener(
+      new ImageListener {
+        def imageUpdated(imp: ImagePlus): Unit = {
+          if (image.contains(imp)) {
+            handleImageUpdated()
+          }
+        }
 
-      def imageClosed(imp: ImagePlus): Unit = {
-        if (image.contains(imp)) {handleImageClosed()}
-      }
+        def imageClosed(imp: ImagePlus): Unit = {
+          if (image.contains(imp)) {
+            handleImageClosed()
+          }
+        }
 
-      def imageOpened(imp: ImagePlus): Unit = {}
-    })
+        def imageOpened(imp: ImagePlus): Unit = {}
+      }
+    )
   }
 
-  def handleImageUpdated(): Unit = {
+  private def handleImageUpdated(): Unit = onFX {
     // Update image title
-    Platform.runLater {
-      model.foreach(m => {
-        m.imageTitle() = image.getOrElse(new ImagePlus("<No Image>")).getTitle
-        m.resetROI()
-      }
-      )
+    model.foreach { m =>
+      m.imageTitle() = image.getOrElse(new ImagePlus("<No Image>")).getTitle
+      m.resetROI()
     }
   }
 
-  def handleImageClosed(): Unit = {
-    Platform.runLater {
-      model.foreach(_.resetROI())
-      dialogStage.foreach(_.hide())
-    }
+  private def handleImageClosed(): Unit = onFX {
+    model.foreach(_.resetROI())
+    dialogStage.foreach(_.hide())
   }
 }
