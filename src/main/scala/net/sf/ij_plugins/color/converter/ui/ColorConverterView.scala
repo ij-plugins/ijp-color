@@ -26,6 +26,7 @@ import javafx.beans.{binding => jfxbb}
 
 import net.sf.ij_plugins.color.converter._
 import net.sf.ij_plugins.color.converter.ui.ColorConverterModel.Update
+import net.sf.ij_plugins.util.IJPUtils
 
 import scalafx.Includes._
 import scalafx.beans.property.ObjectProperty
@@ -37,15 +38,24 @@ import scalafx.scene.control.{Button, ChoiceBox, Label}
 import scalafx.scene.layout.GridPane
 import scalafx.util.StringConverter
 
+object ColorConverterView {
+  private val Title = "Color Converter"
+  private val About = "" +
+    "Converts between color space coordinates.  To convert color values  \n" +
+    "from the source color space to other spaces: type in the source color \n" +
+    "values, then click on the button next to them to convert to other spaces."
+}
 
 class ColorConverterView(val model: ColorConverterModel) {
+
+  import ColorConverterView._
 
   private val nbColumns = 5
   private val xyzUI = new ColorValueUI()
   private val labUI = new ColorValueUI()
   private val rgbUI = new ColorValueUI()
 
-  lazy val pane = createGidPane()
+  lazy val pane: GridPane = createGidPane()
 
   private val buttonXYZ = new Button {
     id = "ijp-button"
@@ -120,7 +130,11 @@ class ColorConverterView(val model: ColorConverterModel) {
       property <== cb.value
     }
 
-    var row = 1
+    var row = 0
+
+    gp.add(IJPUtils.createHeaderNode(Title, About), 0, row, GridPane.Remaining, 1)
+    row += 1
+
     addColorUI(row, buttonXYZ, xyzUI.control, Some("[0-100]"))
     row += 1
 

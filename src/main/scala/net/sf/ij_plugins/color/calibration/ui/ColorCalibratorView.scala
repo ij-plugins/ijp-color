@@ -26,6 +26,7 @@ import javafx.scene.{layout => jfxsl}
 
 import net.sf.ij_plugins.color.calibration.chart.{ColorCharts, GridColorChart, ReferenceColorSpace}
 import net.sf.ij_plugins.color.calibration.regression.MappingMethod
+import net.sf.ij_plugins.util.IJPUtils
 
 import scalafx.Includes._
 import scalafx.collections.ObservableBuffer
@@ -55,10 +56,18 @@ class ColorCalibratorView(model: ColorCalibratorModel) extends jfxsl.StackPane {
 
     var row = 0
 
+    val headerNode = IJPUtils.createHeaderNode(
+      "Color Calibrator",
+      "Performs color calibration of an image using embedded color chart.")
+    gp.add(headerNode, 0, row, GridPane.Remaining, 1)
+    row += 1
+
 
     //
     // Image title
     //
+    gp.add(separator("Image"), 0, row, GridPane.Remaining, 1)
+    row += 1
     val imageTitleLabel = new Label() {
       id = "ijp-image-title"
       hgrow = Priority.Always
@@ -127,7 +136,9 @@ class ColorCalibratorView(model: ColorCalibratorModel) extends jfxsl.StackPane {
     val importROIButton = new Button {
       id = "ijp-button"
       text = "Load location from ROI"
-      onAction = (ae: ActionEvent) => {model.onLoadLocationFromROI()}
+      onAction = (ae: ActionEvent) => {
+        model.onLoadLocationFromROI()
+      }
       alignmentInParent = Pos.Center
     }
     gp.add(importROIButton, 0, row, GridPane.Remaining, 1)
@@ -158,7 +169,9 @@ class ColorCalibratorView(model: ColorCalibratorModel) extends jfxsl.StackPane {
       value <==> model.mappingMethod
     }
     val suggestCalibrationOptionsButton = new Button("Suggest Options") {
-      onAction = (ae: ActionEvent) => {model.onSuggestCalibrationOptions()}
+      onAction = (ae: ActionEvent) => {
+        model.onSuggestCalibrationOptions()
+      }
       disable <== !model.chipValuesObserved
     }
     gp.addRow(row,
@@ -175,7 +188,9 @@ class ColorCalibratorView(model: ColorCalibratorModel) extends jfxsl.StackPane {
       text = "Calibrate"
       id = "ijp-button"
       margin = Insets(10)
-      onAction = (ae: ActionEvent) => {model.onCalibrate()}
+      onAction = (ae: ActionEvent) => {
+        model.onCalibrate()
+      }
       disable <== !model.chipValuesObserved
     }
     gp.add(calibrateButton, 0, row, GridPane.Remaining, 1)
