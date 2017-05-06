@@ -111,7 +111,7 @@ final class GridColorChart(val name: String,
     c => new ColorChip(c.name, c.color, alignmentTransform.transform(c.outline))
   }
 
-  override def toString = name
+  override def toString: String = name
 
   override def averageChipColor[T <: ImageProcessor](src: Array[T]): Array[Array[Double]] = {
     val chips = alignedChips
@@ -131,7 +131,7 @@ final class GridColorChart(val name: String,
       "Expecting " + enabledCount + " elements in the input array, got " + enabled.length)
 
     // Determine indices of enabled chips
-    val thisEnabledWithIndex = this.enabled.zipWithIndex.filter {case (e, i) => enabled(i)}
+    val thisEnabledWithIndex = this.enabled.zipWithIndex.filter { case (_, i) => enabled(i) }
     val newEnabledIndices = (thisEnabledWithIndex zip enabled).filter {case (_, e) => e}.map {case (vi, _) => vi._2}
 
     val newEnabled = new Array[Boolean](this.enabled.size)

@@ -26,7 +26,7 @@ package net.sf.ij_plugins.color.converter
 sealed case class ReferenceWhite(name: String, x: Double, z: Double) {
   final val y: Double = 1
 
-  override def toString = name
+  override def toString: String = name
 }
 
 /** Concrete reference values values for selected illuminants. */

@@ -23,7 +23,7 @@
 package net.sf.ij_plugins.color.converter.ui
 
 sealed case class Gamma(name: String, value: Double) {
-  override def toString = name
+  override def toString: String = name
 }
 
 object Gamma {

@@ -27,7 +27,7 @@ import net.sf.ij_plugins.color.converter.{ColorConverter, ColorTriple}
 
 /** Color spaces used for creation of reference color values. */
 sealed abstract class ReferenceColorSpace(name: String) {
-  override def toString = name
+  override def toString: String = name
 
   def bands: Array[String] = toString.toArray.takeRight(3).map(_.toString)
 

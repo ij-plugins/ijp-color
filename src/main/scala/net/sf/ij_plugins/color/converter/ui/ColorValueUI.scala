@@ -57,7 +57,7 @@ class ColorValueUI {
   allBands.foreach(_.setAlignment(Pos.CenterRight))
   allBands.foreach(_.textFormatter().value.onChange(updateColor()))
 
-  val color = new ObjectProperty[ColorTriple](this, "color", new Color123())
+  val color = new ObjectProperty[ColorTriple](this, "color", Color123())
   color.onChange {
     updating = true
     try {
@@ -81,7 +81,7 @@ class ColorValueUI {
       if (numbers.contains(null)) return
 
       val doubles = numbers.map(_.doubleValue())
-      color() = new Color123(doubles(0), doubles(1), doubles(2))
+      color() = Color123(doubles(0), doubles(1), doubles(2))
     }
   }
 }

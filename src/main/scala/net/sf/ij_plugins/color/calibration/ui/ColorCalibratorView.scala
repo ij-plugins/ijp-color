@@ -91,10 +91,10 @@ class ColorCalibratorView(model: ColorCalibratorModel) extends jfxsl.StackPane {
     }
     val renderReferenceChartSplitButton = new SplitMenuButton {
       text = "Render"
-      onAction = (ae: ActionEvent) => model.onRenderReferenceChart()
+      onAction = (_: ActionEvent) => model.onRenderReferenceChart()
       items = List(
         new MenuItem("Reference Colors") {
-          onAction = (ae: ActionEvent) => model.onShowReferenceColors()
+          onAction = (_: ActionEvent) => model.onShowReferenceColors()
         }
       )
     }
@@ -136,7 +136,7 @@ class ColorCalibratorView(model: ColorCalibratorModel) extends jfxsl.StackPane {
     val importROIButton = new Button {
       id = "ijp-button"
       text = "Load location from ROI"
-      onAction = (ae: ActionEvent) => {
+      onAction = (_: ActionEvent) => {
         model.onLoadLocationFromROI()
       }
       alignmentInParent = Pos.Center
@@ -169,7 +169,7 @@ class ColorCalibratorView(model: ColorCalibratorModel) extends jfxsl.StackPane {
       value <==> model.mappingMethod
     }
     val suggestCalibrationOptionsButton = new Button("Suggest Options") {
-      onAction = (ae: ActionEvent) => {
+      onAction = (_: ActionEvent) => {
         model.onSuggestCalibrationOptions()
       }
       disable <== !model.chipValuesObserved
@@ -188,7 +188,7 @@ class ColorCalibratorView(model: ColorCalibratorModel) extends jfxsl.StackPane {
       text = "Calibrate"
       id = "ijp-button"
       margin = Insets(10)
-      onAction = (ae: ActionEvent) => {
+      onAction = (_: ActionEvent) => {
         model.onCalibrate()
       }
       disable <== !model.chipValuesObserved

@@ -69,7 +69,7 @@ object MappingFactory {
       case _ =>
         throw new IllegalArgumentException("Invalid Mapping method '" + method + "'")
     }
-    new CubicPolynomialTriple(redBandCoefficients, greenBandCoefficients, blueBandCoefficients)
+    CubicPolynomialTriple(redBandCoefficients, greenBandCoefficients, blueBandCoefficients)
   }
 
   def createLinear(standard: Array[Double], observed: Array[Double], band: Int): CubicPolynomial = {
@@ -77,17 +77,17 @@ object MappingFactory {
     val regressionResult = createLinear(standard, observed)
     val intercept = regressionResult.beta(0)
     band match {
-      case 0 => new CubicPolynomial(
+      case 0 => CubicPolynomial(
         intercept = intercept,
         a = regressionResult.beta(1),
         regressionResult = Some(regressionResult)
       )
-      case 1 => new CubicPolynomial(
+      case 1 => CubicPolynomial(
         intercept = intercept,
         b = regressionResult.beta(1),
         regressionResult = Some(regressionResult)
       )
-      case 2 => new CubicPolynomial(
+      case 2 => CubicPolynomial(
         intercept = intercept,
         c = regressionResult.beta(1),
         regressionResult = Some(regressionResult)
@@ -146,19 +146,19 @@ object MappingFactory {
     val regressionResult = createQuadratic(standard, observed)
     val intercept = regressionResult.beta(0)
     band match {
-      case 0 => new CubicPolynomial(
+      case 0 => CubicPolynomial(
         intercept = intercept,
         a = regressionResult.beta(1),
         aa = regressionResult.beta(2),
         regressionResult = Some(regressionResult)
       )
-      case 1 => new CubicPolynomial(
+      case 1 => CubicPolynomial(
         intercept = intercept,
         b = regressionResult.beta(1),
         bb = regressionResult.beta(2),
         regressionResult = Some(regressionResult)
       )
-      case 2 => new CubicPolynomial(
+      case 2 => CubicPolynomial(
         intercept = intercept,
         c = regressionResult.beta(1),
         cc = regressionResult.beta(2),
@@ -215,21 +215,21 @@ object MappingFactory {
     val regressionResult = createCubic(standard, observed)
     val intercept = regressionResult.beta(0)
     band match {
-      case 0 => new CubicPolynomial(
+      case 0 => CubicPolynomial(
         intercept = intercept,
         a = regressionResult.beta(1),
         aa = regressionResult.beta(2),
         aaa = regressionResult.beta(3),
         regressionResult = Some(regressionResult)
       )
-      case 1 => new CubicPolynomial(
+      case 1 => CubicPolynomial(
         intercept = intercept,
         b = regressionResult.beta(1),
         bb = regressionResult.beta(2),
         bbb = regressionResult.beta(3),
         regressionResult = Some(regressionResult)
       )
-      case 2 => new CubicPolynomial(
+      case 2 => CubicPolynomial(
         intercept = intercept,
         c = regressionResult.beta(1),
         cc = regressionResult.beta(2),

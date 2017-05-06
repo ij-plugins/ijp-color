@@ -28,9 +28,9 @@ package net.sf.ij_plugins.color.converter
   */
 sealed case class ChromaticAdaptation(name: String, ma: Matrix3x3) {
   /** Inverse of the adaptation matrix */
-  val maI = ma.inverse
+  val maI: Matrix3x3 = ma.inverse
 
-  override def toString = name
+  override def toString: String = name
 }
 
 /** Concrete coefficients for chromatic adaptation transforms.

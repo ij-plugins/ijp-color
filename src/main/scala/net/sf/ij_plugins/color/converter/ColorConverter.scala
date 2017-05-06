@@ -29,9 +29,9 @@ import scala.math.pow
 /** Color conversion constants */
 object ColorConverter {
 
-  val kE = 216.0 / 24389.0
-  val kK = 24389.0 / 27.0
-  val kKE = 8.0
+  val kE: Double = 216.0 / 24389.0
+  val kK: Double = 24389.0 / 27.0
+  val kKE: Double = 8.0
 }
 
 /** Color converter based on information given at [[http://www.brucelindbloom.com brucelindbloom.com]].

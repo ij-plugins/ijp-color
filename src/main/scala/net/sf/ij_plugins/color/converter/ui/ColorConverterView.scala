@@ -61,7 +61,7 @@ class ColorConverterView(val model: ColorConverterModel) {
     id = "ijp-button"
     text = "XYZ"
     maxWidth = Double.MaxValue
-    onAction = (e: ActionEvent) => {
+    onAction = (_: ActionEvent) => {
       val colors = model.updateFromXYZ(xyzUI.color())
       update(colors)
     }
@@ -71,7 +71,7 @@ class ColorConverterView(val model: ColorConverterModel) {
     id = "ijp-button"
     text = "L*a*b*"
     maxWidth = Double.MaxValue
-    onAction = (e: ActionEvent) => {
+    onAction = (_: ActionEvent) => {
       val colors = model.updateFromLab(labUI.color())
       update(colors)
     }
@@ -81,7 +81,7 @@ class ColorConverterView(val model: ColorConverterModel) {
     id = "ijp-button"
     text = "RGB"
     maxWidth = Double.MaxValue
-    onAction = (e: ActionEvent) => {
+    onAction = (_: ActionEvent) => {
       val colors = model.updateFromRGB(rgbUI.color())
       update(colors)
     }

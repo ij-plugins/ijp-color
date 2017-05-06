@@ -41,7 +41,7 @@ object ColorTriple {
     */
   case class Color123(_1: Double = 0, _2: Double = 0, _3: Double = 0) extends ColorTriple {
 
-    def apply(index: Int) = index match {
+    def apply(index: Int): Double = index match {
       case 0 => _1
       case 1 => _2
       case 2 => _3
@@ -55,7 +55,7 @@ object ColorTriple {
 
   /** An RGB color. */
   case class RGB(r: Double, g: Double, b: Double) extends ColorTriple {
-    def apply(index: Int) = index match {
+    def apply(index: Int): Double = index match {
       case 0 => r
       case 1 => g
       case 2 => b
@@ -67,7 +67,7 @@ object ColorTriple {
 
   /** An XYZ color. */
   case class XYZ(x: Double, y: Double, z: Double) extends ColorTriple {
-    def apply(index: Int) = index match {
+    def apply(index: Int): Double = index match {
       case 0 => x
       case 1 => y
       case 2 => z
@@ -79,7 +79,7 @@ object ColorTriple {
 
   /** An Lab color. */
   case class Lab(l: Double, a: Double, b: Double) extends ColorTriple {
-    def apply(index: Int) = index match {
+    def apply(index: Int): Double = index match {
       case 0 => l
       case 1 => a
       case 2 => b

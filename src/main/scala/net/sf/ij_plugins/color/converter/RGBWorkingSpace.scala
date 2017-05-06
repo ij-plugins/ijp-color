@@ -23,7 +23,8 @@
 package net.sf.ij_plugins.color.converter
 
 import net.sf.ij_plugins.color.converter.ColorTriple.XYZ
-import net.sf.ij_plugins.color.converter.ReferenceWhite.{C, E, D50, D65}
+import net.sf.ij_plugins.color.converter.ReferenceWhite.{C, D50, D65, E}
+
 import scala.math._
 
 
@@ -65,13 +66,13 @@ sealed case class RGBWorkingSpace(name: String,
   private val sg = refWhite.x * mi.m10 + refWhite.y * mi.m11 + refWhite.z * mi.m12
   private val sb = refWhite.x * mi.m20 + refWhite.y * mi.m21 + refWhite.z * mi.m22
 
-  val rgb2xyz = new Matrix3x3(
+  val rgb2xyz: Matrix3x3 = new Matrix3x3(
     m00 = sr * m.m00, m01 = sg * m.m01, m02 = sb * m.m02,
     m10 = sr * m.m10, m11 = sg * m.m11, m12 = sb * m.m12,
     m20 = sr * m.m20, m21 = sg * m.m21, m22 = sb * m.m22
   ).transpose
 
-  val xyz2rgb = rgb2xyz.inverse
+  val xyz2rgb: Matrix3x3 = rgb2xyz.inverse
 
   /** Convert a value in this RGB color space to XYZ with the same reference white.  */
   def convertRGB2XYZ(r: Double, g: Double, b: Double): XYZ = {
@@ -87,7 +88,7 @@ sealed case class RGBWorkingSpace(name: String,
   }
 
 
-  override def toString = name
+  override def toString: String = name
 
   final private def invCompand(companded: Double): Double = {
     if (gamma > 0.0) {
