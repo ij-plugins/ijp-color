@@ -1,7 +1,8 @@
 sudo: false
 language: scala
 scala:
-  - 2.11.7
+  - 2.11.11
+  - 2.12.2
 
 before_install:
   - "export DISPLAY=:99.0"
