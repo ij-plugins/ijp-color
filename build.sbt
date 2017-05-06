@@ -1,8 +1,14 @@
+import java.net.URL
+
 // @formatter:off
 
 name         := "ijp-color"
 organization := "net.sf.ij-plugins"
 version      := "0.5.0"
+
+homepage     := Some(new URL("https://ij-plugins.sf.net"))
+startYear    := Some(2002)
+licenses     := Seq(("LGPL-2.1", new URL("http://opensource.org/licenses/LGPL-2.1")))
 
 crossScalaVersions := Seq("2.11.11", "2.12.2")
 scalaVersion       := crossScalaVersions.value.head
@@ -63,3 +69,30 @@ ijPluginsSubDir         := "ij-plugins"
 ijCleanBeforePrepareRun := true
 // Instruct `clean` to delete created plugins subdirectory created by `ijRun`/`ijPrepareRun`.
 cleanFiles += ijPluginsDir.value
+//
+// Customize Java style publishing
+//
+// Enables publishing to maven repo
+publishMavenStyle := true
+
+publishTo := version {
+  version: String =>
+    if (version.contains("-SNAPSHOT"))
+      Some("Sonatype Nexus Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots")
+    else
+      Some("Sonatype Nexus Releases" at "https://oss.sonatype.org/service/local/staging/deploy/maven2")
+}.value
+
+
+pomExtra :=
+    <scm>
+      <url>https://github.com/ij-plugins/ijp-color</url>
+      <connection>scm:https://github.com/ij-plugins/ijp-color.git</connection>
+    </scm>
+    <developers>
+      <developer>
+        <id>jpsacha</id>
+        <name>Jarek Sacha</name>
+        <url>https://github.com/jpsacha</url>
+      </developer>
+    </developers>
