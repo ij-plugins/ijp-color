@@ -4,7 +4,7 @@ name         := "ijp-color"
 organization := "net.sf.ij-plugins"
 version      := "0.5.0-SNAPSHOT"
 
-crossScalaVersions := Seq("2.11.8", "2.12.1")
+crossScalaVersions := Seq("2.11.11", "2.12.2")
 scalaVersion       := crossScalaVersions.value.head
 
 // append -deprecation to the options passed to the Scala compiler
@@ -34,7 +34,7 @@ libraryDependencies ++= Seq(
   "org.apache.commons"  % "commons-math3"  % "3.6.1",
   "org.scalafx"        %% "scalafx"        % "8.0.102-R11",
   "org.scalafx"        %% "scalafx-extras" % "0.1.0",
-  "org.scalatest"      %% "scalatest"      % "3.0.1"  % "test"
+  "org.scalatest"      %% "scalatest"      % "3.0.3"  % "test"
 
 )
 
