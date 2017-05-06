@@ -1,7 +1,7 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2013 Jarek Sacha
- * Author's email: jsacha at users dot sourceforge dot net
+ * Copyright (C) 2002-2017 Jarek Sacha
+ * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -22,10 +22,11 @@
 
 package net.sf.ij_plugins.color.calibration
 
-import ij.{ImageStack, ImagePlus}
 import java.awt.Rectangle
+
+import ij.{ImagePlus, ImageStack}
 import net.sf.ij_plugins.color.DeltaE
-import net.sf.ij_plugins.color.calibration.chart.{ReferenceColorSpace, ColorChart}
+import net.sf.ij_plugins.color.calibration.chart.{ColorChart, ReferenceColorSpace}
 import net.sf.ij_plugins.color.calibration.regression.MappingMethod
 import net.sf.ij_plugins.color.converter.ColorTriple.Lab
 

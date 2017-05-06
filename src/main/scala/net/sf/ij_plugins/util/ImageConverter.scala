@@ -1,7 +1,7 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2013 Jarek Sacha
- * Author's email: jsacha at users dot sourceforge dot net
+ * Copyright (C) 2002-2017 Jarek Sacha
+ * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -24,6 +24,7 @@ package net.sf.ij_plugins.util
 
 import java.awt.image.BufferedImage
 import javafx.embed.{swing => jfxes}
+
 import scalafx.Includes._
 import scalafx.scene.image.Image
 

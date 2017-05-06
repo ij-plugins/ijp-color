@@ -1,7 +1,7 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2013 Jarek Sacha
- * Author's email: jsacha at users dot sourceforge dot net
+ * Copyright (C) 2002-2017 Jarek Sacha
+ * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -24,6 +24,7 @@ package net.sf.ij_plugins.color.converter.ui
 
 import net.sf.ij_plugins.color.converter._
 import net.sf.ij_plugins.color.converter.ui.ColorConverterModel.Update
+
 import scalafx.beans.property.ObjectProperty
 
 object ColorConverterModel {
