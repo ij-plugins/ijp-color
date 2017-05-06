@@ -2,7 +2,7 @@
 
 name         := "ijp-color"
 organization := "net.sf.ij-plugins"
-version      := "0.5.0-SNAPSHOT"
+version      := "0.5.0"
 
 crossScalaVersions := Seq("2.11.11", "2.12.2")
 scalaVersion       := crossScalaVersions.value.head
