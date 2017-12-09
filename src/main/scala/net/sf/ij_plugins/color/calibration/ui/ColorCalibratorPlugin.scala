@@ -70,7 +70,7 @@ class ColorCalibratorPlugin extends PlugIn {
       dialogStage = Some(
         new Stage {
           title = Title
-          icons += IJTools.imageJIconAsFXImage
+          IJTools.imageJIconAsFXImage.foreach(icons += _)
         }
       )
 
