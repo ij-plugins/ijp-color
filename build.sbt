@@ -10,7 +10,7 @@ homepage     := Some(new URL("https://ij-plugins.sf.net"))
 startYear    := Some(2002)
 licenses     := Seq(("LGPL-2.1", new URL("http://opensource.org/licenses/LGPL-2.1")))
 
-crossScalaVersions := Seq("2.11.11", "2.12.2")
+crossScalaVersions := Seq("2.11.12", "2.12.3")
 scalaVersion       := crossScalaVersions.value.head
 
 // append -deprecation to the options passed to the Scala compiler
@@ -36,11 +36,11 @@ resolvers ++= Seq(
 )
 
 libraryDependencies ++= Seq(
-  "net.imagej"          % "ij"             % "1.51f",
+  "net.imagej"          % "ij"             % "1.51s",
   "org.apache.commons"  % "commons-math3"  % "3.6.1",
-  "org.scalafx"        %% "scalafx"        % "8.0.102-R11",
+  "org.scalafx"        %% "scalafx"        % "8.0.144-R12",
   "org.scalafx"        %% "scalafx-extras" % "0.1.0",
-  "org.scalatest"      %% "scalatest"      % "3.0.3"  % "test"
+  "org.scalatest"      %% "scalatest"      % "3.0.4"  % "test"
 
 )
 
