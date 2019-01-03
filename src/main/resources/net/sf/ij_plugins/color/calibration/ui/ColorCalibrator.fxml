@@ -26,7 +26,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <StackPane xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1"
-           fx:controller="net.sf.ij_plugins.color.calibration.ui.ColorCalibratorView">
+           fx:controller="net.sf.ij_plugins.color.calibration.ui.ColorCalibratorUIController">
     <children>
         <GridPane fx:id="rootGridPane" hgap="10.0" vgap="10.0">
             <padding>

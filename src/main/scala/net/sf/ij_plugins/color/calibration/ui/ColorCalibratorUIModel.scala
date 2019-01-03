@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2017 Jarek Sacha
+ * Copyright (C) 2002-2019 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -24,13 +24,13 @@ package net.sf.ij_plugins.color.calibration.ui
 
 import java.awt.{BasicStroke, Color, Polygon}
 import java.io.{PrintWriter, StringWriter}
-import javafx.beans.property.ReadOnlyBooleanProperty
-import javafx.scene.{chart => jfxsc}
 
 import ij.gui.{PolygonRoi, Roi}
 import ij.measure.ResultsTable
 import ij.process.{ColorProcessor, FloatProcessor}
 import ij.{IJ, ImagePlus, ImageStack}
+import javafx.beans.property.ReadOnlyBooleanProperty
+import javafx.scene.{chart => jfxsc}
 import net.sf.ij_plugins.color.calibration.chart.{ColorCharts, ReferenceColorSpace}
 import net.sf.ij_plugins.color.calibration.regression.MappingMethod
 import net.sf.ij_plugins.color.calibration.{ColorCalibrator, Corrector, LOOCrossValidation, toPolygonROI}
@@ -39,7 +39,7 @@ import net.sf.ij_plugins.color.converter.ColorTriple.Lab
 import net.sf.ij_plugins.color.{ColorFXUI, DeltaE}
 import net.sf.ij_plugins.util._
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
-
+import org.scalafx.extras.mvcfx.ModelFX
 import scalafx.Includes._
 import scalafx.beans.property._
 import scalafx.collections.ObservableBuffer
@@ -49,11 +49,13 @@ import scalafx.scene.chart._
 import scalafx.scene.control.Alert.AlertType
 import scalafx.scene.control.{Alert, Label, TextArea}
 import scalafx.scene.layout.{GridPane, Priority, StackPane}
-import scalafx.stage.{Window, Stage}
+import scalafx.stage.{Stage, Window}
 
 
-/** Model for color calibrator UI. */
-class ColorCalibratorModel(val image: ImagePlus, parentWindow: Window) {
+/**
+  * Model for color calibrator UI.
+  */
+class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends ModelFX {
 
   require(parentWindow != null, "Argument `parentStage` cannot be null.")
 
@@ -69,6 +71,7 @@ class ColorCalibratorModel(val image: ImagePlus, parentWindow: Window) {
   val chipValuesObserved: ReadOnlyBooleanProperty = chipValuesObservedWrapper.getReadOnlyProperty
 
   private def chipMargin: Double = chipMarginPercent() / 100d
+
   private def currentChart = referenceChart().copyWithNewChipMargin(chipMargin)
 
 

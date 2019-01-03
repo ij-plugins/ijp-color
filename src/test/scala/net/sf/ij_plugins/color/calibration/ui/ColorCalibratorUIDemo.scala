@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2017 Jarek Sacha
+ * Copyright (C) 2002-2019 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -24,7 +24,6 @@ package net.sf.ij_plugins.color.calibration.ui
 
 import ij.ImagePlus
 import net.sf.ij_plugins.color.ColorFXUI
-
 import scalafx.Includes._
 import scalafx.application.JFXApp
 import scalafx.application.JFXApp.PrimaryStage
@@ -35,7 +34,7 @@ object ColorCalibratorUIDemo extends JFXApp {
 
   stage = new PrimaryStage() {
     title = "Color Calibrator UI Demo"
-    scene = new Scene(new ColorCalibratorMVVM(new ImagePlus(), this).view) {
+    scene = new Scene(new ColorCalibratorUI(new ImagePlus(), this).view) {
       stylesheets ++= ColorFXUI.stylesheets
     }
   }

@@ -25,6 +25,7 @@ package net.sf.ij_plugins.color.calibration.ui
 import net.sf.ij_plugins.color.calibration.chart.{ColorCharts, GridColorChart, ReferenceColorSpace}
 import net.sf.ij_plugins.color.calibration.regression.MappingMethod
 import net.sf.ij_plugins.util.IJPUtils
+import org.scalafx.extras.mvcfx.ControllerFX
 import scalafx.Includes._
 import scalafx.collections.ObservableBuffer
 import scalafx.geometry.Pos
@@ -33,25 +34,28 @@ import scalafx.scene.control._
 import scalafx.scene.layout.GridPane
 import scalafxml.core.macros.sfxml
 
+/**
+  * Binds ColorCalibrator FXML to UI model.
+  */
 @sfxml
-class ColorCalibratorView(private val imageTitleLabel: Label,
-                          private val chartTypeChoiceBox: ChoiceBox[GridColorChart],
-                          private val renderReferenceChartSplitButton: SplitMenuButton,
-                          private val marginsSpinner: Spinner[java.lang.Integer],
-                          private val importROIButton: Button,
-                          private val referenceColorSpaceChoiceBox: ChoiceBox[ReferenceColorSpace],
-                          private val enableExtraInfoCB: CheckBox,
-                          private val mappingMethodChoiceBox: ChoiceBox[MappingMethod.Value],
-                          private val suggestCalibrationOptionsButton: Button,
-                          private val calibrateButton: Button,
-                          private val rootGridPane: GridPane,
-                          private val model: ColorCalibratorModel) {
+class ColorCalibratorUIController(private val imageTitleLabel: Label,
+                                  private val chartTypeChoiceBox: ChoiceBox[GridColorChart],
+                                  private val renderReferenceChartSplitButton: SplitMenuButton,
+                                  private val marginsSpinner: Spinner[java.lang.Integer],
+                                  private val importROIButton: Button,
+                                  private val referenceColorSpaceChoiceBox: ChoiceBox[ReferenceColorSpace],
+                                  private val enableExtraInfoCB: CheckBox,
+                                  private val mappingMethodChoiceBox: ChoiceBox[MappingMethod.Value],
+                                  private val suggestCalibrationOptionsButton: Button,
+                                  private val calibrateButton: Button,
+                                  private val rootGridPane: GridPane,
+                                  private val model: ColorCalibratorUIModel) extends ControllerFX {
 
+  // Dialog header
   private val headerNode = IJPUtils.createHeaderNode(
     "Color Calibrator",
     "Performs color calibration of an image using embedded color chart.")
   rootGridPane.add(headerNode, 0, 0, GridPane.Remaining, 1)
-
 
   // Image title
   imageTitleLabel.text <== model.imageTitle

@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2017 Jarek Sacha
+ * Copyright (C) 2002-2019 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -29,17 +29,18 @@ import net.sf.ij_plugins.color.ColorFXUI
 import net.sf.ij_plugins.fx._
 import net.sf.ij_plugins.util.IJTools
 import org.scalafx.extras._
-
 import scalafx.Includes._
 import scalafx.scene.Scene
 import scalafx.stage.Stage
 
-/** ImageJ plugin for running image color calibration. */
+/**
+  * ImageJ plugin for running image color calibration.
+  */
 class ColorCalibratorPlugin extends PlugIn {
 
   private final val Title = "Color Calibrator"
   private var image: Option[ImagePlus] = None
-  private var model: Option[ColorCalibratorModel] = None
+  private var model: Option[ColorCalibratorUIModel] = None
   private var dialogStage: Option[Stage] = None
 
 
@@ -74,7 +75,7 @@ class ColorCalibratorPlugin extends PlugIn {
         }
       )
 
-      val mvvm = new ColorCalibratorMVVM(image.get, dialogStage.get)
+      val mvvm = new ColorCalibratorUI(image.get, dialogStage.get)
       model = Some(mvvm.model)
       val mainView = mvvm.view
       dialogStage.get.scene = new Scene {
