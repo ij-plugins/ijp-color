@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2017 Jarek Sacha
+ * Copyright (C) 2002-2019 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -57,7 +57,7 @@
 }
 
 #ijp-separator {
-    -fx-padding: 1em 0.0833em 0em 0.0833em;
+    -fx-padding: 0.5em 0.0833em 0em 0.0833em;
     -fx-font-size: 1.25em;
     -fx-font-style: oblique;
     -fx-text-fill: derive(-fx-text-background-color, 90%);

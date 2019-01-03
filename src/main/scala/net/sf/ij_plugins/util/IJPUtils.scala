@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2017 Jarek Sacha
+ * Copyright (C) 2002-2019 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -22,6 +22,7 @@
 
 package net.sf.ij_plugins.util
 
+import scalafx.geometry.Insets
 import scalafx.scene.Node
 import scalafx.scene.control.Label
 import scalafx.scene.image.ImageView
@@ -35,8 +36,8 @@ object IJPUtils {
   def createHeaderNode(title: String, message: String): Node = {
     // Create header with logo, title, and a brief description
     val headerGP = new GridPane {
-      vgap = 7
-      hgap = 7
+      vgap = 3
+      hgap = 3
     }
 
     val ijpLogoView = new ImageView("/net/sf/ij_plugins/color/IJP-48.png")
@@ -45,6 +46,7 @@ object IJPUtils {
     val pluginTitleLabel = new Label {
       text = title
       id = "ijp-header-title"
+      padding = Insets(0, 0, 0, 7)
     }
     headerGP.add(pluginTitleLabel, 1, 0)
 

@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2017 Jarek Sacha
+ * Copyright (C) 2002-2019 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -25,214 +25,67 @@ package net.sf.ij_plugins.color.calibration.ui
 import net.sf.ij_plugins.color.calibration.chart.{ColorCharts, GridColorChart, ReferenceColorSpace}
 import net.sf.ij_plugins.color.calibration.regression.MappingMethod
 import net.sf.ij_plugins.util.IJPUtils
-
 import scalafx.Includes._
 import scalafx.collections.ObservableBuffer
-import scalafx.event.ActionEvent
-import scalafx.geometry.{Insets, Pos}
-import scalafx.scene.control.Label._
+import scalafx.geometry.Pos
 import scalafx.scene.control.SpinnerValueFactory.IntegerSpinnerValueFactory
 import scalafx.scene.control._
-import scalafx.scene.layout.{GridPane, HBox, Priority}
-import scalafx.scene.text.{Font, FontWeight}
+import scalafx.scene.layout.GridPane
 import scalafxml.core.macros.sfxml
 
 @sfxml
 class ColorCalibratorView(private val imageTitleLabel: Label,
                           private val chartTypeChoiceBox: ChoiceBox[GridColorChart],
                           private val renderReferenceChartSplitButton: SplitMenuButton,
+                          private val marginsSpinner: Spinner[java.lang.Integer],
+                          private val importROIButton: Button,
+                          private val referenceColorSpaceChoiceBox: ChoiceBox[ReferenceColorSpace],
+                          private val enableExtraInfoCB: CheckBox,
+                          private val mappingMethodChoiceBox: ChoiceBox[MappingMethod.Value],
+                          private val suggestCalibrationOptionsButton: Button,
+                          private val calibrateButton: Button,
                           private val rootGridPane: GridPane,
                           private val model: ColorCalibratorModel) {
 
-  //private lazy val _viewNode: Parent = initView()
-  // TODO: add button to suggest best mapping method.
-
-  createContent()
-
-  def createContent() : Unit = {
-
-    //    val gp = new GridPane {
-    //      padding = Insets(10)
-    //      vgap = 10
-    //      hgap = 10
-    //    }
-    val gp = rootGridPane
-
-    var row = 0
-
-    val headerNode = IJPUtils.createHeaderNode(
-      "Color Calibrator",
-      "Performs color calibration of an image using embedded color chart.")
-    gp.add(headerNode, 0, row, GridPane.Remaining, 1)
-    row += 1
+  private val headerNode = IJPUtils.createHeaderNode(
+    "Color Calibrator",
+    "Performs color calibration of an image using embedded color chart.")
+  rootGridPane.add(headerNode, 0, 0, GridPane.Remaining, 1)
 
 
-    //    //
-    //    // Image title
-    //    //
-    //    gp.add(separator("Image"), 0, row, GridPane.Remaining, 1)
-    //    row += 1
-    //    val imageTitleLabel = new Label() {
-    //      id = "ijp-image-title"
-    //      hgrow = Priority.Always
-    //      maxWidth = Double.MaxValue
-    //      text <== model.imageTitle
-    //      alignment = Pos.Center
-    //      alignmentInParent = Pos.Center
-    //    }
-    //    gp.add(imageTitleLabel, 0, row, GridPane.Remaining, 1)
-    imageTitleLabel.text <== model.imageTitle
-    row += 1
+  // Image title
+  imageTitleLabel.text <== model.imageTitle
 
-    //    //
-    //    // Reference chart
-    //    //
-    //    gp.add(separator("Reference Chart"), 0, row, GridPane.Remaining, 1)
-    row += 1
-
-    //    val chartTypeChoiceBox = new ChoiceBox[GridColorChart] {
-    //      items = ObservableBuffer(ColorCharts.values)
-    //      value <==> model.referenceChart
-    //    }
-    chartTypeChoiceBox.items = ObservableBuffer(ColorCharts.values)
-    chartTypeChoiceBox.value <==> model.referenceChart
-    //    val renderReferenceChartSplitButton = new SplitMenuButton {
-    //      text = "Render"
-    //      onAction = (ae: ActionEvent) => model.onRenderReferenceChart()
-    //      items = List(
-    //        new MenuItem("Reference Colors") {
-    //          onAction = (_: ActionEvent) => model.onShowReferenceColors()
-    //        }
-    //      )
-    //    }
-    renderReferenceChartSplitButton.onAction = (_: ActionEvent) => model.onRenderReferenceChart()
-    renderReferenceChartSplitButton.items = List(
-      new MenuItem("Reference Colors") {
-        onAction = (_: ActionEvent) => model.onShowReferenceColors()
-      }
-    )
-    //
-    //    gp.addRow(row,
-    //      new Label("Type") {
-    //        id = "ijp-label"
-    //        alignmentInParent = Pos.CenterRight
-    //      },
-    //      chartTypeChoiceBox,
-    //      renderReferenceChartSplitButton
-    //    )
-    row += 1
-
-    //
-    // Actual chart
-    //
-    gp.add(separator("Actual Chart"), 0, row, GridPane.Remaining, 1)
-    row += 1
-
-    val marginsSpinner = {
-      val valueFactory = new IntegerSpinnerValueFactory(0, 49) {
-        value = model.chipMarginPercent()
-        value <==> model.chipMarginPercent
-      }
-      new Spinner[Integer](valueFactory) {
-        editable = true
-      }
+  // Reference chart
+  chartTypeChoiceBox.items = ObservableBuffer(ColorCharts.values)
+  chartTypeChoiceBox.value <==> model.referenceChart
+  renderReferenceChartSplitButton.onAction = _ => model.onRenderReferenceChart()
+  renderReferenceChartSplitButton.items = List(
+    new MenuItem("Reference Colors") {
+      onAction = _ => model.onShowReferenceColors()
     }
-    gp.addRow(row,
-      new Label("Chip margin %") {
-        id = "ijp-label"
-        alignmentInParent = Pos.CenterRight
-      },
-      marginsSpinner
-    )
-    row += 1
+  )
 
-    val importROIButton = new Button {
-      id = "ijp-button"
-      text = "Load location from ROI"
-      onAction = (_: ActionEvent) => {
-        model.onLoadLocationFromROI()
-      }
-      alignmentInParent = Pos.Center
-    }
-    gp.add(importROIButton, 0, row, GridPane.Remaining, 1)
-    row += 1
-
-    gp.add(separator("Calibration"), 0, row, GridPane.Remaining, 1)
-    row += 1
-
-    val referenceColorSpaceChoiceBox = new ChoiceBox[ReferenceColorSpace] {
-      items = ObservableBuffer(ReferenceColorSpace.values)
-      value <==> model.referenceColorSpace
-    }
-    val enableExtraInfoCB = new CheckBox("Show extra info")
-    model.showExtraInfo <==> enableExtraInfoCB.selected
-    gp.addRow(row,
-      new Label("Reference") {
-        id = "ijp-label"
-        alignmentInParent = Pos.CenterRight
-        tooltip = Tooltip("Reference color space")
-      },
-      referenceColorSpaceChoiceBox,
-      enableExtraInfoCB
-    )
-    row += 1
-
-    val mappingMethodChoiceBox = new ChoiceBox[MappingMethod.Value] {
-      items = ObservableBuffer(MappingMethod.values.toSeq)
-      value <==> model.mappingMethod
-    }
-    val suggestCalibrationOptionsButton = new Button("Suggest Options") {
-      onAction = (_: ActionEvent) => {
-        model.onSuggestCalibrationOptions()
-      }
-      disable <== !model.chipValuesObserved
-    }
-    gp.addRow(row,
-      new Label("Mapping method") {
-        id = "ijp-label"
-        alignmentInParent = Pos.CenterRight
-      },
-      mappingMethodChoiceBox,
-      suggestCalibrationOptionsButton
-    )
-    row += 1
-
-    val calibrateButton = new Button {
-      text = "Calibrate"
-      id = "ijp-button"
-      margin = Insets(10)
-      onAction = (_: ActionEvent) => {
-        model.onCalibrate()
-      }
-      disable <== !model.chipValuesObserved
-    }
-    gp.add(calibrateButton, 0, row, GridPane.Remaining, 1)
-    calibrateButton.alignmentInParent = Pos.Center
-    calibrateButton.font = {
-      val f = calibrateButton.font()
-      Font.font(f.family, FontWeight.Bold, f.size)
-    }
-    row += 1
-
-    calibrateButton.prefWidth <== importROIButton.width
-
-    //    getChildren.addAll(gp)
+  // Actual chart
+  marginsSpinner.valueFactory = new IntegerSpinnerValueFactory(0, 49) {
+    value = model.chipMarginPercent()
+    value <==> model.chipMarginPercent
   }
+  importROIButton.onAction = _ => model.onLoadLocationFromROI()
 
-  private def separator(labelText: String): HBox = {
-    new HBox {
-      val label = new Label(labelText) {
-        id = "ijp-separator"
-      }
-      children = List(
-        label,
-        new Separator {
-          id = "ijp-separator"
-          margin = Insets(10, 0, 5, 10)
-          hgrow = Priority.Always
-          alignment = Pos.TopCenter
-        }
-      )
-    }
-  }
+  // Calibration
+  referenceColorSpaceChoiceBox.items = ObservableBuffer(ReferenceColorSpace.values)
+  referenceColorSpaceChoiceBox.value <==> model.referenceColorSpace
+  model.showExtraInfo <==> enableExtraInfoCB.selected
+
+  mappingMethodChoiceBox.items = ObservableBuffer(MappingMethod.values.toSeq)
+  mappingMethodChoiceBox.value <==> model.mappingMethod
+  suggestCalibrationOptionsButton.onAction = _ => model.onSuggestCalibrationOptions()
+  suggestCalibrationOptionsButton.disable <== !model.chipValuesObserved
+
+  calibrateButton.onAction = _ => model.onCalibrate()
+  calibrateButton.disable <== !model.chipValuesObserved
+  calibrateButton.alignmentInParent = Pos.Center
+
+  calibrateButton.prefWidth <== importROIButton.width
 }
