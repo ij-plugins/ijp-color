@@ -45,6 +45,7 @@ class ColorCalibratorPlugin extends PlugIn {
 
 
   def run(arg: String): Unit = {
+    IJ.showStatus("Preparing UI for " + Title + "...")
 
     // Check is image is available
     image = Some(IJ.getImage)
@@ -75,13 +76,14 @@ class ColorCalibratorPlugin extends PlugIn {
         }
       )
 
-      val mvvm = new ColorCalibratorUI(image.get, dialogStage.get)
-      model = Some(mvvm.model)
-      val mainView = mvvm.view
+      val mvc = new ColorCalibratorUI(image.get, dialogStage.get)
+      model = Some(mvc.model)
+      val mainView = mvc.view
       dialogStage.get.scene = new Scene {
         stylesheets ++= ColorFXUI.stylesheets
         root = mainView
       }
+      IJ.showStatus("")
       dialogStage.get.show()
     }
   }
