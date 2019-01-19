@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2017 Jarek Sacha
+ * Copyright (C) 2002-2019 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -44,7 +44,7 @@ import scala.collection.immutable
 trait ColorChart {
 
   /** Reference white for for the reference color expressed in CIE XYZ. */
-  final val refWhite: ReferenceWhite = ReferenceWhite.D65
+  def refWhite: ReferenceWhite = ReferenceWhite.D65
 
   /** Default converter for transforming color values between different color spaces.
     *
