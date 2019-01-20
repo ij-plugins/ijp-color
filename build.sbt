@@ -10,8 +10,7 @@ homepage     := Some(new URL("https://ij-plugins.sf.net"))
 startYear    := Some(2002)
 licenses     := Seq(("LGPL-2.1", new URL("http://opensource.org/licenses/LGPL-2.1")))
 
-crossScalaVersions := Seq("2.12.8", "2.11.11")
-scalaVersion       := crossScalaVersions.value.head
+scalaVersion       := "2.12.8"
 
 // append -deprecation to the options passed to the Scala compiler
 scalacOptions ++= Seq(
