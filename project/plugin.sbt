@@ -1,3 +1,2 @@
-addSbtPlugin("net.sf.ij-plugins" % "sbt-imagej" % "2.0.1")
+addSbtPlugin("net.sf.ij-plugins" % "sbt-imagej" % "2.1.0")
 
-//addSbtPlugin("com.typesafe.sbteclipse" % "sbteclipse-plugin" % "5.2.4")

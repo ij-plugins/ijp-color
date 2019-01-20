@@ -1,7 +1,7 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2017 Jarek Sacha
- * Author's email: jpsacha at gmail dot com
+ * Copyright (C) 2002-2016 Jarek Sacha
+ * Author's email: jsacha at users dot sourceforge dot net
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -22,22 +22,39 @@
 
 package net.sf.ij_plugins.color.calibration.ui
 
-import ij.ImagePlus
-import net.sf.ij_plugins.color.ColorFXUI
-
 import scalafx.Includes._
 import scalafx.application.JFXApp
 import scalafx.application.JFXApp.PrimaryStage
+import scalafx.geometry.Insets
 import scalafx.scene.Scene
+import scalafx.scene.layout.BorderPane
 
-/** ColorCalibrator UI Demo. */
+/**
+  * @author Jarek Sacha 
+  */
 object ColorCalibratorUIDemo extends JFXApp {
 
-  stage = new PrimaryStage() {
-    title = "Color Calibrator UI Demo"
-    scene = new Scene(new ColorCalibratorMVVM(new ImagePlus(), this).view) {
-      stylesheets ++= ColorFXUI.stylesheets
+  val editableList = new ColorCalibratorUI(null, null) {
+//    model.caption() = "Subject"
+//    model.items ++= Seq(1, 2, 3)
+  }
+
+  stage = new PrimaryStage {
+    scene = new Scene(250, 300) {
+      title = "Editable List Demo"
+      root = new BorderPane {
+        padding = Insets(7)
+        center = editableList.view
+      }
+      onCloseRequest = handle {
+        println("Closing application")
+      }
     }
   }
+
+  editableList.parent = stage
+//  editableList.model.items.onChange((_, _) =>
+//    println(ConfigurationUtils.asString(editableList.model.toConfiguration))
+//  )
 
 }

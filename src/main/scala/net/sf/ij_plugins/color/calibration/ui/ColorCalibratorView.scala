@@ -22,8 +22,6 @@
 
 package net.sf.ij_plugins.color.calibration.ui
 
-import javafx.scene.{layout => jfxsl}
-
 import net.sf.ij_plugins.color.calibration.chart.{ColorCharts, GridColorChart, ReferenceColorSpace}
 import net.sf.ij_plugins.color.calibration.regression.MappingMethod
 import net.sf.ij_plugins.util.IJPUtils
@@ -37,22 +35,28 @@ import scalafx.scene.control.SpinnerValueFactory.IntegerSpinnerValueFactory
 import scalafx.scene.control._
 import scalafx.scene.layout.{GridPane, HBox, Priority}
 import scalafx.scene.text.{Font, FontWeight}
+import scalafxml.core.macros.sfxml
 
-class ColorCalibratorView(model: ColorCalibratorModel) extends jfxsl.StackPane {
+@sfxml
+class ColorCalibratorView(private val imageTitleLabel: Label,
+                          private val chartTypeChoiceBox: ChoiceBox[GridColorChart],
+                          private val renderReferenceChartSplitButton: SplitMenuButton,
+                          private val rootGridPane: GridPane,
+                          private val model: ColorCalibratorModel) {
 
   //private lazy val _viewNode: Parent = initView()
   // TODO: add button to suggest best mapping method.
 
   createContent()
 
+  def createContent() : Unit = {
 
-  def createContent(): Unit = {
-
-    val gp = new GridPane {
-      padding = Insets(10)
-      vgap = 10
-      hgap = 10
-    }
+    //    val gp = new GridPane {
+    //      padding = Insets(10)
+    //      vgap = 10
+    //      hgap = 10
+    //    }
+    val gp = rootGridPane
 
     var row = 0
 
@@ -63,50 +67,59 @@ class ColorCalibratorView(model: ColorCalibratorModel) extends jfxsl.StackPane {
     row += 1
 
 
-    //
-    // Image title
-    //
-    gp.add(separator("Image"), 0, row, GridPane.Remaining, 1)
-    row += 1
-    val imageTitleLabel = new Label() {
-      id = "ijp-image-title"
-      hgrow = Priority.Always
-      maxWidth = Double.MaxValue
-      text <== model.imageTitle
-      alignment = Pos.Center
-      alignmentInParent = Pos.Center
-    }
-    gp.add(imageTitleLabel, 0, row, GridPane.Remaining, 1)
-    row += 1
-
-    //
-    // Reference chart
-    //
-    gp.add(separator("Reference Chart"), 0, row, GridPane.Remaining, 1)
+    //    //
+    //    // Image title
+    //    //
+    //    gp.add(separator("Image"), 0, row, GridPane.Remaining, 1)
+    //    row += 1
+    //    val imageTitleLabel = new Label() {
+    //      id = "ijp-image-title"
+    //      hgrow = Priority.Always
+    //      maxWidth = Double.MaxValue
+    //      text <== model.imageTitle
+    //      alignment = Pos.Center
+    //      alignmentInParent = Pos.Center
+    //    }
+    //    gp.add(imageTitleLabel, 0, row, GridPane.Remaining, 1)
+    imageTitleLabel.text <== model.imageTitle
     row += 1
 
-    val chartTypeChoiceBox = new ChoiceBox[GridColorChart] {
-      items = ObservableBuffer(ColorCharts.values)
-      value <==> model.referenceChart
-    }
-    val renderReferenceChartSplitButton = new SplitMenuButton {
-      text = "Render"
-      onAction = (_: ActionEvent) => model.onRenderReferenceChart()
-      items = List(
-        new MenuItem("Reference Colors") {
-          onAction = (_: ActionEvent) => model.onShowReferenceColors()
-        }
-      )
-    }
+    //    //
+    //    // Reference chart
+    //    //
+    //    gp.add(separator("Reference Chart"), 0, row, GridPane.Remaining, 1)
+    row += 1
 
-    gp.addRow(row,
-      new Label("Type") {
-        id = "ijp-label"
-        alignmentInParent = Pos.CenterRight
-      },
-      chartTypeChoiceBox,
-      renderReferenceChartSplitButton
+    //    val chartTypeChoiceBox = new ChoiceBox[GridColorChart] {
+    //      items = ObservableBuffer(ColorCharts.values)
+    //      value <==> model.referenceChart
+    //    }
+    chartTypeChoiceBox.items = ObservableBuffer(ColorCharts.values)
+    chartTypeChoiceBox.value <==> model.referenceChart
+    //    val renderReferenceChartSplitButton = new SplitMenuButton {
+    //      text = "Render"
+    //      onAction = (ae: ActionEvent) => model.onRenderReferenceChart()
+    //      items = List(
+    //        new MenuItem("Reference Colors") {
+    //          onAction = (_: ActionEvent) => model.onShowReferenceColors()
+    //        }
+    //      )
+    //    }
+    renderReferenceChartSplitButton.onAction = (_: ActionEvent) => model.onRenderReferenceChart()
+    renderReferenceChartSplitButton.items = List(
+      new MenuItem("Reference Colors") {
+        onAction = (_: ActionEvent) => model.onShowReferenceColors()
+      }
     )
+    //
+    //    gp.addRow(row,
+    //      new Label("Type") {
+    //        id = "ijp-label"
+    //        alignmentInParent = Pos.CenterRight
+    //      },
+    //      chartTypeChoiceBox,
+    //      renderReferenceChartSplitButton
+    //    )
     row += 1
 
     //
@@ -203,7 +216,7 @@ class ColorCalibratorView(model: ColorCalibratorModel) extends jfxsl.StackPane {
 
     calibrateButton.prefWidth <== importROIButton.width
 
-    getChildren.addAll(gp)
+    //    getChildren.addAll(gp)
   }
 
   private def separator(labelText: String): HBox = {

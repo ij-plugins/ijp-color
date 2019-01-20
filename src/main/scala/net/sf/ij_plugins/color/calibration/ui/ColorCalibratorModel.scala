@@ -49,13 +49,13 @@ import scalafx.scene.chart._
 import scalafx.scene.control.Alert.AlertType
 import scalafx.scene.control.{Alert, Label, TextArea}
 import scalafx.scene.layout.{GridPane, Priority, StackPane}
-import scalafx.stage.Stage
+import scalafx.stage.{Window, Stage}
 
 
 /** Model for color calibrator UI. */
-class ColorCalibratorModel(val image: ImagePlus, parentStage: Stage) {
+class ColorCalibratorModel(val image: ImagePlus, parentWindow: Window) {
 
-  require(parentStage != null, "Argument `parentStage` cannot be null.")
+  require(parentWindow != null, "Argument `parentStage` cannot be null.")
 
   val imageTitle = new StringProperty(this, "imageTitle", image.getTitle)
   val referenceColorSpace = new ObjectProperty[ReferenceColorSpace](this, "referenceColorSpace", ReferenceColorSpace.sRGB)
@@ -485,7 +485,7 @@ class ColorCalibratorModel(val image: ImagePlus, parentStage: Stage) {
     }
 
     new Alert(AlertType.Error) {
-      initOwner(parentStage)
+      initOwner(parentWindow)
       title = "Error"
       headerText = summary
       contentText = message
@@ -496,7 +496,7 @@ class ColorCalibratorModel(val image: ImagePlus, parentStage: Stage) {
 
   private def showError(summary: String, message: String): Unit = {
     new Alert(AlertType.Error) {
-      initOwner(parentStage)
+      initOwner(parentWindow)
       title = "Error"
       headerText = summary
       contentText = message

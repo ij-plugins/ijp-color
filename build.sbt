@@ -10,7 +10,7 @@ homepage     := Some(new URL("https://ij-plugins.sf.net"))
 startYear    := Some(2002)
 licenses     := Seq(("LGPL-2.1", new URL("http://opensource.org/licenses/LGPL-2.1")))
 
-crossScalaVersions := Seq("2.11.12", "2.12.3")
+crossScalaVersions := Seq("2.12.6", "2.11.11")
 scalaVersion       := crossScalaVersions.value.head
 
 // append -deprecation to the options passed to the Scala compiler
@@ -35,14 +35,18 @@ resolvers ++= Seq(
   "ImageJ Releases" at "http://maven.imagej.net/content/repositories/releases/"
 )
 
-libraryDependencies ++= Seq(
-  "net.imagej"          % "ij"             % "1.51s",
-  "org.apache.commons"  % "commons-math3"  % "3.6.1",
-  "org.scalafx"        %% "scalafx"        % "8.0.144-R12",
-  "org.scalafx"        %% "scalafx-extras" % "0.1.0",
-  "org.scalatest"      %% "scalatest"      % "3.0.4"  % "test"
+addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full)
 
+libraryDependencies ++= Seq(
+  "net.imagej"          % "ij"                  % "1.51f",
+  "org.apache.commons"  % "commons-math3"       % "3.6.1",
+  "org.scalafx"        %% "scalafx"             % "8.0.144-R12",
+  "org.scalafx"        %% "scalafx-extras"      % "0.1.0",
+  "org.scalafx"        %% "scalafxml-core-sfx8" % "0.4",
+  "org.scalatest"      %% "scalatest"           % "3.0.5"  % "test"
 )
+
+autoCompilerPlugins := true
 
 // Fork a new JVM for 'run' and 'test:run'
 fork := true

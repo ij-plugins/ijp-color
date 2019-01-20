@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<!--
+  ~ Image/J Plugins
+  ~ Copyright (C) 2002-2015 Jarek Sacha
+  ~ Author's email: jsacha at users dot sourceforge dot net
+  ~
+  ~ This library is free software; you can redistribute it and/or
+  ~ modify it under the terms of the GNU Lesser General Public
+  ~ License as published by the Free Software Foundation; either
+  ~ version 2.1 of the License, or (at your option) any later version.
+  ~
+  ~ This library is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  ~ Lesser General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Lesser General Public
+  ~ License along with this library; if not, write to the Free Software
+  ~ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+  ~
+  ~ Latest release available at http://sourceforge.net/projects/ij-plugins/
+  -->
+
+<StackPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.sf.ij_plugins.color.calibration.ui.ColorCalibratorView">
+   <children>
+      <GridPane fx:id="rootGridPane" hgap="10.0" vgap="10.0">
+         <padding>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+         </padding>
+         <children>
+            <Label id="ijp-image-title" fx:id="imageTitleLabel" alignment="CENTER" maxWidth="1.7976931348623157E308" text="Label" GridPane.columnSpan="2147483647" GridPane.hgrow="ALWAYS" />
+            <HBox prefHeight="100.0" prefWidth="200.0" GridPane.columnSpan="2147483647" GridPane.rowIndex="1">
+               <children>
+                  <Label id="ijp-separator" text="Reference Chart" />
+                  <Separator id="ijp-separator" prefWidth="200.0" valignment="TOP" HBox.hgrow="ALWAYS">
+                     <HBox.margin>
+                        <Insets bottom="5.0" left="10.0" top="10.0" />
+                     </HBox.margin>
+                  </Separator>
+               </children>
+            </HBox>
+            <Label id="ijp-label" alignment="CENTER_RIGHT" text="Type" GridPane.halignment="RIGHT" GridPane.rowIndex="2" GridPane.valignment="CENTER" />
+            <ChoiceBox fx:id="chartTypeChoiceBox" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <SplitMenuButton fx:id="renderReferenceChartSplitButton" mnemonicParsing="false" text="Render" GridPane.columnIndex="2" GridPane.rowIndex="2">
+              <items>
+                <MenuItem mnemonicParsing="false" text="Action 1" />
+                <MenuItem mnemonicParsing="false" text="Action 2" />
+              </items>
+            </SplitMenuButton>
+         </children>
+         <rowConstraints>
+            <RowConstraints />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" />
+         </rowConstraints>
+         <columnConstraints>
+            <ColumnConstraints />
+            <ColumnConstraints />
+            <ColumnConstraints />
+         </columnConstraints>
+         <StackPane.margin>
+            <Insets />
+         </StackPane.margin>
+      </GridPane>
+   </children>
+</StackPane>

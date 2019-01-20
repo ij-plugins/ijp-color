@@ -74,8 +74,9 @@ class ColorCalibratorPlugin extends PlugIn {
         }
       )
 
-      model = Some(new ColorCalibratorModel(image.get, dialogStage.get))
-      val mainView = new ColorCalibratorView(model.get)
+      val mvvm = new ColorCalibratorMVVM(image.get, dialogStage.get)
+      model = Some(mvvm.model)
+      val mainView = mvvm.view
       dialogStage.get.scene = new Scene {
         stylesheets ++= ColorFXUI.stylesheets
         root = mainView
