@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2017 Jarek Sacha
+ * Copyright (C) 2002-2019 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -133,7 +133,7 @@ class Corrector(val poly: CubicPolynomialTriple) {
       case (COLOR_RGB, 1) =>
         val src = image.getProcessor.asInstanceOf[ColorProcessor]
         mapToFloat(src)
-      case (GRAY8 | ImagePlus.GRAY16 | ImagePlus.GRAY16, 3) =>
+      case (GRAY8, 3) | (GRAY16, 3) | (GRAY32, 3) =>
         val src = (1 to 3).map(image.getStack.getProcessor).toArray
         map(src)
       case _ => throw new IllegalArgumentException("Unsupported ImagePlusType [" + image.getType + "] " +
@@ -159,7 +159,7 @@ class Corrector(val poly: CubicPolynomialTriple) {
         val src = image.getProcessor
         src.setRoi(roi)
         mapToFloat(src.crop().asInstanceOf[ColorProcessor])
-      case (GRAY8 | ImagePlus.GRAY16 | ImagePlus.GRAY16, 3) =>
+      case (GRAY8, 3) | (GRAY16, 3) | (GRAY32, 3) =>
         val src = (1 to 3).map(image.getStack.getProcessor).toArray
         val srcCropped = src.map {
           ip =>
