@@ -4,7 +4,7 @@ import java.net.URL
 
 name         := "ijp-color"
 organization := "net.sf.ij-plugins"
-version      := "0.5.1-SNAPSHOT"
+version      := "0.5.1.2-SNAPSHOT"
 
 homepage     := Some(new URL("https://ij-plugins.sf.net"))
 startYear    := Some(2002)
@@ -46,14 +46,14 @@ lazy val osName = System.getProperty("os.name") match {
 
 lazy val javaFXModules = Seq("base", "controls", "fxml", "graphics", "media", "swing", "web")
 libraryDependencies ++= javaFXModules.map( m =>
-  "org.openjfx" % s"javafx-$m" % "11" classifier osName
+  "org.openjfx" % s"javafx-$m" % "11.0.2" classifier osName
 )
 
 libraryDependencies ++= Seq(
-  "net.imagej"          % "ij"                  % "1.51f",
+  "net.imagej"          % "ij"                  % "1.52j",
   "org.apache.commons"  % "commons-math3"       % "3.6.1",
   "org.scalafx"        %% "scalafx"             % "11-R16",
-  "org.scalafx"        %% "scalafx-extras"      % "0.2.0",
+  "org.scalafx"        %% "scalafx-extras"      % "0.3.0",
   "org.scalafx"        %% "scalafxml-core-sfx8" % "0.4",
   "org.scalatest"      %% "scalatest"           % "3.0.5"  % "test"
 )

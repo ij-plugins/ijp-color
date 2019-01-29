@@ -39,8 +39,10 @@ import net.sf.ij_plugins.color.converter.ColorTriple.Lab
 import net.sf.ij_plugins.color.{ColorFXUI, DeltaE}
 import net.sf.ij_plugins.util._
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
+import org.scalafx.extras.BusyWorker
 import org.scalafx.extras.mvcfx.ModelFX
 import scalafx.Includes._
+import scalafx.application.Platform
 import scalafx.beans.property._
 import scalafx.collections.ObservableBuffer
 import scalafx.geometry.Point2D
@@ -70,12 +72,16 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
   private val chipValuesObservedWrapper = new ReadOnlyBooleanWrapper(this, "chipValuesObserved", false)
   val chipValuesObserved: ReadOnlyBooleanProperty = chipValuesObservedWrapper.getReadOnlyProperty
 
+  private val canApplyToOtherImageWrapper = new ReadOnlyBooleanWrapper(this, "canApplyToOtherImage", false)
+  val canApplyToOtherImage: ReadOnlyBooleanProperty = canApplyToOtherImageWrapper.getReadOnlyProperty
+
   private def chipMargin: Double = chipMarginPercent() / 100d
 
   private def currentChart = referenceChart().copyWithNewChipMargin(chipMargin)
 
+  private val busyWorker: BusyWorker = new BusyWorker("Color Calibrator", parentWindow)
 
-  def onRenderReferenceChart(): Unit = {
+  def onRenderReferenceChart(): Unit = busyWorker.doTask("onRenderReferenceChart") { () =>
     val scale = 80
     val margin = 0.1 * scale
 
@@ -117,7 +123,7 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
     imp.show()
   }
 
-  def onShowReferenceColors(): Unit = {
+  def onShowReferenceColors(): Unit = busyWorker.doTask("onShowReferenceColors") { () =>
     val rt = new ResultsTable()
     val chips = referenceChart().referenceChips
     for (i <- chips.indices) {
@@ -140,7 +146,7 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
   }
 
 
-  def onLoadLocationFromROI(): Unit = {
+  def onLoadLocationFromROI(): Unit = busyWorker.doTask("onLoadLocationFromROI") { () =>
 
     // Load ROI
     val points = loadROI()
@@ -166,7 +172,7 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
     chipValuesObservedWrapper.set(false)
   }
 
-  def onSuggestCalibrationOptions(): Unit = {
+  def onSuggestCalibrationOptions(): Unit = busyWorker.doTask("onSuggestCalibrationOptions") { () =>
     val chart = currentChart
 
     val methods = MappingMethod.values.toList
@@ -215,7 +221,7 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
 
   }
 
-  def onCalibrate(): Unit = {
+  def onCalibrate(): Unit = busyWorker.doTask("onCalibrate") { () =>
 
     // Compute color mapping coefficients
     val chart = currentChart
@@ -409,16 +415,18 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
       bands.foreach(answer.add(_))
       answer
     }
-    val dialogStage = new Stage() {
-      title = chartTitle
-      scene = new Scene {
-        root = new StackPane {
-          children = scatterChart
-          stylesheets ++= ColorFXUI.stylesheets
+    Platform.runLater {
+      val dialogStage = new Stage() {
+        title = chartTitle
+        scene = new Scene {
+          root = new StackPane {
+            children = scatterChart
+            stylesheets ++= ColorFXUI.stylesheets
+          }
         }
       }
+      dialogStage.show()
     }
-    dialogStage.show()
   }
 
   private def showResidualScatterChart(x: Array[Array[Double]], y: Array[Array[Double]], chartTitle: String): Unit = {
