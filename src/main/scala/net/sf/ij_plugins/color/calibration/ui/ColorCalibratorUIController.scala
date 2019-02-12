@@ -48,13 +48,14 @@ class ColorCalibratorUIController(private val imageTitleLabel: Label,
                                   private val mappingMethodChoiceBox: ChoiceBox[MappingMethod.Value],
                                   private val suggestCalibrationOptionsButton: Button,
                                   private val calibrateButton: Button,
+                                  private val applyToCurrentImageButton: Button,
                                   private val rootGridPane: GridPane,
                                   private val model: ColorCalibratorUIModel) extends ControllerFX {
 
   // Dialog header
   private val headerNode = IJPUtils.createHeaderNode(
     "Color Calibrator",
-    "Performs color calibration of an image using embedded color chart.")
+    "Performs color calibration of an image using a color chart.")
   rootGridPane.add(headerNode, 0, 0, GridPane.Remaining, 1)
 
   // Image title
@@ -90,6 +91,8 @@ class ColorCalibratorUIController(private val imageTitleLabel: Label,
   calibrateButton.onAction = _ => model.onCalibrate()
   calibrateButton.disable <== !model.chipValuesObserved
   calibrateButton.alignmentInParent = Pos.Center
-
   calibrateButton.prefWidth <== importROIButton.width
+
+  applyToCurrentImageButton.onAction = _ => model.onApplyToCurrentImage()
+  applyToCurrentImageButton.disable <== !model.correctionRecipeAvailable
 }

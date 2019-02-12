@@ -95,10 +95,13 @@
                 <Button id="ijp-button" fx:id="calibrateButton" contentDisplay="CENTER"
                         maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Calibrate"
                         GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="11"/>
+                <Button fx:id="applyToCurrentImageButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+                        text="Apply to Current Image" GridPane.columnIndex="1" GridPane.rowIndex="12"/>
             </children>
             <rowConstraints>
                 <RowConstraints minHeight="10.0"/>
                 <RowConstraints/>
+                <RowConstraints minHeight="10.0" prefHeight="30.0"/>
                 <RowConstraints minHeight="10.0" prefHeight="30.0"/>
                 <RowConstraints minHeight="10.0" prefHeight="30.0"/>
                 <RowConstraints minHeight="10.0" prefHeight="30.0"/>

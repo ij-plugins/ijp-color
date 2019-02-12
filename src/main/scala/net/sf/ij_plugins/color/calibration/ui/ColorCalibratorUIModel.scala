@@ -54,10 +54,74 @@ import scalafx.scene.layout.{GridPane, Priority, StackPane}
 import scalafx.stage.{Stage, Window}
 
 
+object ColorCalibratorUIModel {
+
+  /** Parameters needed to perform color correction of an image and convert it to sRGB.
+    *
+    * @param imageType ImagePlus image type supported by this correction
+    */
+  case class CorrectionRecipe(corrector: Corrector,
+                              colorConverter: ColorConverter,
+                              referenceColorSpace: ReferenceColorSpace,
+                              imageType: Int)
+
+  def applyCorrection(recipe: CorrectionRecipe,
+                      imp: ImagePlus,
+                      showError: (String, String, Throwable) => Unit): Option[Array[FloatProcessor]] = {
+    val correctedBands = try {
+      recipe.corrector.map(imp)
+    } catch {
+      case t: Throwable =>
+        showError("Error while color correcting the image.", t.getMessage, t)
+        return None
+    }
+
+    // Show floating point stack in the reference color space
+    val correctedInReference = {
+      val stack = new ImageStack(imp.getWidth, imp.getHeight)
+      (recipe.referenceColorSpace.bands zip correctedBands).foreach(v => stack.addSlice(v._1, v._2))
+      new ImagePlus(imp.getTitle + "+corrected_" + recipe.referenceColorSpace, stack)
+    }
+    correctedInReference.show()
+
+    // Convert corrected image to sRGB
+    val correctedImage: ImagePlus = convertToSRGB(correctedBands, recipe.referenceColorSpace, recipe.colorConverter)
+    correctedImage.setTitle(imp.getTitle + "+corrected_" + recipe.referenceColorSpace + "+sRGB")
+    correctedImage.show()
+
+    Option(correctedBands)
+  }
+
+  private def convertToSRGB(bands: Array[FloatProcessor],
+                            colorSpace: ReferenceColorSpace,
+                            converter: ColorConverter): ImagePlus = {
+    colorSpace match {
+      case ReferenceColorSpace.sRGB => new ImagePlus("", IJTools.mergeRGB(bands))
+      case ReferenceColorSpace.XYZ =>
+        // Convert XYZ to sRGB
+        val cp = new ColorProcessor(bands(0).getWidth, bands(0).getHeight)
+        val n = bands(0).getWidth * bands(0).getHeight
+        for (i <- (0 until n).par) {
+          val rgb = converter.xyzToRGB(bands(0).getf(i), bands(1).getf(i), bands(2).getf(i))
+          val r = clipUInt8(rgb.r)
+          val g = clipUInt8(rgb.g)
+          val b = clipUInt8(rgb.b)
+          val color = ((r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF) << 0)
+          cp.set(i, color)
+        }
+        new ImagePlus("", cp)
+      case _ => throw new IllegalArgumentException("Unsupported reference color space '" + colorSpace + "'.")
+    }
+  }
+
+}
+
 /**
   * Model for color calibrator UI.
   */
 class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends ModelFX {
+
+  import ColorCalibratorUIModel._
 
   require(parentWindow != null, "Argument `parentStage` cannot be null.")
 
@@ -68,12 +132,15 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
   val mappingMethod = new ObjectProperty(this, "mappingMethod", MappingMethod.LinearCrossBand)
   val clipReferenceRGB = new BooleanProperty(this, "clipReferenceRGB", true)
   val showExtraInfo = new BooleanProperty(this, "showExtraInfo", false)
+  val correctionRecipe = new ObjectProperty[Option[CorrectionRecipe]](this, "correctionRecipe", None)
 
   private val chipValuesObservedWrapper = new ReadOnlyBooleanWrapper(this, "chipValuesObserved", false)
   val chipValuesObserved: ReadOnlyBooleanProperty = chipValuesObservedWrapper.getReadOnlyProperty
 
-  private val canApplyToOtherImageWrapper = new ReadOnlyBooleanWrapper(this, "canApplyToOtherImage", false)
-  val canApplyToOtherImage: ReadOnlyBooleanProperty = canApplyToOtherImageWrapper.getReadOnlyProperty
+  // True when correction parameters are available and can be applied to another image
+  private val correctionRecipeAvailableWrapper = new ReadOnlyBooleanWrapper(this, "correctionRecipeAvailable", false)
+  correctionRecipeAvailableWrapper <== correctionRecipe =!= None
+  val correctionRecipeAvailable: ReadOnlyBooleanProperty = correctionRecipeAvailableWrapper.getReadOnlyProperty
 
   private def chipMargin: Double = chipMarginPercent() / 100d
 
@@ -234,28 +301,20 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
         showError("Error while computing color calibration.", t.getMessage, t)
         return
     }
-    val corrector = new Corrector(fit.mapping)
 
-    val correctedBands = try {
-      corrector.map(image)
-    } catch {
-      case t: Throwable =>
-        showError("Error while color correcting the image.", t.getMessage, t)
-        return
-    }
 
-    // Show floating point stack in the reference color space
-    val correctedInReference = {
-      val stack = new ImageStack(image.getWidth, image.getHeight)
-      (colorCalibrator.referenceColorSpace.bands zip correctedBands).foreach(v => stack.addSlice(v._1, v._2))
-      new ImagePlus(image.getTitle + "+corrected_" + referenceColorSpace(), stack)
-    }
-    correctedInReference.show()
+    val recipe = CorrectionRecipe(
+      corrector = new Corrector(fit.mapping),
+      colorConverter = colorCalibrator.chart.colorConverter,
+      referenceColorSpace = referenceColorSpace(),
+      imageType = image.getType
+    )
 
-    // Convert corrected image to sRGB
-    val correctedImage: ImagePlus = convertToSRGB(correctedBands, referenceColorSpace(), colorCalibrator.chart.colorConverter)
-    correctedImage.setTitle(image.getTitle + "+corrected_" + referenceColorSpace() + "+sRGB")
-    correctedImage.show()
+    val correctedBands = applyCorrection(
+      recipe,
+      image,
+      showError
+    ).getOrElse(return)
 
     if (showExtraInfo()) {
       // Show table with expected measured and corrected values
@@ -370,27 +429,43 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
         "\n"
       )
     }
+
+    // Update correction recipe
+    correctionRecipe() = Option(recipe)
   }
 
-  private def convertToSRGB(bands: Array[FloatProcessor],
-                            colorSpace: ReferenceColorSpace,
-                            converter: ColorConverter): ImagePlus = {
-    colorSpace match {
-      case ReferenceColorSpace.sRGB => new ImagePlus("", IJTools.mergeRGB(bands))
-      case ReferenceColorSpace.XYZ =>
-        // Convert XYZ to sRGB
-        val cp = new ColorProcessor(bands(0).getWidth, bands(0).getHeight)
-        val n = bands(0).getWidth * bands(0).getHeight
-        for (i <- (0 until n).par) {
-          val rgb = converter.xyzToRGB(bands(0).getf(i), bands(1).getf(i), bands(2).getf(i))
-          val r = clipUInt8(rgb.r)
-          val g = clipUInt8(rgb.g)
-          val b = clipUInt8(rgb.b)
-          val color = ((r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF) << 0)
-          cp.set(i, color)
-        }
-        new ImagePlus("", cp)
-      case _ => throw new IllegalArgumentException("Unsupported reference color space '" + colorSpace + "'.")
+  def onApplyToCurrentImage(): Unit = busyWorker.doTask("onApplyToCurrentImage") { () =>
+    val errorTitle = "Cannot apply Correction"
+
+    // Check that calibration recipe is computed
+    val recipe = correctionRecipe().getOrElse {
+      showError(errorTitle, "Correction parameters not available.")
+      return
+    }
+
+    // Get current image
+    val imp = IJ.getImage
+    if (imp == null) {
+      IJ.noImage()
+      return
+    }
+
+
+    // Verify that image is of correct type
+    if (imp.getType != recipe.imageType) {
+      showError(errorTitle, "Image type does not match expected: [" + recipe.imageType + "]")
+      return
+    }
+
+    // Run calibration on the current image
+    val correctedBands = applyCorrection(recipe, imp, showError).getOrElse(return)
+    if (showExtraInfo()) {
+      val labFPs = referenceColorSpace().toLab(correctedBands)
+      val stack = new ImageStack(labFPs(0).getWidth, labFPs(0).getHeight)
+      stack.addSlice("L*", labFPs(0))
+      stack.addSlice("a*", labFPs(1))
+      stack.addSlice("b*", labFPs(2))
+      new ImagePlus(imp.getShortTitle + "-L*a*b*", stack).show()
     }
   }
 
