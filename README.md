@@ -18,13 +18,13 @@ ImageJ Plugins
 Test Images
 -----------
 
-You can test the calibrator plugin using images in [test/data][test/data].
+You can test the calibrator plugin using images in [test/data](test/data).
 
 
 Stand-alone Library
 -------------------
 
-`ijp-color` was designed to be easily used as a stand-alone library. Examples of use are provided in the [test][src/main/test/scala/net/ij/ij_plugins/color] directory.
+`ijp-color` was designed to be easily used as a stand-alone library. Examples of use are provided in the [test](src/main/test/scala/net/ij/ij_plugins/color) directory.
 
 
 Development Setup
