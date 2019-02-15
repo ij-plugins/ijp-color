@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2017 Jarek Sacha
+ * Copyright (C) 2002-2019 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -23,11 +23,9 @@
 package net.sf.ij_plugins.color.converter.ui
 
 import javafx.beans.{binding => jfxbb}
-
 import net.sf.ij_plugins.color.converter._
 import net.sf.ij_plugins.color.converter.ui.ColorConverterModel.Update
 import net.sf.ij_plugins.util.IJPUtils
-
 import scalafx.Includes._
 import scalafx.beans.property.ObjectProperty
 import scalafx.collections.ObservableBuffer
@@ -39,7 +37,7 @@ import scalafx.scene.layout.GridPane
 import scalafx.util.StringConverter
 
 object ColorConverterView {
-  private val Title = "Color Converter"
+  private val Title = "Color Calculator"
   private val About = "" +
     "Converts between color space coordinates.  To convert color values  \n" +
     "from the source color space to other spaces: type in the source color \n" +
