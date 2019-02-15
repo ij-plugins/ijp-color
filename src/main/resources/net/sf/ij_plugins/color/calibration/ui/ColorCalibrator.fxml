@@ -35,7 +35,7 @@
             <children>
                 <Label id="ijp-image-title" fx:id="imageTitleLabel" maxWidth="1.7976931348623157E308" text="ImageTitle"
                        GridPane.columnSpan="2147483647" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1"/>
-                <HBox prefHeight="100.0" prefWidth="200.0" GridPane.columnSpan="2147483647" GridPane.rowIndex="2">
+                <HBox prefWidth="200.0" GridPane.columnSpan="2147483647" GridPane.rowIndex="2">
                     <children>
                         <Label id="ijp-separator" text="Reference Chart"/>
                         <Separator id="ijp-separator" valignment="TOP" HBox.hgrow="ALWAYS">
@@ -44,18 +44,22 @@
                             </HBox.margin>
                         </Separator>
                     </children>
+                    <padding>
+                        <Insets bottom="5.0" top="10.0"/>
+                    </padding>
                 </HBox>
                 <Label id="ijp-label" alignment="CENTER_RIGHT" text="Type" GridPane.halignment="RIGHT"
                        GridPane.rowIndex="3" GridPane.valignment="CENTER"/>
-                <ChoiceBox fx:id="chartTypeChoiceBox" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
-                <SplitMenuButton fx:id="renderReferenceChartSplitButton" mnemonicParsing="false" text="Render"
-                                 GridPane.columnIndex="2" GridPane.rowIndex="3">
+                <ChoiceBox fx:id="chartTypeChoiceBox" maxWidth="1.7976931348623157E308" prefWidth="200.0"
+                           GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+                <SplitMenuButton fx:id="renderReferenceChartSplitButton" maxWidth="1.7976931348623157E308"
+                                 mnemonicParsing="false" text="Render" GridPane.columnIndex="2" GridPane.rowIndex="3">
                     <items>
                         <MenuItem mnemonicParsing="false" text="Action 1"/>
                         <MenuItem mnemonicParsing="false" text="Action 2"/>
                     </items>
                 </SplitMenuButton>
-                <HBox prefHeight="100.0" prefWidth="200.0" GridPane.columnSpan="2147483647" GridPane.rowIndex="4">
+                <HBox prefWidth="200.0" GridPane.columnSpan="2147483647" GridPane.rowIndex="4">
                     <children>
                         <Label id="ijp-separator" text="Actual Chart"/>
                         <Separator id="ijp-separator" valignment="TOP" HBox.hgrow="ALWAYS">
@@ -64,11 +68,15 @@
                             </HBox.margin>
                         </Separator>
                     </children>
+                    <padding>
+                        <Insets bottom="5.0" top="10.0"/>
+                    </padding>
                 </HBox>
                 <Label id="ijp-label" text="Chip margin %" GridPane.rowIndex="5"/>
-                <Spinner fx:id="marginsSpinner" max="100" min="0" GridPane.columnIndex="1" GridPane.rowIndex="5"/>
+                <Spinner fx:id="marginsSpinner" max="100" maxWidth="1.7976931348623157E308" min="0"
+                         GridPane.columnIndex="1" GridPane.rowIndex="5"/>
 
-                <HBox prefHeight="100.0" prefWidth="200.0" GridPane.columnSpan="2147483647" GridPane.rowIndex="6">
+                <HBox prefWidth="200.0" GridPane.columnSpan="2147483647" GridPane.rowIndex="6">
                     <children>
                         <Label id="ijp-separator" text="Calibration"/>
                         <Separator id="ijp-separator" valignment="TOP" HBox.hgrow="ALWAYS">
@@ -77,37 +85,65 @@
                             </HBox.margin>
                         </Separator>
                     </children>
+                    <padding>
+                        <Insets bottom="5.0" top="10.0"/>
+                    </padding>
                 </HBox>
                 <Label id="ijp-label" alignment="CENTER_RIGHT" text="Reference" GridPane.halignment="RIGHT"
                        GridPane.rowIndex="7" GridPane.valignment="CENTER"/>
-                <ChoiceBox fx:id="referenceColorSpaceChoiceBox" prefWidth="150.0" GridPane.columnIndex="1"
-                           GridPane.rowIndex="7"/>
+                <ChoiceBox fx:id="referenceColorSpaceChoiceBox" maxWidth="1.7976931348623157E308" prefWidth="150.0"
+                           GridPane.columnIndex="1" GridPane.rowIndex="7"/>
                 <CheckBox fx:id="enableExtraInfoCB" mnemonicParsing="false" text="Show extra info"
                           GridPane.columnIndex="1" GridPane.rowIndex="9"/>
                 <Label id="ijp-label" text="Mapping method" GridPane.rowIndex="8"/>
-                <ChoiceBox fx:id="mappingMethodChoiceBox" prefWidth="150.0" GridPane.columnIndex="1"
-                           GridPane.rowIndex="8"/>
+                <ChoiceBox fx:id="mappingMethodChoiceBox" maxWidth="1.7976931348623157E308" prefWidth="150.0"
+                           GridPane.columnIndex="1" GridPane.rowIndex="8"/>
                 <Button fx:id="suggestCalibrationOptionsButton" mnemonicParsing="false" text="Sugget Options"
                         GridPane.columnIndex="2" GridPane.rowIndex="7"/>
                 <Button id="ijp-button" fx:id="calibrateButton" contentDisplay="CENTER"
                         maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Calibrate"
-                        GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="10"/>
+                        GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="10">
+                    <GridPane.margin>
+                        <Insets bottom="5.0" top="5.0"/>
+                    </GridPane.margin>
+                </Button>
                 <Button fx:id="applyToCurrentImageButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
-                        text="Apply to Current Image" GridPane.columnIndex="1" GridPane.rowIndex="11"/>
+                        text="Apply" GridPane.columnIndex="1" GridPane.rowIndex="12">
+                    <padding>
+                        <Insets bottom="5.0" top="5.0"/>
+                    </padding>
+                    <GridPane.margin>
+                        <Insets bottom="5.0" top="5.0"/>
+                    </GridPane.margin>
+                </Button>
+                <HBox prefWidth="200.0" GridPane.columnSpan="2147483647" GridPane.rowIndex="11">
+                    <children>
+                        <Label id="ijp-separator" text="Apply to Another Image"/>
+                        <Separator id="ijp-separator" valignment="TOP" HBox.hgrow="ALWAYS">
+                            <HBox.margin>
+                                <Insets bottom="5.0" left="10.0" top="10.0"/>
+                            </HBox.margin>
+                        </Separator>
+                    </children>
+                    <padding>
+                        <Insets bottom="5.0" top="10.0"/>
+                    </padding>
+                </HBox>
             </children>
             <rowConstraints>
                 <RowConstraints minHeight="10.0"/>
                 <RowConstraints/>
-                <RowConstraints minHeight="10.0" prefHeight="30.0"/>
-                <RowConstraints minHeight="10.0" prefHeight="30.0"/>
-                <RowConstraints minHeight="10.0" prefHeight="30.0"/>
-                <RowConstraints minHeight="10.0" prefHeight="30.0"/>
-                <RowConstraints minHeight="10.0" prefHeight="30.0"/>
-                <RowConstraints minHeight="10.0" prefHeight="30.0"/>
-                <RowConstraints minHeight="10.0" prefHeight="30.0"/>
-                <RowConstraints minHeight="10.0" prefHeight="30.0"/>
-                <RowConstraints minHeight="10.0" prefHeight="30.0"/>
-                <RowConstraints minHeight="10.0" prefHeight="30.0"/>
+                <RowConstraints minHeight="10.0"/>
+                <RowConstraints minHeight="10.0"/>
+                <RowConstraints minHeight="10.0"/>
+                <RowConstraints minHeight="10.0"/>
+                <RowConstraints minHeight="10.0"/>
+                <RowConstraints minHeight="10.0"/>
+                <RowConstraints minHeight="10.0"/>
+                <RowConstraints minHeight="10.0"/>
+                <RowConstraints minHeight="10.0"/>
+                <RowConstraints minHeight="10.0"/>
+                <RowConstraints minHeight="10.0"/>
             </rowConstraints>
             <columnConstraints>
                 <ColumnConstraints/>
