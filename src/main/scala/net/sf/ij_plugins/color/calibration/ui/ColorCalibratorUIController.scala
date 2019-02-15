@@ -42,7 +42,6 @@ class ColorCalibratorUIController(private val imageTitleLabel: Label,
                                   private val chartTypeChoiceBox: ChoiceBox[GridColorChart],
                                   private val renderReferenceChartSplitButton: SplitMenuButton,
                                   private val marginsSpinner: Spinner[java.lang.Integer],
-                                  private val importROIButton: Button,
                                   private val referenceColorSpaceChoiceBox: ChoiceBox[ReferenceColorSpace],
                                   private val enableExtraInfoCB: CheckBox,
                                   private val mappingMethodChoiceBox: ChoiceBox[MappingMethod.Value],
@@ -76,7 +75,7 @@ class ColorCalibratorUIController(private val imageTitleLabel: Label,
     value = model.chipMarginPercent()
     value <==> model.chipMarginPercent
   }
-  importROIButton.onAction = _ => model.onLoadLocationFromROI()
+  //  importROIButton.onAction = _ => model.onLoadLocationFromROI()
 
   // Calibration
   referenceColorSpaceChoiceBox.items = ObservableBuffer(ReferenceColorSpace.values)
@@ -91,7 +90,6 @@ class ColorCalibratorUIController(private val imageTitleLabel: Label,
   calibrateButton.onAction = _ => model.onCalibrate()
   calibrateButton.disable <== !model.chipValuesObserved
   calibrateButton.alignmentInParent = Pos.Center
-  calibrateButton.prefWidth <== importROIButton.width
 
   applyToCurrentImageButton.onAction = _ => model.onApplyToCurrentImage()
   applyToCurrentImageButton.disable <== !model.correctionRecipeAvailable

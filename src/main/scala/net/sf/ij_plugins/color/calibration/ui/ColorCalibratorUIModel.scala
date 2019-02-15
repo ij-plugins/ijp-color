@@ -22,7 +22,7 @@
 
 package net.sf.ij_plugins.color.calibration.ui
 
-import java.awt.{BasicStroke, Color, Polygon}
+import java.awt.{Color, Polygon}
 import java.io.{PrintWriter, StringWriter}
 
 import ij.gui.{PolygonRoi, Roi}
@@ -39,13 +39,12 @@ import net.sf.ij_plugins.color.converter.ColorTriple.Lab
 import net.sf.ij_plugins.color.{ColorFXUI, DeltaE}
 import net.sf.ij_plugins.util._
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
-import org.scalafx.extras.BusyWorker
 import org.scalafx.extras.mvcfx.ModelFX
+import org.scalafx.extras.{BusyWorker, onFXAndWait}
 import scalafx.Includes._
 import scalafx.application.Platform
 import scalafx.beans.property._
 import scalafx.collections.ObservableBuffer
-import scalafx.geometry.Point2D
 import scalafx.scene.Scene
 import scalafx.scene.chart._
 import scalafx.scene.control.Alert.AlertType
@@ -134,6 +133,8 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
   val showExtraInfo = new BooleanProperty(this, "showExtraInfo", false)
   val correctionRecipe = new ObjectProperty[Option[CorrectionRecipe]](this, "correctionRecipe", None)
 
+  val liveChartROI = new LiveChartROI(image, referenceChart, chipMarginPercent)
+
   private val chipValuesObservedWrapper = new ReadOnlyBooleanWrapper(this, "chipValuesObserved", false)
   val chipValuesObserved: ReadOnlyBooleanProperty = chipValuesObservedWrapper.getReadOnlyProperty
 
@@ -142,11 +143,13 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
   correctionRecipeAvailableWrapper <== correctionRecipe =!= None
   val correctionRecipeAvailable: ReadOnlyBooleanProperty = correctionRecipeAvailableWrapper.getReadOnlyProperty
 
-  private def chipMargin: Double = chipMarginPercent() / 100d
-
-  private def currentChart = referenceChart().copyWithNewChipMargin(chipMargin)
+  private def currentChart = liveChartROI.locatedChart.value.get
 
   private val busyWorker: BusyWorker = new BusyWorker("Color Calibrator", parentWindow)
+
+  // Chip values are observed when `locatedChart` is available
+  chipValuesObservedWrapper <== liveChartROI.locatedChart =!= None
+
 
   def onRenderReferenceChart(): Unit = busyWorker.doTask("onRenderReferenceChart") { () =>
     val scale = 80
@@ -210,33 +213,6 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
       rt.setValue("sRGB B", i, rgb.b)
     }
     rt.show(referenceChart().name + " / " + referenceChart().refWhite)
-  }
-
-
-  def onLoadLocationFromROI(): Unit = busyWorker.doTask("onLoadLocationFromROI") { () =>
-
-    // Load ROI
-    val points = loadROI()
-    if (points.isEmpty) return
-
-    // Create alignment transform
-    referenceChart().alignmentTransform = PerspectiveTransform.quadToQuad(
-      referenceChart().referenceOutline.toArray,
-      points.get.toArray
-    )
-
-    // Display chart overlay
-    val shape = toShape(currentChart.alignedChips)
-    image.setOverlay(shape, Color.MAGENTA, new BasicStroke(2))
-
-    chipValuesObservedWrapper.set(true)
-  }
-
-  def resetROI(): Unit = {
-    // Create alignment transform
-    referenceChart().alignmentTransform = new PerspectiveTransform()
-    image.setOverlay(null)
-    chipValuesObservedWrapper.set(false)
   }
 
   def onSuggestCalibrationOptions(): Unit = busyWorker.doTask("onSuggestCalibrationOptions") { () =>
@@ -519,74 +495,52 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
   }
 
 
-  private def loadROI(): Option[Seq[Point2D]] = {
-    // Validate ROI selection
-    if (image == null) {
-      showError("No input image available", "Input image needed for ROI selection.")
-      return None
-    }
-
-    val polygon = image.getRoi match {
-      case polyline: PolygonRoi => polyline.getPolygon.npoints match {
-        case 4 => polyline.getPolygon
-        case n =>
-          showError("Not a valid ROI", "Expecting polygonal selection with 4 points, got " + n + " points.")
-          return None
-      }
-      case _ =>
-        showError("Not a valid ROI", "Polygon or Segmented Line selection required.")
-        return None
-    }
-
-    // Get location of the chart corners from the selected poly-line
-    val p0 = new Point2D(polygon.xpoints(0), polygon.ypoints(0))
-    val p1 = new Point2D(polygon.xpoints(1), polygon.ypoints(1))
-    val p2 = new Point2D(polygon.xpoints(2), polygon.ypoints(2))
-    val p3 = new Point2D(polygon.xpoints(3), polygon.ypoints(3))
-    Some(List(p0, p1, p2, p3))
-  }
-
   private def showError(summary: String, message: String, t: Throwable): Unit = {
-    // Extract exception text
-    val exceptionText = {
-      val sw = new StringWriter()
-      val pw = new PrintWriter(sw)
-      t.printStackTrace(pw)
-      sw.toString
-    }
-    val label = new Label("The exception stacktrace was:")
-    val textArea = new TextArea {
-      text = exceptionText
-      editable = false
-      wrapText = true
-      maxWidth = Double.MaxValue
-      maxHeight = Double.MaxValue
-      vgrow = Priority.Always
-      hgrow = Priority.Always
-    }
-    val expContent = new GridPane {
-      maxWidth = Double.MaxValue
-      add(label, 0, 0)
-      add(textArea, 0, 1)
-    }
+    onFXAndWait {
+      // TODO ShowMessage trait to simplify code
+      // Extract exception text
+      val exceptionText = {
+        val sw = new StringWriter()
+        val pw = new PrintWriter(sw)
+        t.printStackTrace(pw)
+        sw.toString
+      }
+      val label = new Label("The exception stacktrace was:")
+      val textArea = new TextArea {
+        text = exceptionText
+        editable = false
+        wrapText = true
+        maxWidth = Double.MaxValue
+        maxHeight = Double.MaxValue
+        vgrow = Priority.Always
+        hgrow = Priority.Always
+      }
+      val expContent = new GridPane {
+        maxWidth = Double.MaxValue
+        add(label, 0, 0)
+        add(textArea, 0, 1)
+      }
 
-    new Alert(AlertType.Error) {
-      initOwner(parentWindow)
-      title = "Error"
-      headerText = summary
-      contentText = message
-      // Set expandable Exception into the dialog pane.
-      dialogPane().expandableContent = expContent
-    }.showAndWait()
+      new Alert(AlertType.Error) {
+        initOwner(parentWindow)
+        title = "Error"
+        headerText = summary
+        contentText = message
+        // Set expandable Exception into the dialog pane.
+        dialogPane().expandableContent = expContent
+      }.showAndWait()
+    }
   }
 
   private def showError(summary: String, message: String): Unit = {
-    new Alert(AlertType.Error) {
-      initOwner(parentWindow)
-      title = "Error"
-      headerText = summary
-      contentText = message
-    }.showAndWait()
+    onFXAndWait {
+      new Alert(AlertType.Error) {
+        initOwner(parentWindow)
+        title = "Error"
+        headerText = summary
+        contentText = message
+      }.showAndWait()
+    }
   }
 
 }

@@ -56,16 +56,8 @@ trait ColorChart {
     rgbScale = 255
   )
 
-  private var _alignmentTransform = new PerspectiveTransform()
-
   /** Alignment between the reference chips and chips found in the actual chart. */
-  final def alignmentTransform: PerspectiveTransform = _alignmentTransform
-
-  final def alignmentTransform_=(transform: PerspectiveTransform): Unit = {
-    require(transform != null, "Argument 'transform' cannot be null.")
-    _alignmentTransform = transform
-  }
-
+  def alignmentTransform: PerspectiveTransform
 
   /** Compute average color within aligned chips from an RGB image.
     *

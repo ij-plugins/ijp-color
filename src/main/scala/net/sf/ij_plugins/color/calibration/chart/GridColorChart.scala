@@ -25,7 +25,7 @@ package net.sf.ij_plugins.color.calibration.chart
 import ij.process.ImageProcessor
 import net.sf.ij_plugins.color.converter.ColorTriple.Lab
 import net.sf.ij_plugins.color.converter.ReferenceWhite
-import net.sf.ij_plugins.util.IJTools
+import net.sf.ij_plugins.util.{IJTools, PerspectiveTransform}
 import scalafx.geometry.Point2D
 
 import scala.collection.immutable
@@ -46,10 +46,16 @@ final class GridColorChart(val name: String,
                            val chips: List[(String, Lab)],
                            val chipMargin: Double,
                            val enabled: List[Boolean],
-                           override val refWhite: ReferenceWhite) extends ColorChart {
+                           override val refWhite: ReferenceWhite,
+                           override val alignmentTransform: PerspectiveTransform) extends ColorChart {
 
+  // TODO: add requirement messages
   require(chipMargin >= 0 && chipMargin < 0.5, "Margin value must at least 0 but less than 0.5, got " + chipMargin)
-
+  require(nbColumns > 0)
+  require(nbRows > 0)
+  require(nbColumns * nbRows == chips.size)
+  require(refWhite != null)
+  require(alignmentTransform != null)
 
   /** Construct chart with all chips enabled.
     *
@@ -63,8 +69,10 @@ final class GridColorChart(val name: String,
            nbRows: Int,
            chips: List[(String, Lab)],
            refWhite: ReferenceWhite,
-           chipMargin: Double = 0) {
-    this(name, nbColumns, nbRows, chips, chipMargin, List.fill(nbColumns * nbRows)(true), refWhite)
+           chipMargin: Double = 0,
+           perspectiveTransform: PerspectiveTransform = new PerspectiveTransform()) {
+    this(name, nbColumns, nbRows, chips, chipMargin, List.fill(nbColumns * nbRows)(true), refWhite,
+      perspectiveTransform)
   }
 
   private val n = nbColumns * nbRows
@@ -140,15 +148,14 @@ final class GridColorChart(val name: String,
     val newEnabled = new Array[Boolean](this.enabled.size)
     newEnabledIndices.foreach(i => newEnabled(i) = true)
 
-    val r = new GridColorChart(name, nbColumns, nbRows, chips, chipMargin, newEnabled.toList, refWhite)
-    r.alignmentTransform = alignmentTransform
-    r
+    new GridColorChart(name, nbColumns, nbRows, chips, chipMargin, newEnabled.toList, refWhite, alignmentTransform)
   }
 
   /** Creates a copy of this chart with different `chipMargin`. Value of the margin must be between 0 and 0.5. */
-  def copyWithNewChipMargin(newChipMargin: Double): GridColorChart = {
-    val r = new GridColorChart(name, nbColumns, nbRows, chips, refWhite, newChipMargin)
-    r.alignmentTransform = alignmentTransform
-    r
-  }
+  def copyWithNewChipMargin(newChipMargin: Double): GridColorChart =
+    new GridColorChart(name, nbColumns, nbRows, chips, refWhite, newChipMargin, alignmentTransform)
+
+  /** Creates a copy of this chart with different `alignmentTransform`. */
+  def copyWith(newAlignmentTransform: PerspectiveTransform): GridColorChart =
+    new GridColorChart(name, nbColumns, nbRows, chips, refWhite, chipMargin, newAlignmentTransform)
 }

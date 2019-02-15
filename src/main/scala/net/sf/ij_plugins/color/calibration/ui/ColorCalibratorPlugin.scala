@@ -23,6 +23,7 @@
 package net.sf.ij_plugins.color.calibration.ui
 
 import ij.ImagePlus.{COLOR_RGB, GRAY16, GRAY32, GRAY8}
+import ij.gui.Roi
 import ij.plugin.PlugIn
 import ij.{IJ, ImageListener, ImagePlus}
 import net.sf.ij_plugins.color.ColorFXUI
@@ -42,6 +43,9 @@ class ColorCalibratorPlugin extends PlugIn {
   private var image: Option[ImagePlus] = None
   private var model: Option[ColorCalibratorUIModel] = None
   private var dialogStage: Option[Stage] = None
+
+  private var imageListener: Option[ImageListener] = None
+  private var roiListener: Option[LiveChartROI] = None
 
 
   def run(arg: String): Unit = {
@@ -63,8 +67,6 @@ class ColorCalibratorPlugin extends PlugIn {
         return
     }
 
-    setupImageListener()
-
     initializeFX()
 
     onFX {
@@ -85,11 +87,26 @@ class ColorCalibratorPlugin extends PlugIn {
       }
       IJ.showStatus("")
       dialogStage.get.show()
+
+      setupImageListener()
+      setupROIListener(mvc.model.liveChartROI)
+
+      dialogStage.get.onCloseRequest = () => {
+        // TODO Remove image listener
+        // TODO Remove ROI listener
+        removeImageListener()
+        removeROIListener()
+      }
     }
   }
 
   private def setupImageListener(): Unit = {
-    ImagePlus.addImageListener(
+
+    if (imageListener.nonEmpty) {
+      throw new IllegalStateException("ImageListener already created")
+    }
+
+    imageListener = Some(
       new ImageListener {
         def imageUpdated(imp: ImagePlus): Unit = {
           if (image.contains(imp)) {
@@ -106,18 +123,45 @@ class ColorCalibratorPlugin extends PlugIn {
         def imageOpened(imp: ImagePlus): Unit = {}
       }
     )
+
+    ImagePlus.addImageListener(imageListener.get)
+  }
+
+  def removeImageListener(): Unit = {
+    imageListener match {
+      case Some(il) => ImagePlus.removeImageListener(il)
+      case _ =>
+    }
+  }
+
+  private def setupROIListener(liveChartROI: LiveChartROI): Unit = {
+
+    if (roiListener.nonEmpty) {
+      throw new IllegalStateException("RoiListener already created")
+    }
+
+    roiListener = Option(liveChartROI)
+
+    Roi.addRoiListener(roiListener.get)
+  }
+
+  def removeROIListener(): Unit = {
+    roiListener match {
+      case Some(rl) => Roi.removeRoiListener(rl)
+      case _ =>
+    }
   }
 
   private def handleImageUpdated(): Unit = onFX {
     // Update image title
     model.foreach { m =>
       m.imageTitle() = image.getOrElse(new ImagePlus("<No Image>")).getTitle
-      m.resetROI()
+      //      m.resetROI()
     }
   }
 
   private def handleImageClosed(): Unit = onFX {
-    model.foreach(_.resetROI())
+    //    model.foreach(_.resetROI())
     dialogStage.foreach(_.hide())
   }
 }

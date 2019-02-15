@@ -67,11 +67,8 @@
                 </HBox>
                 <Label id="ijp-label" text="Chip margin %" GridPane.rowIndex="5"/>
                 <Spinner fx:id="marginsSpinner" max="100" min="0" GridPane.columnIndex="1" GridPane.rowIndex="5"/>
-                <Button id="ijp-button" fx:id="importROIButton" maxWidth="1.7976931348623157E308"
-                        mnemonicParsing="false" text="Load location from ROI" GridPane.columnIndex="1"
-                        GridPane.halignment="CENTER" GridPane.rowIndex="6"/>
 
-                <HBox prefHeight="100.0" prefWidth="200.0" GridPane.columnSpan="2147483647" GridPane.rowIndex="7">
+                <HBox prefHeight="100.0" prefWidth="200.0" GridPane.columnSpan="2147483647" GridPane.rowIndex="6">
                     <children>
                         <Label id="ijp-separator" text="Calibration"/>
                         <Separator id="ijp-separator" valignment="TOP" HBox.hgrow="ALWAYS">
@@ -82,26 +79,25 @@
                     </children>
                 </HBox>
                 <Label id="ijp-label" alignment="CENTER_RIGHT" text="Reference" GridPane.halignment="RIGHT"
-                       GridPane.rowIndex="8" GridPane.valignment="CENTER"/>
+                       GridPane.rowIndex="7" GridPane.valignment="CENTER"/>
                 <ChoiceBox fx:id="referenceColorSpaceChoiceBox" prefWidth="150.0" GridPane.columnIndex="1"
-                           GridPane.rowIndex="8"/>
+                           GridPane.rowIndex="7"/>
                 <CheckBox fx:id="enableExtraInfoCB" mnemonicParsing="false" text="Show extra info"
-                          GridPane.columnIndex="1" GridPane.rowIndex="10"/>
-                <Label id="ijp-label" text="Mapping method" GridPane.rowIndex="9"/>
+                          GridPane.columnIndex="1" GridPane.rowIndex="9"/>
+                <Label id="ijp-label" text="Mapping method" GridPane.rowIndex="8"/>
                 <ChoiceBox fx:id="mappingMethodChoiceBox" prefWidth="150.0" GridPane.columnIndex="1"
-                           GridPane.rowIndex="9"/>
+                           GridPane.rowIndex="8"/>
                 <Button fx:id="suggestCalibrationOptionsButton" mnemonicParsing="false" text="Sugget Options"
-                        GridPane.columnIndex="2" GridPane.rowIndex="8"/>
+                        GridPane.columnIndex="2" GridPane.rowIndex="7"/>
                 <Button id="ijp-button" fx:id="calibrateButton" contentDisplay="CENTER"
                         maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Calibrate"
-                        GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="11"/>
+                        GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="10"/>
                 <Button fx:id="applyToCurrentImageButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
-                        text="Apply to Current Image" GridPane.columnIndex="1" GridPane.rowIndex="12"/>
+                        text="Apply to Current Image" GridPane.columnIndex="1" GridPane.rowIndex="11"/>
             </children>
             <rowConstraints>
                 <RowConstraints minHeight="10.0"/>
                 <RowConstraints/>
-                <RowConstraints minHeight="10.0" prefHeight="30.0"/>
                 <RowConstraints minHeight="10.0" prefHeight="30.0"/>
                 <RowConstraints minHeight="10.0" prefHeight="30.0"/>
                 <RowConstraints minHeight="10.0" prefHeight="30.0"/>
