@@ -24,6 +24,7 @@ package net.sf.ij_plugins.color.calibration.ui
 
 import java.awt.{Color, Polygon}
 import java.io.{PrintWriter, StringWriter}
+import java.net.URL
 
 import ij.gui.{PolygonRoi, Roi}
 import ij.measure.ResultsTable
@@ -347,8 +348,8 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
       }
       rtFit.show("Regression Coefficients")
 
-      showScatterChart(fit.reference, fit.observed, "Reference vs. Observed")
-      showScatterChart(fit.reference, fit.corrected, "Reference vs. Corrected")
+      showScatterChart(fit.reference, fit.observed, referenceColorSpace().bands, "Reference vs. Observed")
+      showScatterChart(fit.reference, fit.corrected, referenceColorSpace().bands, "Reference vs. Corrected")
       showResidualScatterChart(fit.reference, fit.corrected, "Reference vs. Corrected Residual")
 
       // Delta in reference color space
@@ -464,7 +465,22 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
   }
 
 
-  private def showScatterChart(x: Array[Array[Double]], y: Array[Array[Double]], chartTitle: String): Unit = {
+  private def showScatterChart(x: Array[Array[Double]],
+                               y: Array[Array[Double]],
+                               seriesLabels: Array[String],
+                               chartTitle: String): Unit = {
+
+    require(seriesLabels.length == 3)
+
+    def check(name: String): Option[URL] = {
+      val stylesheetURL = getClass.getResource(name)
+      Option(stylesheetURL)
+    }
+
+    def myStylesheets: Seq[String] = List(
+      "RGBScatterChart.css"
+    ).flatMap(check(_).map(_.toExternalForm))
+
     // Create plot
     val xAxis = new NumberAxis()
     val yAxis = new NumberAxis()
@@ -474,7 +490,7 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
       val bands = (0 to 2).map {
         b =>
           new XYChart.Series[Number, Number] {
-            name = "Band " + b
+            name = seriesLabels(b)
           }
       }
       val chips = referenceChart().referenceChips
@@ -491,6 +507,7 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
           root = new StackPane {
             children = scatterChart
             stylesheets ++= ColorFXUI.stylesheets
+            stylesheets ++= myStylesheets
           }
         }
       }
@@ -509,7 +526,7 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
       }
       dy(i) = dd
     }
-    showScatterChart(x, dy, chartTitle)
+    showScatterChart(x, dy, referenceColorSpace().bands, chartTitle)
   }
 
 
