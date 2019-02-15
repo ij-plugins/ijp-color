@@ -20,23 +20,14 @@
  * Latest release available at http://sourceforge.net/projects/ij-plugins/
  */
 
-package net.sf.ij_plugins.color.calibration.ui
+.default-color0.chart-symbol {
+    -fx-background-color: #ff3030;
+}
 
-import ij.ImagePlus
-import net.sf.ij_plugins.color.ColorFXUI
-import scalafx.Includes._
-import scalafx.application.JFXApp
-import scalafx.application.JFXApp.PrimaryStage
-import scalafx.scene.Scene
+.default-color1.chart-symbol {
+    -fx-background-color: #30ff30;
+}
 
-/** ColorCalibrator UI Demo. */
-object ColorCalibratorUIDemo extends JFXApp {
-
-  stage = new PrimaryStage() {
-    title = "Color Calibrator UI Demo"
-    scene = new Scene(new ColorCalibratorUI(new ImagePlus(), this).view) {
-      stylesheets ++= ColorFXUI.stylesheets
-    }
-  }
-
+.default-color2.chart-symbol {
+    -fx-background-color: #3030ff;
 }

@@ -28,12 +28,11 @@ import net.sf.ij_plugins.color.calibration.regression.MappingMethod
 import net.sf.ij_plugins.util._
 import org.scalatest.FlatSpec
 import org.scalatest.Matchers._
-
 import scalafx.geometry.Point2D
 
 /**
- * @author Jarek Sacha 
- */
+  * @author Jarek Sacha
+  */
 class ColorCalibratorSpec extends FlatSpec {
 
   "ColorCalibrator" should "perform color calibration in XYZ" in {
@@ -106,8 +105,8 @@ class ColorCalibratorSpec extends FlatSpec {
       new Point2D(25, 18), new Point2D(25 + 546, 18),
       new Point2D(25 + 546, 18 + 362), new Point2D(25, 18 + 362)
     )
-    chart.alignmentTransform = PerspectiveTransform.quadToQuad(
-      chart.referenceOutline.toArray, chartLocationROI)
+    val newChart = chart.copyWith(PerspectiveTransform.quadToQuad(
+      chart.referenceOutline.toArray, chartLocationROI))
 
     val expectedXYZDeltas = Array(
       1.240, 3.884, 3.085, 0.512, 1.109, 2.427,
@@ -122,12 +121,12 @@ class ColorCalibratorSpec extends FlatSpec {
     imp should not equal null
 
     // Create color calibration
-    val colorCalibrator = new ColorCalibrator(chart, colorSpace, method)
+    val colorCalibrator = new ColorCalibrator(newChart, colorSpace, method)
     val fit = colorCalibrator.computeCalibrationMapping(imp)
 
     // Check deltas, this is a consistency check, deltas may be lower if the fit algorithm is improved
     val deltas = fit.correctedDeltas
-    for (i <- 0 until expectedXYZDeltas.length) {
+    for (i <- expectedXYZDeltas.indices) {
       deltas(i) should be(expectedXYZDeltas(i) +- 0.1)
     }
   }
@@ -144,8 +143,8 @@ class ColorCalibratorSpec extends FlatSpec {
       new Point2D(25, 18), new Point2D(25 + 546, 18),
       new Point2D(25 + 546, 18 + 362), new Point2D(25, 18 + 362)
     )
-    chart.alignmentTransform = PerspectiveTransform.quadToQuad(
-      chart.referenceOutline.toArray, chartLocationROI)
+    val newChart = chart.copyWith(PerspectiveTransform.quadToQuad(
+      chart.referenceOutline.toArray, chartLocationROI))
 
     val expectedXYZDeltas = Array(
       1.240, 3.884, 3.085, 0.512, 1.109, 2.427,
@@ -160,12 +159,12 @@ class ColorCalibratorSpec extends FlatSpec {
     imp should not equal null
 
     // Create color calibration
-    val colorCalibrator = new ColorCalibrator(chart, colorSpace, method)
+    val colorCalibrator = new ColorCalibrator(newChart, colorSpace, method)
     val fit = colorCalibrator.computeCalibrationMapping(imp)
 
     // Check deltas, this is a consistency check, deltas may be lower if the fit algorithm is improved
     val deltas = fit.correctedDeltas
-    for (i <- 0 until expectedXYZDeltas.length) {
+    for (i <- expectedXYZDeltas.indices) {
       deltas(i) should be(expectedXYZDeltas(i) +- 0.1)
     }
 

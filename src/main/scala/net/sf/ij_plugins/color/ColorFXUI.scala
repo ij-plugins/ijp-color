@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2017 Jarek Sacha
+ * Copyright (C) 2002-2019 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -24,7 +24,9 @@ package net.sf.ij_plugins.color
 
 import java.net.URL
 
+import net.sf.ij_plugins.util.IJTools
 import scalafx.Includes._
+import scalafx.application.Platform
 import scalafx.scene.layout.StackPane
 import scalafx.scene.{Node, Scene}
 import scalafx.stage.Stage
@@ -33,30 +35,34 @@ import scalafx.stage.Stage
 object ColorFXUI {
 
   /**
-   * Return string representing URL to stylesheet used by `ColorFXUI` user interface.
-   *
-   * Returns empty string if stylesheet is not present.
-   */
+    * Return string representing URL to stylesheet used by `ColorFXUI` user interface.
+    *
+    * Returns empty string if stylesheet is not present.
+    */
   def stylesheets: Seq[String] = List(
     "ijp-color.css"
   ).flatMap(check(_).map(_.toExternalForm))
 
   /**
-   * Show `node` in a new window.
-   * @param node node to show.
-   * @param windowTitle window title.
-   */
+    * Show `node` in a new window.
+    *
+    * @param node        node to show.
+    * @param windowTitle window title.
+    */
   def showInNewWindow(node: Node, windowTitle: String): Unit = {
-    val dialogStage = new Stage() {
-      title = windowTitle
-      scene = new Scene {
-        root = new StackPane {
-          children = node
-          stylesheets ++= ColorFXUI.stylesheets
+    Platform.runLater {
+      val dialogStage = new Stage() {
+        title = windowTitle
+        IJTools.imageJIconAsFXImage.foreach(icons += _)
+        scene = new Scene {
+          root = new StackPane {
+            children = node
+            stylesheets ++= ColorFXUI.stylesheets
+          }
         }
       }
+      dialogStage.show()
     }
-    dialogStage.show()
   }
 
   private def check(name: String): Option[URL] = {

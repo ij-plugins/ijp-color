@@ -54,7 +54,7 @@ class ColorConverterPlugin extends PlugIn {
             title = Title
             scene = new Scene {
               title = Title
-              icons += IJTools.imageJIconAsFXImage
+              IJTools.imageJIconAsFXImage.foreach(icons += _)
               root = new ColorConverterView(new ColorConverterModel()).pane
               stylesheets ++= ColorFXUI.stylesheets
             }

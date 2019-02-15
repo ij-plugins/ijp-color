@@ -46,9 +46,12 @@ object IJTools {
     *
     * @return ImageJ icon or `null`.
     */
-  def imageJIconAsFXImage: Image = {
-    val imageJ: ImageJ = IJ.getInstance
-    if (imageJ != null) ImageConverter.toFXImage(imageJ.getIconImage) else null
+  def imageJIconAsFXImage: Option[Image] = {
+    Option(IJ.getInstance).flatMap { i =>
+      Option(i.getIconImage).map { icon =>
+        ImageConverter.toFXImage(icon)
+      }
+    }
   }
 
   /** Splits ColorProcessor into ByteProcessors representing each of three bands (red, green, and blue).
@@ -131,7 +134,7 @@ object IJTools {
 
   /** Measure color within ROI.
     *
-    * @param tri three bands of an image, may represent only color space.
+    * @param tri     three bands of an image, may represent only color space.
     * @param outline outline of the region of interest.
     * @return average color in the ROI.
     * @see #measureColorXY(ij.process.ImageProcessor[], ij.gui.Roi)
@@ -157,12 +160,12 @@ object IJTools {
   }
 
   /**
-   *
-   * @param src images to validate
-   * @param length expected number of images
-   * @tparam T  image processor type
-   * @throws IllegalArgumentException if the images in the array are not of the same dimension.
-   */
+    *
+    * @param src    images to validate
+    * @param length expected number of images
+    * @tparam T image processor type
+    * @throws IllegalArgumentException if the images in the array are not of the same dimension.
+    */
   @inline
   def validateSameDimensions[T <: ImageProcessor](src: Array[T], length: Int): Unit = {
     require(src != null, "Input cannot be null.")
@@ -175,12 +178,12 @@ object IJTools {
   }
 
   /**
-   *
-   * @param src images to validate
-   * @param length expected number of images
-   * @tparam T  image processor type
-   * @throws IllegalArgumentException if the images in the array are not of the same dimension.
-   */
+    *
+    * @param src    images to validate
+    * @param length expected number of images
+    * @tparam T image processor type
+    * @throws IllegalArgumentException if the images in the array are not of the same dimension.
+    */
   @inline
   def validateSameTypeAndDimensions[T <: ImageProcessor](src: Array[T], length: Int): Unit = {
     validateSameDimensions(src, length)

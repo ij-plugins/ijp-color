@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2017 Jarek Sacha
+ * Copyright (C) 2002-2019 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -23,6 +23,7 @@
 package net.sf.ij_plugins.color.calibration.chart
 
 import net.sf.ij_plugins.color.converter.ColorTriple.Lab
+import net.sf.ij_plugins.color.converter.ReferenceWhite
 
 
 /** Enumeration of some common color charts. */
@@ -61,6 +62,7 @@ object ColorCharts {
       ("Neutral 3.5", Lab(36.19, -0.71, -0.30)),
       ("Black", Lab(20.68, -0.03, -0.50))
     ),
+    ReferenceWhite.D65,
     chipMargin = 0
   )
 
@@ -96,9 +98,54 @@ object ColorCharts {
       ("Neutral 3.5", Lab(36.20, -0.59, -0.73)),
       ("Black", Lab(20.44, 0.12, -0.54))
     ),
+    ReferenceWhite.D65,
     chipMargin = 0
   )
 
+  /** Image Science ColorGauge Matte Neutral Patch Versions
+    * Data retrieved on 2019/01/08.
+    *
+    * Illuminant D50
+    * [[http://www.imagescienceassociates.com/mm5/pubs/Micro_Nano_Pico_Rez_TargetData.xls]]
+    */
+  val ImageScienceColorGaugeMatte = new GridColorChart("Image Science ColorGauge Matte", 6, 5,
+    List(
+      ("1", Lab(38.76, 13.81, 14.69)),
+      ("2", Lab(65.15, 19.21, 17.92)),
+      ("3", Lab(49.61, -4.20, -21.33)),
+      ("4", Lab(43.54, -12.89, 22.66)),
+      ("5", Lab(55.52, 8.78, -24.31)),
+      ("6", Lab(70.42, -32.39, -0.48)),
+      ("7", Lab(50.86, -27.78, -27.68)),
+      ("8", Lab(95.09, -0.77, 3.54)),
+      ("9", Lab(88.69, -0.50, 1.25)),
+      ("10", Lab(83.46, -0.88, 1.92)),
+      ("11", Lab(76.31, -0.89, 1.33)),
+      ("12", Lab(63.13, 35.43, 57.84)),
+      ("13", Lab(52.85, 49.90, -12.86)),
+      ("14", Lab(69.43, -0.78, 0.74)),
+      ("15", Lab(61.66, -0.89, 0.73)),
+      ("16", Lab(55.98, -0.84, 0.66)),
+      ("17", Lab(48.54, -0.67, 0.38)),
+      ("18", Lab(40.08, 10.25, -44.77)),
+      ("19", Lab(82.02, 3.28, 78.75)),
+      ("20", Lab(40.92, -0.59, 0.28)),
+      ("21", Lab(31.38, -0.44, -0.17)),
+      ("22", Lab(24.07, 0.35, -0.35)),
+      ("23", Lab(22.31, 0.18, -0.16)),
+      ("24", Lab(51.75, 47.36, 16.93)),
+      ("25", Lab(43.48, 50.74, 29.13)),
+      ("26", Lab(55.60, -38.46, 32.19)),
+      ("27", Lab(29.51, 13.42, -47.69)),
+      ("28", Lab(72.10, 19.51, 67.85)),
+      ("29", Lab(72.50, -22.92, 56.08)),
+      ("30", Lab(30.32, 22.13, -19.02)),
+    ),
+    ReferenceWhite.D50,
+    chipMargin = 0
+  )
+
+
   /** All pre-defined color charts */
-  val values = List(GretagMacbethColorChecker, XRitePassportColorChecker)
+  val values = List(GretagMacbethColorChecker, XRitePassportColorChecker, ImageScienceColorGaugeMatte)
 }

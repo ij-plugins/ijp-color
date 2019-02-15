@@ -20,44 +20,26 @@
  * Latest release available at http://sourceforge.net/projects/ij-plugins/
  */
 
-package net.sf.ij_plugins.util
+package net.sf.ij_plugins.color.calibration.ui
 
-import scalafx.geometry.Insets
-import scalafx.scene.Node
-import scalafx.scene.control.Label
-import scalafx.scene.image.ImageView
-import scalafx.scene.layout.GridPane
+
+import ij.ImagePlus
+import org.scalafx.extras.mvcfx.MVCfx
+import scalafx.stage.Window
 
 /**
-  * Internal utilities.
+  * Creates Color Calibrator UI.
+  *
+  * @author Jarek Sacha
   */
-object IJPUtils {
+class ColorCalibratorUI(val image: ImagePlus, private var _parentWindow: Window)
+  extends MVCfx("ColorCalibrator.fxml") {
 
-  def createHeaderNode(title: String, message: String): Node = {
-    // Create header with logo, title, and a brief description
-    val headerGP = new GridPane {
-      vgap = 3
-      hgap = 3
-    }
+  lazy val model = new ColorCalibratorUIModel(image, _parentWindow)
 
-    val ijpLogoView = new ImageView("/net/sf/ij_plugins/color/IJP-48.png")
-    headerGP.add(ijpLogoView, 0, 0)
+  def parentWindow: Window = _parentWindow
 
-    val pluginTitleLabel = new Label {
-      text = title
-      id = "ijp-header-title"
-      padding = Insets(0, 0, 0, 7)
-    }
-    headerGP.add(pluginTitleLabel, 1, 0)
-
-    val descriptionLabel = new Label {
-      text = message
-      id = "ijp-header-message"
-      wrapText = true
-    }
-    headerGP.add(descriptionLabel, 0, 1, GridPane.Remaining, 1)
-
-    headerGP
+  def parentWindow_=(newParent: Window): Unit = {
+    _parentWindow = newParent
   }
-
 }

@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2017 Jarek Sacha
+ * Copyright (C) 2002-2019 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -22,15 +22,16 @@
 
 package net.sf.ij_plugins.color.calibration.ui
 
-import java.awt.{BasicStroke, Color, Polygon}
+import java.awt.{Color, Polygon}
 import java.io.{PrintWriter, StringWriter}
-import javafx.beans.property.ReadOnlyBooleanProperty
-import javafx.scene.{chart => jfxsc}
+import java.net.URL
 
 import ij.gui.{PolygonRoi, Roi}
 import ij.measure.ResultsTable
 import ij.process.{ColorProcessor, FloatProcessor}
 import ij.{IJ, ImagePlus, ImageStack}
+import javafx.beans.property.ReadOnlyBooleanProperty
+import javafx.scene.{chart => jfxsc}
 import net.sf.ij_plugins.color.calibration.chart.{ColorCharts, ReferenceColorSpace}
 import net.sf.ij_plugins.color.calibration.regression.MappingMethod
 import net.sf.ij_plugins.color.calibration.{ColorCalibrator, Corrector, LOOCrossValidation, toPolygonROI}
@@ -39,23 +40,90 @@ import net.sf.ij_plugins.color.converter.ColorTriple.Lab
 import net.sf.ij_plugins.color.{ColorFXUI, DeltaE}
 import net.sf.ij_plugins.util._
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
-
+import org.scalafx.extras.mvcfx.ModelFX
+import org.scalafx.extras.{BusyWorker, onFXAndWait}
 import scalafx.Includes._
+import scalafx.application.Platform
 import scalafx.beans.property._
 import scalafx.collections.ObservableBuffer
-import scalafx.geometry.Point2D
 import scalafx.scene.Scene
 import scalafx.scene.chart._
 import scalafx.scene.control.Alert.AlertType
 import scalafx.scene.control.{Alert, Label, TextArea}
 import scalafx.scene.layout.{GridPane, Priority, StackPane}
-import scalafx.stage.Stage
+import scalafx.stage.{Stage, Window}
 
 
-/** Model for color calibrator UI. */
-class ColorCalibratorModel(val image: ImagePlus, parentStage: Stage) {
+object ColorCalibratorUIModel {
 
-  require(parentStage != null, "Argument `parentStage` cannot be null.")
+  /** Parameters needed to perform color correction of an image and convert it to sRGB.
+    *
+    * @param imageType ImagePlus image type supported by this correction
+    */
+  case class CorrectionRecipe(corrector: Corrector,
+                              colorConverter: ColorConverter,
+                              referenceColorSpace: ReferenceColorSpace,
+                              imageType: Int)
+
+  def applyCorrection(recipe: CorrectionRecipe,
+                      imp: ImagePlus,
+                      showError: (String, String, Throwable) => Unit): Option[Array[FloatProcessor]] = {
+    val correctedBands = try {
+      recipe.corrector.map(imp)
+    } catch {
+      case t: Throwable =>
+        showError("Error while color correcting the image.", t.getMessage, t)
+        return None
+    }
+
+    // Show floating point stack in the reference color space
+    val correctedInReference = {
+      val stack = new ImageStack(imp.getWidth, imp.getHeight)
+      (recipe.referenceColorSpace.bands zip correctedBands).foreach(v => stack.addSlice(v._1, v._2))
+      new ImagePlus(imp.getTitle + "+corrected_" + recipe.referenceColorSpace, stack)
+    }
+    correctedInReference.show()
+
+    // Convert corrected image to sRGB
+    val correctedImage: ImagePlus = convertToSRGB(correctedBands, recipe.referenceColorSpace, recipe.colorConverter)
+    correctedImage.setTitle(imp.getTitle + "+corrected_" + recipe.referenceColorSpace + "+sRGB")
+    correctedImage.show()
+
+    Option(correctedBands)
+  }
+
+  private def convertToSRGB(bands: Array[FloatProcessor],
+                            colorSpace: ReferenceColorSpace,
+                            converter: ColorConverter): ImagePlus = {
+    colorSpace match {
+      case ReferenceColorSpace.sRGB => new ImagePlus("", IJTools.mergeRGB(bands))
+      case ReferenceColorSpace.XYZ =>
+        // Convert XYZ to sRGB
+        val cp = new ColorProcessor(bands(0).getWidth, bands(0).getHeight)
+        val n = bands(0).getWidth * bands(0).getHeight
+        for (i <- (0 until n).par) {
+          val rgb = converter.xyzToRGB(bands(0).getf(i), bands(1).getf(i), bands(2).getf(i))
+          val r = clipUInt8(rgb.r)
+          val g = clipUInt8(rgb.g)
+          val b = clipUInt8(rgb.b)
+          val color = ((r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF) << 0)
+          cp.set(i, color)
+        }
+        new ImagePlus("", cp)
+      case _ => throw new IllegalArgumentException("Unsupported reference color space '" + colorSpace + "'.")
+    }
+  }
+
+}
+
+/**
+  * Model for color calibrator UI.
+  */
+class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends ModelFX {
+
+  import ColorCalibratorUIModel._
+
+  require(parentWindow != null, "Argument `parentStage` cannot be null.")
 
   val imageTitle = new StringProperty(this, "imageTitle", image.getTitle)
   val referenceColorSpace = new ObjectProperty[ReferenceColorSpace](this, "referenceColorSpace", ReferenceColorSpace.sRGB)
@@ -64,15 +132,27 @@ class ColorCalibratorModel(val image: ImagePlus, parentStage: Stage) {
   val mappingMethod = new ObjectProperty(this, "mappingMethod", MappingMethod.LinearCrossBand)
   val clipReferenceRGB = new BooleanProperty(this, "clipReferenceRGB", true)
   val showExtraInfo = new BooleanProperty(this, "showExtraInfo", false)
+  val correctionRecipe = new ObjectProperty[Option[CorrectionRecipe]](this, "correctionRecipe", None)
+
+  val liveChartROI = new LiveChartROI(image, referenceChart, chipMarginPercent)
 
   private val chipValuesObservedWrapper = new ReadOnlyBooleanWrapper(this, "chipValuesObserved", false)
   val chipValuesObserved: ReadOnlyBooleanProperty = chipValuesObservedWrapper.getReadOnlyProperty
 
-  private def chipMargin: Double = chipMarginPercent() / 100d
-  private def currentChart = referenceChart().copyWithNewChipMargin(chipMargin)
+  // True when correction parameters are available and can be applied to another image
+  private val correctionRecipeAvailableWrapper = new ReadOnlyBooleanWrapper(this, "correctionRecipeAvailable", false)
+  correctionRecipeAvailableWrapper <== correctionRecipe =!= None
+  val correctionRecipeAvailable: ReadOnlyBooleanProperty = correctionRecipeAvailableWrapper.getReadOnlyProperty
+
+  private def currentChart = liveChartROI.locatedChart.value.get
+
+  private val busyWorker: BusyWorker = new BusyWorker("Color Calibrator", parentWindow)
+
+  // Chip values are observed when `locatedChart` is available
+  chipValuesObservedWrapper <== liveChartROI.locatedChart =!= None
 
 
-  def onRenderReferenceChart(): Unit = {
+  def onRenderReferenceChart(): Unit = busyWorker.doTask("onRenderReferenceChart") { () =>
     val scale = 80
     val margin = 0.1 * scale
 
@@ -114,7 +194,7 @@ class ColorCalibratorModel(val image: ImagePlus, parentStage: Stage) {
     imp.show()
   }
 
-  def onShowReferenceColors(): Unit = {
+  def onShowReferenceColors(): Unit = busyWorker.doTask("onShowReferenceColors") { () =>
     val rt = new ResultsTable()
     val chips = referenceChart().referenceChips
     for (i <- chips.indices) {
@@ -136,57 +216,48 @@ class ColorCalibratorModel(val image: ImagePlus, parentStage: Stage) {
     rt.show(referenceChart().name + " / " + referenceChart().refWhite)
   }
 
-
-  def onLoadLocationFromROI(): Unit = {
-
-    // Load ROI
-    val points = loadROI()
-    if (points.isEmpty) return
-
-    // Create alignment transform
-    referenceChart().alignmentTransform = PerspectiveTransform.quadToQuad(
-      referenceChart().referenceOutline.toArray,
-      points.get.toArray
-    )
-
-    // Display chart overlay
-    val shape = toShape(currentChart.alignedChips)
-    image.setOverlay(shape, Color.MAGENTA, new BasicStroke(2))
-
-    chipValuesObservedWrapper.set(true)
-  }
-
-  def resetROI(): Unit = {
-    // Create alignment transform
-    referenceChart().alignmentTransform = new PerspectiveTransform()
-    image.setOverlay(null)
-    chipValuesObservedWrapper.set(false)
-  }
-
-  def onSuggestCalibrationOptions(): Unit = {
+  def onSuggestCalibrationOptions(): Unit = busyWorker.doTask("onSuggestCalibrationOptions") { () =>
     val chart = currentChart
 
     val methods = MappingMethod.values.toList
-    val crossValidations = for (rcs <- ReferenceColorSpace.values; method <- methods) yield {
+
+    val refSpaceMethods = for (rcs <- ReferenceColorSpace.values; method <- methods) yield (rcs, method)
+
+    val crossValidations = for (((rcs, method), i) <- refSpaceMethods.zipWithIndex) yield {
       IJ.showStatus("Checking " + rcs + " + " + method)
+      IJ.showProgress(i, refSpaceMethods.length)
+
       val stats = new DescriptiveStatistics()
       val deltas = LOOCrossValidation.crossValidation(chart, rcs, method, image)
       deltas.foreach(v => stats.addValue(v))
       val mean = deltas.sum / deltas.length
-      println("" + rcs + ": " + method + "mean =" + mean + ", median = " +
-        stats.getPercentile(50) + ",  min = " + deltas.min + ", max =" + deltas.max)
-      (rcs, method, mean, deltas.min, deltas.max)
+
+      (rcs, method, mean, deltas.min, deltas.max, stats.getPercentile(50))
     }
+    IJ.showProgress(1, 1)
+
 
     val best = crossValidations.minBy(_._3)
     IJ.showStatus("Best: " + best._1 + ":" + best._2 + " -> " + best._3)
-    println("Best: " + best._1 + ":" + best._2 + " -> " + best._3)
-    println("Max : " + crossValidations.map(_._3).max)
+
+    // Sort, worst first
+    val hSorted = crossValidations.toArray.sortBy(-_._3)
+
+    // Show as results table
+    val rt = new ResultsTable()
+    for ((v, i) <- hSorted.reverse.zipWithIndex) {
+      rt.setValue("Reference", i, v._1.toString)
+      rt.setValue("Method", i, v._2.toString)
+      rt.setValue("Mean", i, v._3)
+      rt.setValue("Min", i, v._4)
+      rt.setValue("Max", i, v._5)
+      rt.setValue("Median", i, v._6)
+    }
+    rt.show(image.getTitle + " Method LOO Cross Validation Error")
+
 
     // Show chart with comparison of results
     // TODO show chart with error bars
-    val hSorted = crossValidations.toArray.sortBy(-_._3)
-
     createBarChart()
 
     def createBarChart(): Unit = {
@@ -212,7 +283,7 @@ class ColorCalibratorModel(val image: ImagePlus, parentStage: Stage) {
 
   }
 
-  def onCalibrate(): Unit = {
+  def onCalibrate(): Unit = busyWorker.doTask("onCalibrate") { () =>
 
     // Compute color mapping coefficients
     val chart = currentChart
@@ -225,28 +296,20 @@ class ColorCalibratorModel(val image: ImagePlus, parentStage: Stage) {
         showError("Error while computing color calibration.", t.getMessage, t)
         return
     }
-    val corrector = new Corrector(fit.mapping)
 
-    val correctedBands = try {
-      corrector.map(image)
-    } catch {
-      case t: Throwable =>
-        showError("Error while color correcting the image.", t.getMessage, t)
-        return
-    }
 
-    // Show floating point stack in the reference color space
-    val correctedInReference = {
-      val stack = new ImageStack(image.getWidth, image.getHeight)
-      (colorCalibrator.referenceColorSpace.bands zip correctedBands).foreach(v => stack.addSlice(v._1, v._2))
-      new ImagePlus(image.getTitle + "+corrected_" + referenceColorSpace(), stack)
-    }
-    correctedInReference.show()
+    val recipe = CorrectionRecipe(
+      corrector = new Corrector(fit.mapping),
+      colorConverter = colorCalibrator.chart.colorConverter,
+      referenceColorSpace = referenceColorSpace(),
+      imageType = image.getType
+    )
 
-    // Convert corrected image to sRGB
-    val correctedImage: ImagePlus = convertToSRGB(correctedBands, referenceColorSpace(), colorCalibrator.chart.colorConverter)
-    correctedImage.setTitle(image.getTitle + "+corrected_" + referenceColorSpace() + "+sRGB")
-    correctedImage.show()
+    val correctedBands = applyCorrection(
+      recipe,
+      image,
+      showError
+    ).getOrElse(return)
 
     if (showExtraInfo()) {
       // Show table with expected measured and corrected values
@@ -285,8 +348,8 @@ class ColorCalibratorModel(val image: ImagePlus, parentStage: Stage) {
       }
       rtFit.show("Regression Coefficients")
 
-      showScatterChart(fit.reference, fit.observed, "Reference vs. Observed")
-      showScatterChart(fit.reference, fit.corrected, "Reference vs. Corrected")
+      showScatterChart(fit.reference, fit.observed, referenceColorSpace().bands, "Reference vs. Observed")
+      showScatterChart(fit.reference, fit.corrected, referenceColorSpace().bands, "Reference vs. Corrected")
       showResidualScatterChart(fit.reference, fit.corrected, "Reference vs. Corrected Residual")
 
       // Delta in reference color space
@@ -361,32 +424,63 @@ class ColorCalibratorModel(val image: ImagePlus, parentStage: Stage) {
         "\n"
       )
     }
+
+    // Update correction recipe
+    correctionRecipe() = Option(recipe)
   }
 
-  private def convertToSRGB(bands: Array[FloatProcessor],
-                            colorSpace: ReferenceColorSpace,
-                            converter: ColorConverter): ImagePlus = {
-    colorSpace match {
-      case ReferenceColorSpace.sRGB => new ImagePlus("", IJTools.mergeRGB(bands))
-      case ReferenceColorSpace.XYZ =>
-        // Convert XYZ to sRGB
-        val cp = new ColorProcessor(bands(0).getWidth, bands(0).getHeight)
-        val n = bands(0).getWidth * bands(0).getHeight
-        for (i <- (0 until n).par) {
-          val rgb = converter.xyzToRGB(bands(0).getf(i), bands(1).getf(i), bands(2).getf(i))
-          val r = clipUInt8(rgb.r)
-          val g = clipUInt8(rgb.g)
-          val b = clipUInt8(rgb.b)
-          val color = ((r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF) << 0)
-          cp.set(i, color)
-        }
-        new ImagePlus("", cp)
-      case _ => throw new IllegalArgumentException("Unsupported reference color space '" + colorSpace + "'.")
+  def onApplyToCurrentImage(): Unit = busyWorker.doTask("onApplyToCurrentImage") { () =>
+    val errorTitle = "Cannot apply Correction"
+
+    // Check that calibration recipe is computed
+    val recipe = correctionRecipe().getOrElse {
+      showError(errorTitle, "Correction parameters not available.")
+      return
+    }
+
+    // Get current image
+    val imp = IJ.getImage
+    if (imp == null) {
+      IJ.noImage()
+      return
+    }
+
+
+    // Verify that image is of correct type
+    if (imp.getType != recipe.imageType) {
+      showError(errorTitle, "Image type does not match expected: [" + recipe.imageType + "]")
+      return
+    }
+
+    // Run calibration on the current image
+    val correctedBands = applyCorrection(recipe, imp, showError).getOrElse(return)
+    if (showExtraInfo()) {
+      val labFPs = referenceColorSpace().toLab(correctedBands)
+      val stack = new ImageStack(labFPs(0).getWidth, labFPs(0).getHeight)
+      stack.addSlice("L*", labFPs(0))
+      stack.addSlice("a*", labFPs(1))
+      stack.addSlice("b*", labFPs(2))
+      new ImagePlus(imp.getShortTitle + "-L*a*b*", stack).show()
     }
   }
 
 
-  private def showScatterChart(x: Array[Array[Double]], y: Array[Array[Double]], chartTitle: String): Unit = {
+  private def showScatterChart(x: Array[Array[Double]],
+                               y: Array[Array[Double]],
+                               seriesLabels: Array[String],
+                               chartTitle: String): Unit = {
+
+    require(seriesLabels.length == 3)
+
+    def check(name: String): Option[URL] = {
+      val stylesheetURL = getClass.getResource(name)
+      Option(stylesheetURL)
+    }
+
+    def myStylesheets: Seq[String] = List(
+      "RGBScatterChart.css"
+    ).flatMap(check(_).map(_.toExternalForm))
+
     // Create plot
     val xAxis = new NumberAxis()
     val yAxis = new NumberAxis()
@@ -396,7 +490,7 @@ class ColorCalibratorModel(val image: ImagePlus, parentStage: Stage) {
       val bands = (0 to 2).map {
         b =>
           new XYChart.Series[Number, Number] {
-            name = "Band " + b
+            name = seriesLabels(b)
           }
       }
       val chips = referenceChart().referenceChips
@@ -406,16 +500,19 @@ class ColorCalibratorModel(val image: ImagePlus, parentStage: Stage) {
       bands.foreach(answer.add(_))
       answer
     }
-    val dialogStage = new Stage() {
-      title = chartTitle
-      scene = new Scene {
-        root = new StackPane {
-          children = scatterChart
-          stylesheets ++= ColorFXUI.stylesheets
+    Platform.runLater {
+      val dialogStage = new Stage() {
+        title = chartTitle
+        scene = new Scene {
+          root = new StackPane {
+            children = scatterChart
+            stylesheets ++= ColorFXUI.stylesheets
+            stylesheets ++= myStylesheets
+          }
         }
       }
+      dialogStage.show()
     }
-    dialogStage.show()
   }
 
   private def showResidualScatterChart(x: Array[Array[Double]], y: Array[Array[Double]], chartTitle: String): Unit = {
@@ -429,78 +526,56 @@ class ColorCalibratorModel(val image: ImagePlus, parentStage: Stage) {
       }
       dy(i) = dd
     }
-    showScatterChart(x, dy, chartTitle)
+    showScatterChart(x, dy, referenceColorSpace().bands, chartTitle)
   }
 
-
-  private def loadROI(): Option[Seq[Point2D]] = {
-    // Validate ROI selection
-    if (image == null) {
-      showError("No input image available", "Input image needed for ROI selection.")
-      return None
-    }
-
-    val polygon = image.getRoi match {
-      case polyline: PolygonRoi => polyline.getPolygon.npoints match {
-        case 4 => polyline.getPolygon
-        case n =>
-          showError("Not a valid ROI", "Expecting polygonal selection with 4 points, got " + n + " points.")
-          return None
-      }
-      case _ =>
-        showError("Not a valid ROI", "Polygon or Segmented Line selection required.")
-        return None
-    }
-
-    // Get location of the chart corners from the selected poly-line
-    val p0 = new Point2D(polygon.xpoints(0), polygon.ypoints(0))
-    val p1 = new Point2D(polygon.xpoints(1), polygon.ypoints(1))
-    val p2 = new Point2D(polygon.xpoints(2), polygon.ypoints(2))
-    val p3 = new Point2D(polygon.xpoints(3), polygon.ypoints(3))
-    Some(List(p0, p1, p2, p3))
-  }
 
   private def showError(summary: String, message: String, t: Throwable): Unit = {
-    // Extract exception text
-    val exceptionText = {
-      val sw = new StringWriter()
-      val pw = new PrintWriter(sw)
-      t.printStackTrace(pw)
-      sw.toString
-    }
-    val label = new Label("The exception stacktrace was:")
-    val textArea = new TextArea {
-      text = exceptionText
-      editable = false
-      wrapText = true
-      maxWidth = Double.MaxValue
-      maxHeight = Double.MaxValue
-      vgrow = Priority.Always
-      hgrow = Priority.Always
-    }
-    val expContent = new GridPane {
-      maxWidth = Double.MaxValue
-      add(label, 0, 0)
-      add(textArea, 0, 1)
-    }
+    onFXAndWait {
+      // TODO ShowMessage trait to simplify code
+      // Extract exception text
+      val exceptionText = {
+        val sw = new StringWriter()
+        val pw = new PrintWriter(sw)
+        t.printStackTrace(pw)
+        sw.toString
+      }
+      val label = new Label("The exception stacktrace was:")
+      val textArea = new TextArea {
+        text = exceptionText
+        editable = false
+        wrapText = true
+        maxWidth = Double.MaxValue
+        maxHeight = Double.MaxValue
+        vgrow = Priority.Always
+        hgrow = Priority.Always
+      }
+      val expContent = new GridPane {
+        maxWidth = Double.MaxValue
+        add(label, 0, 0)
+        add(textArea, 0, 1)
+      }
 
-    new Alert(AlertType.Error) {
-      initOwner(parentStage)
-      title = "Error"
-      headerText = summary
-      contentText = message
-      // Set expandable Exception into the dialog pane.
-      dialogPane().expandableContent = expContent
-    }.showAndWait()
+      new Alert(AlertType.Error) {
+        initOwner(parentWindow)
+        title = "Error"
+        headerText = summary
+        contentText = message
+        // Set expandable Exception into the dialog pane.
+        dialogPane().expandableContent = expContent
+      }.showAndWait()
+    }
   }
 
   private def showError(summary: String, message: String): Unit = {
-    new Alert(AlertType.Error) {
-      initOwner(parentStage)
-      title = "Error"
-      headerText = summary
-      contentText = message
-    }.showAndWait()
+    onFXAndWait {
+      new Alert(AlertType.Error) {
+        initOwner(parentWindow)
+        title = "Error"
+        headerText = summary
+        contentText = message
+      }.showAndWait()
+    }
   }
 
 }
