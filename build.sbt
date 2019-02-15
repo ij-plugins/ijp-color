@@ -4,7 +4,7 @@ import java.net.URL
 
 name         := "ijp-color"
 organization := "net.sf.ij-plugins"
-version      := "0.5.1.2-SNAPSHOT"
+version      := "0.6.0"
 
 homepage     := Some(new URL("https://ij-plugins.sf.net"))
 startYear    := Some(2002)
@@ -14,7 +14,7 @@ scalaVersion       := "2.12.8"
 
 // append -deprecation to the options passed to the Scala compiler
 scalacOptions ++= Seq(
-//  "-target:jvm-1.8",
+  "-target:jvm-1.8",
   "-encoding", "UTF-8",
   "-unchecked",
   "-deprecation",
