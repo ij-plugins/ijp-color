@@ -219,26 +219,44 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
     val chart = currentChart
 
     val methods = MappingMethod.values.toList
-    val crossValidations = for (rcs <- ReferenceColorSpace.values; method <- methods) yield {
+
+    val refSpaceMethods = for (rcs <- ReferenceColorSpace.values; method <- methods) yield (rcs, method)
+
+    val crossValidations = for (((rcs, method), i) <- refSpaceMethods.zipWithIndex) yield {
       IJ.showStatus("Checking " + rcs + " + " + method)
+      IJ.showProgress(i, refSpaceMethods.length)
+
       val stats = new DescriptiveStatistics()
       val deltas = LOOCrossValidation.crossValidation(chart, rcs, method, image)
       deltas.foreach(v => stats.addValue(v))
       val mean = deltas.sum / deltas.length
-      println("" + rcs + ": " + method + "mean =" + mean + ", median = " +
-        stats.getPercentile(50) + ",  min = " + deltas.min + ", max =" + deltas.max)
-      (rcs, method, mean, deltas.min, deltas.max)
+
+      (rcs, method, mean, deltas.min, deltas.max, stats.getPercentile(50))
     }
+    IJ.showProgress(1, 1)
+
 
     val best = crossValidations.minBy(_._3)
     IJ.showStatus("Best: " + best._1 + ":" + best._2 + " -> " + best._3)
-    println("Best: " + best._1 + ":" + best._2 + " -> " + best._3)
-    println("Max : " + crossValidations.map(_._3).max)
+
+    // Sort, worst first
+    val hSorted = crossValidations.toArray.sortBy(-_._3)
+
+    // Show as results table
+    val rt = new ResultsTable()
+    for ((v, i) <- hSorted.reverse.zipWithIndex) {
+      rt.setValue("Reference", i, v._1.toString)
+      rt.setValue("Method", i, v._2.toString)
+      rt.setValue("Mean", i, v._3)
+      rt.setValue("Min", i, v._4)
+      rt.setValue("Max", i, v._5)
+      rt.setValue("Median", i, v._6)
+    }
+    rt.show(image.getTitle + " Method LOO Cross Validation Error")
+
 
     // Show chart with comparison of results
     // TODO show chart with error bars
-    val hSorted = crossValidations.toArray.sortBy(-_._3)
-
     createBarChart()
 
     def createBarChart(): Unit = {
