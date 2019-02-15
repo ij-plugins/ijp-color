@@ -24,6 +24,7 @@ package net.sf.ij_plugins.color
 
 import java.net.URL
 
+import net.sf.ij_plugins.util.IJTools
 import scalafx.Includes._
 import scalafx.application.Platform
 import scalafx.scene.layout.StackPane
@@ -52,6 +53,7 @@ object ColorFXUI {
     Platform.runLater {
       val dialogStage = new Stage() {
         title = windowTitle
+        IJTools.imageJIconAsFXImage.foreach(icons += _)
         scene = new Scene {
           root = new StackPane {
             children = node
