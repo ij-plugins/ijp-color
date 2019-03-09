@@ -129,6 +129,8 @@
                         <Insets bottom="5.0" top="10.0"/>
                     </padding>
                 </HBox>
+                <Button fx:id="helpButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Help"
+                        GridPane.columnIndex="2" GridPane.rowIndex="12"/>
             </children>
             <rowConstraints>
                 <RowConstraints minHeight="10.0"/>

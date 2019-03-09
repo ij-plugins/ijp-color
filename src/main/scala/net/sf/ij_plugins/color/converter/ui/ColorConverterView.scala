@@ -22,6 +22,7 @@
 
 package net.sf.ij_plugins.color.converter.ui
 
+import ij.plugin.BrowserLauncher
 import javafx.beans.{binding => jfxbb}
 import net.sf.ij_plugins.color.converter._
 import net.sf.ij_plugins.color.converter.ui.ColorConverterModel.Update
@@ -42,6 +43,8 @@ object ColorConverterView {
     "Converts between color space coordinates.  To convert color values  \n" +
     "from the source color space to other spaces: type in the source color \n" +
     "values, then click on the button next to them to convert to other spaces."
+  val HelpURL = "https://github.com/ij-plugins/ijp-color"
+
 }
 
 class ColorConverterView(val model: ColorConverterModel) {
@@ -178,6 +181,16 @@ class ColorConverterView(val model: ColorConverterModel) {
         }
       )
     )
+
+    val helpButton = new Button {
+      id = "ijp-button"
+      text = "Help"
+      onAction = (_: ActionEvent) => {
+        BrowserLauncher.openURL(HelpURL)
+      }
+    }
+    gp.add(helpButton, 4, row)
+
     row += 1
 
     gp

@@ -25,6 +25,7 @@ package net.sf.ij_plugins.color.calibration.ui
 import java.net.URL
 
 import ij.measure.ResultsTable
+import ij.plugin.BrowserLauncher
 import ij.process.FloatProcessor
 import ij.{CompositeImage, IJ, ImagePlus, ImageStack}
 import javafx.beans.property.ReadOnlyBooleanProperty
@@ -48,6 +49,8 @@ import scalafx.scene.layout.StackPane
 import scalafx.stage.{Stage, Window}
 
 object ColorCalibratorUIModel {
+
+  val HelpURL = "https://github.com/ij-plugins/ijp-color"
 
   def applyCorrection(recipe: CorrectionRecipe,
                       imp: ImagePlus,
@@ -397,6 +400,9 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
     }
   }
 
+  def onHelp(): Unit = busyWorker.doTask("onHelp") { () =>
+    BrowserLauncher.openURL(HelpURL)
+  }
 
   private def showScatterChart(x: Array[Array[Double]],
                                y: Array[Array[Double]],

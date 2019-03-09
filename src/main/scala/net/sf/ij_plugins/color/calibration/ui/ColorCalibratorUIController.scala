@@ -48,6 +48,7 @@ class ColorCalibratorUIController(private val imageTitleLabel: Label,
                                   private val suggestCalibrationOptionsButton: Button,
                                   private val calibrateButton: Button,
                                   private val applyToCurrentImageButton: Button,
+                                  private val helpButton: Button,
                                   private val rootGridPane: GridPane,
                                   private val model: ColorCalibratorUIModel) extends ControllerFX {
 
@@ -93,4 +94,6 @@ class ColorCalibratorUIController(private val imageTitleLabel: Label,
 
   applyToCurrentImageButton.onAction = _ => model.onApplyToCurrentImage()
   applyToCurrentImageButton.disable <== !model.correctionRecipeAvailable
+
+  helpButton.onAction = _ => model.onHelp()
 }
