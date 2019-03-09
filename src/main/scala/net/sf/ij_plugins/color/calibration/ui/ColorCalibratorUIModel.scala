@@ -128,13 +128,15 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
   val imageTitle = new StringProperty(this, "imageTitle", image.getTitle)
   val referenceColorSpace = new ObjectProperty[ReferenceColorSpace](this, "referenceColorSpace", ReferenceColorSpace.sRGB)
   val referenceChart = new ObjectProperty(this, "chart", ColorCharts.GretagMacbethColorChecker)
+  // Convenience variable to feed/link to `liveChartROI`
+  val referenceChartOption = new ObjectProperty(this, "chart", Option(referenceChart()))
   val chipMarginPercent = new ObjectProperty[Integer](this, "chipMargin", 20)
   val mappingMethod = new ObjectProperty(this, "mappingMethod", MappingMethod.LinearCrossBand)
   val clipReferenceRGB = new BooleanProperty(this, "clipReferenceRGB", true)
   val showExtraInfo = new BooleanProperty(this, "showExtraInfo", false)
   val correctionRecipe = new ObjectProperty[Option[CorrectionRecipe]](this, "correctionRecipe", None)
 
-  val liveChartROI = new LiveChartROI(image, referenceChart, chipMarginPercent)
+  val liveChartROI = new LiveChartROI(image, referenceChartOption, chipMarginPercent)
 
   private val chipValuesObservedWrapper = new ReadOnlyBooleanWrapper(this, "chipValuesObserved", false)
   val chipValuesObserved: ReadOnlyBooleanProperty = chipValuesObservedWrapper.getReadOnlyProperty
@@ -150,6 +152,8 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
 
   // Chip values are observed when `locatedChart` is available
   chipValuesObservedWrapper <== liveChartROI.locatedChart =!= None
+
+  referenceChart.onChange((_, _, newValue) => referenceChartOption() = Option(newValue))
 
 
   def onRenderReferenceChart(): Unit = busyWorker.doTask("onRenderReferenceChart") { () =>

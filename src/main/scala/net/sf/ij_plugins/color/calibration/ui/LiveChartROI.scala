@@ -36,7 +36,7 @@ import scalafx.geometry.Point2D
   * @param imp Image which ROI is observed
   */
 class LiveChartROI(imp: ImagePlus,
-                   referenceChart: ObjectProperty[GridColorChart],
+                   referenceChart: ObjectProperty[Option[GridColorChart]],
                    chipMarginPercent: ObjectProperty[Integer])
   extends RoiListener {
 
@@ -68,29 +68,29 @@ class LiveChartROI(imp: ImagePlus,
 
     val roi = imp.getRoi
 
-    if (roi != null && roi.getType == Roi.POLYGON && roi.getPolygon.npoints == 4) {
+    referenceChart() match {
+      case Some(refChart) if roi != null && roi.getType == Roi.POLYGON && roi.getPolygon.npoints == 4 =>
+        val polygon = roi.getPolygon
+        // Get location of the chart corners from the selected poly-line
+        val p0 = new Point2D(polygon.xpoints(0), polygon.ypoints(0))
+        val p1 = new Point2D(polygon.xpoints(1), polygon.ypoints(1))
+        val p2 = new Point2D(polygon.xpoints(2), polygon.ypoints(2))
+        val p3 = new Point2D(polygon.xpoints(3), polygon.ypoints(3))
+        val points = Array(p0, p1, p2, p3)
 
-      val polygon = roi.getPolygon
-      // Get location of the chart corners from the selected poly-line
-      val p0 = new Point2D(polygon.xpoints(0), polygon.ypoints(0))
-      val p1 = new Point2D(polygon.xpoints(1), polygon.ypoints(1))
-      val p2 = new Point2D(polygon.xpoints(2), polygon.ypoints(2))
-      val p3 = new Point2D(polygon.xpoints(3), polygon.ypoints(3))
-      val points = Array(p0, p1, p2, p3)
+        // Create alignment transform
+        val alignmentTransform = PerspectiveTransform.quadToQuad(
+          refChart.referenceOutline.toArray,
+          points
+        )
 
-      // Create alignment transform
-      val alignmentTransform = PerspectiveTransform.quadToQuad(
-        referenceChart().referenceOutline.toArray,
-        points
-      )
-
-      // Display chart overlay
-      val currentChart = referenceChart().
-        copyWithNewChipMargin(chipMarginPercent() / 100.0).
-        copyWith(alignmentTransform)
-      _locatedChart() = Option(currentChart)
-    } else {
-      _locatedChart() = None
+        // Display chart overlay
+        val currentChart = refChart.
+          copyWithNewChipMargin(chipMarginPercent() / 100.0).
+          copyWith(alignmentTransform)
+        _locatedChart() = Option(currentChart)
+      case _ =>
+        _locatedChart() = None
     }
 
     updateOverlay()
