@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2017 Jarek Sacha
+ * Copyright (C) 2002-2019 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -17,7 +17,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Latest release available at http://sourceforge.net/projects/ij-plugins/
+ * Latest release available at https://github.com/ij-plugins/ijp-color/
  */
 
 package net.sf.ij_plugins.color.calibration
@@ -43,12 +43,13 @@ object LOOCrossValidation {
     * color computed for that chip by the corrector is determined (square root of sum of squares of
     * color components differences).
     *
-    * @return deltas when each of the chips, in turn, is excluded.
+    * @return deltas when each of the chips, in turn, is excluded. Each element in the sequence is
+    *         a tuple: (deltaE, deltaL, deltaA, deltaB)
     */
   def crossValidation(chart: ColorChart,
                       referenceColorSpace: ReferenceColorSpace,
                       mappingMethod: MappingMethod.Value,
-                      image: ImagePlus): IndexedSeq[Double] = {
+                      image: ImagePlus): IndexedSeq[(Double, Double, Double, Double)] = {
 
     val n = chart.referenceChips.size
     val expectedColors = chart.referenceColor(referenceColorSpace)
@@ -89,11 +90,17 @@ object LOOCrossValidation {
         fp.getStatistics.mean
       }
       val actualTestColorLab = Lab(actualTestColor(0), actualTestColor(1), actualTestColor(2))
-      val expectedColor = expectedColors(i)
+      val expectedColorLab = referenceColorSpace.toLab(expectedColors(i))
+
+      val deltaL = math.abs(expectedColorLab(0) - actualTestColor(0))
+      val deltaA = math.abs(expectedColorLab(1) - actualTestColor(1))
+      val deltaB = math.abs(expectedColorLab(2) - actualTestColor(2))
 
       // Delta needs to be computed in a manner independent of the reference color space so different reference
       // color spaces can be compared to each other. We will use CIE L*a*b* as common comparison space.
-      DeltaE.e76(referenceColorSpace.toLab(expectedColor), actualTestColorLab)
+      val deltaE = DeltaE.e76(expectedColorLab, actualTestColorLab)
+
+      (deltaE, deltaL, deltaA, deltaB)
     }
   }
 

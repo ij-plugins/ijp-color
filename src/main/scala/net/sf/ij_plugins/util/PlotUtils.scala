@@ -17,23 +17,23 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Latest release available at http://sourceforge.net/projects/ij-plugins/
+ * Latest release available at https://github.com/ij-plugins/ijp-color/
  */
 
 package net.sf.ij_plugins.util
-
-import java.awt.Color
 
 import net.sf.ij_plugins.color.ColorFXUI
 import org.jfree.chart.axis.NumberAxis
 import org.jfree.chart.fx.ChartViewer
 import org.jfree.chart.labels.{ItemLabelAnchor, ItemLabelPosition, StandardCategoryItemLabelGenerator}
 import org.jfree.chart.plot.{CategoryPlot, PlotOrientation}
-import org.jfree.chart.renderer.category.StatisticalBarRenderer
+import org.jfree.chart.renderer.category.{BarRenderer, StatisticalBarRenderer}
 import org.jfree.chart.ui.TextAnchor
 import org.jfree.chart.{ChartFactory, ChartUtils}
+import org.jfree.data.category.DefaultCategoryDataset
 import org.jfree.data.statistics.DefaultStatisticalCategoryDataset
 import scalafx.Includes._
+import scalafx.scene.paint.Color
 
 object PlotUtils {
 
@@ -56,40 +56,68 @@ object PlotUtils {
   //    ColorFXUI.showInNewWindow(chart, title)
   //  }
 
-  //  def createBarPlot(title: String,
-  //                    data: Seq[(String, Double)],
-  //                    categoryAxisLabel: String = "Type",
-  //                    valueAxisLabel: String = "Value"
-  //                   ): Unit = {
-  //
-  //
-  //    val dataset: DefaultStatisticalCategoryDataset = new DefaultStatisticalCategoryDataset
-  //    for (d <- data) {
-  //      dataset.add(d._2, 1, "", d._1)
-  //    }
-  //
-  //    val chart = ChartFactory.createBarChart(title, // chart title
-  //      categoryAxisLabel, // domain axis label
-  //      valueAxisLabel, // range axis label
-  //      dataset,
-  //      PlotOrientation.HORIZONTAL,
-  //      true, // include legend
-  //      true, // tooltips?
-  //      false // URLs?
-  //    )
-  //
-  //    ColorFXUI.showInNewWindow(new ChartViewer(chart), title)
-  //  }
+
+  case class ValueEntry(row: String, column: String, value: Double)
+
+  case class ValueErrorEntry(row: String, column: String, value: Double, error: Double)
+
+
+  def createBarPlot(title: String,
+                    data: Seq[ValueEntry],
+                    categoryAxisLabel: String = "Type",
+                    valueAxisLabel: String = "Value",
+                    barColors: Seq[Color] = Seq.empty[Color]
+                   ): Unit = {
+
+
+    val dataset = new DefaultCategoryDataset()
+    for (d <- data) {
+      dataset.addValue(d.value, d.row, d.column)
+    }
+
+    val chart = ChartFactory.createBarChart(null, // chart title
+      categoryAxisLabel, // domain axis label
+      valueAxisLabel, // range axis label
+      dataset,
+      PlotOrientation.HORIZONTAL,
+      true, // include legend
+      true, // tooltips?
+      false // URLs?
+    )
+
+    val plot = chart.getPlot.asInstanceOf[CategoryPlot]
+
+    // ensure the current theme is applied to the renderer just added
+    ChartUtils.applyCurrentTheme(chart)
+
+    // customise the renderer...
+    val renderer = new BarRenderer()
+    renderer.setDrawBarOutline(false)
+    renderer.setIncludeBaseInRange(false)
+    renderer.setShadowVisible(false)
+
+    renderer.setDefaultItemLabelGenerator(new StandardCategoryItemLabelGenerator())
+    renderer.setDefaultItemLabelsVisible(true)
+    renderer.setDefaultItemLabelPaint(java.awt.Color.WHITE)
+    renderer.setDefaultPositiveItemLabelPosition(new ItemLabelPosition(ItemLabelAnchor.INSIDE6, TextAnchor.BOTTOM_CENTER))
+
+    for ((c, i) <- barColors.zipWithIndex) {
+      renderer.setSeriesPaint(i, new java.awt.Color(c.red.toFloat, c.green.toFloat, c.blue.toFloat))
+    }
+
+    plot.setRenderer(renderer)
+    ColorFXUI.showInNewWindow(new ChartViewer(chart), title)
+  }
 
   def createBarErrorPlot(title: String,
-                         data: Seq[(String, Double, Double)],
+                         data: Seq[ValueErrorEntry],
                          categoryAxisLabel: String = "Type",
                          valueAxisLabel: String = "Value"
                         ): Unit = {
 
     val dataset: DefaultStatisticalCategoryDataset = new DefaultStatisticalCategoryDataset
     for (d <- data) {
-      dataset.add(d._2, d._3, "", d._1)
+      dataset.add(d.value, d.error, d.row, d.column)
     }
 
     val chart = ChartFactory.createLineChart(null, // chart title
@@ -97,7 +125,7 @@ object PlotUtils {
       valueAxisLabel, // range axis label
       dataset,
       PlotOrientation.HORIZONTAL,
-      false, // include legend
+      true, // include legend
       true, // tooltips?
       false // URLs?
     )
@@ -109,19 +137,19 @@ object PlotUtils {
     rangeAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits)
     rangeAxis.setAutoRangeIncludesZero(false)
 
-    // customise the renderer...
-    val renderer = new StatisticalBarRenderer()
-    renderer.setDrawBarOutline(false)
-    renderer.setErrorIndicatorPaint(Color.GRAY)
-    renderer.setIncludeBaseInRange(false)
-    plot.setRenderer(renderer)
-
     // ensure the current theme is applied to the renderer just added
     ChartUtils.applyCurrentTheme(chart)
 
+    // customise the renderer...
+    val renderer = new StatisticalBarRenderer()
+    renderer.setDrawBarOutline(false)
+    renderer.setErrorIndicatorPaint(java.awt.Color.GRAY)
+    renderer.setIncludeBaseInRange(false)
+    plot.setRenderer(renderer)
+
     renderer.setDefaultItemLabelGenerator(new StandardCategoryItemLabelGenerator())
     renderer.setDefaultItemLabelsVisible(true)
-    renderer.setDefaultItemLabelPaint(Color.WHITE)
+    renderer.setDefaultItemLabelPaint(java.awt.Color.WHITE)
     renderer.setDefaultPositiveItemLabelPosition(new ItemLabelPosition(ItemLabelAnchor.INSIDE6, TextAnchor.BOTTOM_CENTER))
 
     ColorFXUI.showInNewWindow(new ChartViewer(chart), title)

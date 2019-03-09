@@ -17,7 +17,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Latest release available at http://sourceforge.net/projects/ij-plugins/
+ * Latest release available at https://github.com/ij-plugins/ijp-color/
  */
 
 package net.sf.ij_plugins.color.calibration.ui
@@ -35,7 +35,7 @@ import net.sf.ij_plugins.color.calibration.regression.MappingMethod
 import net.sf.ij_plugins.color.calibration.{ColorCalibrator, Corrector, LOOCrossValidation, toPolygonROI}
 import net.sf.ij_plugins.color.converter.ColorTriple.Lab
 import net.sf.ij_plugins.color.{ColorFXUI, DeltaE}
-import net.sf.ij_plugins.util.PlotUtils.createBarErrorPlot
+import net.sf.ij_plugins.util.PlotUtils.{ValueEntry, ValueErrorEntry, createBarErrorPlot, createBarPlot}
 import net.sf.ij_plugins.util._
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
 import org.scalafx.extras.mvcfx.ModelFX
@@ -47,6 +47,7 @@ import scalafx.collections.ObservableBuffer
 import scalafx.scene.Scene
 import scalafx.scene.chart._
 import scalafx.scene.layout.StackPane
+import scalafx.scene.paint.Color
 import scalafx.stage.{Stage, Window}
 
 object ColorCalibratorUIModel {
@@ -163,49 +164,61 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
       IJ.showStatus("Checking " + rcs + " + " + _method)
       IJ.showProgress(i, refSpaceMethods.length)
 
-      val stats = new DescriptiveStatistics()
+      val _statsDeltaE = new DescriptiveStatistics()
+      val _statsDeltaL = new DescriptiveStatistics()
+      val _statsDeltaA = new DescriptiveStatistics()
+      val _statsDeltaB = new DescriptiveStatistics()
       val deltas = LOOCrossValidation.crossValidation(chart, rcs, _method, image)
-      deltas.foreach(v => stats.addValue(v))
-      val _mean = deltas.sum / deltas.length
-
-      (rcs, _method, _mean, deltas.min, deltas.max, stats.getPercentile(50))
+      deltas.foreach { case (deltaE, deltaL, deltaA, deltaB) =>
+        _statsDeltaE.addValue(deltaE)
+        _statsDeltaL.addValue(deltaL)
+        _statsDeltaA.addValue(deltaA)
+        _statsDeltaB.addValue(deltaB)
+      }
       new {
         val referenceColorSpace = rcs
         val method = _method
-        val mean = _mean
-        val min = deltas.min
-        val max = deltas.max
-        val median = stats.getPercentile(50)
-        val stdDev = stats.getStandardDeviation
+        val statsDeltaE = _statsDeltaE
+        val statsDeltaL = _statsDeltaL
+        val statsDeltaA = _statsDeltaA
+        val statsDeltaB = _statsDeltaB
       }
     }
     IJ.showProgress(1, 1)
 
 
-    val best = crossValidations.minBy(_.mean)
-    IJ.showStatus("Best: " + best.referenceColorSpace + ":" + best.method + " -> " + best.mean)
+    val best = crossValidations.minBy(_.statsDeltaE.getMean)
+    IJ.showStatus("Best: " + best.referenceColorSpace + ":" + best.method + " -> " + best.statsDeltaE.getMean)
 
     // Sort, worst first
-    val hSorted = crossValidations.toArray.sortBy(_.mean)
+    val hSorted = crossValidations.toArray.sortBy(_.statsDeltaE.getMean)
 
     // Show as results table
     val rt = new ResultsTable()
     for ((v, i) <- hSorted.reverse.zipWithIndex) {
       rt.setValue("Reference", i, v.referenceColorSpace.toString)
       rt.setValue("Method", i, v.method.toString)
-      rt.setValue("Mean", i, v.mean)
-      rt.setValue("Min", i, v.min)
-      rt.setValue("Max", i, v.max)
-      rt.setValue("Median", i, v.median)
-      rt.setValue("StandardDeviation", i, v.stdDev)
+      rt.setValue("Mean DeltaE", i, v.statsDeltaE.getMean)
+      rt.setValue("Min DeltaE", i, v.statsDeltaE.getMin)
+      rt.setValue("Max DeltaE", i, v.statsDeltaE.getMax)
+      rt.setValue("Median DeltaE", i, v.statsDeltaE.getPercentile(50))
+      rt.setValue("StandardDeviation DeltaE", i, v.statsDeltaE.getStandardDeviation)
     }
     rt.show(image.getTitle + " Method LOO Cross Validation Error")
 
 
     // Show chart with comparison of results
-    val data: Seq[(String, Double, Double)] = hSorted.map(m => (m.referenceColorSpace + " + " + m.method, m.mean, m.stdDev))
+    //    val data: Seq[ValueErrorEntry] = hSorted.flatMap { m =>
+    //      Seq(ValueErrorEntry("Delta E", m.referenceColorSpace + " + " + m.method, m.statsDeltaE.getMean, m.statsDeltaE.getStandardDeviation),
+    //        ValueErrorEntry("Delta L*", m.referenceColorSpace + " + " + m.method, m.statsDeltaL.getMean, m.statsDeltaL.getStandardDeviation),
+    //        ValueErrorEntry("Delta a*", m.referenceColorSpace + " + " + m.method, m.statsDeltaA.getMean, m.statsDeltaA.getStandardDeviation),
+    //        ValueErrorEntry("Delta b*", m.referenceColorSpace + " + " + m.method, m.statsDeltaB.getMean, m.statsDeltaB.getStandardDeviation))
+    //    }
+    val data: Seq[ValueErrorEntry] = hSorted.map { m =>
+      ValueErrorEntry("Delta E", m.referenceColorSpace + " + " + m.method, m.statsDeltaE.getMean, m.statsDeltaE.getStandardDeviation)
+    }
     createBarErrorPlot(
-      title = "Cross-Validation: " + imageTitle(),
+      title = "Method Comparison by Cross-Validation: " + imageTitle(),
       data = data,
       categoryAxisLabel = "Method",
       valueAxisLabel = "Mean Delta E (smaller is better)"
@@ -291,6 +304,9 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
       showScatterChart(fit.reference, fit.observed, referenceColorSpace().bandsNames, "Reference vs. Observed")
       showScatterChart(fit.reference, fit.corrected, referenceColorSpace().bandsNames, "Reference vs. Corrected")
       showResidualScatterChart(fit.reference, fit.corrected, "Reference vs. Corrected Residual")
+
+      showColorErrorChart(fit.reference, fit.corrected,
+        chips.map(_.name).toArray, referenceColorSpace().bandsNames)
 
       // Delta in reference color space
       val deltaStats = {
@@ -403,6 +419,26 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
 
   def onHelp(): Unit = busyWorker.doTask("onHelp") { () =>
     BrowserLauncher.openURL(HelpURL)
+  }
+
+  private def showColorErrorChart(x: Array[Array[Double]],
+                                  y: Array[Array[Double]],
+                                  columnNames: Array[String],
+                                  seriesLabels: Array[String]): Unit = {
+    assert(x.length == y.length)
+    assert(x.length == columnNames.length)
+
+    val xxYYcc = x.zip(y).zip(columnNames)
+    val data = xxYYcc.flatMap { case ((xx, yy), cc) =>
+      Seq(
+        ValueEntry(seriesLabels(0), cc, math.abs(xx(0) - yy(0))),
+        ValueEntry(seriesLabels(1), cc, math.abs(xx(1) - yy(1))),
+        ValueEntry(seriesLabels(2), cc, math.abs(xx(2) - yy(2)))
+      )
+    }
+    val barColors = Seq(Color(1, 0.33, 0.33, 0.75), Color(0.33, 1, 0.33, 0.5), Color(0.33, 0.33, 1, 0.25))
+    createBarPlot("Individual Chip Error: " + imageTitle(), data, "Chip", "Error", barColors)
+
   }
 
   private def showScatterChart(x: Array[Array[Double]],
