@@ -249,35 +249,41 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
       // Show table with expected measured and corrected values
       val rtColor = new ResultsTable()
       val chips = chart.referenceChips
+      val bands = recipe.referenceColorSpace.bandsNames
       for (i <- chips.indices) {
         rtColor.incrementCounter()
         rtColor.setLabel(chips(i).name, i)
-        rtColor.setValue("Reference 0", i, IJ.d2s(fit.reference(i)(0), 4))
-        rtColor.setValue("Reference 1", i, IJ.d2s(fit.reference(i)(1), 4))
-        rtColor.setValue("Reference 2", i, IJ.d2s(fit.reference(i)(2), 4))
-        rtColor.setValue("Observed 0", i, IJ.d2s(fit.observed(i)(0), 4))
-        rtColor.setValue("Observed 1", i, IJ.d2s(fit.observed(i)(1), 4))
-        rtColor.setValue("Observed 2", i, IJ.d2s(fit.observed(i)(2), 4))
-        rtColor.setValue("Corrected 0", i, IJ.d2s(fit.corrected(i)(0), 4))
-        rtColor.setValue("Corrected 1", i, IJ.d2s(fit.corrected(i)(1), 4))
-        rtColor.setValue("Corrected 2", i, IJ.d2s(fit.corrected(i)(2), 4))
-        rtColor.setValue("Delta", i, IJ.d2s(delta(fit.reference(i), fit.corrected(i)), 4))
+        for (b <- bands.indices) rtColor.setValue("Reference " + bands(b), i, IJ.d2s(fit.reference(i)(b), 4))
+        for (b <- bands.indices) rtColor.setValue("Observed " + bands(b), i, IJ.d2s(fit.observed(i)(b), 4))
+        for (b <- bands.indices) rtColor.setValue("Corrected " + bands(b), i, IJ.d2s(fit.corrected(i)(b), 4))
+        rtColor.setValue("Delta " + bands.map(_.toUpperCase.head).mkString(""), i,
+          IJ.d2s(delta(fit.reference(i), fit.corrected(i)), 4))
+        for (b <- bands.indices) rtColor.setValue("Delta " + bands(b).toUpperCase().head, i,
+          IJ.d2s(math.abs(fit.reference(i)(b) - fit.corrected(i)(b)), 4))
       }
       rtColor.show("Color Values")
 
       // Show table with regression results
       val rtFit = new ResultsTable()
       List(
-        ("Band 1", fit.mapping.band1),
-        ("Band 2", fit.mapping.band2),
-        ("Band 3", fit.mapping.band3)
+        (bands(0), fit.mapping.band1),
+        (bands(1), fit.mapping.band2),
+        (bands(2), fit.mapping.band3)
       ).foreach {
         case (name, b) =>
           rtFit.incrementCounter()
           rtFit.addLabel(name)
           rtFit.addValue("R Squared", b.regressionResult.get.rSquared)
           b.toMap.foreach {
-            case (l, v) => rtFit.addValue(l, IJ.d2s(v, 8))
+            case (_l, v) =>
+              val l = if (_l.length <= 3)
+                _l.
+                  replace('a', bands(0).toLowerCase().head).
+                  replace('b', bands(1).toLowerCase().head).
+                  replace('c', bands(2).toLowerCase().head)
+              else
+                _l
+              rtFit.addValue(l, IJ.d2s(v, 8))
           }
       }
       rtFit.show("Regression Coefficients")
