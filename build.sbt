@@ -52,6 +52,8 @@ libraryDependencies ++= javaFXModules.map( m =>
 libraryDependencies ++= Seq(
   "net.imagej"          % "ij"                  % "1.52j",
   "org.apache.commons"  % "commons-math3"       % "3.6.1",
+  "org.jfree"           % "jfreechart-fx"       % "1.0.1",
+  "org.jfree"           % "fxgraphics2d"        % "1.8",
   "org.scalafx"        %% "scalafx"             % "11-R16",
   "org.scalafx"        %% "scalafx-extras"      % "0.3.0",
   "org.scalafx"        %% "scalafxml-core-sfx8" % "0.4",

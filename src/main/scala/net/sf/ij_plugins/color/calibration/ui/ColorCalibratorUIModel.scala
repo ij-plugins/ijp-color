@@ -35,6 +35,7 @@ import net.sf.ij_plugins.color.calibration.regression.MappingMethod
 import net.sf.ij_plugins.color.calibration.{ColorCalibrator, Corrector, LOOCrossValidation, toPolygonROI}
 import net.sf.ij_plugins.color.converter.ColorTriple.Lab
 import net.sf.ij_plugins.color.{ColorFXUI, DeltaE}
+import net.sf.ij_plugins.util.PlotUtils.createBarErrorPlot
 import net.sf.ij_plugins.util._
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
 import org.scalafx.extras.mvcfx.ModelFX
@@ -158,64 +159,57 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
 
     val refSpaceMethods = for (rcs <- ReferenceColorSpace.values; method <- methods) yield (rcs, method)
 
-    val crossValidations = for (((rcs, method), i) <- refSpaceMethods.zipWithIndex) yield {
-      IJ.showStatus("Checking " + rcs + " + " + method)
+    val crossValidations = for (((rcs, _method), i) <- refSpaceMethods.zipWithIndex) yield {
+      IJ.showStatus("Checking " + rcs + " + " + _method)
       IJ.showProgress(i, refSpaceMethods.length)
 
       val stats = new DescriptiveStatistics()
-      val deltas = LOOCrossValidation.crossValidation(chart, rcs, method, image)
+      val deltas = LOOCrossValidation.crossValidation(chart, rcs, _method, image)
       deltas.foreach(v => stats.addValue(v))
-      val mean = deltas.sum / deltas.length
+      val _mean = deltas.sum / deltas.length
 
-      (rcs, method, mean, deltas.min, deltas.max, stats.getPercentile(50))
+      (rcs, _method, _mean, deltas.min, deltas.max, stats.getPercentile(50))
+      new {
+        val referenceColorSpace = rcs
+        val method = _method
+        val mean = _mean
+        val min = deltas.min
+        val max = deltas.max
+        val median = stats.getPercentile(50)
+        val stdDev = stats.getStandardDeviation
+      }
     }
     IJ.showProgress(1, 1)
 
 
-    val best = crossValidations.minBy(_._3)
-    IJ.showStatus("Best: " + best._1 + ":" + best._2 + " -> " + best._3)
+    val best = crossValidations.minBy(_.mean)
+    IJ.showStatus("Best: " + best.referenceColorSpace + ":" + best.method + " -> " + best.mean)
 
     // Sort, worst first
-    val hSorted = crossValidations.toArray.sortBy(-_._3)
+    val hSorted = crossValidations.toArray.sortBy(_.mean)
 
     // Show as results table
     val rt = new ResultsTable()
     for ((v, i) <- hSorted.reverse.zipWithIndex) {
-      rt.setValue("Reference", i, v._1.toString)
-      rt.setValue("Method", i, v._2.toString)
-      rt.setValue("Mean", i, v._3)
-      rt.setValue("Min", i, v._4)
-      rt.setValue("Max", i, v._5)
-      rt.setValue("Median", i, v._6)
+      rt.setValue("Reference", i, v.referenceColorSpace.toString)
+      rt.setValue("Method", i, v.method.toString)
+      rt.setValue("Mean", i, v.mean)
+      rt.setValue("Min", i, v.min)
+      rt.setValue("Max", i, v.max)
+      rt.setValue("Median", i, v.median)
+      rt.setValue("StandardDeviation", i, v.stdDev)
     }
     rt.show(image.getTitle + " Method LOO Cross Validation Error")
 
 
     // Show chart with comparison of results
-    // TODO show chart with error bars
-    createBarChart()
-
-    def createBarChart(): Unit = {
-      val categories = hSorted.map(m => m._1 + " + " + m._2).toSeq
-      val values = hSorted.map(_._3).toSeq
-
-      val yAxis = CategoryAxis(ObservableBuffer(categories))
-      val xAxis = NumberAxis("Mean Delta E (smaller is better)")
-
-      def xyData(xs: Seq[Double]) = ObservableBuffer(
-        xs zip categories map (xy => XYChart.Data[Number, String](xy._1, xy._2))
-      )
-
-      val series1 = XYChart.Series("Deltas", xyData(values))
-
-      val chart = new BarChart[Number, String](xAxis, yAxis) {
-        data = series1
-        legendVisible = false
-      }
-
-      ColorFXUI.showInNewWindow(chart, "Cross-Validation: " + imageTitle())
-    }
-
+    val data: Seq[(String, Double, Double)] = hSorted.map(m => (m.referenceColorSpace + " + " + m.method, m.mean, m.stdDev))
+    createBarErrorPlot(
+      title = "Cross-Validation: " + imageTitle(),
+      data = data,
+      categoryAxisLabel = "Method",
+      valueAxisLabel = "Mean Delta E (smaller is better)"
+    )
   }
 
   def onCalibrate(): Unit = busyWorker.doTask("onCalibrate") { () =>
