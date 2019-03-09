@@ -17,7 +17,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Latest release available at http://sourceforge.net/projects/ij-plugins/
+ * Latest release available at https://github.com/ij-plugins/ijp-color/
  */
 
 package net.sf.ij_plugins.color.converter.ui
