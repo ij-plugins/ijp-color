@@ -87,7 +87,7 @@ object ColorCalibrator {
 class ColorCalibrator(val chart: ColorChart,
                       val referenceColorSpace: ReferenceColorSpace,
                       val mappingMethod: MappingMethod.Value,
-                      val clipReferenceRGB: Boolean = true) {
+                      val clipReferenceRGB: Boolean) {
 
   import ColorCalibrator._
 

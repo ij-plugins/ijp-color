@@ -219,7 +219,8 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
     val chart = currentChart
 
     // Compute color mapping coefficients
-    val colorCalibrator = new ColorCalibrator(chart, referenceColorSpace(), mappingMethod())
+    val clipReferenceRGB = false
+    val colorCalibrator = new ColorCalibrator(chart, referenceColorSpace(), mappingMethod(), clipReferenceRGB)
 
     val fit = try {
       colorCalibrator.computeCalibrationMapping(image)

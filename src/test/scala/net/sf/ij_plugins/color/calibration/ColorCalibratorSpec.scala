@@ -121,7 +121,8 @@ class ColorCalibratorSpec extends FlatSpec {
     imp should not equal null
 
     // Create color calibration
-    val colorCalibrator = new ColorCalibrator(newChart, colorSpace, method)
+    val clipReferenceRGB = false
+    val colorCalibrator = new ColorCalibrator(newChart, colorSpace, method, clipReferenceRGB)
     val fit = colorCalibrator.computeCalibrationMapping(imp)
 
     // Check deltas, this is a consistency check, deltas may be lower if the fit algorithm is improved
@@ -159,7 +160,8 @@ class ColorCalibratorSpec extends FlatSpec {
     imp should not equal null
 
     // Create color calibration
-    val colorCalibrator = new ColorCalibrator(newChart, colorSpace, method)
+    val clipReferenceRGB = false
+    val colorCalibrator = new ColorCalibrator(newChart, colorSpace, method, clipReferenceRGB)
     val fit = colorCalibrator.computeCalibrationMapping(imp)
 
     // Check deltas, this is a consistency check, deltas may be lower if the fit algorithm is improved

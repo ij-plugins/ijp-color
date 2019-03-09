@@ -31,8 +31,8 @@ import net.sf.ij_plugins.color.calibration.regression.MappingMethod
 import net.sf.ij_plugins.color.converter.ColorTriple.Lab
 
 /**
- * @author Jarek Sacha 
- */
+  * @author Jarek Sacha
+  */
 object LOOCrossValidation {
 
 
@@ -55,12 +55,13 @@ object LOOCrossValidation {
 
     for (i <- 0 until n) yield {
       // Disable i-th chip when computing calibration coefficients
-      val enabled = Array.fill[Boolean](n) {true}
+      val enabled = Array.fill[Boolean](n)(true)
       enabled(i) = false
       val leaveOneOutChart = chart.copyWithEnableChips(enabled)
 
       // Compute color mapping coefficients
-      val colorCalibrator = new ColorCalibrator(leaveOneOutChart, referenceColorSpace, mappingMethod)
+      val clipReferenceRGB = false
+      val colorCalibrator = new ColorCalibrator(leaveOneOutChart, referenceColorSpace, mappingMethod, clipReferenceRGB)
 
       //      val fit = try {
       //        colorCalibrator.computeCalibrationMapping(chipMargin, image)
@@ -98,7 +99,10 @@ object LOOCrossValidation {
 
   def delta(a: Array[Double], b: Array[Double]): Double = {
     require(a.length == b.length, "Length of input arrays must match")
-    val sunOfSquares = (a zip b).foldLeft(0d)((s, v) => {val v2 = v._1 - v._2; s + (v2 * v2)})
+    val sunOfSquares = (a zip b).foldLeft(0d)((s, v) => {
+      val v2 = v._1 - v._2
+      s + (v2 * v2)
+    })
     math.sqrt(sunOfSquares)
   }
 
