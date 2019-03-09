@@ -22,48 +22,32 @@
 
 package net.sf.ij_plugins.color.calibration.ui
 
-import java.awt.{Color, Polygon}
-import java.io.{PrintWriter, StringWriter}
 import java.net.URL
 
-import ij.gui.{PolygonRoi, Roi}
 import ij.measure.ResultsTable
-import ij.process.{ColorProcessor, FloatProcessor}
-import ij.{IJ, ImagePlus, ImageStack}
+import ij.process.FloatProcessor
+import ij.{CompositeImage, IJ, ImagePlus, ImageStack}
 import javafx.beans.property.ReadOnlyBooleanProperty
 import javafx.scene.{chart => jfxsc}
 import net.sf.ij_plugins.color.calibration.chart.{ColorCharts, ReferenceColorSpace}
 import net.sf.ij_plugins.color.calibration.regression.MappingMethod
 import net.sf.ij_plugins.color.calibration.{ColorCalibrator, Corrector, LOOCrossValidation, toPolygonROI}
-import net.sf.ij_plugins.color.converter.ColorConverter
 import net.sf.ij_plugins.color.converter.ColorTriple.Lab
 import net.sf.ij_plugins.color.{ColorFXUI, DeltaE}
 import net.sf.ij_plugins.util._
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
 import org.scalafx.extras.mvcfx.ModelFX
-import org.scalafx.extras.{BusyWorker, onFXAndWait}
+import org.scalafx.extras.{BusyWorker, ShowMessage}
 import scalafx.Includes._
 import scalafx.application.Platform
 import scalafx.beans.property._
 import scalafx.collections.ObservableBuffer
 import scalafx.scene.Scene
 import scalafx.scene.chart._
-import scalafx.scene.control.Alert.AlertType
-import scalafx.scene.control.{Alert, Label, TextArea}
-import scalafx.scene.layout.{GridPane, Priority, StackPane}
+import scalafx.scene.layout.StackPane
 import scalafx.stage.{Stage, Window}
 
-
 object ColorCalibratorUIModel {
-
-  /** Parameters needed to perform color correction of an image and convert it to sRGB.
-    *
-    * @param imageType ImagePlus image type supported by this correction
-    */
-  case class CorrectionRecipe(corrector: Corrector,
-                              colorConverter: ColorConverter,
-                              referenceColorSpace: ReferenceColorSpace,
-                              imageType: Int)
 
   def applyCorrection(recipe: CorrectionRecipe,
                       imp: ImagePlus,
@@ -79,8 +63,9 @@ object ColorCalibratorUIModel {
     // Show floating point stack in the reference color space
     val correctedInReference = {
       val stack = new ImageStack(imp.getWidth, imp.getHeight)
-      (recipe.referenceColorSpace.bands zip correctedBands).foreach(v => stack.addSlice(v._1, v._2))
-      new ImagePlus(imp.getTitle + "+corrected_" + recipe.referenceColorSpace, stack)
+      (recipe.referenceColorSpace.bandsNames zip correctedBands).foreach(v => stack.addSlice(v._1, v._2))
+      val mode = if (recipe.referenceColorSpace == ReferenceColorSpace.sRGB) CompositeImage.COMPOSITE else CompositeImage.GRAYSCALE
+      new CompositeImage(new ImagePlus(imp.getTitle + "+corrected_" + recipe.referenceColorSpace, stack), mode)
     }
     correctedInReference.show()
 
@@ -91,35 +76,12 @@ object ColorCalibratorUIModel {
 
     Option(correctedBands)
   }
-
-  private def convertToSRGB(bands: Array[FloatProcessor],
-                            colorSpace: ReferenceColorSpace,
-                            converter: ColorConverter): ImagePlus = {
-    colorSpace match {
-      case ReferenceColorSpace.sRGB => new ImagePlus("", IJTools.mergeRGB(bands))
-      case ReferenceColorSpace.XYZ =>
-        // Convert XYZ to sRGB
-        val cp = new ColorProcessor(bands(0).getWidth, bands(0).getHeight)
-        val n = bands(0).getWidth * bands(0).getHeight
-        for (i <- (0 until n).par) {
-          val rgb = converter.xyzToRGB(bands(0).getf(i), bands(1).getf(i), bands(2).getf(i))
-          val r = clipUInt8(rgb.r)
-          val g = clipUInt8(rgb.g)
-          val b = clipUInt8(rgb.b)
-          val color = ((r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF) << 0)
-          cp.set(i, color)
-        }
-        new ImagePlus("", cp)
-      case _ => throw new IllegalArgumentException("Unsupported reference color space '" + colorSpace + "'.")
-    }
-  }
-
 }
 
 /**
   * Model for color calibrator UI.
   */
-class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends ModelFX {
+class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends ModelFX with ShowMessage {
 
   import ColorCalibratorUIModel._
 
@@ -138,64 +100,30 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
 
   val liveChartROI = new LiveChartROI(image, referenceChartOption, chipMarginPercent)
 
-  private val chipValuesObservedWrapper = new ReadOnlyBooleanWrapper(this, "chipValuesObserved", false)
-  val chipValuesObserved: ReadOnlyBooleanProperty = chipValuesObservedWrapper.getReadOnlyProperty
+  val chipValuesObserved: ReadOnlyBooleanProperty = {
+    val p = new ReadOnlyBooleanWrapper(this, "chipValuesObserved", false)
+    // Chip values are observed when `locatedChart` is available
+    p <== liveChartROI.locatedChart =!= None
+    p.getReadOnlyProperty
+  }
 
   // True when correction parameters are available and can be applied to another image
-  private val correctionRecipeAvailableWrapper = new ReadOnlyBooleanWrapper(this, "correctionRecipeAvailable", false)
-  correctionRecipeAvailableWrapper <== correctionRecipe =!= None
-  val correctionRecipeAvailable: ReadOnlyBooleanProperty = correctionRecipeAvailableWrapper.getReadOnlyProperty
+  val correctionRecipeAvailable: ReadOnlyBooleanProperty = {
+    val p = new ReadOnlyBooleanWrapper(this, "correctionRecipeAvailable", false)
+    p <== correctionRecipe =!= None
+    p.getReadOnlyProperty
+  }
 
   private def currentChart = liveChartROI.locatedChart.value.get
 
   private val busyWorker: BusyWorker = new BusyWorker("Color Calibrator", parentWindow)
 
-  // Chip values are observed when `locatedChart` is available
-  chipValuesObservedWrapper <== liveChartROI.locatedChart =!= None
 
   referenceChart.onChange((_, _, newValue) => referenceChartOption() = Option(newValue))
 
 
   def onRenderReferenceChart(): Unit = busyWorker.doTask("onRenderReferenceChart") { () =>
-    val scale = 80
-    val margin = 0.1 * scale
-
-    val chart = referenceChart().copyWithNewChipMargin(0.1)
-    val maxX = chart.referenceOutline.map(_.x).max * scale
-    val maxY = chart.referenceOutline.map(_.y).max * scale
-    val width: Int = (maxX + 2 * margin).toInt
-    val height: Int = (maxY + 2 * margin).toInt
-    val cp = new ColorProcessor(width, height)
-    cp.setColor(Color.BLACK)
-    cp.fill()
-    val converter = chart.colorConverter
-    for (chip <- chart.referenceChips) {
-      // ROI
-      val outline = chip.outline
-      val xPoints = outline.map(p => (margin + p.x * scale).toInt).toArray
-      val yPoints = outline.map(p => (margin + p.y * scale).toInt).toArray
-      val roi = new PolygonRoi(new Polygon(xPoints, yPoints, xPoints.length), Roi.POLYGON)
-      cp.setRoi(roi)
-      // Color
-      val color = {
-        val rgb = converter.toRGB(converter.toXYZ(chip.color))
-        new Color(clipUInt8(rgb.r), clipUInt8(rgb.g), clipUInt8(rgb.b))
-      }
-      cp.setColor(color)
-      cp.fill()
-    }
-
-    val imp = new ImagePlus(chart.name, cp)
-    imp.setRoi(
-      new PolygonRoi(
-        new Polygon(
-          Array(margin.toInt, (maxX + margin).toInt, (maxX + margin).toInt, margin.toInt),
-          Array(margin.toInt, margin.toInt, (maxY + margin).toInt, (maxY + margin).toInt),
-          4
-        ), Roi.POLYGON
-      )
-    )
-    imp.show()
+    renderReferenceChart(referenceChart()).show()
   }
 
   def onShowReferenceColors(): Unit = busyWorker.doTask("onShowReferenceColors") { () =>
@@ -289,18 +217,20 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
 
   def onCalibrate(): Unit = busyWorker.doTask("onCalibrate") { () =>
 
-    // Compute color mapping coefficients
+    correctionRecipe() = None
+
     val chart = currentChart
+
+    // Compute color mapping coefficients
     val colorCalibrator = new ColorCalibrator(chart, referenceColorSpace(), mappingMethod())
 
     val fit = try {
       colorCalibrator.computeCalibrationMapping(image)
     } catch {
       case t: Throwable =>
-        showError("Error while computing color calibration.", t.getMessage, t)
+        showException("Error while computing color calibration.", t.getMessage, t)
         return
     }
-
 
     val recipe = CorrectionRecipe(
       corrector = new Corrector(fit.mapping),
@@ -309,10 +239,12 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
       imageType = image.getType
     )
 
+    correctionRecipe() = Option(recipe)
+
     val correctedBands = applyCorrection(
       recipe,
       image,
-      showError
+      showException
     ).getOrElse(return)
 
     if (showExtraInfo()) {
@@ -352,8 +284,8 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
       }
       rtFit.show("Regression Coefficients")
 
-      showScatterChart(fit.reference, fit.observed, referenceColorSpace().bands, "Reference vs. Observed")
-      showScatterChart(fit.reference, fit.corrected, referenceColorSpace().bands, "Reference vs. Corrected")
+      showScatterChart(fit.reference, fit.observed, referenceColorSpace().bandsNames, "Reference vs. Observed")
+      showScatterChart(fit.reference, fit.corrected, referenceColorSpace().bandsNames, "Reference vs. Corrected")
       showResidualScatterChart(fit.reference, fit.corrected, "Reference vs. Corrected Residual")
 
       // Delta in reference color space
@@ -385,7 +317,7 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
         stack.addSlice("L*", labFPs(0))
         stack.addSlice("a*", labFPs(1))
         stack.addSlice("b*", labFPs(2))
-        new ImagePlus("L*a*b*", stack).show()
+        new CompositeImage(new ImagePlus("L*a*b*", stack), CompositeImage.GRAYSCALE).show()
         for (chip <- chart.alignedChips) {
           val poly = toPolygonROI(chip.outline)
           val actualTestColor = for (fp <- labFPs) yield {
@@ -428,9 +360,6 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
         "\n"
       )
     }
-
-    // Update correction recipe
-    correctionRecipe() = Option(recipe)
   }
 
   def onApplyToCurrentImage(): Unit = busyWorker.doTask("onApplyToCurrentImage") { () =>
@@ -457,14 +386,14 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
     }
 
     // Run calibration on the current image
-    val correctedBands = applyCorrection(recipe, imp, showError).getOrElse(return)
+    val correctedBands = applyCorrection(recipe, imp, showException).getOrElse(return)
     if (showExtraInfo()) {
       val labFPs = referenceColorSpace().toLab(correctedBands)
       val stack = new ImageStack(labFPs(0).getWidth, labFPs(0).getHeight)
       stack.addSlice("L*", labFPs(0))
       stack.addSlice("a*", labFPs(1))
       stack.addSlice("b*", labFPs(2))
-      new ImagePlus(imp.getShortTitle + "-L*a*b*", stack).show()
+      new CompositeImage(new ImagePlus(imp.getShortTitle + "-L*a*b*", stack), CompositeImage.GRAYSCALE).show()
     }
   }
 
@@ -530,56 +459,6 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
       }
       dy(i) = dd
     }
-    showScatterChart(x, dy, referenceColorSpace().bands, chartTitle)
+    showScatterChart(x, dy, referenceColorSpace().bandsNames, chartTitle)
   }
-
-
-  private def showError(summary: String, message: String, t: Throwable): Unit = {
-    onFXAndWait {
-      // TODO ShowMessage trait to simplify code
-      // Extract exception text
-      val exceptionText = {
-        val sw = new StringWriter()
-        val pw = new PrintWriter(sw)
-        t.printStackTrace(pw)
-        sw.toString
-      }
-      val label = new Label("The exception stacktrace was:")
-      val textArea = new TextArea {
-        text = exceptionText
-        editable = false
-        wrapText = true
-        maxWidth = Double.MaxValue
-        maxHeight = Double.MaxValue
-        vgrow = Priority.Always
-        hgrow = Priority.Always
-      }
-      val expContent = new GridPane {
-        maxWidth = Double.MaxValue
-        add(label, 0, 0)
-        add(textArea, 0, 1)
-      }
-
-      new Alert(AlertType.Error) {
-        initOwner(parentWindow)
-        title = "Error"
-        headerText = summary
-        contentText = message
-        // Set expandable Exception into the dialog pane.
-        dialogPane().expandableContent = expContent
-      }.showAndWait()
-    }
-  }
-
-  private def showError(summary: String, message: String): Unit = {
-    onFXAndWait {
-      new Alert(AlertType.Error) {
-        initOwner(parentWindow)
-        title = "Error"
-        headerText = summary
-        contentText = message
-      }.showAndWait()
-    }
-  }
-
 }
