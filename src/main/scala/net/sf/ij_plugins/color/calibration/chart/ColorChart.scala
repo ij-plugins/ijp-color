@@ -22,6 +22,8 @@
 
 package net.sf.ij_plugins.color.calibration.chart
 
+import ij.ImagePlus
+import ij.ImagePlus.{COLOR_RGB, GRAY16, GRAY32, GRAY8}
 import ij.process.{ColorProcessor, ImageProcessor}
 import net.sf.ij_plugins.color.converter.{ColorConverter, RGBWorkingSpace, ReferenceWhite}
 import net.sf.ij_plugins.util.{IJTools, PerspectiveTransform}
@@ -73,6 +75,25 @@ trait ColorChart {
     * @param src image represented by 3 bands
     */
   def averageChipColor[T <: ImageProcessor](src: Array[T]): Array[Array[Double]]
+
+  /** Compute average color within aligned chips from an an image.
+    *
+    * @param image is either single slice RGB image (ColorProcessor)
+    *              or three slices of gray processors representing color bands.
+    * @return average for each band in each color chip (array of triples).
+    */
+  def averageChipColor(image: ImagePlus): Array[Array[Double]] = {
+    (image.getType, image.getStackSize) match {
+      case (COLOR_RGB, 1) =>
+        val src = image.getProcessor.asInstanceOf[ColorProcessor]
+        averageChipColor(src)
+      case (GRAY8, 3) | (GRAY16, 3) | (GRAY32, 3) =>
+        val src = (1 to 3).map(image.getStack.getProcessor).toArray
+        averageChipColor(src)
+      case _ =>
+        throw new IllegalArgumentException("Input image must be either single slice RGB image or three slice gray level image.")
+    }
+  }
 
   /** Return reference colors represented in given color space. */
   def referenceColor(colorSpace: ReferenceColorSpace): Array[Array[Double]] = colorSpace match {
