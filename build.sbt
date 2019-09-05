@@ -10,7 +10,7 @@ homepage     := Some(new URL("https://github.com/ij-plugins/ijp-color"))
 startYear    := Some(2002)
 licenses     := Seq(("LGPL-2.1", new URL("http://opensource.org/licenses/LGPL-2.1")))
 
-scalaVersion       := "2.12.8"
+scalaVersion := "2.12.9"
 
 // append -deprecation to the options passed to the Scala compiler
 scalacOptions ++= Seq(
@@ -46,7 +46,7 @@ lazy val osName = System.getProperty("os.name") match {
 
 lazy val javaFXModules = Seq("base", "controls", "fxml", "graphics", "media", "swing", "web")
 libraryDependencies ++= javaFXModules.map( m =>
-  "org.openjfx" % s"javafx-$m" % "11.0.2" classifier osName
+  "org.openjfx" % s"javafx-$m" % "12.0.2" classifier osName
 )
 
 libraryDependencies ++= Seq(
@@ -54,10 +54,10 @@ libraryDependencies ++= Seq(
   "org.apache.commons"  % "commons-math3"       % "3.6.1",
   "org.jfree"           % "jfreechart-fx"       % "1.0.1",
   "org.jfree"           % "fxgraphics2d"        % "1.8",
-  "org.scalafx"        %% "scalafx"             % "11-R16",
+  "org.scalafx"        %% "scalafx"             % "12.0.1-R17",
   "org.scalafx"        %% "scalafx-extras"      % "0.3.0",
   "org.scalafx"        %% "scalafxml-core-sfx8" % "0.4",
-  "org.scalatest"      %% "scalatest"           % "3.0.5"  % "test"
+  "org.scalatest"      %% "scalatest"           % "3.0.8"  % "test"
 )
 
 autoCompilerPlugins := true
@@ -87,30 +87,3 @@ ijPluginsSubDir         := "ij-plugins"
 ijCleanBeforePrepareRun := true
 // Instruct `clean` to delete created plugins subdirectory created by `ijRun`/`ijPrepareRun`.
 cleanFiles += ijPluginsDir.value
-//
-// Customize Java style publishing
-//
-// Enables publishing to maven repo
-publishMavenStyle := true
-
-publishTo := version {
-  version: String =>
-    if (version.contains("-SNAPSHOT"))
-      Some("Sonatype Nexus Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots")
-    else
-      Some("Sonatype Nexus Releases" at "https://oss.sonatype.org/service/local/staging/deploy/maven2")
-}.value
-
-
-pomExtra :=
-    <scm>
-      <url>https://github.com/ij-plugins/ijp-color</url>
-      <connection>scm:https://github.com/ij-plugins/ijp-color.git</connection>
-    </scm>
-    <developers>
-      <developer>
-        <id>jpsacha</id>
-        <name>Jarek Sacha</name>
-        <url>https://github.com/jpsacha</url>
-      </developer>
-    </developers>
