@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2017 Jarek Sacha
+ * Copyright (C) 2002-2019 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -17,17 +17,16 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Latest release available at http://sourceforge.net/projects/ij-plugins/
+ * Latest release available at https://github.com/ij-plugins/ijp-color/
  */
 
 package net.sf.ij_plugins.color.converter.ui
 
+import ij.plugin.BrowserLauncher
 import javafx.beans.{binding => jfxbb}
-
 import net.sf.ij_plugins.color.converter._
 import net.sf.ij_plugins.color.converter.ui.ColorConverterModel.Update
 import net.sf.ij_plugins.util.IJPUtils
-
 import scalafx.Includes._
 import scalafx.beans.property.ObjectProperty
 import scalafx.collections.ObservableBuffer
@@ -39,11 +38,13 @@ import scalafx.scene.layout.GridPane
 import scalafx.util.StringConverter
 
 object ColorConverterView {
-  private val Title = "Color Converter"
+  private val Title = "Color Calculator"
   private val About = "" +
     "Converts between color space coordinates.  To convert color values  \n" +
     "from the source color space to other spaces: type in the source color \n" +
     "values, then click on the button next to them to convert to other spaces."
+  val HelpURL = "https://github.com/ij-plugins/ijp-color"
+
 }
 
 class ColorConverterView(val model: ColorConverterModel) {
@@ -180,6 +181,16 @@ class ColorConverterView(val model: ColorConverterModel) {
         }
       )
     )
+
+    val helpButton = new Button {
+      id = "ijp-button"
+      text = "Help"
+      onAction = (_: ActionEvent) => {
+        BrowserLauncher.openURL(HelpURL)
+      }
+    }
+    gp.add(helpButton, 4, row)
+
     row += 1
 
     gp

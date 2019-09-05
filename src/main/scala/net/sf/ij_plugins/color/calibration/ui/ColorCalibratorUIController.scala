@@ -17,7 +17,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Latest release available at http://sourceforge.net/projects/ij-plugins/
+ * Latest release available at https://github.com/ij-plugins/ijp-color/
  */
 
 package net.sf.ij_plugins.color.calibration.ui
@@ -48,6 +48,7 @@ class ColorCalibratorUIController(private val imageTitleLabel: Label,
                                   private val suggestCalibrationOptionsButton: Button,
                                   private val calibrateButton: Button,
                                   private val applyToCurrentImageButton: Button,
+                                  private val helpButton: Button,
                                   private val rootGridPane: GridPane,
                                   private val model: ColorCalibratorUIModel) extends ControllerFX {
 
@@ -93,4 +94,6 @@ class ColorCalibratorUIController(private val imageTitleLabel: Label,
 
   applyToCurrentImageButton.onAction = _ => model.onApplyToCurrentImage()
   applyToCurrentImageButton.disable <== !model.correctionRecipeAvailable
+
+  helpButton.onAction = _ => model.onHelp()
 }

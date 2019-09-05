@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2017 Jarek Sacha
+ * Copyright (C) 2002-2019 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -17,7 +17,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Latest release available at http://sourceforge.net/projects/ij-plugins/
+ * Latest release available at https://github.com/ij-plugins/ijp-color/
  */
 
 package net.sf.ij_plugins.color.calibration.chart
@@ -26,10 +26,12 @@ import ij.process.FloatProcessor
 import net.sf.ij_plugins.color.converter.{ColorConverter, ColorTriple}
 
 /** Color spaces used for creation of reference color values. */
-sealed abstract class ReferenceColorSpace(name: String) {
+sealed abstract class ReferenceColorSpace(name: String, bands: Array[String]) {
   override def toString: String = name
 
-  def bands: Array[String] = toString.toArray.takeRight(3).map(_.toString)
+  private val _bands: Array[String] = bands.clone()
+
+  def bandsNames: Array[String] = _bands.clone()
 
   /** Convert color value from the current color space to CIE L*a*b* */
   def toLab(c1: Double, c2: Double, c3: Double): ColorTriple.Lab = {
@@ -72,10 +74,12 @@ sealed abstract class ReferenceColorSpace(name: String) {
 
 /** Enumeration of supported reference color spaces. */
 object ReferenceColorSpace {
+
   /** CIE XYZ color space */
-  case object XYZ extends ReferenceColorSpace("XYZ")
+  case object XYZ extends ReferenceColorSpace("XYZ", Array("X", "Y", "Z"))
+
   /** sRGB color space */
-  case object sRGB extends ReferenceColorSpace("sRGB")
+  case object sRGB extends ReferenceColorSpace("sRGB", Array("Red", "Green", "Blue"))
 
   /** All refined reference color spaces. */
   val values = List(XYZ, sRGB)

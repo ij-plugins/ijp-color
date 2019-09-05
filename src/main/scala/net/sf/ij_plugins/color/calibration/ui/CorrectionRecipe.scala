@@ -20,36 +20,17 @@
  * Latest release available at https://github.com/ij-plugins/ijp-color/
  */
 
-package net.sf.ij_plugins.util
+package net.sf.ij_plugins.color.calibration.ui
 
-import org.scalatest.FlatSpec
-import org.scalatest.Matchers._
+import net.sf.ij_plugins.color.calibration.Corrector
+import net.sf.ij_plugins.color.calibration.chart.ReferenceColorSpace
+import net.sf.ij_plugins.color.converter.ColorConverter
 
-import scalafx.geometry.Point2D
-
-class PerspectiveTransformTest extends FlatSpec {
-
-  "PerspectiveTransform" should "transform points" in {
-
-    // Reference quad
-    val referenceQuad = Array(
-      new Point2D(0, 0),
-      new Point2D(6, 0),
-      new Point2D(6, 4),
-      new Point2D(0, 4)
-    )
-
-    val deformedQuad = Array(
-      new Point2D(207, 95),
-      new Point2D(461, 132),
-      new Point2D(436, 312),
-      new Point2D(198, 255)
-    )
-
-    val alignmentTransform = PerspectiveTransform.quadToQuad(referenceQuad, deformedQuad)
-    val pm = alignmentTransform.transform(new Point2D(3, 2))
-
-    pm.x should be(317.07786 +- 0.00001)
-    pm.y should be(199.30959 +- 0.00001)
-  }
-}
+/** Parameters needed to perform color correction of an image and convert it to sRGB.
+  *
+  * @param imageType ImagePlus image type supported by this correction
+  */
+case class CorrectionRecipe(corrector: Corrector,
+                            colorConverter: ColorConverter,
+                            referenceColorSpace: ReferenceColorSpace,
+                            imageType: Int)

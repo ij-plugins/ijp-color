@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2017 Jarek Sacha
+ * Copyright (C) 2002-2019 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -17,7 +17,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Latest release available at http://sourceforge.net/projects/ij-plugins/
+ * Latest release available at https://github.com/ij-plugins/ijp-color/
  */
 
 package net.sf.ij_plugins.color.calibration
@@ -121,7 +121,8 @@ class ColorCalibratorSpec extends FlatSpec {
     imp should not equal null
 
     // Create color calibration
-    val colorCalibrator = new ColorCalibrator(newChart, colorSpace, method)
+    val clipReferenceRGB = false
+    val colorCalibrator = new ColorCalibrator(newChart, colorSpace, method, clipReferenceRGB)
     val fit = colorCalibrator.computeCalibrationMapping(imp)
 
     // Check deltas, this is a consistency check, deltas may be lower if the fit algorithm is improved
@@ -159,7 +160,8 @@ class ColorCalibratorSpec extends FlatSpec {
     imp should not equal null
 
     // Create color calibration
-    val colorCalibrator = new ColorCalibrator(newChart, colorSpace, method)
+    val clipReferenceRGB = false
+    val colorCalibrator = new ColorCalibrator(newChart, colorSpace, method, clipReferenceRGB)
     val fit = colorCalibrator.computeCalibrationMapping(imp)
 
     // Check deltas, this is a consistency check, deltas may be lower if the fit algorithm is improved
