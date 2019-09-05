@@ -137,18 +137,10 @@ final class GridColorChart(val name: String,
     * @return
     */
   def copyWithEnableChips(enabled: Array[Boolean]): GridColorChart = {
-    val enabledCount: Int = this.enabled.count(_ == true)
-    require(enabledCount == enabled.length,
-      "Expecting " + enabledCount + " elements in the input array, got " + enabled.length)
+    require(chips.length == enabled.length,
+      "Expecting " + chips.length + " elements in the input array, got " + enabled.length)
 
-    // Determine indices of enabled chips
-    val thisEnabledWithIndex = this.enabled.zipWithIndex.filter { case (_, i) => enabled(i) }
-    val newEnabledIndices = (thisEnabledWithIndex zip enabled).filter { case (_, e) => e }.map { case (vi, _) => vi._2 }
-
-    val newEnabled = new Array[Boolean](this.enabled.size)
-    newEnabledIndices.foreach(i => newEnabled(i) = true)
-
-    new GridColorChart(name, nbColumns, nbRows, chips, chipMargin, newEnabled.toList, refWhite, alignmentTransform)
+    new GridColorChart(name, nbColumns, nbRows, chips, chipMargin, enabled.toList, refWhite, alignmentTransform)
   }
 
   /** Creates a copy of this chart with different `chipMargin`. Value of the margin must be between 0 and 0.5. */
