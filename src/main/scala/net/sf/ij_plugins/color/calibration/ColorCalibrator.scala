@@ -35,9 +35,9 @@ object ColorCalibrator {
   /** Results of computing color calibration.
     *
     * @param reference reference color values
-    * @param observed observed color values
+    * @param observed  observed color values
     * @param corrected color values after calibration
-    * @param mapping coefficients of the polynomial mapping functions.
+    * @param mapping   coefficients of the polynomial mapping functions.
     */
   case class CalibrationFit(reference: Array[Array[Double]],
                             observed: Array[Array[Double]],
@@ -75,14 +75,14 @@ object ColorCalibrator {
   * the reference can be done with good accuracy using low order polynomial.
   * If the input image is a typical JPEG image it is best to select sRGB as a reference color space.
   *
-  * @param chart color chart providing reference color values, location of chips, and the alignment transform
-  *              to spatially map color chip locations fro the reference to input image.
+  * @param chart               color chart providing reference color values, location of chips, and the alignment transform
+  *                            to spatially map color chip locations fro the reference to input image.
   * @param referenceColorSpace assumption about the color space of the input image.
   *                            Reference color values will be generated in that color space.
-  * @param mappingMethod type of polynomial function used to map from input to the reference color space.
-  * @param clipReferenceRGB if the reference was selected as RGB, the reference color values can be outside the gamut
-  *                         of that color space (lower than 0 or larger than 255). This parameter gives an option
-  *                         to clip reference color value to fit within the gamut.
+  * @param mappingMethod       type of polynomial function used to map from input to the reference color space.
+  * @param clipReferenceRGB    if the reference was selected as RGB, the reference color values can be outside the gamut
+  *                            of that color space (lower than 0 or larger than 255). This parameter gives an option
+  *                            to clip reference color value to fit within the gamut.
   */
 class ColorCalibrator(val chart: ColorChart,
                       val referenceColorSpace: ReferenceColorSpace,
@@ -101,7 +101,8 @@ class ColorCalibrator(val chart: ColorChart,
     *                                                too high given the number of reference colors.
     */
   def computeCalibrationMapping(observed: Array[Array[Double]]): CalibrationFit = {
-    require(observed.length == chart.referenceChips.length)
+    require(observed.length == chart.referenceChips.length,
+      s"Expecting ${chart.referenceChips.length} observations, got ${observed.length}.")
     require(observed.forall(_.length == 3))
 
     val reference = chart.referenceColor(referenceColorSpace).clone()
@@ -155,7 +156,7 @@ class ColorCalibrator(val chart: ColorChart,
     * `clipReferenceRGB` is true.
     *
     * @param image input image to measure observed color value of chart's chips.
-    * @throws ColorException if one of the calibration mapping functions cannot be computed.
+    * @throws ColorException           if one of the calibration mapping functions cannot be computed.
     * @throws IllegalArgumentException if input image is not RGB or not a three slice stack of gray level images.
     */
   def computeCalibrationMapping(image: ImagePlus): CalibrationFit = {
