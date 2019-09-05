@@ -2,14 +2,11 @@ sudo: false
 language: scala
 scala:
   - 2.11.11
-  - 2.12.2
-
-before_install:
-  - "export DISPLAY=:99.0"
-  - "sh -e /etc/init.d/xvfb start"
+  - 2.12.9
 
 jdk:
   - oraclejdk11
+  - oraclejdk12
 
 install: true
 
