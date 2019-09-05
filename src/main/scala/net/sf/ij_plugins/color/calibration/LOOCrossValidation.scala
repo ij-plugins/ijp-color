@@ -53,6 +53,7 @@ object LOOCrossValidation {
 
     val n = chart.referenceChips.size
     val expectedColors = chart.referenceColor(referenceColorSpace)
+    val observed = chart.averageChipColor(image)
 
     for (i <- 0 until n) yield {
       // Disable i-th chip when computing calibration coefficients
@@ -74,7 +75,12 @@ object LOOCrossValidation {
       //          //        return
       //        }
       //      }
-      val fit = colorCalibrator.computeCalibrationMapping(image)
+      //      val fit = colorCalibrator.computeCalibrationMapping(image)
+
+      val observedLOO = observed.zipWithIndex.filter(v => enabled(v._2)).map(_._1)
+
+      val fit = colorCalibrator.computeCalibrationMapping(observedLOO)
+
       val corrector = new Corrector(fit.mapping)
 
       // Measure correction quality on the disabled chip
