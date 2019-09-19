@@ -4,7 +4,7 @@ import java.net.URL
 
 name         := "ijp-color"
 organization := "net.sf.ij-plugins"
-version      := "0.7.0.1-SNAPSHOT"
+version      := "0.7.1"
 
 homepage     := Some(new URL("https://github.com/ij-plugins/ijp-color"))
 startYear    := Some(2002)
