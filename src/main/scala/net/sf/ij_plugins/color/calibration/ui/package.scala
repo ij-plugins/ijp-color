@@ -33,6 +33,8 @@ import net.sf.ij_plugins.color.converter.ColorConverter
 import net.sf.ij_plugins.util.{IJTools, PerspectiveTransform, clipUInt8}
 import scalafx.geometry.Point2D
 
+import scala.collection.parallel.immutable.ParRange
+
 package object ui {
   def toShape(chips: Seq[ColorChip]): Shape = {
     val shape = new Path2D.Double
@@ -107,7 +109,7 @@ package object ui {
         // Convert XYZ to sRGB
         val cp = new ColorProcessor(bands(0).getWidth, bands(0).getHeight)
         val n = bands(0).getWidth * bands(0).getHeight
-        for (i <- (0 until n).par) {
+        for (i <- new ParRange(0 until n)) {
           val rgb = converter.xyzToRGB(bands(0).getf(i), bands(1).getf(i), bands(2).getf(i))
           val r = clipUInt8(rgb.r)
           val g = clipUInt8(rgb.g)
