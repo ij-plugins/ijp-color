@@ -27,7 +27,6 @@ import java.text.DecimalFormat
 import net.sf.ij_plugins.color.converter.ColorTriple
 import net.sf.ij_plugins.color.converter.ColorTriple.Color123
 import net.sf.ij_plugins.color.converter.ui.ColorValueUI.NumberTextField
-
 import scalafx.Includes._
 import scalafx.beans.property.ObjectProperty
 import scalafx.geometry.Pos
@@ -71,7 +70,7 @@ class ColorValueUI {
 
 
   val control = new HBox {
-    children +=(band1NTF, band2NTF, band3NTF)
+    children ++= Seq(band1NTF, band2NTF, band3NTF)
   }
 
   private def updateColor(): Unit = {
