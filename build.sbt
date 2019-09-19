@@ -4,13 +4,21 @@ import java.net.URL
 
 name         := "ijp-color"
 organization := "net.sf.ij-plugins"
-version      := "0.7.0"
+version      := "0.7.0.1-SNAPSHOT"
 
 homepage     := Some(new URL("https://github.com/ij-plugins/ijp-color"))
 startYear    := Some(2002)
 licenses     := Seq(("LGPL-2.1", new URL("http://opensource.org/licenses/LGPL-2.1")))
 
-scalaVersion := "2.12.9"
+crossScalaVersions := Seq("2.13.1", "2.12.10")
+scalaVersion := crossScalaVersions.value.head
+
+def isScala2_13plus(scalaVersion: String): Boolean = {
+  CrossVersion.partialVersion(scalaVersion) match {
+    case Some((2, n)) if n >= 13 => true
+    case _ => false
+  }
+}
 
 // append -deprecation to the options passed to the Scala compiler
 scalacOptions ++= Seq(
@@ -18,23 +26,22 @@ scalacOptions ++= Seq(
   "-encoding", "UTF-8",
   "-unchecked",
   "-deprecation",
-//  "-optimize",
   "-Xlint",
-  "-Xfuture",
-  "-Yno-adapted-args",
-  "-Ywarn-dead-code",
-//  "-Ywarn-numeric-widen",
-//  "-Ywarn-value-discard",
-  "-Ywarn-unused",
-  "-Ywarn-unused-import")
+  "-feature"
+  )
 
 // Point to location of a snapshot repository for ScalaFX
-resolvers ++= Seq(
-  "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
-  "ImageJ Releases" at "http://maven.imagej.net/content/repositories/releases/"
-)
+resolvers += Resolver.sonatypeRepo("snapshots")
 
-addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full)
+// Enable macro annotation processing
+scalacOptions += (if(isScala2_13plus(scalaVersion.value)) "-Ymacro-annotations" else "")
+libraryDependencies += (
+    if (isScala2_13plus(scalaVersion.value)) {
+      "org.scala-lang.modules" %% "scala-parallel-collections" % "0.2.0"
+    } else {
+      compilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full)
+    }
+  )
 
 // Determine OS version of JavaFX binaries
 lazy val osName = System.getProperty("os.name") match {
@@ -54,9 +61,9 @@ libraryDependencies ++= Seq(
   "org.apache.commons"  % "commons-math3"       % "3.6.1",
   "org.jfree"           % "jfreechart-fx"       % "1.0.1",
   "org.jfree"           % "fxgraphics2d"        % "1.8",
-  "org.scalafx"        %% "scalafx"             % "12.0.1-R17",
-  "org.scalafx"        %% "scalafx-extras"      % "0.3.0",
-  "org.scalafx"        %% "scalafxml-core-sfx8" % "0.4",
+  "org.scalafx"        %% "scalafx"             % "12.0.2-R18",
+  "org.scalafx"        %% "scalafx-extras"      % "0.3.1",
+  "org.scalafx"        %% "scalafxml-core-sfx8" % "0.5",
   "org.scalatest"      %% "scalatest"           % "3.0.8"  % "test"
 )
 

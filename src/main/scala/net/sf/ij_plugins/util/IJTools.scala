@@ -25,7 +25,6 @@ package net.sf.ij_plugins.util
 import ij.gui.{PolygonRoi, Roi}
 import ij.process.{ByteProcessor, ColorProcessor, FloatProcessor, ImageProcessor}
 import ij.{IJ, ImageJ}
-
 import scalafx.geometry.Point2D
 import scalafx.scene.image.Image
 
@@ -170,7 +169,7 @@ object IJTools {
   def validateSameDimensions[T <: ImageProcessor](src: Array[T], length: Int): Unit = {
     require(src != null, "Input cannot be null.")
     require(src.length == length, "Input array has to have " + length + " elements.")
-    require(!src.contains(null), "Input array cannot have null entries.")
+    require(!src.contains(null.asInstanceOf[T]), "Input array cannot have null entries.")
     val width = src(0).getWidth
     val height = src(0).getHeight
     require(src.forall(width == _.getWidth), "All input images have to have the same width: " + src.map(_.getWidth).mkString(","))
