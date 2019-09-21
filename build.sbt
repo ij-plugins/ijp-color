@@ -9,10 +9,11 @@ import scala.xml.{Node => XmlNode, NodeSeq => XmlNodeSeq, _}
 
 name := "ijp-color-project"
 
-lazy val _version       = "0.8.0"
-lazy val _scalaVersions = Seq("2.13.1", "2.12.10")
-lazy val _scalaVersion  = _scalaVersions.head
+val _version       = "0.8.0"
+val _scalaVersions = Seq("2.13.1", "2.12.10")
+val _scalaVersion  = _scalaVersions.head
 
+version             := _version
 scalaVersion        := _scalaVersion
 publishArtifact     := false
 skip in publish     := true
@@ -35,6 +36,7 @@ lazy val osName = System.getProperty("os.name") match {
 lazy val javaFXModules = Seq("base", "controls", "fxml", "graphics", "media", "swing", "web")
 
 val commonSettings = Seq(
+  version      := _version,
   organization := "net.sf.ij-plugins",
   homepage     := Some(new URL("https://github.com/ij-plugins/ijp-color")),
   startYear    := Some(2002),
@@ -58,7 +60,7 @@ val commonSettings = Seq(
   ),
   scalacOptions in(Compile, doc) ++= (
     Option(System.getenv("GRAPHVIZ_DOT_PATH")) match {
-      case Some(path) => Seq("-diagrams", "-diagrams-dot-path", path)
+      case Some(path) => Seq("-diagrams", "-diagrams-dot-path", path, "-diagrams-debug")
       case None => Seq.empty[String]
     }),
   // Point to location of a snapshot repository
@@ -88,6 +90,7 @@ val commonSettings = Seq(
 
 // The core ijp-color module
 lazy val ijp_color = (project in file("ijp-color")).settings(
+  name := "ijp-color",
   commonSettings,
   libraryDependencies ++= Seq(
     "net.imagej"          % "ij"            % "1.52j",
@@ -106,6 +109,7 @@ lazy val ijp_color = (project in file("ijp-color")).settings(
 // The ijp-color UI and ImageJ plugins module
 lazy val ijp_color_ui = (project in file("ijp-color-ui"))
   .settings(
+    name := "ijp-color-ui",
     commonSettings,
     // Enable macro annotation processing for ScalaFXML
     scalacOptions += (if(isScala2_13plus(scalaVersion.value)) "-Ymacro-annotations" else ""),
