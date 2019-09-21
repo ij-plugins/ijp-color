@@ -1,0 +1,5 @@
+Operations on color spaces and color images, including color calibration.
+
+Package [[net.sf.ij_plugins.color.calibration `net.sf.ij_plugins.color.calibration`]] contains color calibration.
+
+Package [[net.sf.ij_plugins.color.converter `net.sf.ij_plugins.color.converter`]] contains conversions between color spaces.
