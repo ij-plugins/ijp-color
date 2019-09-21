@@ -1,6 +1,6 @@
 import java.net.URL
 
-import xerial.sbt.Sonatype._
+import xerial.sbt.Sonatype.GitHubHosting
 
 import scala.xml.transform.{RewriteRule, RuleTransformer}
 import scala.xml.{Node => XmlNode, NodeSeq => XmlNodeSeq, _}
@@ -50,7 +50,8 @@ val commonSettings = Seq(
     "-unchecked",
     "-deprecation",
     "-Xlint",
-    "-feature"
+    "-feature",
+    "-explaintypes", 
   ),
   scalacOptions in(Compile, doc) ++= Opts.doc.title("IJP Color API"),
   scalacOptions in(Compile, doc) ++= Opts.doc.version(_version),
@@ -63,22 +64,19 @@ val commonSettings = Seq(
       case Some(path) => Seq("-diagrams", "-diagrams-dot-path", path, "-diagrams-debug")
       case None => Seq.empty[String]
     }),
-  // Point to location of a snapshot repository
+  javacOptions  ++= Seq("-deprecation", "-Xlint"),
+  //
   resolvers += Resolver.sonatypeRepo("snapshots"),
   //
   autoCompilerPlugins := true,
   // Fork a new JVM for 'run' and 'test:run'
   fork := true,
-  // Fork a new JVM for 'test:run', but not 'run'
-  fork in Test := true,
-  // Only use a single thread for building
-  parallelExecution := false,
-  // Execute tests in the current project serially
-  parallelExecution in Test := false,
   // Add a JVM option to use when forking a JVM for 'run'
   javaOptions += "-Xmx1G",
   // Instruct `clean` to delete created plugins subdirectory created by `ijRun`/`ijPrepareRun`.
   cleanFiles += ijPluginsDir.value,
+  //
+  manifestSetting,
   // Setup publishing
   publishMavenStyle := true,
   sonatypeProfileName := "net.sf.ij-plugins",
@@ -91,27 +89,30 @@ val commonSettings = Seq(
 
 
 // The core ijp-color module
-lazy val ijp_color = (project in file("ijp-color")).settings(
-  name := "ijp-color",
-  commonSettings,
-  libraryDependencies ++= Seq(
-    "net.imagej"          % "ij"            % "1.52j",
-    "org.apache.commons"  % "commons-math3" % "3.6.1",
-    "org.scalatest"      %% "scalatest"     % "3.0.8"  % "test"
-  ),
-  libraryDependencies ++= (
-    if (isScala2_13plus(scalaVersion.value)) {
-      Seq("org.scala-lang.modules" %% "scala-parallel-collections" % "0.2.0")
-    } else {
-      Seq.empty[ModuleID]
-    }
-  ),
-)
+lazy val ijp_color = (project in file("ijp-color"))
+  .settings(
+    name        := "ijp-color",
+    description := "IJP Color Core",
+    commonSettings,
+    libraryDependencies ++= Seq(
+      "net.imagej"          % "ij"            % "1.52j",
+      "org.apache.commons"  % "commons-math3" % "3.6.1",
+      "org.scalatest"      %% "scalatest"     % "3.0.8"  % "test"
+    ),
+    libraryDependencies ++= (
+      if (isScala2_13plus(scalaVersion.value)) {
+        Seq("org.scala-lang.modules" %% "scala-parallel-collections" % "0.2.0")
+      } else {
+        Seq.empty[ModuleID]
+      }
+    ),
+  )
 
 // The ijp-color UI and ImageJ plugins module
 lazy val ijp_color_ui = (project in file("ijp-color-ui"))
   .settings(
-    name := "ijp-color-ui",
+    name        := "ijp-color-ui",
+    description := "IJP Color UI and ImageJ plugins",
     commonSettings,
     // Enable macro annotation processing for ScalaFXML
     scalacOptions += (if(isScala2_13plus(scalaVersion.value)) "-Ymacro-annotations" else ""),
@@ -151,6 +152,21 @@ lazy val ijp_color_ui = (project in file("ijp-color-ui"))
     )
   )
   .dependsOn(ijp_color)
+
+lazy val manifestSetting = packageOptions += {
+  Package.ManifestAttributes(
+    "Created-By" -> "Simple Build Tool",
+    "Built-By"  -> Option(System.getenv("JAR_BUILT_BY")).getOrElse(System.getProperty("user.name")),
+    "Build-Jdk" -> System.getProperty("java.version"),
+    "Specification-Title"      -> name.value,
+    "Specification-Version"    -> version.value,
+    "Specification-Vendor"     -> organization.value,
+    "Implementation-Title"     -> name.value,
+    "Implementation-Version"   -> version.value,
+    "Implementation-Vendor-Id" -> organization.value,
+    "Implementation-Vendor"    -> organization.value
+  )
+}
 
 // Set the prompt (for this build) to include the project id.
 shellPrompt in ThisBuild := { state => "sbt:" + Project.extract(state).currentRef.project + "> " }
