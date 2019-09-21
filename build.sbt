@@ -7,13 +7,13 @@ import scala.xml.{Node => XmlNode, NodeSeq => XmlNodeSeq, _}
 
 // @formatter:off
 
-name         := "ijp-color-project"
+name := "ijp-color-project"
 
 lazy val _version       = "0.7.1.1-SNAPSHOT"
 lazy val _scalaVersions = Seq("2.13.1", "2.12.10")
 lazy val _scalaVersion  = _scalaVersions.head
 
-scalaVersion := _scalaVersion
+scalaVersion    := _scalaVersion
 publishArtifact := false
 skip in publish := true
 
@@ -40,7 +40,7 @@ val commonSettings = Seq(
   licenses     := Seq(("LGPL-2.1", new URL("http://opensource.org/licenses/LGPL-2.1"))),
   //
   crossScalaVersions := _scalaVersions,
-  scalaVersion := _scalaVersion,
+  scalaVersion       := _scalaVersion,
   //
   scalacOptions ++= Seq(
     "-encoding", "UTF-8",
@@ -49,6 +49,17 @@ val commonSettings = Seq(
     "-Xlint",
     "-feature"
   ),
+  scalacOptions in(Compile, doc) ++= Opts.doc.title("IJP Color API"),
+  scalacOptions in(Compile, doc) ++= Opts.doc.version(_version),
+  scalacOptions in(Compile, doc) ++= Seq(
+    "-doc-footer", s"IJP Color API v.${_version}",
+    "-doc-root-content", baseDirectory.value + "/src/main/scala/root-doc.creole"
+  ),
+  scalacOptions in(Compile, doc) ++= (
+    Option(System.getenv("GRAPHVIZ_DOT_PATH")) match {
+      case Some(path) => Seq("-diagrams", "-diagrams-dot-path", path)
+      case None => Seq.empty[String]
+    }),
   // Point to location of a snapshot repository
   resolvers += Resolver.sonatypeRepo("snapshots"),
   //
