@@ -77,6 +77,8 @@ val commonSettings = Seq(
   parallelExecution in Test := false,
   // Add a JVM option to use when forking a JVM for 'run'
   javaOptions += "-Xmx1G",
+  // Instruct `clean` to delete created plugins subdirectory created by `ijRun`/`ijPrepareRun`.
+  cleanFiles += ijPluginsDir.value,
   // Setup publishing
   publishMavenStyle := true,
   sonatypeProfileName := "net.sf.ij-plugins",
