@@ -13,9 +13,10 @@ lazy val _version       = "0.7.1.1-SNAPSHOT"
 lazy val _scalaVersions = Seq("2.13.1", "2.12.10")
 lazy val _scalaVersion  = _scalaVersions.head
 
-scalaVersion    := _scalaVersion
-publishArtifact := false
-skip in publish := true
+scalaVersion        := _scalaVersion
+publishArtifact     := false
+skip in publish     := true
+sonatypeProfileName := "net.sf.ij-plugins"
 
 // Helper to determine Scala version-dependent settings
 def isScala2_13plus(scalaVersion: String): Boolean =
@@ -76,8 +77,12 @@ val commonSettings = Seq(
   javaOptions += "-Xmx1G",
   // Setup publishing
   publishMavenStyle := true,
+  sonatypeProfileName := "net.sf.ij-plugins",
   sonatypeProjectHosting := Some(GitHubHosting("ij-plugins", "ijp-color", "jpsacha@gmail.com")),
-  publishTo := sonatypePublishTo.value
+  publishTo := sonatypePublishTo.value,
+  developers := List(
+    Developer(id="jpsacha", name="Jarek Sacha", email="jpsacha@gmail.com", url=url("https://github.com/jpsacha"))
+  )
 )
 
 
