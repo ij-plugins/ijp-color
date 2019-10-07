@@ -20,27 +20,18 @@
  * Latest release available at https://github.com/ij-plugins/ijp-color/
  */
 
-package net.sf.ij_plugins.color.converter.ui
+package net.sf.ij_plugins.color.calibration.chart
 
-import enumeratum.{Enum, EnumEntry}
+import org.scalatest.FlatSpec
+import org.scalatest.Matchers._
 
-import scala.collection.immutable
+class ReferenceColorSpaceTest extends FlatSpec {
 
-sealed abstract class Gamma(override val entryName: String, val value: Double) extends EnumEntry {
-  override def toString: String = entryName
-}
+  behavior of "ReferenceColorSpace"
 
-case object Gamma extends Enum[Gamma] {
-
-  case object v10 extends Gamma("1.0", 1.0)
-
-  case object v18 extends Gamma("1.8", 1.8)
-
-  case object v22 extends Gamma("2.2", 2.2)
-
-  case object sRGB extends Gamma("sRGB", -2.2)
-
-  case object L extends Gamma("L*", 0.0)
-
-  val values: immutable.IndexedSeq[Gamma] = findValues
+  it should "convert to ReferenceColorSpace from text" in {
+    // Check issue #10 [https://github.com/ij-plugins/ijp-color/issues/10]
+    val v = ReferenceColorSpace.withName("sRGB")
+    v should be(ReferenceColorSpace.sRGB)
+  }
 }

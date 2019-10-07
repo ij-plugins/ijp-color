@@ -109,7 +109,7 @@ class ColorConverterView(val model: ColorConverterModel) {
       }
     }
 
-    def addChoiceBox[T <: AnyRef](row: Int, label: String, property: ObjectProperty[T], values: List[T],
+    def addChoiceBox[T <: AnyRef](row: Int, label: String, property: ObjectProperty[T], values: Seq[T],
                                   converter: Option[StringConverter[T]] = None): Unit = {
       val v = ObservableBuffer(values)
       val cb = new ChoiceBox[T] {
@@ -173,7 +173,7 @@ class ColorConverterView(val model: ColorConverterModel) {
     row += 1
 
     addChoiceBox(row, "Adaptation", model.chromaticAdaptation,
-      None :: ChromaticAdaptation.values.map(Some(_)),
+      None :: ChromaticAdaptation.values.map(Some(_)).toList,
       Some(
         StringConverter.toStringConverter[Option[ChromaticAdaptation]] {
           case Some(o) => o.toString

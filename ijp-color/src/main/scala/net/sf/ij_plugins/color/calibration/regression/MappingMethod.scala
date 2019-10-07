@@ -22,8 +22,12 @@
 
 package net.sf.ij_plugins.color.calibration.regression
 
+import enumeratum.{Enum, EnumEntry}
+
+import scala.collection.immutable
+
 /** Enumeration of polynomial function mapping methods used by `MappingFactory`. */
-object MappingMethod {
+case object MappingMethod extends Enum[MappingMethod] {
 
   /** First order polynomial, within single color band - single input. */
   case object Linear extends MappingMethod("Linear")
@@ -44,9 +48,9 @@ object MappingMethod {
   case object CubicCrossBand extends MappingMethod("Cubic Cross-band")
 
   /** All refined reference color spaces. */
-  val values: Seq[MappingMethod] = Seq(Linear, LinearCrossBand, Quadratic, QuadraticCrossBand, Cubic, CubicCrossBand)
+  val values: immutable.IndexedSeq[MappingMethod] = findValues
 }
 
-sealed abstract class MappingMethod(val name: String) {
-  override def toString: String = name
+sealed abstract class MappingMethod(override val entryName: String) extends EnumEntry {
+  override def toString: String = entryName
 }

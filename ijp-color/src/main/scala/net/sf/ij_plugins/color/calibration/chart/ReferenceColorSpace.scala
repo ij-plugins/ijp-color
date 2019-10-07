@@ -22,12 +22,15 @@
 
 package net.sf.ij_plugins.color.calibration.chart
 
+import enumeratum.{Enum, EnumEntry}
 import ij.process.FloatProcessor
 import net.sf.ij_plugins.color.converter.{ColorConverter, ColorTriple}
 
+import scala.collection.immutable
+
 /** Color spaces used for creation of reference color values. */
-sealed abstract class ReferenceColorSpace(name: String, bands: Array[String]) {
-  override def toString: String = name
+sealed abstract class ReferenceColorSpace(override val entryName: String, bands: Array[String]) extends EnumEntry {
+  override def toString: String = entryName
 
   private val _bands: Array[String] = bands.clone()
 
@@ -73,7 +76,7 @@ sealed abstract class ReferenceColorSpace(name: String, bands: Array[String]) {
 }
 
 /** Enumeration of supported reference color spaces. */
-object ReferenceColorSpace {
+case object ReferenceColorSpace extends Enum[ReferenceColorSpace] {
 
   /** CIE XYZ color space */
   case object XYZ extends ReferenceColorSpace("XYZ", Array("X", "Y", "Z"))
@@ -82,5 +85,5 @@ object ReferenceColorSpace {
   case object sRGB extends ReferenceColorSpace("sRGB", Array("Red", "Green", "Blue"))
 
   /** All refined reference color spaces. */
-  val values: Seq[ReferenceColorSpace] = Seq(XYZ, sRGB)
+  val values: immutable.IndexedSeq[ReferenceColorSpace] = findValues
 }

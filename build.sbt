@@ -95,8 +95,10 @@ lazy val ijp_color = (project in file("ijp-color"))
     description := "IJP Color Core",
     commonSettings,
     libraryDependencies ++= Seq(
+      "com.beachape"       %% "enumeratum"    % "1.5.13",
       "net.imagej"          % "ij"            % "1.52j",
       "org.apache.commons"  % "commons-math3" % "3.6.1",
+      // Test
       "org.scalatest"      %% "scalatest"     % "3.0.8"  % "test"
     ),
     libraryDependencies ++= (
@@ -149,6 +151,8 @@ lazy val ijp_color_ui = (project in file("ijp-color-ui"))
       "org.scalafx"        %% "scalafx"             % "12.0.2-R18",
       "org.scalafx"        %% "scalafx-extras"      % "0.3.1",
       "org.scalafx"        %% "scalafxml-core-sfx8" % "0.5",
+      // Test
+      "org.scalatest"      %% "scalatest"           % "3.0.8"  % "test"
     )
   )
   .dependsOn(ijp_color)
