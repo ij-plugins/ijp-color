@@ -36,7 +36,7 @@ import scalafx.stage.Window
 object SuggestCalibrationOptionsTask {
 
   private case class CrossValidationData(referenceColorSpace: ReferenceColorSpace,
-                                         method: MappingMethod.Value,
+                                         method: MappingMethod,
                                          statsDeltaE: DescriptiveStatistics,
                                          statsDeltaL: DescriptiveStatistics,
                                          statsDeltaA: DescriptiveStatistics,

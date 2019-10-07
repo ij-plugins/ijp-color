@@ -50,7 +50,7 @@ import scalafx.stage.{Stage, Window}
 
 class CalibrateTask(correctionRecipe: ObjectProperty[Option[CorrectionRecipe]],
                     referenceColorSpace: ObjectProperty[ReferenceColorSpace],
-                    mappingMethod: ObjectProperty[MappingMethod.Value],
+                    mappingMethod: ObjectProperty[MappingMethod],
                     image: ImagePlus,
                     chart: GridColorChart,
                     showExtraInfo: BooleanProperty,

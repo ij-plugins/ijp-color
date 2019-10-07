@@ -58,7 +58,7 @@ object ColorCalibrator {
   /** Create instance of ColorCalibrator */
   def apply(chart: ColorChart,
             referenceColorSpace: ReferenceColorSpace,
-            mappingMethod: MappingMethod.Value,
+            mappingMethod: MappingMethod,
             clipReferenceRGB: Boolean = true): ColorCalibrator = {
     new ColorCalibrator(chart, referenceColorSpace, mappingMethod, clipReferenceRGB)
   }
@@ -86,7 +86,7 @@ object ColorCalibrator {
   */
 class ColorCalibrator(val chart: ColorChart,
                       val referenceColorSpace: ReferenceColorSpace,
-                      val mappingMethod: MappingMethod.Value,
+                      val mappingMethod: MappingMethod,
                       val clipReferenceRGB: Boolean) {
 
   import ColorCalibrator._

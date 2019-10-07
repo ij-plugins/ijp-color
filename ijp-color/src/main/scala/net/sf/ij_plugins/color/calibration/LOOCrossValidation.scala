@@ -48,7 +48,7 @@ object LOOCrossValidation {
     */
   def crossValidation(chart: ColorChart,
                       referenceColorSpace: ReferenceColorSpace,
-                      mappingMethod: MappingMethod.Value,
+                      mappingMethod: MappingMethod,
                       image: ImagePlus): IndexedSeq[(Double, Double, Double, Double)] = {
 
     val n = chart.referenceChips.size

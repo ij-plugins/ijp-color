@@ -28,8 +28,8 @@ import ij.plugin.BrowserLauncher
 import javafx.beans.property.ReadOnlyBooleanProperty
 import net.sf.ij_plugins.color.calibration.chart.{ColorCharts, ReferenceColorSpace}
 import net.sf.ij_plugins.color.calibration.regression.MappingMethod
-import net.sf.ij_plugins.color.calibration.{CorrectionRecipe, renderReferenceChart}
 import net.sf.ij_plugins.color.calibration.ui.tasks.{ApplyToCurrentImageTask, CalibrateTask, SuggestCalibrationOptionsTask}
+import net.sf.ij_plugins.color.calibration.{CorrectionRecipe, renderReferenceChart}
 import org.scalafx.extras.mvcfx.ModelFX
 import org.scalafx.extras.{BusyWorker, ShowMessage}
 import scalafx.beans.property._
@@ -54,7 +54,7 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
   // Convenience variable to feed/link to `liveChartROI`
   val referenceChartOption = new ObjectProperty(this, "chart", Option(referenceChart()))
   val chipMarginPercent = new ObjectProperty[Integer](this, "chipMargin", 20)
-  val mappingMethod = new ObjectProperty(this, "mappingMethod", MappingMethod.LinearCrossBand)
+  val mappingMethod = new ObjectProperty[MappingMethod](this, "mappingMethod", MappingMethod.LinearCrossBand)
   val clipReferenceRGB = new BooleanProperty(this, "clipReferenceRGB", true)
   val showExtraInfo = new BooleanProperty(this, "showExtraInfo", false)
   val correctionRecipe = new ObjectProperty[Option[CorrectionRecipe]](this, "correctionRecipe", None)
