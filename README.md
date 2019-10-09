@@ -63,13 +63,13 @@ SBT will download all needed dependencies. Key libraries:
 
 ### Command line
 
-You can build the `ij-color` plugins and run it within ImageJ using SBT task `ijRun`:
+You can build the `ij-color` plugins and run it within ImageJ using SBT task `ijRun` from the `experimental` module:
  
 ```
-sbt ij_color_ui/ijRun
+sbt experimental/ijRun
 ```
 
 
 ### IntelliJ
 
-You will need to install Scala plugin then import the project from `build.sbt` file. To run the `ij-color` plugins in ImageJ, setup "Run Configuration" for "SBT Task" and add task `ijRun`.  
+You will need to install Scala plugin then import the project from `build.sbt` file. To run the `ij-color` plugins in ImageJ, setup "Run Configuration" for "SBT Task" and add task `experimental/ijRun`.  

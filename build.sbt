@@ -68,6 +68,8 @@ val commonSettings = Seq(
   //
   resolvers += Resolver.sonatypeRepo("snapshots"),
   //
+  exportJars := true,
+  //
   autoCompilerPlugins := true,
   // Fork a new JVM for 'run' and 'test:run'
   fork := true,
@@ -157,6 +159,27 @@ lazy val ijp_color_ui = (project in file("ijp-color-ui"))
   )
   .dependsOn(ijp_color)
 
+// The 'experimental' is not a part of distribution.
+// It is intended for ImageJ with plugins and fast local experimentation with new features.
+lazy val experimental = (project in file("experimental"))
+  .settings(
+    name := "experimental",
+    commonSettings,
+    // Add JavaFX dependencies
+    libraryDependencies ++= javaFXModules.map( m =>
+      "org.openjfx" % s"javafx-$m" % "12.0.2" classifier osName
+    ),
+    // Do not publish this artifact
+    publishArtifact := false,
+    skip in publish := true,
+    // Customize `sbt-imagej` plugin
+    ijRuntimeSubDir         := "sandbox",
+    ijPluginsSubDir         := "ij-plugins",
+    ijCleanBeforePrepareRun := true,
+    cleanFiles += ijPluginsDir.value,
+  )
+  .dependsOn(ijp_color_ui)
+
 lazy val manifestSetting = packageOptions += {
   Package.ManifestAttributes(
     "Created-By" -> "Simple Build Tool",
@@ -175,10 +198,7 @@ lazy val manifestSetting = packageOptions += {
 // Set the prompt (for this build) to include the project id.
 shellPrompt in ThisBuild := { state => "sbt:" + Project.extract(state).currentRef.project + "> " }
 
-// Enable and customize `sbt-imagej` plugin
-enablePlugins(SbtImageJ)
-ijRuntimeSubDir         := "sandbox"
-ijPluginsSubDir         := "ij-plugins"
-ijCleanBeforePrepareRun := true
+
 // Instruct `clean` to delete created plugins subdirectory created by `ijRun`/`ijPrepareRun`.
+enablePlugins(SbtImageJ)
 cleanFiles += ijPluginsDir.value

@@ -68,3 +68,4 @@ crashlytics.properties
 crashlytics-build.properties
 
 sandbox/
+/experimental/
