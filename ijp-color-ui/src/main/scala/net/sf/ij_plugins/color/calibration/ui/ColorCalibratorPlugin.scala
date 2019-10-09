@@ -33,6 +33,8 @@ import scalafx.Includes._
 import scalafx.scene.Scene
 import scalafx.stage.Stage
 
+import scala.util.control.NonFatal
+
 /**
   * ImageJ plugin for running image color calibration.
   */
@@ -66,7 +68,24 @@ class ColorCalibratorPlugin extends PlugIn {
         return
     }
 
-    initializeFX()
+    try {
+      initializeFX()
+    } catch {
+      // ImageJ has a bug where is may show incorrect error message about missing plugin,
+      // se wee need to handle this here
+      case NonFatal(ex) =>
+        IJ.error(Title, "Cannot initialize JavaFX: " + ex.getMessage)
+        return
+      case ex: ClassNotFoundException =>
+        IJ.error(Title, "Cannot initialize JavaFX. ClassNotFoundException: " + ex.getMessage)
+        return
+      case ex: NoClassDefFoundError =>
+        IJ.error(Title, "Cannot initialize JavaFX. NoClassDefFoundError: " + ex.getMessage)
+        return
+      case ex: Throwable =>
+        IJ.error(Title, "Cannot initialize JavaFX: " + ex.getClass.getName + ": " + ex.getMessage)
+        return
+    }
 
     onFX {
       // Create dialog

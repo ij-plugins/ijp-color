@@ -22,6 +22,7 @@
 
 package net.sf.ij_plugins.color.converter.ui
 
+import ij.IJ
 import ij.plugin.PlugIn
 import net.sf.ij_plugins.color.ColorFXUI
 import net.sf.ij_plugins.fx._
@@ -29,6 +30,8 @@ import org.scalafx.extras.onFX
 import scalafx.Includes._
 import scalafx.scene.Scene
 import scalafx.stage.Stage
+
+import scala.util.control.NonFatal
 
 object ColorConverterPlugin {
   private var dialogStage: Option[Stage] = None
@@ -42,7 +45,25 @@ class ColorConverterPlugin extends PlugIn {
 
   def run(arg: String): Unit = {
 
-    initializeFX()
+    try {
+      initializeFX()
+    } catch {
+      // ImageJ has a bug where is may show incorrect error message about missing plugin,
+      // se wee need to handle this here
+      case NonFatal(ex) =>
+        IJ.error(Title, "Cannot initialize JavaFX: " + ex.getMessage)
+        return
+      case ex: ClassNotFoundException =>
+        IJ.error(Title, "Cannot initialize JavaFX. ClassNotFoundException: " + ex.getMessage)
+        return
+      case ex: NoClassDefFoundError =>
+        IJ.error(Title, "Cannot initialize JavaFX. NoClassDefFoundError: " + ex.getMessage)
+        return
+      case ex: Throwable =>
+        IJ.error(Title, "Cannot initialize JavaFX: " + ex.getClass.getName + ": " + ex.getMessage)
+        return
+    }
+
     onFX {
       if (ColorConverterPlugin.dialogStage.isDefined) {
         ColorConverterPlugin.dialogStage.foreach(_.show())
