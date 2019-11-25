@@ -28,59 +28,20 @@ import net.sf.ij_plugins.color.calibration.LOOCrossValidation
 import net.sf.ij_plugins.color.calibration.chart.{GridColorChart, ReferenceColorSpace}
 import net.sf.ij_plugins.color.calibration.regression.MappingMethod
 import net.sf.ij_plugins.util.PlotUtils.{ValueErrorEntry, createBarErrorPlot}
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
 import org.scalafx.extras.BusyWorker.SimpleTask
 import org.scalafx.extras.ShowMessage
 import scalafx.stage.Window
-
-object SuggestCalibrationOptionsTask {
-
-  private case class CrossValidationData(referenceColorSpace: ReferenceColorSpace,
-                                         method: MappingMethod,
-                                         statsDeltaE: DescriptiveStatistics,
-                                         statsDeltaL: DescriptiveStatistics,
-                                         statsDeltaA: DescriptiveStatistics,
-                                         statsDeltaB: DescriptiveStatistics)
-
-}
 
 class SuggestCalibrationOptionsTask(chart: GridColorChart,
                                     image: ImagePlus,
                                     val parentWindow: Option[Window]) extends SimpleTask[Unit] with ShowMessage {
 
-  import SuggestCalibrationOptionsTask._
-
   def call(): Unit = {
-    val methods = MappingMethod.values.toList
 
-    val refSpaceMethods = for (rcs <- ReferenceColorSpace.values; method <- methods) yield (rcs, method)
 
-    val crossValidations = for (((rcs, _method), i) <- refSpaceMethods.zipWithIndex) yield {
-      IJ.showStatus("Checking " + rcs + " + " + _method)
-      IJ.showProgress(i, refSpaceMethods.length)
-
-      val _statsDeltaE = new DescriptiveStatistics()
-      val _statsDeltaL = new DescriptiveStatistics()
-      val _statsDeltaA = new DescriptiveStatistics()
-      val _statsDeltaB = new DescriptiveStatistics()
-      val deltas = LOOCrossValidation.crossValidation(chart, rcs, _method, image)
-      deltas.foreach { case (deltaE, deltaL, deltaA, deltaB) =>
-        _statsDeltaE.addValue(deltaE)
-        _statsDeltaL.addValue(deltaL)
-        _statsDeltaA.addValue(deltaA)
-        _statsDeltaB.addValue(deltaB)
-      }
-      CrossValidationData(
-        referenceColorSpace = rcs,
-        method = _method,
-        statsDeltaE = _statsDeltaE,
-        statsDeltaL = _statsDeltaL,
-        statsDeltaA = _statsDeltaA,
-        statsDeltaB = _statsDeltaB
-      )
-    }
-    IJ.showProgress(1, 1)
-
+    IJ.showStatus("Computing cross validations...")
+    val crossValidations = LOOCrossValidation.crossValidationStatsAll(chart, image,
+      ReferenceColorSpace.values, MappingMethod.values)
 
     val best = crossValidations.minBy(_.statsDeltaE.getMean)
     IJ.showStatus("Best: " + best.referenceColorSpace + ":" + best.method + " -> " + best.statsDeltaE.getMean)

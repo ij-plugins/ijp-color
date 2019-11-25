@@ -83,7 +83,7 @@ class ColorCalibratorUIController(private val imageTitleLabel: Label,
   referenceColorSpaceChoiceBox.value <==> model.referenceColorSpace
   model.showExtraInfo <==> enableExtraInfoCB.selected
 
-  mappingMethodChoiceBox.items = ObservableBuffer(MappingMethod.values.toSeq)
+  mappingMethodChoiceBox.items = ObservableBuffer(MappingMethod.values)
   mappingMethodChoiceBox.value <==> model.mappingMethod
   suggestCalibrationOptionsButton.onAction = _ => model.onSuggestCalibrationOptions()
   suggestCalibrationOptionsButton.disable <== !model.chipValuesObserved

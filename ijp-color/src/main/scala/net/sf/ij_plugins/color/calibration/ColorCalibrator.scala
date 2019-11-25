@@ -37,12 +37,12 @@ object ColorCalibrator {
     * @param reference reference color values
     * @param observed  observed color values
     * @param corrected color values after calibration
-    * @param mapping   coefficients of the polynomial mapping functions.
+    * @param corrector coefficients of the polynomial mapping functions.
     */
   case class CalibrationFit(reference: Array[Array[Double]],
                             observed: Array[Array[Double]],
                             corrected: Array[Array[Double]],
-                            mapping: CubicPolynomialTriple) {
+                            corrector: CubicPolynomialTriple) {
     // Validate inputs
     require(reference.length > 0)
     require(reference.forall(_.length == 3))
@@ -115,12 +115,10 @@ class ColorCalibrator(val chart: ColorChart,
       })
     }
 
-    val mapping = MappingFactory.createCubicPolynomialTriple(reference, observed, mappingMethod)
-
-    val corrector = new Corrector(mapping)
+    val corrector = MappingFactory.createCubicPolynomialTriple(reference, observed, mappingMethod)
     val corrected = observed.map(corrector.map)
 
-    CalibrationFit(reference = reference, observed = observed, corrected = corrected, mapping)
+    CalibrationFit(reference = reference, observed = observed, corrected = corrected, corrector)
   }
 
   /** Estimate calibration coefficient. This method does not clip reference color values.

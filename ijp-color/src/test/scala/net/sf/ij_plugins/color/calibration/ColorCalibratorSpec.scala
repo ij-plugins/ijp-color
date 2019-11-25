@@ -170,7 +170,7 @@ class ColorCalibratorSpec extends FlatSpec {
     }
 
     var bestTime = Long.MaxValue
-    val corrector = new Corrector(fit.mapping)
+    val corrector = fit.corrector
     for (_ <- 1 to 10) {
       val startTime: Long = System.currentTimeMillis
       val correctedImp = corrector.map(imp)

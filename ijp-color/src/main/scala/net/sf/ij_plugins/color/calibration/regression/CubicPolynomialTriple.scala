@@ -22,18 +22,19 @@
 
 package net.sf.ij_plugins.color.calibration.regression
 
+import net.sf.ij_plugins.color.calibration.Corrector
 
 /** Three polynomials representing mapping for three color bands. */
 case class CubicPolynomialTriple(band1: CubicPolynomial,
                                  band2: CubicPolynomial,
-                                 band3: CubicPolynomial) {
+                                 band3: CubicPolynomial) extends Corrector {
 
   /** Convert triplet `src` in source color space to triplet `dest` space to destination color space.
     *
     * @param src  array of size 3 representing triplet of colors in source color space.
     * @param dest array of size 3 representing triplet of colors in destination color space.
     */
-  def evaluate(src: Array[Double], dest: Array[Double]): Unit = {
+  protected override def evaluate(src: Array[Double], dest: Array[Double]): Unit = {
     dest(0) = band1.evaluate(src)
     dest(1) = band2.evaluate(src)
     dest(2) = band3.evaluate(src)

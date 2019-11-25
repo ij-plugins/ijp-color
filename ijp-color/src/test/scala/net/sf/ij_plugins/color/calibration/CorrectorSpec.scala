@@ -37,7 +37,7 @@ class CorrectorSpec extends FlatSpec {
     val poly1 = new CubicPolynomial(intercept = 3.03222422, a = 0.00082806, b = 0.00206088, c = -0.00017526)
     val poly2 = new CubicPolynomial(intercept = 3.41117364, a = 0.00024909, b = -0.00010136, c = 0.00270941)
 
-    val corrector = new Corrector(new CubicPolynomialTriple(poly0, poly1, poly2))
+    val corrector = CubicPolynomialTriple(poly0, poly1, poly2)
 
     val observed = Array(
       Array(3851.8935, 1820.0959, 1081.1987),

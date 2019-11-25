@@ -73,7 +73,7 @@ class CalibrateTask(correctionRecipe: ObjectProperty[Option[CorrectionRecipe]],
     }
 
     val recipe = CorrectionRecipe(
-      corrector = new Corrector(fit.mapping),
+      corrector = fit.corrector,
       colorConverter = colorCalibrator.chart.colorConverter,
       referenceColorSpace = referenceColorSpace(),
       imageType = image.getType
@@ -108,9 +108,9 @@ class CalibrateTask(correctionRecipe: ObjectProperty[Option[CorrectionRecipe]],
       // Show table with regression results
       val rtFit = new ResultsTable()
       List(
-        (bands(0), fit.mapping.band1),
-        (bands(1), fit.mapping.band2),
-        (bands(2), fit.mapping.band3)
+        (bands(0), fit.corrector.band1),
+        (bands(1), fit.corrector.band2),
+        (bands(2), fit.corrector.band3)
       ).foreach {
         case (name, b) =>
           rtFit.incrementCounter()

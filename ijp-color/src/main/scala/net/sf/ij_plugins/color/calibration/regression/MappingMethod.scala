@@ -47,7 +47,7 @@ case object MappingMethod extends Enum[MappingMethod] {
   /** Third order polynomial within with three input for each color band. */
   case object CubicCrossBand extends MappingMethod("Cubic Cross-band")
 
-  /** All refined reference color spaces. */
+  /** All MappingMethod values. */
   val values: immutable.IndexedSeq[MappingMethod] = findValues
 }
 

@@ -34,6 +34,7 @@ lazy val osName = System.getProperty("os.name") match {
   case _ => throw new Exception("Unknown platform!")
 }
 lazy val javaFXModules = Seq("base", "controls", "fxml", "graphics", "media", "swing", "web")
+lazy val javaFXVersion = "12.0.2"
 
 val commonSettings = Seq(
   version      := _version,
@@ -129,7 +130,7 @@ lazy val ijp_color_ui = (project in file("ijp-color-ui"))
     ),
     // JavaFX dependencies marked as "provided"
     libraryDependencies ++= javaFXModules.map( m =>
-      "org.openjfx" % s"javafx-$m" % "12.0.2" % "provided" classifier osName
+      "org.openjfx" % s"javafx-$m" % javaFXVersion % "provided" classifier osName
     ),
     // Use `pomPostProcess` to remove dependencies marked as "provided" from publishing in POM
     // This is to avoid dependency on wrong OS version JavaFX libraries
@@ -167,7 +168,7 @@ lazy val experimental = (project in file("experimental"))
     commonSettings,
     // Add JavaFX dependencies
     libraryDependencies ++= javaFXModules.map( m =>
-      "org.openjfx" % s"javafx-$m" % "12.0.2" classifier osName
+      "org.openjfx" % s"javafx-$m" % javaFXVersion classifier osName
     ),
     // Do not publish this artifact
     publishArtifact := false,
