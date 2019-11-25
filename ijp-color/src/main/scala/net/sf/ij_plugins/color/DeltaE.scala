@@ -143,6 +143,83 @@ object DeltaE {
   def e94Textiles(referenceLab: ColorTriple.Lab, sampleLab: ColorTriple.Lab): Double =
     e94Textiles(referenceLab.toArray, sampleLab.toArray)
 
+  /** Compute color deference between color using CIE Delta E 200 formula.
+    * See [[http://www.brucelindbloom.com/Eqn_DeltaE_CIE2000.html]]
+    *
+    * @param lab1 CIE L*a*b* sample 1
+    * @param lab2 CIE L*a*b* sample 2
+    * @return delta E 2000
+    */
+  def e2000(lab1: Array[Double], lab2: Array[Double]): Double = {
+    validateLab(lab1)
+    validateLab(lab2)
+    e2000(
+      ColorTriple.Lab(lab1(0), lab1(1), lab1(2)),
+      ColorTriple.Lab(lab2(0), lab2(1), lab2(2)))
+  }
+
+  /** Compute color deference between color using CIE Delta E 200 formula.
+    * See [[http://www.brucelindbloom.com/Eqn_DeltaE_CIE2000.html]]
+    *
+    * @param lab1 CIE L*a*b* sample 1
+    * @param lab2 CIE L*a*b* sample 2
+    * @return delta E 2000
+    */
+  def e2000(lab1: ColorTriple.Lab, lab2: ColorTriple.Lab,
+            kL: Double = 1.0, kC: Double = 1.0, kH: Double = 1.0): Double = {
+
+    val lBarPrime = 0.5 * (lab1.l + lab2.l)
+    val c1 = Math.sqrt(lab1.a * lab1.a + lab1.b * lab1.b);
+    val c2 = Math.sqrt(lab2.a * lab2.a + lab2.b * lab2.b)
+    val cBar = 0.5 * (c1 + c2)
+    val cBar7 = cBar * cBar * cBar * cBar * cBar * cBar * cBar;
+    val g = 0.5 * (1.0 - Math.sqrt(cBar7 / (cBar7 + 6103515625.0)));
+    /* 6103515625 = 25^7 */
+    val a1Prime = lab1.a * (1.0 + g)
+    val a2Prime = lab2.a * (1.0 + g)
+    val c1Prime = Math.sqrt(a1Prime * a1Prime + lab1.b * lab1.b);
+    val c2Prime = Math.sqrt(a2Prime * a2Prime + lab2.b * lab2.b);
+    val cBarPrime = 0.5 * (c1Prime + c2Prime)
+    var h1Prime = (Math.atan2(lab1.b, a1Prime) * 180.0) / Math.PI
+    if (h1Prime < 0.0)
+      h1Prime += 360.0;
+    var h2Prime = (Math.atan2(lab2.b, a2Prime) * 180.0) / Math.PI
+    if (h2Prime < 0.0)
+      h2Prime += 360.0
+    val hBarPrime =
+      if (Math.abs(h1Prime - h2Prime) > 180.0)
+        0.5 * (h1Prime + h2Prime + 360.0)
+      else
+        0.5 * (h1Prime + h2Prime)
+    val t = 1.0 -
+      0.17 * Math.cos(Math.PI * (hBarPrime - 30.0) / 180.0) +
+      0.24 * Math.cos(Math.PI * (2.0 * hBarPrime) / 180.0) +
+      0.32 * Math.cos(Math.PI * (3.0 * hBarPrime + 6.0) / 180.0) -
+      0.20 * Math.cos(Math.PI * (4.0 * hBarPrime - 63.0) / 180.0);
+    val dhPrime =
+      if (Math.abs(h2Prime - h1Prime) <= 180.0)
+        h2Prime - h1Prime
+      else if (h2Prime <= h1Prime)
+        h2Prime - h1Prime + 360.0
+      else
+        h2Prime - h1Prime - 360.0;
+    val dLPrime = lab2.l - lab1.l
+    val dCPrime = c2Prime - c1Prime
+    val dHPrime = 2.0 * Math.sqrt(c1Prime * c2Prime) * Math.sin(Math.PI * (0.5 * dhPrime) / 180.0);
+    val sL = 1.0 + ((0.015 * (lBarPrime - 50.0) * (lBarPrime - 50.0)) / Math.sqrt(20.0 + (lBarPrime - 50.0) * (lBarPrime - 50.0)))
+    val sC = 1.0 + 0.045 * cBarPrime
+    val sH = 1.0 + 0.015 * cBarPrime * t
+    val dTheta = 30.0 * Math.exp(-((hBarPrime - 275.0) / 25.0) * ((hBarPrime - 275.0) / 25.0));
+    val cBarPrime7 = cBarPrime * cBarPrime * cBarPrime * cBarPrime * cBarPrime * cBarPrime * cBarPrime;
+    val rC = Math.sqrt(cBarPrime7 / (cBarPrime7 + 6103515625.0))
+    val rT = -2.0 * rC * Math.sin(Math.PI * (2.0 * dTheta) / 180.0);
+    Math.sqrt(
+      (dLPrime / (kL * sL)) * (dLPrime / (kL * sL)) +
+        (dCPrime / (kC * sC)) * (dCPrime / (kC * sC)) +
+        (dHPrime / (kH * sH)) * (dHPrime / (kH * sH)) +
+        (dCPrime / (kC * sC)) * (dHPrime / (kH * sH)) * rT)
+  }
+
   /** Compute color deference between color using Delta CMC(l:c) formula,
     * see [[http://www.brucelindbloom.com/Eqn_DeltaE_CMC.html]]
     *

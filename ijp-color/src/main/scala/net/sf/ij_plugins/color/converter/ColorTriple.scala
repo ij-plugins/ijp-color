@@ -53,6 +53,13 @@ object ColorTriple {
     override def toArray: Array[Double] = Array(_1, _2, _3)
   }
 
+  object Color123 {
+    def apply(a: Array[Double]): Color123 = {
+      require(a.length == 3)
+      new Color123(a(0), a(1), a(2))
+    }
+  }
+
   /** An RGB color. */
   case class RGB(r: Double, g: Double, b: Double) extends ColorTriple {
     def apply(index: Int): Double = index match {
@@ -62,7 +69,15 @@ object ColorTriple {
       case _ => throw new IllegalArgumentException("Invalid color band index: " + index)
     }
 
+    @inline
     override def toArray: Array[Double] = Array(r, g, b)
+  }
+
+  object RGB {
+    def apply(rgb: Array[Double]): RGB = {
+      require(rgb.length == 3)
+      new RGB(rgb(0), rgb(1), rgb(2))
+    }
   }
 
   /** An XYZ color. */
@@ -74,7 +89,15 @@ object ColorTriple {
       case _ => throw new IllegalArgumentException("Invalid color band index: " + index)
     }
 
+    @inline
     override def toArray: Array[Double] = Array(x, y, z)
+  }
+
+  object XYZ {
+    def apply(xyz: Array[Double]): XYZ = {
+      require(xyz.length == 3)
+      new XYZ(xyz(0), xyz(1), xyz(2))
+    }
   }
 
   /** An Lab color. */
@@ -86,7 +109,15 @@ object ColorTriple {
       case _ => throw new IllegalArgumentException("Invalid color band index: " + index)
     }
 
+    @inline
     override def toArray: Array[Double] = Array(l, a, b)
+  }
+
+  object Lab {
+    def apply(lab: Array[Double]): Lab = {
+      require(lab.length == 3)
+      new Lab(lab(0), lab(1), lab(2))
+    }
   }
 
 }
