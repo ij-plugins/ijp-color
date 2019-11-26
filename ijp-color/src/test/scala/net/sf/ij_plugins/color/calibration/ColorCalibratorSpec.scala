@@ -101,7 +101,8 @@ class ColorCalibratorSpec extends FlatSpec {
     val colorSpace = ReferenceColorSpace.XYZ
     val method = MappingMethod.LinearCrossBand
     val testImage = new File("../test/data/Passport-linear-25.tif")
-    assert(testImage.exists(), "File must exists: " + testImage.getCanonicalPath)
+    assert(testImage.exists(), "File must exists: " + testImage.getCanonicalPath
+      + "[..: " + new File("..").list().mkString(", ") + "]")
 
     val chartLocationROI = Array(
       point2D(25, 18), point2D(25 + 546, 18),
