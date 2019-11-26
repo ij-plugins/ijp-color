@@ -22,6 +22,8 @@
 
 package net.sf.ij_plugins.color.calibration
 
+import java.io.File
+
 import ij.IJ
 import net.sf.ij_plugins.color.calibration.chart.{ColorCharts, ReferenceColorSpace}
 import net.sf.ij_plugins.color.calibration.regression.MappingMethod
@@ -98,7 +100,8 @@ class ColorCalibratorSpec extends FlatSpec {
     val chart = ColorCharts.XRitePassportColorChecker.copyWithNewChipMargin(0.25)
     val colorSpace = ReferenceColorSpace.XYZ
     val method = MappingMethod.LinearCrossBand
-    val testImage = "../test/data/Passport-linear-25.tif"
+    val testImage = new File("../test/data/Passport-linear-25.tif")
+    assert(testImage.exists(), "File must exists: " + testImage.getCanonicalPath)
 
     val chartLocationROI = Array(
       point2D(25, 18), point2D(25 + 546, 18),
@@ -116,7 +119,7 @@ class ColorCalibratorSpec extends FlatSpec {
     )
 
     // Load test image
-    val imp = IJ.openImage(testImage)
+    val imp = IJ.openImage(testImage.getCanonicalPath)
     imp should not equal null
 
     // Create color calibration
