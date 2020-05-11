@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2019 Jarek Sacha
+ * Copyright (C) 2002-2020 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -31,9 +31,9 @@ import net.sf.ij_plugins.color.calibration._
 import net.sf.ij_plugins.color.calibration.chart.{GridColorChart, ReferenceColorSpace}
 import net.sf.ij_plugins.color.calibration.regression.MappingMethod
 import net.sf.ij_plugins.color.converter.ColorTriple.Lab
+import net.sf.ij_plugins.color.util.PlotUtils.ValueEntry
+import net.sf.ij_plugins.color.util.{PlotUtils, delta}
 import net.sf.ij_plugins.color.{ColorFXUI, DeltaE}
-import net.sf.ij_plugins.util.PlotUtils.{ValueEntry, createBarPlot}
-import net.sf.ij_plugins.util.delta
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
 import org.scalafx.extras.BusyWorker.SimpleTask
 import org.scalafx.extras.ShowMessage
@@ -227,7 +227,7 @@ class CalibrateTask(correctionRecipe: ObjectProperty[Option[CorrectionRecipe]],
       )
     }.toIndexedSeq
     val barColors = Seq(Color(1, 0.33, 0.33, 0.75), Color(0.33, 1, 0.33, 0.5), Color(0.33, 0.33, 1, 0.25))
-    createBarPlot("Individual Chip Error: " + image.getTitle, data, "Chip", "Error", barColors)
+    PlotUtils.createBarPlot("Individual Chip Error: " + image.getTitle, data, "Chip", "Error", barColors)
 
   }
 

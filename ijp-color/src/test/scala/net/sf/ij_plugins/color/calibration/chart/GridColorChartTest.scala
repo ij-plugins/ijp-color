@@ -25,13 +25,8 @@ package net.sf.ij_plugins.color.calibration.chart
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers._
 
-class ReferenceColorSpaceTest extends AnyFlatSpec {
+class GridColorChartTest extends AnyFlatSpec {
 
-  behavior of "ReferenceColorSpace"
+  "GridColorChart" should "provide aligned outline" in pending
 
-  it should "convert to ReferenceColorSpace from text" in {
-    // Check issue #10 [https://github.com/ij-plugins/ijp-color/issues/10]
-    val v = ReferenceColorSpace.withName("sRGB")
-    v should be(ReferenceColorSpace.sRGB)
-  }
 }

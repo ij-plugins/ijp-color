@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2019 Jarek Sacha
+ * Copyright (C) 2002-2020 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -51,7 +51,7 @@ case class CubicPolynomial(intercept: Double = .0,
     *
     * @param coeff coefficient array.
     */
-  def this(coeff: Array[Double], regressionResult: Option[Regression.Result]) {
+  def this(coeff: Array[Double], regressionResult: Option[Regression.Result]) = {
     this(coeff(0), coeff(1), coeff(2), coeff(3), coeff(4), coeff(5), coeff(6),
       coeff(7), coeff(8), coeff(9), coeff(10), coeff(11), coeff(12), coeff(13), regressionResult
     )

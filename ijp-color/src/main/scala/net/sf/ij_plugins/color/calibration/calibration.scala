@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2019 Jarek Sacha
+ * Copyright (C) 2002-2020 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -30,9 +30,10 @@ import ij.process.{ColorProcessor, FloatProcessor}
 import ij.{CompositeImage, ImagePlus, ImageStack}
 import net.sf.ij_plugins.color.calibration.chart.{ColorChip, GridColorChart, ReferenceColorSpace}
 import net.sf.ij_plugins.color.converter.ColorConverter
-import net.sf.ij_plugins.util.{IJTools, PerspectiveTransform, clipUInt8}
+import net.sf.ij_plugins.color.util.{IJTools, PerspectiveTransform, clipUInt8}
 
 import scala.collection.parallel.immutable.ParRange
+import scala.math.Ordering.Double.IeeeOrdering
 
 /** Tools for color calibration. */
 package object calibration {

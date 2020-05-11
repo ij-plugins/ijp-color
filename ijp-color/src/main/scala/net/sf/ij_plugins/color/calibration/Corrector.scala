@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2019 Jarek Sacha
+ * Copyright (C) 2002-2020 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -26,7 +26,7 @@ import ij.ImagePlus
 import ij.ImagePlus._
 import ij.gui.{PolygonRoi, Roi}
 import ij.process._
-import net.sf.ij_plugins.util.IJTools
+import net.sf.ij_plugins.color.util.IJTools
 
 
 /** Performs color space mapping using cubic polynomial cross-band functions. */

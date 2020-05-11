@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2019 Jarek Sacha
+ * Copyright (C) 2002-2020 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -20,7 +20,7 @@
  * Latest release available at https://github.com/ij-plugins/ijp-color/
  */
 
-package net.sf.ij_plugins.util
+package net.sf.ij_plugins.color.util
 
 import net.sf.ij_plugins.color.ColorFXUI
 import org.jfree.chart.axis.NumberAxis

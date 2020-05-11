@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2019 Jarek Sacha
+ * Copyright (C) 2002-2020 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -25,20 +25,20 @@ package net.sf.ij_plugins.color
 
 import net.sf.ij_plugins.color.DeltaE._
 import net.sf.ij_plugins.color.converter.ColorTriple
-import org.scalatest.FlatSpec
-import org.scalatest.Matchers._
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers._
 
-class DeltaESpec extends FlatSpec {
-  private final val LAB_1                 = Array(59.8, 13.0, 19.4)
-  private final val LAB_2                 = Array(63.4, 13.2, 20.7)
+class DeltaESpec extends AnyFlatSpec {
+  private final val LAB_1 = Array(59.8, 13.0, 19.4)
+  private final val LAB_2 = Array(63.4, 13.2, 20.7)
   private final val DELTA_E_1976 = 3.832754d
   private final val DELTA_E_1994_TEXT_1_2 = 1.930490d
   private final val DELTA_E_1994_TEXT_2_1 = 1.925103d
   private final val DELTA_E_1994_ARTS_1_2 = 3.669222d
   private final val DELTA_E_1994_ARTS_2_1 = 3.666295d
   private final val DELTA_E_2000_111 = 3.182956d
-  private final val DELTA_E_CMC_11_1_2    = 3.202334d
-  private final val DELTA_E_CMC_11_2_1    = 3.110326d
+  private final val DELTA_E_CMC_11_1_2 = 3.202334d
+  private final val DELTA_E_CMC_11_2_1 = 3.110326d
   private final val DELTA_E_CMC_21_1_2    = 1.847990d
   private final val DELTA_E_CMC_21_2_1    = 1.790792d
   private final val TOLERANCE             = 0.000001d

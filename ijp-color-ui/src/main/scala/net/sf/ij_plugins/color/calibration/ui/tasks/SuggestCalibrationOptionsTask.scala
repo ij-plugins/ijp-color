@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2019 Jarek Sacha
+ * Copyright (C) 2002-2020 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -27,10 +27,25 @@ import ij.{IJ, ImagePlus}
 import net.sf.ij_plugins.color.calibration.LOOCrossValidation
 import net.sf.ij_plugins.color.calibration.chart.{GridColorChart, ReferenceColorSpace}
 import net.sf.ij_plugins.color.calibration.regression.MappingMethod
-import net.sf.ij_plugins.util.PlotUtils.{ValueErrorEntry, createBarErrorPlot}
+import net.sf.ij_plugins.color.util.PlotUtils
+import net.sf.ij_plugins.color.util.PlotUtils.ValueErrorEntry
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
 import org.scalafx.extras.BusyWorker.SimpleTask
 import org.scalafx.extras.ShowMessage
 import scalafx.stage.Window
+
+import scala.math.Ordering.Double.IeeeOrdering
+
+object SuggestCalibrationOptionsTask {
+
+  private case class CrossValidationData(referenceColorSpace: ReferenceColorSpace,
+                                         method: MappingMethod,
+                                         statsDeltaE: DescriptiveStatistics,
+                                         statsDeltaL: DescriptiveStatistics,
+                                         statsDeltaA: DescriptiveStatistics,
+                                         statsDeltaB: DescriptiveStatistics)
+
+}
 
 class SuggestCalibrationOptionsTask(chart: GridColorChart,
                                     image: ImagePlus,
@@ -73,7 +88,7 @@ class SuggestCalibrationOptionsTask(chart: GridColorChart,
     val data = hSorted.map { m =>
       ValueErrorEntry("Delta E", s"${m.referenceColorSpace} + ${m.method}", m.statsDeltaE.getMean, m.statsDeltaE.getStandardDeviation)
     }.toIndexedSeq
-    createBarErrorPlot(
+    PlotUtils.createBarErrorPlot(
       title = "Method Comparison by Cross-Validation: " + image.getTitle,
       data = data,
       categoryAxisLabel = "Method",

@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2019 Jarek Sacha
+ * Copyright (C) 2002-2020 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -20,7 +20,7 @@
  * Latest release available at https://github.com/ij-plugins/ijp-color/
  */
 
-package net.sf.ij_plugins.image
+package net.sf.ij_plugins.color.image
 
 import ij.plugin.Duplicator
 import ij.process.{ColorProcessor, FloatProcessor, ImageConverter, StackConverter}
@@ -29,15 +29,15 @@ import ij.{ImagePlus, ImageStack}
 /** Represents image with multiple values per pixel. */
 class VectorImage(private val src: ImagePlus) {
 
-  val stack : ImageStack          = convertToFloatStack(src)
+  val stack: ImageStack = convertToFloatStack(src)
   val pixels: Array[Array[Float]] = for (i <- (1 to stack.getSize).toArray) yield
     stack.getProcessor(i).getPixels.asInstanceOf[Array[Float]]
 
-  def this(cp: ColorProcessor) {
+  def this(cp: ColorProcessor) = {
     this(new ImagePlus("", cp))
   }
 
-  def this(width: Int, height: Int, nbValues: Int) {
+  def this(width: Int, height: Int, nbValues: Int) = {
     this(
       new ImagePlus("", {
         val s = new ImageStack(width, height)

@@ -41,6 +41,12 @@ Tool for converting individual color values between different color spaces. Insp
 
 ![Image Calibrator](assets/Color_Converter_0.6_01.png)
 
+### IJP Color Chart ROI Tool
+
+Converts color chart ROI to individual chip ROIs
+
+...
+
 
 Test Images
 -----------

@@ -9,8 +9,8 @@ import scala.xml.{Node => XmlNode, NodeSeq => XmlNodeSeq, _}
 
 name := "ijp-color-project"
 
-val _version       = "0.8.0.1-SNAPSHOT"
-val _scalaVersions = Seq("2.13.1", "2.12.10")
+val _version       = "0.8.0.3-SNAPSHOT"
+val _scalaVersions = Seq("2.13.1")
 val _scalaVersion  = _scalaVersions.head
 
 version             := _version
@@ -84,7 +84,7 @@ val commonSettings = Seq(
   publishMavenStyle := true,
   sonatypeProfileName := "net.sf.ij-plugins",
   sonatypeProjectHosting := Some(GitHubHosting("ij-plugins", "ijp-color", "jpsacha@gmail.com")),
-  publishTo := sonatypePublishTo.value,
+  publishTo := sonatypePublishToBundle.value,
   developers := List(
     Developer(id="jpsacha", name="Jarek Sacha", email="jpsacha@gmail.com", url=url("https://github.com/jpsacha"))
   )
@@ -98,11 +98,11 @@ lazy val ijp_color = (project in file("ijp-color"))
     description := "IJP Color Core",
     commonSettings,
     libraryDependencies ++= Seq(
-      "com.beachape"       %% "enumeratum"    % "1.5.13",
-      "net.imagej"          % "ij"            % "1.52j",
+      "com.beachape"       %% "enumeratum"    % "1.5.15",
+      "net.imagej"          % "ij"            % "1.52v",
       "org.apache.commons"  % "commons-math3" % "3.6.1",
       // Test
-      "org.scalatest"      %% "scalatest"     % "3.0.8"  % "test"
+      "org.scalatest"      %% "scalatest"     % "3.1.1"  % "test"
     ),
     libraryDependencies ++= (
       if (isScala2_13plus(scalaVersion.value)) {
@@ -152,10 +152,10 @@ lazy val ijp_color_ui = (project in file("ijp-color-ui"))
       "org.jfree"           % "jfreechart-fx"       % "1.0.1",
       "org.jfree"           % "fxgraphics2d"        % "1.8",
       "org.scalafx"        %% "scalafx"             % "12.0.2-R18",
-      "org.scalafx"        %% "scalafx-extras"      % "0.3.2",
+      "org.scalafx"        %% "scalafx-extras"      % "0.3.3",
       "org.scalafx"        %% "scalafxml-core-sfx8" % "0.5",
       // Test
-      "org.scalatest"      %% "scalatest"           % "3.0.8"  % "test"
+      "org.scalatest"      %% "scalatest"     % "3.1.1"  % "test"
     )
   )
   .dependsOn(ijp_color)

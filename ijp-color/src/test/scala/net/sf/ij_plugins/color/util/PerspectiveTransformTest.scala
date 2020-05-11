@@ -20,18 +20,35 @@
  * Latest release available at https://github.com/ij-plugins/ijp-color/
  */
 
-package net.sf.ij_plugins.color.calibration.chart
+package net.sf.ij_plugins.color.util
 
+import net.sf.ij_plugins.color.calibration.point2D
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers._
 
-class ReferenceColorSpaceTest extends AnyFlatSpec {
+class PerspectiveTransformTest extends AnyFlatSpec {
 
-  behavior of "ReferenceColorSpace"
+  "PerspectiveTransform" should "transform points" in {
 
-  it should "convert to ReferenceColorSpace from text" in {
-    // Check issue #10 [https://github.com/ij-plugins/ijp-color/issues/10]
-    val v = ReferenceColorSpace.withName("sRGB")
-    v should be(ReferenceColorSpace.sRGB)
+    // Reference quad
+    val referenceQuad = Array(
+      point2D(0, 0),
+      point2D(6, 0),
+      point2D(6, 4),
+      point2D(0, 4)
+    )
+
+    val deformedQuad = Array(
+      point2D(207, 95),
+      point2D(461, 132),
+      point2D(436, 312),
+      point2D(198, 255)
+    )
+
+    val alignmentTransform = PerspectiveTransform.quadToQuad(referenceQuad, deformedQuad)
+    val pm = alignmentTransform.transform(point2D(3, 2))
+
+    pm.getX should be(317.07786 +- 0.00001)
+    pm.getY should be(199.30959 +- 0.00001)
   }
 }

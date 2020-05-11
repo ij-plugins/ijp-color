@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2019 Jarek Sacha
+ * Copyright (C) 2002-2020 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -25,12 +25,12 @@ package net.sf.ij_plugins.color.calibration.chart
 import java.awt.geom.Point2D
 
 import net.sf.ij_plugins.color.calibration.point2D
-import org.scalatest.FlatSpec
+import org.scalatest.flatspec.AnyFlatSpec
 
 /**
- * @author Jarek Sacha 
- */
-class ChartGridSpec extends FlatSpec {
+  * @author Jarek Sacha
+  */
+class ChartGridSpec extends AnyFlatSpec {
 
   "ChartGrid" should "locate chips with 0 margin" in {
 

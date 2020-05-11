@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2019 Jarek Sacha
+ * Copyright (C) 2002-2020 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -20,35 +20,29 @@
  * Latest release available at https://github.com/ij-plugins/ijp-color/
  */
 
-package net.sf.ij_plugins.util
+package net.sf.ij_plugins.color.util
 
-import net.sf.ij_plugins.color.calibration.point2D
-import org.scalatest.FlatSpec
-import org.scalatest.Matchers._
+import java.awt.image.BufferedImage
 
-class PerspectiveTransformTest extends FlatSpec {
+/** Tools for converting images between AWT and JavaFX. */
+object ImageConverter {
 
-  "PerspectiveTransform" should "transform points" in {
+  /** Convert AWT image to BufferedImage.
+    *
+    * @param image AWT image.
+    */
+  def toBufferImage(image: java.awt.Image): BufferedImage = toBufferImage(image, BufferedImage.TYPE_INT_ARGB)
 
-    // Reference quad
-    val referenceQuad = Array(
-      point2D(0, 0),
-      point2D(6, 0),
-      point2D(6, 4),
-      point2D(0, 4)
-    )
-
-    val deformedQuad = Array(
-      point2D(207, 95),
-      point2D(461, 132),
-      point2D(436, 312),
-      point2D(198, 255)
-    )
-
-    val alignmentTransform = PerspectiveTransform.quadToQuad(referenceQuad, deformedQuad)
-    val pm = alignmentTransform.transform(point2D(3, 2))
-
-    pm.getX should be(317.07786 +- 0.00001)
-    pm.getY should be(199.30959 +- 0.00001)
+  /** Convert AWT image to BufferedImage.
+    *
+    * @param image     image to convert
+    * @param imageType `BufferedImage` type
+    * @see [[java.awt.image.BufferedImage]]
+    */
+  def toBufferImage(image: java.awt.Image, imageType: Int): BufferedImage = {
+    val bi = new BufferedImage(image.getWidth(null), image.getHeight(null), imageType)
+    val g = bi.createGraphics
+    g.drawImage(image, null, null)
+    bi
   }
 }

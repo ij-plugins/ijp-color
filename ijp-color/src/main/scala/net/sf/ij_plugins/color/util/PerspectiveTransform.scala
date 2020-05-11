@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2019 Jarek Sacha
+ * Copyright (C) 2002-2020 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -20,9 +20,11 @@
  * Latest release available at https://github.com/ij-plugins/ijp-color/
  */
 
-package net.sf.ij_plugins.util
+package net.sf.ij_plugins.color.util
 
 import java.awt.geom.{AffineTransform, NoninvertibleTransformException, Point2D}
+
+import scala.collection.immutable
 
 /** Factory methods for creating projective transforms. */
 object PerspectiveTransform {
@@ -280,10 +282,11 @@ final class PerspectiveTransform(val m00: Double = 1, val m01: Double = 0, val m
   import PerspectiveTransform._
 
   /** Constructs a new PerspectiveTransform from a two-dimensional array of doubles.
-    * @throws NullPointerException if matrix is null
+    *
+    * @throws NullPointerException           if matrix is null
     * @throws ArrayIndexOutOfBoundsException if matrix is too small
     */
-  def this(matrix: Array[Array[Double]]) {
+  def this(matrix: Array[Array[Double]]) = {
     this(
       matrix(0)(0), matrix(0)(1), matrix(0)(2),
       matrix(1)(0), matrix(1)(1), matrix(1)(2),
@@ -292,9 +295,10 @@ final class PerspectiveTransform(val m00: Double = 1, val m01: Double = 0, val m
   }
 
   /** Constructs a new PerspectiveTransform with the same effect as an existing AffineTransform.
+    *
     * @throws NullPointerException if transform is null
     */
-  def this(transform: AffineTransform) {
+  def this(transform: AffineTransform) = {
     this(
       transform.getScaleX, transform.getShearX, transform.getTranslateX,
       transform.getShearY, transform.getScaleY, transform.getTranslateY,
@@ -303,9 +307,10 @@ final class PerspectiveTransform(val m00: Double = 1, val m01: Double = 0, val m
   }
 
   /** Sets this transform to a given PerspectiveTransform.
+    *
     * @throws NullPointerException if tx is null
     */
-  def this(tx: PerspectiveTransform) {
+  def this(tx: PerspectiveTransform) = {
     this(
       tx.m00, tx.m01, tx.m02,
       tx.m10, tx.m11, tx.m12,
@@ -626,7 +631,7 @@ final class PerspectiveTransform(val m00: Double = 1, val m01: Double = 0, val m
     * @param points The array containing the source point objects.
     * @throws IllegalArgumentException if ptSrc is null
     */
-  def transform(points: Seq[Point2D]): Seq[Point2D] = {
+  def transform(points: Seq[Point2D]): immutable.Seq[Point2D] = {
     require(points != null, "The input argument 'points' may not be null.")
     points.map(p => transform(p))
   }

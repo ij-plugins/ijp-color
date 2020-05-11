@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2019 Jarek Sacha
+ * Copyright (C) 2002-2020 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -26,10 +26,11 @@ import ij.ImagePlus
 import ij.measure.ResultsTable
 import ij.plugin.BrowserLauncher
 import javafx.beans.property.ReadOnlyBooleanProperty
-import net.sf.ij_plugins.color.calibration.chart.{ColorCharts, ReferenceColorSpace}
+import net.sf.ij_plugins.color.calibration.chart.{GridColorChart, ReferenceColorSpace}
 import net.sf.ij_plugins.color.calibration.regression.MappingMethod
 import net.sf.ij_plugins.color.calibration.ui.tasks.{ApplyToCurrentImageTask, CalibrateTask, SuggestCalibrationOptionsTask}
 import net.sf.ij_plugins.color.calibration.{CorrectionRecipe, renderReferenceChart}
+import net.sf.ij_plugins.color.util.LiveChartROI
 import org.scalafx.extras.mvcfx.ModelFX
 import org.scalafx.extras.{BusyWorker, ShowMessage}
 import scalafx.beans.property._
@@ -50,16 +51,15 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
 
   val imageTitle = new StringProperty(this, "imageTitle", image.getTitle)
   val referenceColorSpace = new ObjectProperty[ReferenceColorSpace](this, "referenceColorSpace", ReferenceColorSpace.sRGB)
-  val referenceChart = new ObjectProperty(this, "chart", ColorCharts.GretagMacbethColorChecker)
-  // Convenience variable to feed/link to `liveChartROI`
-  val referenceChartOption = new ObjectProperty(this, "chart", Option(referenceChart()))
+  val referenceChartOption = new ObjectProperty[Option[GridColorChart]](this, "chart", None)
   val chipMarginPercent = new ObjectProperty[Integer](this, "chipMargin", 20)
   val mappingMethod = new ObjectProperty[MappingMethod](this, "mappingMethod", MappingMethod.LinearCrossBand)
   val clipReferenceRGB = new BooleanProperty(this, "clipReferenceRGB", true)
   val showExtraInfo = new BooleanProperty(this, "showExtraInfo", false)
   val correctionRecipe = new ObjectProperty[Option[CorrectionRecipe]](this, "correctionRecipe", None)
 
-  val liveChartROI = new LiveChartROI(image, referenceChartOption, chipMarginPercent)
+
+  val liveChartROI: LiveChartROI = LiveChartROI(image, referenceChartOption)
 
   val chipValuesObserved: ReadOnlyBooleanProperty = {
     val p = new ReadOnlyBooleanWrapper(this, "chipValuesObserved", false)
@@ -75,27 +75,55 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
     p.getReadOnlyProperty
   }
 
-  private def currentChart = liveChartROI.locatedChart.value.get
+  private def currentChart: GridColorChart = {
+    liveChartROI.locatedChart.value match {
+      case Some(c) => c match {
+        case gcc: GridColorChart =>
+          gcc
+        case x =>
+          throw new IllegalStateException(
+            s"Internal error. Unexpected class type. Expecting ${classOf[GridColorChart]}, got ${x.getClass}")
+      }
+      case None => throw new IllegalStateException(s"Internal error. Option is empty.")
+
+    }
+  }
 
   private val busyWorker: BusyWorker = new BusyWorker("Color Calibrator", parentWindow)
 
+  chipMarginPercent.onChange { (_, _, _) =>
+    updateChipMarginPercent()
+  }
 
-  referenceChart.onChange((_, _, newValue) => referenceChartOption() = Option(newValue))
+  private def updateChipMarginPercent(): Unit = {
+    referenceChart = referenceChart.copyWithNewChipMargin(chipMarginPercent() / 100d)
+  }
+
+  def selectReferenceChart(newValue: GridColorChart): Unit = {
+    referenceChart = newValue
+    updateChipMarginPercent()
+  }
+
+  private def referenceChart = referenceChartOption().get
+
+  private def referenceChart_=(newValue: GridColorChart): Unit = {
+    referenceChartOption() = Option(newValue)
+  }
 
 
   def onRenderReferenceChart(): Unit = busyWorker.doTask("onRenderReferenceChart") { () =>
-    renderReferenceChart(referenceChart()).show()
+    renderReferenceChart(referenceChart).show()
   }
 
   def onShowReferenceColors(): Unit = busyWorker.doTask("onShowReferenceColors") { () =>
     val rt = new ResultsTable()
-    val chips = referenceChart().referenceChips
+    val chips = referenceChart.referenceChips
     for (i <- chips.indices) {
       rt.incrementCounter()
       rt.setLabel(chips(i).name, i)
       val lab = chips(i).color
-      val xyz = referenceChart().colorConverter.toXYZ(lab)
-      val rgb = referenceChart().colorConverter.toRGB(xyz)
+      val xyz = referenceChart.colorConverter.toXYZ(lab)
+      val rgb = referenceChart.colorConverter.toRGB(xyz)
       rt.setValue("CIE L*", i, lab.l)
       rt.setValue("CIE a*", i, lab.a)
       rt.setValue("CIE b*", i, lab.b)
@@ -106,7 +134,7 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
       rt.setValue("sRGB G", i, rgb.g)
       rt.setValue("sRGB B", i, rgb.b)
     }
-    rt.show(referenceChart().name + " / " + referenceChart().refWhite)
+    rt.show(referenceChart.name + " / " + referenceChart.refWhite)
   }
 
   def onSuggestCalibrationOptions(): Unit = busyWorker.doTask("onSuggestCalibrationOptions") {

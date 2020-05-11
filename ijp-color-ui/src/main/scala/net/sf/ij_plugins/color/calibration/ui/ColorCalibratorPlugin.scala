@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2019 Jarek Sacha
+ * Copyright (C) 2002-2020 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -27,7 +27,8 @@ import ij.gui.Roi
 import ij.plugin.PlugIn
 import ij.{IJ, ImageListener, ImagePlus}
 import net.sf.ij_plugins.color.ColorFXUI
-import net.sf.ij_plugins.fx.{imageJIconAsFXImage, _}
+import net.sf.ij_plugins.color.fx.{imageJIconAsFXImage, _}
+import net.sf.ij_plugins.color.util.LiveChartROI
 import org.scalafx.extras._
 import scalafx.Includes._
 import scalafx.scene.Scene
@@ -42,6 +43,7 @@ class ColorCalibratorPlugin extends PlugIn {
 
   private final val Title = "Color Calibrator"
   private var image: Option[ImagePlus] = None
+
   private var model: Option[ColorCalibratorUIModel] = None
   private var dialogStage: Option[Stage] = None
 

@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2019 Jarek Sacha
+ * Copyright (C) 2002-2020 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -20,40 +20,46 @@
  * Latest release available at https://github.com/ij-plugins/ijp-color/
  */
 
-package net.sf.ij_plugins.color.calibration.ui
+package net.sf.ij_plugins.color.util
 
-import java.awt.{BasicStroke, Color}
+import java.awt.Color
 
 import ij.ImagePlus
-import ij.gui.{Roi, RoiListener}
-import net.sf.ij_plugins.color.calibration.chart.GridColorChart
-import net.sf.ij_plugins.color.calibration.toShape
-import net.sf.ij_plugins.fx.toAWT
-import net.sf.ij_plugins.util.PerspectiveTransform
+import ij.gui.{Overlay, Roi, RoiListener}
+import net.sf.ij_plugins.color.calibration.chart.GridChartFrame
+import net.sf.ij_plugins.color.fx.toAWT
 import scalafx.beans.property._
 import scalafx.geometry.Point2D
+
+object LiveChartROI {
+  def apply[T <: GridChartFrame](imp: ImagePlus,
+                                 referenceChart: ObjectProperty[Option[T]]): LiveChartROI = {
+    // This a hack so we can pass `referenceChart` argument to `LiveChartROI` constructor without
+    // compiler complaining about incorrect types. There may be some smarted way to deal with this. Suggestions welcomed.
+    val _referenceChartFrameOption =
+    new ObjectProperty[Option[GridChartFrame]](this, "", referenceChart())
+    _referenceChartFrameOption <== referenceChart
+    new LiveChartROI(imp, _referenceChartFrameOption)
+  }
+}
 
 /**
   *
   * @param imp Image which ROI is observed
   */
 class LiveChartROI(imp: ImagePlus,
-                   referenceChart: ObjectProperty[Option[GridColorChart]],
-                   chipMarginPercent: ObjectProperty[Integer])
+                   referenceChart: ObjectProperty[Option[GridChartFrame]])
   extends RoiListener {
 
-  // TODO: Handle external closing of imp
-
-  private val color = new Color(255, 0, 255, 128)
+  private val overlyColor = new Color(255, 0, 255, 128)
 
   private val _status = new ReadOnlyStringWrapper()
   val status: ReadOnlyStringProperty = _status.readOnlyProperty
 
-  private val _locatedChart = new ReadOnlyObjectWrapper[Option[GridColorChart]](this, "locatedChart", None)
-  val locatedChart: ReadOnlyObjectProperty[Option[GridColorChart]] = _locatedChart.readOnlyProperty
+  private val _locatedChart = new ReadOnlyObjectWrapper[Option[GridChartFrame]](this, "locatedChart", None)
+  val locatedChart: ReadOnlyObjectProperty[Option[GridChartFrame]] = _locatedChart.readOnlyProperty
 
   referenceChart.onChange((_, _, _) => updateChartLocation())
-  chipMarginPercent.onChange((_, _, _) => updateChartLocation())
 
   updateChartLocation()
 
@@ -87,9 +93,7 @@ class LiveChartROI(imp: ImagePlus,
         )
 
         // Display chart overlay
-        val currentChart = refChart.
-          copyWithNewChipMargin(chipMarginPercent() / 100.0).
-          copyWith(alignmentTransform)
+        val currentChart = refChart.copyWith(alignmentTransform)
         _locatedChart() = Option(currentChart)
       case _ =>
         _locatedChart() = None
@@ -99,11 +103,17 @@ class LiveChartROI(imp: ImagePlus,
   }
 
 
-  private def updateOverlay(): Unit = {
+  /**
+    * Update overlay displayed on ImagePlus
+    */
+  def updateOverlay(): Unit = {
     locatedChart() match {
       case Some(chart) =>
-        val shape = toShape(chart.alignedChips)
-        imp.setOverlay(shape, color, new BasicStroke(1))
+        val o = new Overlay()
+        chart.alignedChipROIs.foreach(o.add)
+        o.setStrokeColor(overlyColor)
+        o.setStrokeWidth(1d)
+        imp.setOverlay(o)
       case None =>
         imp.setOverlay(null)
         imp.setHideOverlay(true)

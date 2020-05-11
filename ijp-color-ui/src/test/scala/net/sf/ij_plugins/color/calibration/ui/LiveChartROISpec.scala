@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2019 Jarek Sacha
+ * Copyright (C) 2002-2020 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -20,29 +20,13 @@
  * Latest release available at https://github.com/ij-plugins/ijp-color/
  */
 
-package net.sf.ij_plugins.util
+package net.sf.ij_plugins.color.calibration.ui
 
-import java.awt.image.BufferedImage
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers._
 
-/** Tools for converting images between AWT and JavaFX. */
-object ImageConverter {
+class LiveChartROISpec extends AnyFlatSpec {
 
-  /** Convert AWT image to BufferedImage.
-    *
-    * @param image AWT image.
-    */
-  def toBufferImage(image: java.awt.Image): BufferedImage = toBufferImage(image, BufferedImage.TYPE_INT_ARGB)
+  "LiveChartROI" should "???" in pending
 
-  /** Convert AWT image to BufferedImage.
-    *
-    * @param image     image to convert
-    * @param imageType `BufferedImage` type
-    * @see [[java.awt.image.BufferedImage]]
-    */
-  def toBufferImage(image: java.awt.Image, imageType: Int): BufferedImage = {
-    val bi = new BufferedImage(image.getWidth(null), image.getHeight(null), imageType)
-    val g = bi.createGraphics
-    g.drawImage(image, null, null)
-    bi
-  }
 }

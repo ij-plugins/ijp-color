@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2019 Jarek Sacha
+ * Copyright (C) 2002-2020 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -20,11 +20,12 @@
  * Latest release available at https://github.com/ij-plugins/ijp-color/
  */
 
-package net.sf.ij_plugins.util
+package net.sf.ij_plugins.color.util
 
 import java.awt.geom.Point2D
 
 import ij.gui.{PolygonRoi, Roi}
+import ij.plugin.frame.RoiManager
 import ij.process.{ByteProcessor, ColorProcessor, FloatProcessor, ImageProcessor}
 import ij.{IJ, ImageJ}
 
@@ -107,7 +108,7 @@ object IJTools {
     }
   }
 
-  def toRoi(outline: Array[Point2D]): PolygonRoi = {
+  def toRoi(outline: Seq[Point2D]): PolygonRoi = {
     val x = new Array[Float](outline.length)
     val y = new Array[Float](outline.length)
 
@@ -127,7 +128,7 @@ object IJTools {
     * @see #measureColorXY(ij.process.ImageProcessor[], ij.gui.Roi)
     */
   def measureColor[T <: ImageProcessor](tri: Array[T], outline: Array[Point2D]): Array[Double] = {
-    measureColor(tri, toRoi(outline))
+    measureColor(tri, toRoi(outline.toSeq))
   }
 
   /** Measure color within ROI.
@@ -178,5 +179,31 @@ object IJTools {
       val t = src(0).getClass
       require(src.tail.forall(_.getClass == t), "All input images must be of the same type.")
     }
+  }
+
+  /**
+    * Get the singleton instance of ImageJ `RoiManager`
+    *
+    * @return RoiManager instance
+    */
+  def roiManagerInstance: RoiManager = { // Workaround for ImageJ bug.
+    // RoiManger is a singleton in function, but it has constructors.
+    // If a second instance of RoiManager is created it should not be used.
+    // Make sure that RoiManager is created.
+    new RoiManager
+    // Get reference of primary instance, which may or may not be one created above.
+    RoiManager.getInstance
+  }
+
+  /**
+    * Add result ROIs to ROI Manager, replacing current content. If ROI Manager is not visible it will be opened.
+    *
+    * @param rois         ROI's to be added.
+    * @param clearContent if `true` ROI Manager content will be cleared before new rois will be added
+    */
+  def addToROIManager(rois: IterableOnce[Roi], clearContent: Boolean = false): Unit = {
+    val roiManager = roiManagerInstance
+    if (clearContent) roiManager.runCommand("Reset")
+    rois.iterator.foreach(roiManager.addRoi)
   }
 }

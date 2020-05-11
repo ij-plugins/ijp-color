@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2019 Jarek Sacha
+ * Copyright (C) 2002-2020 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -24,14 +24,14 @@ package net.sf.ij_plugins.color.converter
 
 import net.sf.ij_plugins.color.converter.ColorTriple.{Lab, RGB, XYZ}
 import net.sf.ij_plugins.color.converter.RGBWorkingSpace.AdobeRGB1998
-import org.scalatest.FlatSpec
-import org.scalatest.Matchers._
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers._
 
 /**
   * @author Jarek Sacha
   * @since 10/16/12 8:14 PM
   */
-class ColorConverterTest extends FlatSpec {
+class ColorConverterTest extends AnyFlatSpec {
   /**
     * From http://www.brucelindbloom.com/downloads/ColorCheckerSpreadsheets.zip, assumes D65 and 2 degree observer
     */

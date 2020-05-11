@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2019 Jarek Sacha
+ * Copyright (C) 2002-2020 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -27,14 +27,14 @@ import java.io.File
 import ij.IJ
 import net.sf.ij_plugins.color.calibration.chart.{ColorCharts, ReferenceColorSpace}
 import net.sf.ij_plugins.color.calibration.regression.MappingMethod
-import net.sf.ij_plugins.util._
-import org.scalatest.FlatSpec
-import org.scalatest.Matchers._
+import net.sf.ij_plugins.color.util.PerspectiveTransform
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers._
 
 /**
   * @author Jarek Sacha
   */
-class ColorCalibratorSpec extends FlatSpec {
+class ColorCalibratorSpec extends AnyFlatSpec {
 
   "ColorCalibrator" should "perform color calibration in XYZ" in {
 

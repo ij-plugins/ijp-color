@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2019 Jarek Sacha
+ * Copyright (C) 2002-2020 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -24,7 +24,7 @@ package net.sf.ij_plugins.color.calibration.ui
 
 import net.sf.ij_plugins.color.calibration.chart.{ColorCharts, GridColorChart, ReferenceColorSpace}
 import net.sf.ij_plugins.color.calibration.regression.MappingMethod
-import net.sf.ij_plugins.util.IJPUtils
+import net.sf.ij_plugins.color.util.IJPUtils
 import org.scalafx.extras.mvcfx.ControllerFX
 import scalafx.Includes._
 import scalafx.collections.ObservableBuffer
@@ -63,7 +63,11 @@ class ColorCalibratorUIController(private val imageTitleLabel: Label,
 
   // Reference chart
   chartTypeChoiceBox.items = ObservableBuffer(ColorCharts.values)
-  chartTypeChoiceBox.value <==> model.referenceChart
+  chartTypeChoiceBox.value.onChange { (_, oldValue, newValue) =>
+    model.selectReferenceChart(newValue)
+  }
+  chartTypeChoiceBox.selectionModel().selectFirst()
+
   renderReferenceChartSplitButton.onAction = _ => model.onRenderReferenceChart()
   renderReferenceChartSplitButton.items = List(
     new MenuItem("Reference Colors") {

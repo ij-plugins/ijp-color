@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2019 Jarek Sacha
+ * Copyright (C) 2002-2020 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -20,17 +20,17 @@
  * Latest release available at https://github.com/ij-plugins/ijp-color/
  */
 
-package net.sf.ij_plugins
+package net.sf.ij_plugins.color
 
 /** Various utility methods. */
 package object util {
   /**
-   * Distance between points. For points in CIE L*a*b* color space it is equivalent to delta E 1974.
-   *
-   * @param a first point.
-   * @param b second point.
-   * @return distance
-   */
+    * Distance between points. For points in CIE L*a*b* color space it is equivalent to delta E 1974.
+    *
+    * @param a first point.
+    * @param b second point.
+    * @return distance
+    */
   def delta(a: Array[Double], b: Array[Double]): Double = {
     assert(a != null)
     assert(b != null)
