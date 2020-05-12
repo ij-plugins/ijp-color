@@ -30,6 +30,8 @@ import net.sf.ij_plugins.color.calibration.regression.MappingMethod
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers._
 
+import scala.math.Ordering.Double.IeeeOrdering
+
 
 class LOOCrossValidationSpec extends AnyFlatSpec {
 
