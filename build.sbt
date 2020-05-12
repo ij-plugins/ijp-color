@@ -9,7 +9,7 @@ import scala.xml.{Node => XmlNode, NodeSeq => XmlNodeSeq, _}
 
 name := "ijp-color-project"
 
-val _version       = "0.8.0.3-SNAPSHOT"
+val _version       = "0.8.0.4-SNAPSHOT"
 val _scalaVersions = Seq("2.13.1")
 val _scalaVersion  = _scalaVersions.head
 
@@ -34,7 +34,7 @@ lazy val osName = System.getProperty("os.name") match {
   case _ => throw new Exception("Unknown platform!")
 }
 lazy val javaFXModules = Seq("base", "controls", "fxml", "graphics", "media", "swing", "web")
-lazy val javaFXVersion = "12.0.2"
+lazy val javaFXVersion = "14.0.1"
 
 val commonSettings = Seq(
   version      := _version,
@@ -98,11 +98,11 @@ lazy val ijp_color = (project in file("ijp-color"))
     description := "IJP Color Core",
     commonSettings,
     libraryDependencies ++= Seq(
-      "com.beachape"       %% "enumeratum"    % "1.5.15",
+      "com.beachape"       %% "enumeratum"    % "1.6.0",
       "net.imagej"          % "ij"            % "1.52v",
       "org.apache.commons"  % "commons-math3" % "3.6.1",
       // Test
-      "org.scalatest"      %% "scalatest"     % "3.1.1"  % "test"
+      "org.scalatest"      %% "scalatest"     % "3.1.2"  % "test"
     ),
     libraryDependencies ++= (
       if (isScala2_13plus(scalaVersion.value)) {
@@ -151,11 +151,11 @@ lazy val ijp_color_ui = (project in file("ijp-color-ui"))
     libraryDependencies ++= Seq(
       "org.jfree"           % "jfreechart-fx"       % "1.0.1",
       "org.jfree"           % "fxgraphics2d"        % "1.8",
-      "org.scalafx"        %% "scalafx"             % "12.0.2-R18",
-      "org.scalafx"        %% "scalafx-extras"      % "0.3.3",
+      "org.scalafx"        %% "scalafx"             % "14-R19",
+      "org.scalafx"        %% "scalafx-extras"      % "0.3.4",
       "org.scalafx"        %% "scalafxml-core-sfx8" % "0.5",
       // Test
-      "org.scalatest"      %% "scalatest"     % "3.1.1"  % "test"
+      "org.scalatest"      %% "scalatest"           % "3.1.2"  % "test"
     )
   )
   .dependsOn(ijp_color)
