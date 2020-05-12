@@ -224,7 +224,7 @@ class ColorChartToolPlugin extends PlugIn with DialogListener {
 
   private def doMeasureChips(imp: ImagePlus, chart: GridChartFrame): Unit = {
 
-    val roiBandStats = GridChartFrameUtils.measureRois(imp, chart.alignedChipROIs)
+    val roiBandStats = GridChartFrameUtils.measureRois(imp, chart)
 
     val rt = new ResultsTable()
 

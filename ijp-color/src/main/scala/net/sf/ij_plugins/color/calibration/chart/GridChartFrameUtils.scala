@@ -30,7 +30,7 @@ import scala.collection.immutable.ListMap
 
 object GridChartFrameUtils {
 
-  def measureRois(imp: ImagePlus, chart: GridChartFrame): Unit = {
+  def measureRois(imp: ImagePlus, chart: GridChartFrame): ListMap[Roi, ListMap[String, ImageStatistics]] = {
     measureRois(imp, chart.alignedChipROIs)
   }
 
