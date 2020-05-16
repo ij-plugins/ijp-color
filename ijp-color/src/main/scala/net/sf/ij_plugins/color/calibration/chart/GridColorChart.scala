@@ -41,6 +41,7 @@ import scala.collection.immutable
   * @param chips      chip names and CIE L*a*b* / D65 color values, row by row, starting at (0,0) or top left corner.
   * @param chipMargin reduction of chip from their maximum size on the grid (as fraction of its width or height).
   *                   Value of the margin must be between 0 and 0.5.
+  * @param enabled    which chips are active. If value is 'true' chip is active' if 'false' not used in computations.
   */
 final class GridColorChart(val name: String,
                            nbColumns: Int,
@@ -58,6 +59,7 @@ final class GridColorChart(val name: String,
   require(nbColumns > 0)
   require(nbRows > 0)
   require(nbColumns * nbRows == chips.size)
+  require(chips.size == enabled.size)
   require(refWhite != null)
   require(alignmentTransform != null)
 
@@ -72,11 +74,11 @@ final class GridColorChart(val name: String,
            nbColumns: Int,
            nbRows: Int,
            chips: List[(String, Lab)],
-           refWhite: ReferenceWhite,
            chipMargin: Double = 0,
-           perspectiveTransform: PerspectiveTransform = new PerspectiveTransform()) = {
+           refWhite: ReferenceWhite,
+           alignmentTransform: PerspectiveTransform = new PerspectiveTransform()) = {
     this(name, nbColumns, nbRows, chips, chipMargin, List.fill(nbColumns * nbRows)(true), refWhite,
-      perspectiveTransform)
+      alignmentTransform)
   }
 
   private val n = nbColumns * nbRows
@@ -163,9 +165,9 @@ final class GridColorChart(val name: String,
 
   /** Creates a copy of this chart with different `chipMargin`. Value of the margin must be between 0 and 0.5. */
   override def copyWithNewChipMargin(newChipMargin: Double): GridColorChart =
-    new GridColorChart(name, nbColumns, nbRows, chips, refWhite, newChipMargin, alignmentTransform)
+    new GridColorChart(name, nbColumns, nbRows, chips, newChipMargin, refWhite, alignmentTransform)
 
   /** Creates a copy of this chart with different `alignmentTransform`. */
   override def copyWith(newAlignmentTransform: PerspectiveTransform): GridColorChart =
-    new GridColorChart(name, nbColumns, nbRows, chips, refWhite, chipMargin, newAlignmentTransform)
+    new GridColorChart(name, nbColumns, nbRows, chips, chipMargin, refWhite, newAlignmentTransform)
 }
