@@ -1,7 +1,6 @@
-import java.net.URL
-
 import xerial.sbt.Sonatype.GitHubHosting
 
+import java.net.URL
 import scala.xml.transform.{RewriteRule, RuleTransformer}
 import scala.xml.{Node => XmlNode, NodeSeq => XmlNodeSeq, _}
 
@@ -10,7 +9,7 @@ import scala.xml.{Node => XmlNode, NodeSeq => XmlNodeSeq, _}
 name := "ijp-color-project"
 
 val _version       = "0.8.0.6-SNAPSHOT"
-val _scalaVersions = Seq("2.13.1")
+val _scalaVersions = Seq("2.13.4")
 val _scalaVersion  = _scalaVersions.head
 
 version             := _version
@@ -34,7 +33,7 @@ lazy val osName = System.getProperty("os.name") match {
   case _ => throw new Exception("Unknown platform!")
 }
 lazy val javaFXModules = Seq("base", "controls", "fxml", "graphics", "media", "swing", "web")
-lazy val javaFXVersion = "14.0.1"
+lazy val javaFXVersion = "15.0.1"
 
 val commonSettings = Seq(
   version      := _version,
@@ -98,15 +97,15 @@ lazy val ijp_color = (project in file("ijp-color"))
     description := "IJP Color Core",
     commonSettings,
     libraryDependencies ++= Seq(
-      "com.beachape"       %% "enumeratum"    % "1.6.0",
-      "net.imagej"          % "ij"            % "1.52v",
+      "com.beachape"       %% "enumeratum"    % "1.6.1",
+      "net.imagej"          % "ij"            % "1.53g",
       "org.apache.commons"  % "commons-math3" % "3.6.1",
       // Test
-      "org.scalatest"      %% "scalatest"     % "3.1.2"  % "test"
+      "org.scalatest"      %% "scalatest"     % "3.2.3"  % "test"
     ),
     libraryDependencies ++= (
       if (isScala2_13plus(scalaVersion.value)) {
-        Seq("org.scala-lang.modules" %% "scala-parallel-collections" % "0.2.0")
+        Seq("org.scala-lang.modules" %% "scala-parallel-collections" % "1.0.0")
       } else {
         Seq.empty[ModuleID]
       }
@@ -151,11 +150,11 @@ lazy val ijp_color_ui = (project in file("ijp-color-ui"))
     libraryDependencies ++= Seq(
       "org.jfree"           % "jfreechart-fx"       % "1.0.1",
       "org.jfree"           % "fxgraphics2d"        % "1.8",
-      "org.scalafx"        %% "scalafx"             % "14-R19",
-      "org.scalafx"        %% "scalafx-extras"      % "0.3.4",
+      "org.scalafx"        %% "scalafx"             % "15.0.1-R21",
+      "org.scalafx"        %% "scalafx-extras"      % "0.3.6",
       "org.scalafx"        %% "scalafxml-core-sfx8" % "0.5",
       // Test
-      "org.scalatest"      %% "scalatest"           % "3.1.2"  % "test"
+      "org.scalatest"      %% "scalatest"           % "3.2.3"  % "test"
     )
   )
   .dependsOn(ijp_color)
