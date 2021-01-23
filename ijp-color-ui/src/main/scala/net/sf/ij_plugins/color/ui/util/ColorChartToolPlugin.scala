@@ -45,7 +45,11 @@ object ColorChartToolPlugin {
   * Send tiles of the chart to ROI Manager
   * User indicates chart location by pointing to chart corners.
   */
-class ColorChartToolPlugin extends PlugIn with DialogListener with ImageListenerHelper {
+class ColorChartToolPlugin
+  extends PlugIn
+    with DialogListener
+    with ImageListenerHelper
+    with LiveChartROIHelper {
 
   import ColorChartToolPlugin._
 
@@ -55,8 +59,6 @@ class ColorChartToolPlugin extends PlugIn with DialogListener with ImageListener
     "Measures color of each chip."
 
   private var dialog: Option[NonBlockingGenericDialog] = None
-
-  private var liveChartROI: Option[LiveChartROI] = None
 
   private val referenceChartOption = {
     val chart = new GridChartFrame(6, 4, chipMargin = 0.1, new PerspectiveTransform())
@@ -79,7 +81,7 @@ class ColorChartToolPlugin extends PlugIn with DialogListener with ImageListener
     dialog = Option(gd)
 
     setupImageListener()
-    setupROIListener()
+    setupROIListener(new LiveChartROI(image.get, referenceChartOption))
 
     // Show dialog and wait
     gd.showDialog()
@@ -148,26 +150,9 @@ class ColorChartToolPlugin extends PlugIn with DialogListener with ImageListener
   }
 
 
-  private def setupROIListener(): Unit = {
-
-    if (liveChartROI.nonEmpty) {
-      throw new IllegalStateException("RoiListener already created")
-    }
-
-    liveChartROI = Some(new LiveChartROI(image.get, referenceChartOption))
-
-    Roi.addRoiListener(liveChartROI.get)
-  }
-
-  def removeROIListener(): Unit = {
-    liveChartROI match {
-      case Some(rl) => Roi.removeRoiListener(rl)
-      case _ =>
-    }
-  }
-
   override protected def handleImageUpdated(): Unit = {
-    liveChartROI.foreach(v => v.locatedChart)
+    // TODO: Review correctness, this code seems to do nothing
+    liveChartROIOption.foreach(v => v.locatedChart)
   }
 
   override protected def handleImageClosed(): Unit = {
@@ -180,7 +165,7 @@ class ColorChartToolPlugin extends PlugIn with DialogListener with ImageListener
   }
 
   private def chartOption: Option[GridChartFrame] = {
-    liveChartROI.flatMap(v1 => v1.locatedChart.value)
+    liveChartROIOption.flatMap(_.locatedChart.value)
   }
 
   private def doSendToROIManager(chart: GridChartFrame): Unit = {

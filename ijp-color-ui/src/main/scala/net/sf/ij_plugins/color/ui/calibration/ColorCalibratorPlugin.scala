@@ -23,11 +23,10 @@
 package net.sf.ij_plugins.color.ui.calibration
 
 import ij.ImagePlus.{COLOR_RGB, GRAY16, GRAY32, GRAY8}
-import ij.gui.Roi
 import ij.plugin.PlugIn
 import ij.{IJ, ImagePlus}
 import net.sf.ij_plugins.color.ui.fx.{ColorFXUI, imageJIconAsFXImage, initializeFX}
-import net.sf.ij_plugins.color.ui.util.{ImageListenerHelper, LiveChartROI}
+import net.sf.ij_plugins.color.ui.util.{ImageListenerHelper, LiveChartROIHelper}
 import org.scalafx.extras._
 import scalafx.Includes._
 import scalafx.scene.Scene
@@ -38,14 +37,15 @@ import scala.util.control.NonFatal
 /**
   * ImageJ plugin for running image color calibration.
   */
-class ColorCalibratorPlugin extends PlugIn with ImageListenerHelper {
+class ColorCalibratorPlugin
+  extends PlugIn
+    with ImageListenerHelper
+    with LiveChartROIHelper {
 
   private final val Title = "Color Calibrator"
 
   private var model: Option[ColorCalibratorUIModel] = None
   private var dialogStage: Option[Stage] = None
-
-  private var liveChartROI: Option[LiveChartROI] = None
 
   def run(arg: String): Unit = {
     IJ.showStatus("Preparing UI for " + Title + "...")
@@ -116,23 +116,6 @@ class ColorCalibratorPlugin extends PlugIn with ImageListenerHelper {
     }
   }
 
-  private def setupROIListener(aLiveChartROI: LiveChartROI): Unit = {
-
-    if (liveChartROI.nonEmpty) {
-      throw new IllegalStateException("RoiListener already created")
-    }
-
-    liveChartROI = Option(aLiveChartROI)
-
-    Roi.addRoiListener(liveChartROI.get)
-  }
-
-  def removeROIListener(): Unit = {
-    liveChartROI match {
-      case Some(rl) => Roi.removeRoiListener(rl)
-      case _ =>
-    }
-  }
 
   override protected def handleImageUpdated(): Unit = onFX {
     // Update image title
