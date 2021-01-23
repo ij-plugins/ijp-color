@@ -26,7 +26,7 @@ import ij.gui._
 import ij.measure.ResultsTable
 import ij.plugin.PlugIn
 import ij.process.ImageStatistics
-import ij.{IJ, ImageListener, ImagePlus}
+import ij.{IJ, ImagePlus}
 import net.sf.ij_plugins.color.calibration.chart.{GridChartFrame, GridChartFrameUtils}
 import net.sf.ij_plugins.color.util.{IJTools, PerspectiveTransform}
 import scalafx.beans.property.ObjectProperty
@@ -45,7 +45,7 @@ object ColorChartToolPlugin {
   * Send tiles of the chart to ROI Manager
   * User indicates chart location by pointing to chart corners.
   */
-class ColorChartToolPlugin extends PlugIn with DialogListener {
+class ColorChartToolPlugin extends PlugIn with DialogListener with ImageListenerHelper {
 
   import ColorChartToolPlugin._
 
@@ -54,11 +54,8 @@ class ColorChartToolPlugin extends PlugIn with DialogListener {
     "Converts color chart ROI to individual chip ROIs.<br>" +
     "Measures color of each chip."
 
-
-  private var image: Option[ImagePlus] = None
   private var dialog: Option[NonBlockingGenericDialog] = None
 
-  private var imageListener: Option[ImageListener] = None
   private var liveChartROI: Option[LiveChartROI] = None
 
   private val referenceChartOption = {
@@ -150,38 +147,6 @@ class ColorChartToolPlugin extends PlugIn with DialogListener {
     chartOption.nonEmpty
   }
 
-  private def setupImageListener(): Unit = {
-    if (imageListener.nonEmpty) {
-      throw new IllegalStateException("ImageListener already created")
-    }
-
-    imageListener = Some(
-      new ImageListener {
-        def imageUpdated(imp: ImagePlus): Unit = {
-          if (image.contains(imp)) {
-            handleImageUpdated()
-          }
-        }
-
-        def imageClosed(imp: ImagePlus): Unit = {
-          if (image.contains(imp)) {
-            handleImageClosed()
-          }
-        }
-
-        def imageOpened(imp: ImagePlus): Unit = {}
-      }
-    )
-
-    ImagePlus.addImageListener(imageListener.get)
-  }
-
-  private def removeImageListener(): Unit = {
-    imageListener match {
-      case Some(il) => ImagePlus.removeImageListener(il)
-      case _ =>
-    }
-  }
 
   private def setupROIListener(): Unit = {
 
@@ -201,11 +166,11 @@ class ColorChartToolPlugin extends PlugIn with DialogListener {
     }
   }
 
-  private def handleImageUpdated(): Unit = {
+  override protected def handleImageUpdated(): Unit = {
     liveChartROI.foreach(v => v.locatedChart)
   }
 
-  private def handleImageClosed(): Unit = {
+  override protected def handleImageClosed(): Unit = {
     // Image was closed, so close the dialog associated with that image
     dialog.foreach { d =>
       d.setVisible(false)
