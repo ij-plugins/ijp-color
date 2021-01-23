@@ -97,14 +97,11 @@ class ColorChartToolPlugin
       if (sendToROIManager) {
         doSendToROIManager(chart)
       }
+
       if (measureChips) {
         doMeasureChips(imp, chart)
       }
-
     }
-
-    // Cleanup
-    println("Done: gd.showDialog(): OK=" + gd.wasOKed())
   }
 
   private def createDialog(): NonBlockingGenericDialog = {
@@ -128,6 +125,10 @@ class ColorChartToolPlugin
         // TODO Cleanup
       }
     })
+
+    // Set dialog icon that is not set in NonBlockingGenericDialog by default
+    Option(IJ.getInstance()).foreach(ij => gd.setIconImage(ij.getIconImage))
+
     gd
   }
 
