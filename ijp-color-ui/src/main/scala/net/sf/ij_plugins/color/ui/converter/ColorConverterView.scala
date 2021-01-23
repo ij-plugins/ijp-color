@@ -184,7 +184,7 @@ class ColorConverterView(val model: ColorConverterModel) {
     )
 
     val helpButton = new Button {
-      id = "ijp-button"
+      id = "ijp-button-plain"
       text = "Help"
       onAction = (_: ActionEvent) => {
         BrowserLauncher.openURL(HelpURL)
