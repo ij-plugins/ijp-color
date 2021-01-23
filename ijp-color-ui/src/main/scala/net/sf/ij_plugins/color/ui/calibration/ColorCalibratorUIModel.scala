@@ -37,7 +37,7 @@ import scalafx.beans.property._
 import scalafx.stage.Window
 
 object ColorCalibratorUIModel {
-  val HelpURL = "https://github.com/ij-plugins/ijp-color"
+  val HelpURL = "https://github.com/ij-plugins/ijp-color/wiki/Color-Calibrator"
 }
 
 /**

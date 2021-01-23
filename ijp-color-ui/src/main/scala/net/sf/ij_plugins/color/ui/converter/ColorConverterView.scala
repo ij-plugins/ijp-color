@@ -44,7 +44,7 @@ object ColorConverterView {
     "Converts between color space coordinates.  To convert color values  \n" +
     "from the source color space to other spaces: type in the source color \n" +
     "values, then click on the button next to them to convert to other spaces."
-  val HelpURL = "https://github.com/ij-plugins/ijp-color"
+  val HelpURL = "https://github.com/ij-plugins/ijp-color/wiki/Color-Calculator"
 
 }
 

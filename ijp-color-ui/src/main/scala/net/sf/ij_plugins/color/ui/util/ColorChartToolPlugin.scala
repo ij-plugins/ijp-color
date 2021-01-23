@@ -114,7 +114,7 @@ class ColorChartToolPlugin
       addMessage("")
       addCheckbox("Send chip ROI to ROI Manager", sendToROIManager)
       addCheckbox("Measure chips", measureChips)
-      addHelp("https://github.com/ij-plugins/ijp-color")
+      addHelp("https://github.com/ij-plugins/ijp-color/wiki/Color-Chart-ROI-Tool")
     }
     gd.addDialogListener(this)
     gd.addWindowListener(new WindowAdapter {
