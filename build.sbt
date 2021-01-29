@@ -8,7 +8,7 @@ import scala.xml.{Node => XmlNode, NodeSeq => XmlNodeSeq, _}
 
 name := "ijp-color-project"
 
-val _version       = "0.8.0.6-SNAPSHOT"
+val _version       = "0.9.0"
 val _scalaVersions = Seq("2.13.4")
 val _scalaVersion  = _scalaVersions.head
 
