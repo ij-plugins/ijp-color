@@ -40,32 +40,32 @@ object MappingFactory {
         createLinear(standardM.getColumn(0), observedM.getColumn(0), 0),
         createLinear(standardM.getColumn(1), observedM.getColumn(1), 1),
         createLinear(standardM.getColumn(2), observedM.getColumn(2), 2)
-        )
+      )
       case LinearCrossBand => (
         createLinearXBand(standardM.getColumn(0), observed),
         createLinearXBand(standardM.getColumn(1), observed),
         createLinearXBand(standardM.getColumn(2), observed)
-        )
+      )
       case Quadratic => (
         createQuadratic(standardM.getColumn(0), observedM.getColumn(0), 0),
         createQuadratic(standardM.getColumn(1), observedM.getColumn(1), 1),
         createQuadratic(standardM.getColumn(2), observedM.getColumn(2), 2)
-        )
+      )
       case QuadraticCrossBand => (
         createQuadraticXBand(standardM.getColumn(0), observed),
         createQuadraticXBand(standardM.getColumn(1), observed),
         createQuadraticXBand(standardM.getColumn(2), observed)
-        )
+      )
       case Cubic => (
         createCubic(standardM.getColumn(0), observedM.getColumn(0), 0),
         createCubic(standardM.getColumn(1), observedM.getColumn(1), 1),
         createCubic(standardM.getColumn(2), observedM.getColumn(2), 2)
-        )
+      )
       case CubicCrossBand => (
         createCubicXBand(standardM.getColumn(0), observed),
         createCubicXBand(standardM.getColumn(1), observed),
         createCubicXBand(standardM.getColumn(2), observed)
-        )
+      )
       case _ =>
         throw new IllegalArgumentException("Invalid Mapping method '" + method + "'")
     }

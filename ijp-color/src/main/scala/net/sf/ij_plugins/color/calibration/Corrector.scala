@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2019 Jarek Sacha
+ * Copyright (C) 2002-2020 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -26,12 +26,18 @@ import ij.ImagePlus
 import ij.ImagePlus._
 import ij.gui.{PolygonRoi, Roi}
 import ij.process._
-import net.sf.ij_plugins.color.calibration.regression.CubicPolynomialTriple
-import net.sf.ij_plugins.util.IJTools
+import net.sf.ij_plugins.color.util.IJTools
 
 
 /** Performs color space mapping using cubic polynomial cross-band functions. */
-class Corrector(val poly: CubicPolynomialTriple) {
+trait Corrector {
+
+  /** Map triplet `src` to triplet `dest`
+    *
+    * @param src  array of size 3
+    * @param dest array of size 3
+    */
+  protected def evaluate(src: Array[Double], dest: Array[Double]): Unit
 
   /** Map color triplet.
     *
@@ -42,7 +48,7 @@ class Corrector(val poly: CubicPolynomialTriple) {
     require(src.length == 3, "Color space mapping can only be done when input image has 3 color bands")
 
     val dest: Array[Double] = new Array[Double](3)
-    poly.evaluate(src, dest)
+    evaluate(src, dest)
     dest
   }
 
@@ -55,7 +61,7 @@ class Corrector(val poly: CubicPolynomialTriple) {
     * Calibration mapping must be set before calling this method.
     * It is critical to only use this method on the same type of an image as it was used for
     * computing the calibration mapping.
-
+    *
     * @param src image to be calibrated.
     * @return converted image in sRGB color space.
     * @throws IllegalArgumentException if the mapping was not set.
@@ -122,7 +128,7 @@ class Corrector(val poly: CubicPolynomialTriple) {
     * Calibration mapping must be computed before calling this method.
     * It is critical to only use this method on the same type of an image as it was used for
     * computing the calibration mapping.
-
+    *
     * @param image image to be calibrated.
     * @return calibrated image.
     * @throws IllegalArgumentException if the mapping was not yet computed or input image of of incorrect type.
@@ -147,7 +153,7 @@ class Corrector(val poly: CubicPolynomialTriple) {
     * Calibration mapping must be computed before calling this method.
     * It is critical to only use this method on the same type of an image as it was used for
     * computing the calibration mapping.
-
+    *
     * @param image image to be calibrated.
     * @return pair (calibrated cropped image, cropped roi)
     * @throws IllegalArgumentException if the mapping was not yet computed or input image of of incorrect type.
@@ -211,7 +217,7 @@ class Corrector(val poly: CubicPolynomialTriple) {
       for (band <- 0 until 3) {
         srcRGB(band) = srcPixels(band)(i)
       }
-      poly.evaluate(srcRGB, destRGB)
+      evaluate(srcRGB, destRGB)
       for (band <- 0 until 3) {
         destPixels(band)(i) = destRGB(band).toFloat
       }

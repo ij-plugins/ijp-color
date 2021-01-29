@@ -22,20 +22,35 @@
 
 package net.sf.ij_plugins.color.calibration.regression
 
+import enumeratum.{Enum, EnumEntry}
+
+import scala.collection.immutable
+
 /** Enumeration of polynomial function mapping methods used by `MappingFactory`. */
-object MappingMethod extends Enumeration {
-  type MappingMethod = Value
+case object MappingMethod extends Enum[MappingMethod] {
 
   /** First order polynomial, within single color band - single input. */
-  val Linear             = Value("Linear")
+  case object Linear extends MappingMethod("Linear")
+
   /** First order polynomial within with three input for each color band. */
-  val LinearCrossBand    = Value("Linear Cross-band")
+  case object LinearCrossBand extends MappingMethod("Linear Cross-band")
+
   /** Second order polynomial, within single color band - single input. */
-  val Quadratic          = Value("Quadratic")
+  case object Quadratic extends MappingMethod("Quadratic")
+
   /** Second order polynomial within with three input for each color band. */
-  val QuadraticCrossBand = Value("Quadratic Cross-band")
+  case object QuadraticCrossBand extends MappingMethod("Quadratic Cross-band")
+
   /** Third order polynomial, within single color band - single input. */
-  val Cubic              = Value("Cubic")
+  case object Cubic extends MappingMethod("Cubic")
+
   /** Third order polynomial within with three input for each color band. */
-  val CubicCrossBand     = Value("Cubic Cross-band")
+  case object CubicCrossBand extends MappingMethod("Cubic Cross-band")
+
+  /** All MappingMethod values. */
+  val values: immutable.IndexedSeq[MappingMethod] = findValues
+}
+
+sealed abstract class MappingMethod(override val entryName: String) extends EnumEntry {
+  override def toString: String = entryName
 }

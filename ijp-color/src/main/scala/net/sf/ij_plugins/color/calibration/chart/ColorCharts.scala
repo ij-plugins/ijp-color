@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2019 Jarek Sacha
+ * Copyright (C) 2002-2020 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -62,8 +62,8 @@ object ColorCharts {
       ("Neutral 3.5", Lab(36.19, -0.71, -0.30)),
       ("Black", Lab(20.68, -0.03, -0.50))
     ),
-    ReferenceWhite.D65,
-    chipMargin = 0
+    chipMargin = 0,
+    refWhite = ReferenceWhite.D65
   )
 
   /** X-Rite Passport ColorChecker chart, based on the values from "ColorChecker Passport Technical Review"
@@ -98,8 +98,8 @@ object ColorCharts {
       ("Neutral 3.5", Lab(36.20, -0.59, -0.73)),
       ("Black", Lab(20.44, 0.12, -0.54))
     ),
-    ReferenceWhite.D65,
-    chipMargin = 0
+    chipMargin = 0,
+    refWhite = ReferenceWhite.D65
   )
 
   /** Image Science ColorGauge Matte Neutral Patch Versions
@@ -141,8 +141,8 @@ object ColorCharts {
       ("29", Lab(72.50, -22.92, 56.08)),
       ("30", Lab(30.32, 22.13, -19.02)),
     ),
-    ReferenceWhite.D50,
-    chipMargin = 0
+    chipMargin = 0,
+    refWhite = ReferenceWhite.D50
   )
 
 

@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2019 Jarek Sacha
+ * Copyright (C) 2002-2020 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -24,11 +24,11 @@ package net.sf.ij_plugins.color.calibration.chart
 
 import java.awt.geom.Point2D
 
+import ij.gui.Roi
 import ij.process.ImageProcessor
-import net.sf.ij_plugins.color.calibration.point2D
 import net.sf.ij_plugins.color.converter.ColorTriple.Lab
 import net.sf.ij_plugins.color.converter.ReferenceWhite
-import net.sf.ij_plugins.util.{IJTools, PerspectiveTransform}
+import net.sf.ij_plugins.color.util.{IJTools, PerspectiveTransform}
 
 import scala.collection.immutable
 
@@ -41,21 +41,25 @@ import scala.collection.immutable
   * @param chips      chip names and CIE L*a*b* / D65 color values, row by row, starting at (0,0) or top left corner.
   * @param chipMargin reduction of chip from their maximum size on the grid (as fraction of its width or height).
   *                   Value of the margin must be between 0 and 0.5.
+  * @param enabled    which chips are active. If value is 'true' chip is active' if 'false' not used in computations.
   */
 final class GridColorChart(val name: String,
-                           val nbColumns: Int,
-                           val nbRows: Int,
+                           nbColumns: Int,
+                           nbRows: Int,
                            val chips: List[(String, Lab)],
-                           val chipMargin: Double,
+                           chipMargin: Double,
                            val enabled: List[Boolean],
                            override val refWhite: ReferenceWhite,
-                           override val alignmentTransform: PerspectiveTransform) extends ColorChart {
+                           alignmentTransform: PerspectiveTransform)
+  extends GridChartFrame(nbColumns, nbRows, chipMargin, alignmentTransform)
+    with ColorChart {
 
   // TODO: add requirement messages
   require(chipMargin >= 0 && chipMargin < 0.5, "Margin value must at least 0 but less than 0.5, got " + chipMargin)
   require(nbColumns > 0)
   require(nbRows > 0)
   require(nbColumns * nbRows == chips.size)
+  require(chips.size == enabled.size)
   require(refWhite != null)
   require(alignmentTransform != null)
 
@@ -70,11 +74,11 @@ final class GridColorChart(val name: String,
            nbColumns: Int,
            nbRows: Int,
            chips: List[(String, Lab)],
-           refWhite: ReferenceWhite,
            chipMargin: Double = 0,
-           perspectiveTransform: PerspectiveTransform = new PerspectiveTransform()) {
+           refWhite: ReferenceWhite,
+           alignmentTransform: PerspectiveTransform = new PerspectiveTransform()) = {
     this(name, nbColumns, nbRows, chips, chipMargin, List.fill(nbColumns * nbRows)(true), refWhite,
-      perspectiveTransform)
+      alignmentTransform)
   }
 
   private val n = nbColumns * nbRows
@@ -103,26 +107,40 @@ final class GridColorChart(val name: String,
     enabledChips.map { v => colorConverter.toXYZ(v._2).toArray }.toArray
   }
 
-
-  /** Outline of the reference chart as a sequence of 4 corner points: top-left, top-right, bottom-right, bottom-left.
-    */
-  def referenceOutline: Seq[Point2D] = {
-    List(point2D(0, 0), point2D(nbColumns, 0), point2D(nbColumns, nbRows), point2D(0, nbRows))
-  }
-
-  /** Return the aligned outline of a chip in given `column` and `row`.
+  /**
+    * Return the aligned outline of a chip in given `column` and `row`.
     *
     * Chip linear size is reduced by a margin expressed as a fraction of width/length.
     */
+  @deprecated("Unused method, will be removed", "0.8")
   def outlineChipAt(column: Int, row: Int, margin: Double): Array[Point2D] = {
     val ref = referenceGrid.chipAt(column, row, margin)
     ref.map(p => alignmentTransform.transform(p))
   }
 
-  /** Color chips with alignment transform applied to their outline. */
-  def alignedChips: immutable.IndexedSeq[ColorChip] = referenceChips.map {
+  /**
+    * Color chips with alignment transform applied to their outline.
+    */
+  override def alignedChips: IndexedSeq[ColorChip] = referenceChips.map {
     c => new ColorChip(c.name, c.color, alignmentTransform.transform(c.outline))
   }
+
+  /**
+    * Color chips with alignment transform applied to their outline.
+    */
+  override def alignedChipROIs: IndexedSeq[Roi] = alignedChips.map { chip =>
+    val roi = IJTools.toRoi(chip.outline)
+    roi.setName(chip.name)
+    roi
+  }
+
+  /**
+    * Actual outline of the of the chart (reference outline with alignment transform applied).
+    */
+  @deprecated("Unused method, will be removed", "0.8")
+  def alignedOutline: IndexedSeq[Point2D] =
+    alignmentTransform.transform(referenceOutline).toIndexedSeq
+
 
   override def toString: String = name
 
@@ -138,7 +156,7 @@ final class GridColorChart(val name: String,
     *                If value is `true` chip with corresponding index is enabled, if `false` it is disabled.
     * @return
     */
-  def copyWithEnableChips(enabled: Array[Boolean]): GridColorChart = {
+  override def copyWithEnableChips(enabled: Array[Boolean]): GridColorChart = {
     require(chips.length == enabled.length,
       "Expecting " + chips.length + " elements in the input array, got " + enabled.length)
 
@@ -146,10 +164,10 @@ final class GridColorChart(val name: String,
   }
 
   /** Creates a copy of this chart with different `chipMargin`. Value of the margin must be between 0 and 0.5. */
-  def copyWithNewChipMargin(newChipMargin: Double): GridColorChart =
-    new GridColorChart(name, nbColumns, nbRows, chips, refWhite, newChipMargin, alignmentTransform)
+  override def copyWithNewChipMargin(newChipMargin: Double): GridColorChart =
+    new GridColorChart(name, nbColumns, nbRows, chips, newChipMargin, refWhite, alignmentTransform)
 
   /** Creates a copy of this chart with different `alignmentTransform`. */
-  def copyWith(newAlignmentTransform: PerspectiveTransform): GridColorChart =
-    new GridColorChart(name, nbColumns, nbRows, chips, refWhite, chipMargin, newAlignmentTransform)
+  override def copyWith(newAlignmentTransform: PerspectiveTransform): GridColorChart =
+    new GridColorChart(name, nbColumns, nbRows, chips, chipMargin, refWhite, newAlignmentTransform)
 }

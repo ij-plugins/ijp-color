@@ -22,9 +22,11 @@
 
 package net.sf.ij_plugins.color.converter
 
+import enumeratum.{Enum, EnumEntry}
 import net.sf.ij_plugins.color.converter.ColorTriple.XYZ
 import net.sf.ij_plugins.color.converter.ReferenceWhite.{C, D50, D65, E}
 
+import scala.collection.immutable
 import scala.math._
 
 
@@ -43,12 +45,12 @@ import scala.math._
   * Concrete RGB working spaces are defined in the companion [[net.sf.ij_plugins.color.converter.RGBWorkingSpace]] object,
   * for instance [[net.sf.ij_plugins.color.converter.RGBWorkingSpace.sRGB]].
   */
-sealed case class RGBWorkingSpace(name: String,
-                                  xR: Double, yR: Double,
-                                  xG: Double, yG: Double,
-                                  xB: Double, yB: Double,
-                                  refWhite: ReferenceWhite,
-                                  gamma: Double) {
+sealed abstract class RGBWorkingSpace(override val entryName: String,
+                                      val xR: Double, val yR: Double,
+                                      val xG: Double, val yG: Double,
+                                      val xB: Double, val yB: Double,
+                                      val refWhite: ReferenceWhite,
+                                      val gamma: Double) extends EnumEntry {
 
   private val m  = new Matrix3x3(
     m00 = xR / yR,
@@ -88,7 +90,7 @@ sealed case class RGBWorkingSpace(name: String,
   }
 
 
-  override def toString: String = name
+  override def toString: String = entryName
 
   final private def invCompand(companded: Double): Double = {
     if (gamma > 0.0) {
@@ -120,10 +122,10 @@ sealed case class RGBWorkingSpace(name: String,
 
 
 /** Predefined RGB working spaces. */
-object RGBWorkingSpace {
+object RGBWorkingSpace extends Enum[RGBWorkingSpace] {
 
   /** Adobe RGB (1998) */
-  val AdobeRGB1998 = RGBWorkingSpace(
+  case object AdobeRGB1998 extends RGBWorkingSpace(
     "Adobe RGB (1998)",
     xR = 0.64, yR = 0.33,
     xG = 0.21, yG = 0.71,
@@ -133,7 +135,7 @@ object RGBWorkingSpace {
   )
 
   /** AppleRGB */
-  val AppleRGB = RGBWorkingSpace(
+  case object AppleRGB extends RGBWorkingSpace(
     "Apple RGB",
     xR = 0.625, yR = 0.340,
     xG = 0.280, yG = 0.595,
@@ -143,7 +145,7 @@ object RGBWorkingSpace {
   )
 
   /** Best RGB */
-  val BestRGB = RGBWorkingSpace(
+  case object BestRGB extends RGBWorkingSpace(
     "Best RGB",
     xR = 0.7347, yR = 0.2653,
     xG = 0.2150, yG = 0.7750,
@@ -153,7 +155,7 @@ object RGBWorkingSpace {
   )
 
   /** Beta RGB */
-  val BetaRGB = RGBWorkingSpace(
+  case object BetaRGB extends RGBWorkingSpace(
     "Beta RGB",
     xR = 0.6888, yR = 0.3112,
     xG = 0.1986, yG = 0.7551,
@@ -163,7 +165,7 @@ object RGBWorkingSpace {
   )
 
   /** Bruce RGB */
-  val BruceRGB = RGBWorkingSpace(
+  case object BruceRGB extends RGBWorkingSpace(
     "Bruce RGB",
     xR = 0.64, yR = 0.33,
     xG = 0.28, yG = 0.65,
@@ -173,7 +175,7 @@ object RGBWorkingSpace {
   )
 
   /** CIE RGB */
-  val CIERGB = RGBWorkingSpace(
+  case object CIERGB extends RGBWorkingSpace(
     "CIE RGB",
     xR = 0.735, yR = 0.265,
     xG = 0.274, yG = 0.717,
@@ -183,7 +185,7 @@ object RGBWorkingSpace {
   )
 
   /** ColorMatch RGB */
-  val ColorMatchRGB = RGBWorkingSpace(
+  case object ColorMatchRGB extends RGBWorkingSpace(
     "ColorMatch RGB",
     xR = 0.630, yR = 0.340,
     xG = 0.295, yG = 0.605,
@@ -193,7 +195,7 @@ object RGBWorkingSpace {
   )
 
   /** Don RGB 4 */
-  val DonRGB4 = RGBWorkingSpace(
+  case object DonRGB4 extends RGBWorkingSpace(
     "Don RGB 4",
     xR = 0.696, yR = 0.300,
     xG = 0.215, yG = 0.765,
@@ -203,7 +205,7 @@ object RGBWorkingSpace {
   )
 
   /** ECI RGB v2 */
-  val ECIRGBv2 = RGBWorkingSpace(
+  case object ECIRGBv2 extends RGBWorkingSpace(
     "ECI RGB v2",
     xR = 0.67, yR = 0.33,
     xG = 0.21, yG = 0.71,
@@ -213,7 +215,7 @@ object RGBWorkingSpace {
   )
 
   /** Ekta Space PS5 */
-  val EktaSpacePS5 = RGBWorkingSpace(
+  case object EktaSpacePS5 extends RGBWorkingSpace(
     "Ekta Space PS5",
     xR = 0.695, yR = 0.305,
     xG = 0.260, yG = 0.700,
@@ -223,7 +225,7 @@ object RGBWorkingSpace {
   )
 
   /** NTSC RGB */
-  val NTSCRGB = RGBWorkingSpace(
+  case object NTSCRGB extends RGBWorkingSpace(
     "NTSC RGB",
     xR = 0.67, yR = 0.33,
     xG = 0.21, yG = 0.71,
@@ -233,7 +235,7 @@ object RGBWorkingSpace {
   )
 
   /** PAL/SECAM RGB */
-  val PALSECAMRGB = RGBWorkingSpace(
+  case object PALSECAMRGB extends RGBWorkingSpace(
     "PAL/SECAM RGB",
     xR = 0.64, yR = 0.33,
     xG = 0.29, yG = 0.60,
@@ -243,7 +245,7 @@ object RGBWorkingSpace {
   )
 
   /** ProPhoto RGB */
-  val ProPhotoRGB = RGBWorkingSpace(
+  case object ProPhotoRGB extends RGBWorkingSpace(
     "ProPhoto RGB",
     xR = 0.7347, yR = 0.2653,
     xG = 0.1596, yG = 0.8404,
@@ -253,7 +255,7 @@ object RGBWorkingSpace {
   )
 
   /** SMPTE-C RGB */
-  val SMPTE_CRGB = RGBWorkingSpace(
+  case object SMPTE_CRGB extends RGBWorkingSpace(
     "SMPTE-C RGB",
     xR = 0.630, yR = 0.340,
     xG = 0.310, yG = 0.595,
@@ -263,7 +265,7 @@ object RGBWorkingSpace {
   )
 
   /** sRGB */
-  val sRGB = RGBWorkingSpace(
+  case object sRGB extends RGBWorkingSpace(
     "sRGB",
     xR = 0.64, yR = 0.33,
     xG = 0.30, yG = 0.60,
@@ -273,7 +275,7 @@ object RGBWorkingSpace {
   )
 
   /** Wide Gamut RGB */
-  val WideGamutRGB = RGBWorkingSpace(
+  case object WideGamutRGB extends RGBWorkingSpace(
     "Wide Gamut RGB",
     xR = 0.735, yR = 0.265,
     xG = 0.115, yG = 0.826,
@@ -283,8 +285,5 @@ object RGBWorkingSpace {
   )
 
   /** List of all predefined RGB working spaces. */
-  val values = List(
-    AdobeRGB1998, AppleRGB, BestRGB, BetaRGB, BruceRGB, CIERGB, ColorMatchRGB, DonRGB4, ECIRGBv2,
-    EktaSpacePS5, NTSCRGB, PALSECAMRGB, ProPhotoRGB, SMPTE_CRGB, sRGB, WideGamutRGB
-  )
+  val values: immutable.IndexedSeq[RGBWorkingSpace] = findValues
 }

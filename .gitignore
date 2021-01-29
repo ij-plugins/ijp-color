@@ -68,3 +68,7 @@ crashlytics.properties
 crashlytics-build.properties
 
 sandbox/
+/experimental/
+/tmp/
+/.bsp/
+/null/

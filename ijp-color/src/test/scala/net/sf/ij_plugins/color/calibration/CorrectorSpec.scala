@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2019 Jarek Sacha
+ * Copyright (C) 2002-2020 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -23,21 +23,21 @@
 package net.sf.ij_plugins.color.calibration
 
 import net.sf.ij_plugins.color.calibration.regression.{CubicPolynomial, CubicPolynomialTriple}
-import org.scalatest.FlatSpec
-import org.scalatest.Matchers._
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers._
 
 
 /**
- * @author Jarek Sacha 
- */
-class CorrectorSpec extends FlatSpec {
+  * @author Jarek Sacha
+  */
+class CorrectorSpec extends AnyFlatSpec {
 
   "Corrector" should "map correctly" in {
     val poly0 = new CubicPolynomial(intercept = 2.94261364, a = 0.00152897, b = 0.00100197, c = 0.00017698)
     val poly1 = new CubicPolynomial(intercept = 3.03222422, a = 0.00082806, b = 0.00206088, c = -0.00017526)
     val poly2 = new CubicPolynomial(intercept = 3.41117364, a = 0.00024909, b = -0.00010136, c = 0.00270941)
 
-    val corrector = new Corrector(new CubicPolynomialTriple(poly0, poly1, poly2))
+    val corrector = CubicPolynomialTriple(poly0, poly1, poly2)
 
     val observed = Array(
       Array(3851.8935, 1820.0959, 1081.1987),

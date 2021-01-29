@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2019 Jarek Sacha
+ * Copyright (C) 2002-2020 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -26,7 +26,7 @@ import ij.ImagePlus
 import ij.ImagePlus.{COLOR_RGB, GRAY16, GRAY32, GRAY8}
 import ij.process.{ColorProcessor, ImageProcessor}
 import net.sf.ij_plugins.color.converter.{ColorConverter, RGBWorkingSpace, ReferenceWhite}
-import net.sf.ij_plugins.util.{IJTools, PerspectiveTransform}
+import net.sf.ij_plugins.color.util.{IJTools, PerspectiveTransform}
 
 import scala.collection.immutable
 

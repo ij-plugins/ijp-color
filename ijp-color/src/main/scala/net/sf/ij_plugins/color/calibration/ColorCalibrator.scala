@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2019 Jarek Sacha
+ * Copyright (C) 2002-2020 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -27,7 +27,7 @@ import ij.ImagePlus._
 import ij.process._
 import net.sf.ij_plugins.color.calibration.chart.{ColorChart, ReferenceColorSpace}
 import net.sf.ij_plugins.color.calibration.regression.{CubicPolynomialTriple, MappingFactory, MappingMethod}
-import net.sf.ij_plugins.util._
+import net.sf.ij_plugins.color.util.{clipUInt8D, delta}
 
 /** Color calibration helper methods */
 object ColorCalibrator {
@@ -37,12 +37,12 @@ object ColorCalibrator {
     * @param reference reference color values
     * @param observed  observed color values
     * @param corrected color values after calibration
-    * @param mapping   coefficients of the polynomial mapping functions.
+    * @param corrector coefficients of the polynomial mapping functions.
     */
   case class CalibrationFit(reference: Array[Array[Double]],
                             observed: Array[Array[Double]],
                             corrected: Array[Array[Double]],
-                            mapping: CubicPolynomialTriple) {
+                            corrector: CubicPolynomialTriple) {
     // Validate inputs
     require(reference.length > 0)
     require(reference.forall(_.length == 3))
@@ -58,7 +58,7 @@ object ColorCalibrator {
   /** Create instance of ColorCalibrator */
   def apply(chart: ColorChart,
             referenceColorSpace: ReferenceColorSpace,
-            mappingMethod: MappingMethod.Value,
+            mappingMethod: MappingMethod,
             clipReferenceRGB: Boolean = true): ColorCalibrator = {
     new ColorCalibrator(chart, referenceColorSpace, mappingMethod, clipReferenceRGB)
   }
@@ -86,7 +86,7 @@ object ColorCalibrator {
   */
 class ColorCalibrator(val chart: ColorChart,
                       val referenceColorSpace: ReferenceColorSpace,
-                      val mappingMethod: MappingMethod.Value,
+                      val mappingMethod: MappingMethod,
                       val clipReferenceRGB: Boolean) {
 
   import ColorCalibrator._
@@ -115,12 +115,10 @@ class ColorCalibrator(val chart: ColorChart,
       })
     }
 
-    val mapping = MappingFactory.createCubicPolynomialTriple(reference, observed, mappingMethod)
-
-    val corrector = new Corrector(mapping)
+    val corrector = MappingFactory.createCubicPolynomialTriple(reference, observed, mappingMethod)
     val corrected = observed.map(corrector.map)
 
-    CalibrationFit(reference = reference, observed = observed, corrected = corrected, mapping)
+    CalibrationFit(reference = reference, observed = observed, corrected = corrected, corrector)
   }
 
   /** Estimate calibration coefficient. This method does not clip reference color values.
