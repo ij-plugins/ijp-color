@@ -14,6 +14,7 @@ This is a part of [IJ Plugins Project](http://ij-plugins.sourceforge.net/).
 ImageJ Plugins
 --------------
 
+
 ### IJP Color Calibrator
 
 Color calibrates images using a color chart. Supported charts:
@@ -24,28 +25,23 @@ Color calibrates images using a color chart. Supported charts:
 
 Supports 8, 16, 32 bit per channel color images, including raw.
 
-![Image Calibrator](assets/Color_Calibrator_0.6_01.png)
+![Image Calibrator](assets/https://github.com/ij-plugins/ijp-color/wiki/assets/Color_Calibrator_0.6_01.png)
 
-Features:
-* Interactive placement of color chart (select 4 corners using polygon selection)
-* Custom chip margin
-* Render colors of the reference chart and display reference values
-* Assume that input image is in linear XYZ (e.g raw image) or non-linear (sRGB) color space
-* 6 mapping options (linear, linear cross-band, quadratic, quadratic cross-band, cubic, cubic-cross band)
-* Automatic computation of the best reference and mapping method ("Suggest Options")
-* Displays detailed information about the correction, including errors for each chip, and correction fit scatter plots ("Show extra info")
+More details in [project Wiki]
+
 
 ### IJP Color Calculator
 
 Tool for converting individual color values between different color spaces. Inspired by Bruce Lindbloom [CIE Color Calculator](http://www.brucelindbloom.com/index.html?ColorCalculator.html)
 
-![Image Calibrator](assets/Color_Converter_0.6_01.png)
+![Image Calibrator](https://github.com/ij-plugins/ijp-color/wiki/assets/Color_Converter_0.6_01.png)
+
 
 ### IJP Color Chart ROI Tool
 
-Converts color chart ROI to individual chip ROIs
+Converts color chart ROI to individual chip ROIs. Measures color of each chip.
 
-...
+![Chart Tool](https://github.com/ij-plugins/ijp-color/wiki/assets/Chart_Tool_0.9_01.png)
 
 
 Test Images
@@ -80,3 +76,5 @@ sbt experimental/ijRun
 ### IntelliJ
 
 You will need to install Scala plugin then import the project from `build.sbt` file. To run the `ij-color` plugins in ImageJ, setup "Run Configuration" for "SBT Task" and add task `experimental/ijRun`.  
+
+[project Wiki]: https://github.com/ij-plugins/ijp-color/wiki
