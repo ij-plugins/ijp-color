@@ -69,7 +69,7 @@ SBT will download all needed dependencies. Key libraries:
 You can build the `ij-color` plugins and run it within ImageJ using SBT task `ijRun` from the `experimental` module:
  
 ```
-sbt experimental/ijRun
+sbt ijRun
 ```
 
 
