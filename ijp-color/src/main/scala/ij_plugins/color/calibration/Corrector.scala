@@ -64,7 +64,7 @@ trait Corrector {
     *
     * @param src image to be calibrated.
     * @return converted image in sRGB color space.
-    * @throws IllegalArgumentException if the mapping was not set.
+    * @throws java.lang.IllegalArgumentException if the mapping was not set.
     * @see #map[T <: ImageProcessor](src: Array[T])
     */
   def mapToFloat(src: ColorProcessor): Array[FloatProcessor] = {
@@ -95,8 +95,8 @@ trait Corrector {
     *
     * @param src image to be calibrated.
     * @return calibrated image in the `referenceColorSpace`.
-    * @throws IllegalArgumentException if the mapping is not set or
-    *                                  the images in the array are not of the same type and dimension.
+    * @throws java.lang.IllegalArgumentException if the mapping is not set or
+    *                                            the images in the array are not of the same type and dimension.
     */
   def map[T <: ImageProcessor](src: Array[T]): Array[FloatProcessor] = {
     // Sanity checks
@@ -131,7 +131,7 @@ trait Corrector {
     *
     * @param image image to be calibrated.
     * @return calibrated image.
-    * @throws IllegalArgumentException if the mapping was not yet computed or input image of of incorrect type.
+    * @throws java.lang.IllegalArgumentException if the mapping was not yet computed or input image of of incorrect type.
     * @see #computeCalibrationMapping(chipMargin: Double, image: ColorProcessor)
     */
   def map(image: ImagePlus): Array[FloatProcessor] = {
@@ -156,7 +156,7 @@ trait Corrector {
     *
     * @param image image to be calibrated.
     * @return pair (calibrated cropped image, cropped roi)
-    * @throws IllegalArgumentException if the mapping was not yet computed or input image of of incorrect type.
+    * @throws java.lang.IllegalArgumentException if the mapping was not yet computed or input image of of incorrect type.
     * @see #computeCalibrationMapping(chipMargin: Double, image: ColorProcessor)
     */
   def map(image: ImagePlus, roi: PolygonRoi): (Array[FloatProcessor], PolygonRoi) = {

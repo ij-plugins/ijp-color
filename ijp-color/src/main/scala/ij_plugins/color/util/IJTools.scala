@@ -152,7 +152,7 @@ object IJTools {
     * @param src    images to validate
     * @param length expected number of images
     * @tparam T image processor type
-    * @throws IllegalArgumentException if the images in the array are not of the same dimension.
+    * @throws java.lang.IllegalArgumentException if the images in the array are not of the same dimension.
     */
   @inline
   def validateSameDimensions[T <: ImageProcessor](src: Array[T], length: Int): Unit = {
@@ -170,7 +170,7 @@ object IJTools {
     * @param src    images to validate
     * @param length expected number of images
     * @tparam T image processor type
-    * @throws IllegalArgumentException if the images in the array are not of the same dimension.
+    * @throws java.lang.IllegalArgumentException if the images in the array are not of the same dimension.
     */
   @inline
   def validateSameTypeAndDimensions[T <: ImageProcessor](src: Array[T], length: Int): Unit = {

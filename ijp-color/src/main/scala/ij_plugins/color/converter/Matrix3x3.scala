@@ -41,7 +41,7 @@ final class Matrix3x3(val m00: Double, val m01: Double, val m02: Double,
 
   /** Return inverse of this matrix.
     *
-    * @throws IllegalArgumentException if the matrix has no inverse.
+    * @throws java.lang.IllegalArgumentException if the matrix has no inverse.
     */
   def inverse: Matrix3x3 = {
     val d = determinant

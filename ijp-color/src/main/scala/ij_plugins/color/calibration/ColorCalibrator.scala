@@ -95,10 +95,10 @@ class ColorCalibrator(val chart: ColorChart,
     *
     * @param observed Actually observed color values.
     * @return color mapping coefficients.
-    * @throws ij_plugins.color.ColorException when the reference and observed values are not sufficient
-    *                                         to compute mapping polynomial coefficients, for instance,
-    *                                         if the desired polynomial order is
-    *                                         too high given the number of reference colors.
+    * @throws java.lang.IllegalArgumentException when the reference and observed values are not sufficient
+    *                                            to compute mapping polynomial coefficients, for instance,
+    *                                            if the desired polynomial order is
+    *                                            too high given the number of reference colors.
     */
   def computeCalibrationMapping(observed: Array[Array[Double]]): CalibrationFit = {
     require(observed.length == chart.referenceChips.length,
@@ -124,7 +124,7 @@ class ColorCalibrator(val chart: ColorChart,
   /** Estimate calibration coefficient. This method does not clip reference color values.
     *
     * @param bands input image bands to measure observed color value of chart's chips.
-    * @throws ColorException if one of the calibration mapping functions cannot be computed.
+    * @throws java.lang.IllegalArgumentException if one of the calibration mapping functions cannot be computed.
     */
   def computeCalibrationMapping[T <: ImageProcessor](bands: Array[T]): CalibrationFit = {
     require(
@@ -143,7 +143,7 @@ class ColorCalibrator(val chart: ColorChart,
     * `clipReferenceRGB` is true.
     *
     * @param image input image to measure observed color value of chart's chips.
-    * @throws ColorException if one of the calibration mapping functions cannot be computed.
+    * @throws java.lang.IllegalArgumentException if one of the calibration mapping functions cannot be computed.
     */
   def computeCalibrationMapping(image: ColorProcessor): CalibrationFit = {
     val observed = chart.averageChipColor(image)
@@ -154,8 +154,9 @@ class ColorCalibrator(val chart: ColorChart,
     * `clipReferenceRGB` is true.
     *
     * @param image input image to measure observed color value of chart's chips.
-    * @throws ColorException           if one of the calibration mapping functions cannot be computed.
-    * @throws IllegalArgumentException if input image is not RGB or not a three slice stack of gray level images.
+    * @throws java.lang.IllegalArgumentException if one of the calibration mapping functions cannot be computed or
+    *                                            if the input image is not RGB or not a three slice stack of
+    *                                            gray level images.
     */
   def computeCalibrationMapping(image: ImagePlus): CalibrationFit = {
     (image.getType, image.getStackSize) match {

@@ -282,8 +282,8 @@ final class PerspectiveTransform(val m00: Double = 1, val m01: Double = 0, val m
 
   /** Constructs a new PerspectiveTransform from a two-dimensional array of doubles.
     *
-    * @throws NullPointerException           if matrix is null
-    * @throws ArrayIndexOutOfBoundsException if matrix is too small
+    * @throws java.lang.IllegalArgumentException       if matrix is null
+    * @throws java.lang.ArrayIndexOutOfBoundsException if matrix is too small
     */
   def this(matrix: Array[Array[Double]]) = {
     this(
@@ -295,7 +295,7 @@ final class PerspectiveTransform(val m00: Double = 1, val m01: Double = 0, val m
 
   /** Constructs a new PerspectiveTransform with the same effect as an existing AffineTransform.
     *
-    * @throws NullPointerException if transform is null
+    * @throws java.lang.IllegalArgumentException if transform is null
     */
   def this(transform: AffineTransform) = {
     this(
@@ -307,7 +307,7 @@ final class PerspectiveTransform(val m00: Double = 1, val m01: Double = 0, val m
 
   /** Sets this transform to a given PerspectiveTransform.
     *
-    * @throws NullPointerException if tx is null
+    * @throws java.lang.IllegalArgumentException if tx is null
     */
   def this(tx: PerspectiveTransform) = {
     this(
@@ -359,8 +359,8 @@ final class PerspectiveTransform(val m00: Double = 1, val m01: Double = 0, val m
     *
     * @param matrix The 2-dimensional double array to store the
     *               returned values.  The array is assumed to be at least 3x3.
-    * @throws ArrayIndexOutOfBoundsException if matrix is too small
-    * @throws IllegalArgumentException if matrix is null
+    * @throws java.lang.ArrayIndexOutOfBoundsException if matrix is too small
+    * @throws java.lang.IllegalArgumentException       if matrix is null
     */
   def toMatrix(matrix: Array[Array[Double]] = Array.ofDim[Double](3, 3)): Array[Array[Double]] = {
     require(matrix != null, "The input argument 'matrix' may not be null.")
@@ -452,7 +452,8 @@ final class PerspectiveTransform(val m00: Double = 1, val m01: Double = 0, val m
 
 
   /** Creates new transform that post-concatenates a given AffineTransform to this transform.
-    * @throws IllegalArgumentException if tx is null
+    *
+    * @throws java.lang.IllegalArgumentException if tx is null
     */
   def concatenate(tx: AffineTransform): PerspectiveTransform = {
     require(tx != null, "The input argument 'tx' may not be null.")
@@ -479,7 +480,8 @@ final class PerspectiveTransform(val m00: Double = 1, val m01: Double = 0, val m
   }
 
   /** Creates new transform that post-concatenates a given PerspectiveTransform to this transform.
-    * @throws IllegalArgumentException if tx is null
+    *
+    * @throws java.lang.IllegalArgumentException if tx is null
     */
   def concatenate(tx: PerspectiveTransform): PerspectiveTransform = {
     require(tx != null, "The input argument 'tx' may not be null.")
@@ -500,7 +502,8 @@ final class PerspectiveTransform(val m00: Double = 1, val m01: Double = 0, val m
   }
 
   /** Creates new transform that pre-concatenates a given AffineTransform to this transform.
-    * @throws IllegalArgumentException if tx is null
+    *
+    * @throws java.lang.IllegalArgumentException if tx is null
     */
   def preConcatenate(tx: AffineTransform): PerspectiveTransform = {
     require(tx != null, "The input argument 'tx' may not be null.")
@@ -527,7 +530,8 @@ final class PerspectiveTransform(val m00: Double = 1, val m01: Double = 0, val m
   }
 
   /** Creates new transform that pre-concatenates a given PerspectiveTransform to this transform.
-    * @throws IllegalArgumentException if tx is null
+    *
+    * @throws java.lang.IllegalArgumentException if tx is null
     */
   def preConcatenate(tx: PerspectiveTransform): PerspectiveTransform = {
     require(tx != null, "The input argument 'tx' may not be null.")
@@ -548,7 +552,8 @@ final class PerspectiveTransform(val m00: Double = 1, val m01: Double = 0, val m
   }
 
   /** Returns a new PerspectiveTransform that is the inverse of the current transform.
-    * @throws NoninvertibleTransformException if transform cannot be inverted
+    *
+    * @throws java.awt.geom.NoninvertibleTransformException if transform cannot be inverted
     */
   def createInverse: PerspectiveTransform = {
     val tx = makeAdjoint()
@@ -587,7 +592,7 @@ final class PerspectiveTransform(val m00: Double = 1, val m01: Double = 0, val m
     *
     * @param ptSrc The array containing the source point objects.
     * @param ptDst The array where the transform point objects are returned.
-    * @throws IllegalArgumentException if ptSrc is null
+    * @throws java.lang.IllegalArgumentException if ptSrc is null
     */
   def transform(ptSrc: Point2D, ptDst: Point2D = null): Point2D = {
     require(ptSrc != null, "The input argument 'ptSrc' may not be null.")
@@ -609,7 +614,7 @@ final class PerspectiveTransform(val m00: Double = 1, val m01: Double = 0, val m
   //    * point will be overwritten with the transformed point.
   //    *
   //    * @param ptSrc The array containing the source point objects.
-  //    * @throws IllegalArgumentException if ptSrc is null
+  //    * @throws java.lang.IllegalArgumentException if ptSrc is null
   //    */
   //  def transform(ptSrc: scalafx.geometry.Point2D): scalafx.geometry.Point2D = {
   //    require(ptSrc != null, "The input argument 'ptSrc' may not be null.")
@@ -628,7 +633,7 @@ final class PerspectiveTransform(val m00: Double = 1, val m01: Double = 0, val m
     * point will be overwritten with the transformed point.
     *
     * @param points The array containing the source point objects.
-    * @throws IllegalArgumentException if ptSrc is null
+    * @throws java.lang.IllegalArgumentException if ptSrc is null
     */
   def transform(points: Seq[Point2D]): immutable.Seq[Point2D] = {
     require(points != null, "The input argument 'points' may not be null.")
@@ -642,11 +647,12 @@ final class PerspectiveTransform(val m00: Double = 1, val m01: Double = 0, val m
     * is returned for convenience.
     * Note that ptSrc and ptDst can the same. In this case, the input
     * point will be overwritten with the transformed point.
+    *
     * @param ptSrc The point to be inverse transformed.
     * @param ptDst The resulting transformed point.
-    * @throws NoninvertibleTransformException  if the matrix cannot be
-    *                                          inverted.
-    * @throws IllegalArgumentException if ptSrc is null
+    * @throws java.awt.geom.NoninvertibleTransformException if the matrix cannot be
+    *                                                       inverted.
+    * @throws java.lang.IllegalArgumentException            if ptSrc is null
     */
   def inverseTransform(ptSrc: Point2D, ptDst: Point2D = null): Point2D = {
     require(ptSrc != null, "The input argument 'ptSrc' may not be null.")
