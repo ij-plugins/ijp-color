@@ -3,8 +3,6 @@ ijp-color
 
 Operations on color spaces and color images. Can be used as a stand-alone library or a plugin for [ImageJ](http://rsb.info.nih.gov/ij)
 
-This is a part of [IJ Plugins Project](http://ij-plugins.sourceforge.net/).
-
 [![Actions Status](https://github.com/ij-plugins/ijp-color/workflows/Scala%20CI/badge.svg)](https://github.com/ij-plugins/ijp-color/actions) 
 [![Build Status](https://travis-ci.org/ij-plugins/ijp-color.svg?branch=develop)](https://travis-ci.org/ij-plugins/ijp-color) 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/net.sf.ij-plugins/ijp-color_2.13/badge.svg)](https://maven-badges.herokuapp.com/maven-central/net.sf.ij-plugins/ijp-color_2.13) 
@@ -69,7 +67,7 @@ SBT will download all needed dependencies. Key libraries:
 You can build the `ij-color` plugins and run it within ImageJ using SBT task `ijRun` from the `experimental` module:
  
 ```
-sbt experimental/ijRun
+sbt ijRun
 ```
 
 

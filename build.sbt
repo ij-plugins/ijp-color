@@ -8,7 +8,7 @@ import scala.xml.{Node => XmlNode, NodeSeq => XmlNodeSeq, _}
 
 name := "ijp-color-project"
 
-val _version       = "0.9.0"
+val _version       = "0.9.0.1-SNAPSHOT"
 val _scalaVersions = Seq("2.13.4")
 val _scalaVersion  = _scalaVersions.head
 
@@ -195,10 +195,9 @@ lazy val manifestSetting = packageOptions += {
   )
 }
 
-// Set the prompt (for this build) to include the project id.
-shellPrompt in ThisBuild := { state => "sbt:" + Project.extract(state).currentRef.project + "> " }
-
 
 // Instruct `clean` to delete created plugins subdirectory created by `ijRun`/`ijPrepareRun`.
 enablePlugins(SbtImageJ)
 cleanFiles += ijPluginsDir.value
+
+addCommandAlias("ijRun", "experimental/ijRun")
