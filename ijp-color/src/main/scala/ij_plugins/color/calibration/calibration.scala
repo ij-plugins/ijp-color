@@ -32,7 +32,6 @@ import ij_plugins.color.util.{IJTools, PerspectiveTransform, clipUInt8}
 import java.awt.geom.{Path2D, Point2D}
 import java.awt.{Color, Polygon, Shape}
 import scala.collection.parallel.immutable.ParRange
-import scala.math.Ordering.Double.IeeeOrdering
 
 /** Tools for color calibration. */
 package object calibration {

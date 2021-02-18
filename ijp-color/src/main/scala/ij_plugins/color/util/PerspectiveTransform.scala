@@ -39,6 +39,7 @@ object PerspectiveTransform {
     * [   0    1    ty  ]
     * [   0    0    1   ]
     * }}}
+    *
     * @param tx The distance by which coordinates are translated in the X axis direction
     * @param ty The distance by which coordinates are translated in the Y axis direction
     */
@@ -57,6 +58,7 @@ object PerspectiveTransform {
     * [       0              0         1   ]
     * }}}
     * Rotating with a positive angle theta rotates points on the positive X axis toward the positive Y axis.
+    *
     * @param theta The angle of rotation in radians.
     */
   def rotation(theta: Double): PerspectiveTransform = {
@@ -74,8 +76,8 @@ object PerspectiveTransform {
     * Rotating with a positive angle theta rotates points on the positive X axis toward the positive Y axis.
     *
     * @param theta The angle of rotation in radians.
-    * @param x The X coordinate of the origin of the rotation
-    * @param y The Y coordinate of the origin of the rotation
+    * @param x     The X coordinate of the origin of the rotation
+    * @param y     The Y coordinate of the origin of the rotation
     */
   def rotation(theta: Double, x: Double, y: Double): PerspectiveTransform = {
     val cos = math.cos(theta)
@@ -414,8 +416,8 @@ final class PerspectiveTransform(val m00: Double = 1, val m01: Double = 0, val m
     * Rotating with a positive angle theta rotates points on the positive X axis toward the positive Y axis.
     *
     * @param theta The angle of rotation in radians.
-    * @param x The X coordinate of the origin of the rotation
-    * @param y The Y coordinate of the origin of the rotation
+    * @param x     The X coordinate of the origin of the rotation
+    * @param y     The Y coordinate of the origin of the rotation
     */
   def rotate(theta: Double, x: Double, y: Double): PerspectiveTransform = concatenate(rotation(theta, x, y))
 
@@ -637,7 +639,10 @@ final class PerspectiveTransform(val m00: Double = 1, val m01: Double = 0, val m
     */
   def transform(points: Seq[Point2D]): immutable.Seq[Point2D] = {
     require(points != null, "The input argument 'points' may not be null.")
-    points.map(p => transform(p))
+    // Conversion `toList` to achieve Scala 2.12 compatibility
+    points
+      .map(p => transform(p))
+      .toList
   }
 
 

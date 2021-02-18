@@ -28,7 +28,7 @@ import ij_plugins.color.util.{IJTools, PerspectiveTransform}
 
 import java.awt.Polygon
 import java.awt.geom.Point2D
-import scala.collection.immutable.ArraySeq
+import scala.collection.compat.immutable.ArraySeq
 
 object GridChartFrame {
   /**

@@ -34,8 +34,6 @@ import org.scalafx.extras.BusyWorker.SimpleTask
 import org.scalafx.extras.ShowMessage
 import scalafx.stage.Window
 
-import scala.math.Ordering.Double.IeeeOrdering
-
 object SuggestCalibrationOptionsTask {
 
   private case class CrossValidationData(referenceColorSpace: ReferenceColorSpace,
