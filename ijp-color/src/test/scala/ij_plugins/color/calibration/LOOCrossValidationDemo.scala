@@ -27,7 +27,6 @@ import ij_plugins.color.calibration.chart.{ColorCharts, ReferenceColorSpace}
 import ij_plugins.color.calibration.regression.MappingMethod
 
 import java.io.File
-import scala.math.Ordering.Double.IeeeOrdering
 
 object LOOCrossValidationDemo extends App {
 

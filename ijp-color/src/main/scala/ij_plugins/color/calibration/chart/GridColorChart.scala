@@ -120,14 +120,14 @@ final class GridColorChart(val name: String,
   /**
     * Color chips with alignment transform applied to their outline.
     */
-  override def alignedChips: IndexedSeq[ColorChip] = referenceChips.map {
+  override def alignedChips: immutable.IndexedSeq[ColorChip] = referenceChips.map {
     c => new ColorChip(c.name, c.color, alignmentTransform.transform(c.outline))
   }
 
   /**
     * Color chips with alignment transform applied to their outline.
     */
-  override def alignedChipROIs: IndexedSeq[Roi] = alignedChips.map { chip =>
+  override def alignedChipROIs: immutable.IndexedSeq[Roi] = alignedChips.map { chip =>
     val roi = IJTools.toRoi(chip.outline)
     roi.setName(chip.name)
     roi
@@ -137,7 +137,7 @@ final class GridColorChart(val name: String,
     * Actual outline of the of the chart (reference outline with alignment transform applied).
     */
   @deprecated("Unused method, will be removed", "0.8")
-  def alignedOutline: IndexedSeq[Point2D] =
+  def alignedOutline: immutable.IndexedSeq[Point2D] =
     alignmentTransform.transform(referenceOutline).toIndexedSeq
 
 

@@ -29,7 +29,6 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers._
 
 import java.io.File
-import scala.math.Ordering.Double.IeeeOrdering
 
 
 class LOOCrossValidationSpec extends AnyFlatSpec {

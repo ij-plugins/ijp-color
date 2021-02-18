@@ -28,6 +28,7 @@ import ij.process.{ByteProcessor, ColorProcessor, FloatProcessor, ImageProcessor
 import ij.{IJ, ImageJ}
 
 import java.awt.geom.Point2D
+import scala.collection.compat._
 
 
 /** Helper methods for working with ImageJ. */
