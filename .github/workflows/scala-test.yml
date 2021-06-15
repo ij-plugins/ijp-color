@@ -14,4 +14,6 @@ jobs:
       with:
         java-version: 11
     - name: Run tests
-      run: sbt +test
+      uses: GabrielBB/xvfb-action@v1
+      with:
+        run: sbt +test
