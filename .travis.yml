@@ -12,7 +12,7 @@ install: true
 
 script:
   - java -version
-  - sbt test
+  - sbt ++$TRAVIS_SCALA_VERSION test
 
 branches:
   only:
