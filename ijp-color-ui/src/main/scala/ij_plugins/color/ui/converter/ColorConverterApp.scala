@@ -24,18 +24,19 @@ package ij_plugins.color.ui.converter
 
 import ij_plugins.color.ui.fx.ColorFXUI
 import scalafx.Includes._
-import scalafx.application.JFXApp
-import scalafx.application.JFXApp.PrimaryStage
+import scalafx.application.JFXApp3
 import scalafx.scene.Scene
 
-object ColorConverterApp extends JFXApp {
+object ColorConverterApp extends JFXApp3 {
 
-  stage = new PrimaryStage {
-    title = "IJP Color Converter"
-    scene = new Scene {
-      val model = new ColorConverterModel()
-      root = new ColorConverterView(model).pane
-      stylesheets ++= ColorFXUI.stylesheets
+  override def start(): Unit = {
+    stage = new JFXApp3.PrimaryStage {
+      title = "IJP Color Converter"
+      scene = new Scene {
+        val model = new ColorConverterModel()
+        root = new ColorConverterView(model).pane
+        stylesheets ++= ColorFXUI.stylesheets
+      }
     }
   }
 }

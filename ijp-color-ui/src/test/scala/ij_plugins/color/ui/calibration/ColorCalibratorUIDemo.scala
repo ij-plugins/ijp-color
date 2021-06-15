@@ -25,18 +25,18 @@ package ij_plugins.color.ui.calibration
 import ij.ImagePlus
 import ij_plugins.color.ui.fx.ColorFXUI
 import scalafx.Includes._
-import scalafx.application.JFXApp
-import scalafx.application.JFXApp.PrimaryStage
+import scalafx.application.JFXApp3
 import scalafx.scene.Scene
 
 /** ColorCalibrator UI Demo. */
-object ColorCalibratorUIDemo extends JFXApp {
+object ColorCalibratorUIDemo extends JFXApp3 {
 
-  stage = new PrimaryStage() {
-    title = "Color Calibrator UI Demo"
-    scene = new Scene(new ColorCalibratorUI(new ImagePlus(), this).view) {
-      stylesheets ++= ColorFXUI.stylesheets
+  override def start(): Unit = {
+    stage = new JFXApp3.PrimaryStage() {
+      title = "Color Calibrator UI Demo"
+      scene = new Scene(new ColorCalibratorUI(new ImagePlus(), this).view) {
+        stylesheets ++= ColorFXUI.stylesheets
+      }
     }
   }
-
 }

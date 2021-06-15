@@ -8,14 +8,14 @@ import scala.xml.{Node => XmlNode, NodeSeq => XmlNodeSeq, _}
 
 name := "ijp-color-project"
 
-val _version       = "0.10.1"
-val _scalaVersions = Seq("2.13.4", "2.12.13")
+val _version       = "0.10.1.1-SNAPSHOT"
+val _scalaVersions = Seq("2.13.6", "2.12.14")
 val _scalaVersion  = _scalaVersions.head
 
 version             := _version
 scalaVersion        := _scalaVersion
 publishArtifact     := false
-skip in publish     := true
+publish / skip      := true
 sonatypeProfileName := "net.sf.ij-plugins"
 
 // Helper to determine Scala version-dependent settings
@@ -33,7 +33,7 @@ lazy val osName = System.getProperty("os.name") match {
   case _ => throw new Exception("Unknown platform!")
 }
 lazy val javaFXModules = Seq("base", "controls", "fxml", "graphics", "media", "swing", "web")
-lazy val javaFXVersion = "15.0.1"
+lazy val javaFXVersion = "16"
 
 val commonSettings = Seq(
   version      := _version,
@@ -53,13 +53,13 @@ val commonSettings = Seq(
     "-feature",
     "-explaintypes", 
   ),
-  scalacOptions in(Compile, doc) ++= Opts.doc.title("IJP Color API"),
-  scalacOptions in(Compile, doc) ++= Opts.doc.version(_version),
-  scalacOptions in(Compile, doc) ++= Seq(
+  Compile / doc / scalacOptions ++= Opts.doc.title("IJP Color API"),
+  Compile / doc / scalacOptions ++= Opts.doc.version(_version),
+  Compile / doc / scalacOptions ++= Seq(
     "-doc-footer", s"IJP Color API v.${_version}",
     "-doc-root-content", baseDirectory.value + "/src/main/scala/root-doc.creole"
   ),
-  scalacOptions in(Compile, doc) ++= (
+  Compile / doc / scalacOptions ++= (
     Option(System.getenv("GRAPHVIZ_DOT_PATH")) match {
       case Some(path) => Seq("-diagrams", "-diagrams-dot-path", path, "-diagrams-debug")
       case None => Seq.empty[String]
@@ -98,15 +98,15 @@ lazy val ijp_color = (project in file("ijp-color"))
     commonSettings,
     libraryDependencies ++= Seq(
       "com.beachape"           %% "enumeratum"              % "1.6.1",
-      "net.imagej"              % "ij"                      % "1.53g",
+      "net.imagej"              % "ij"                      % "1.53j",
       "org.apache.commons"      % "commons-math3"           % "3.6.1",
-      "org.scala-lang.modules" %% "scala-collection-compat" % "2.4.2",
+      "org.scala-lang.modules" %% "scala-collection-compat" % "2.4.4",
       // Test
-      "org.scalatest" %% "scalatest" % "3.2.3"  % "test"
+      "org.scalatest" %% "scalatest" % "3.2.9"  % "test"
     ),
     libraryDependencies ++= (
       if (isScala2_13plus(scalaVersion.value)) {
-        Seq("org.scala-lang.modules" %% "scala-parallel-collections" % "1.0.0")
+        Seq("org.scala-lang.modules" %% "scala-parallel-collections" % "1.0.3")
       } else {
         Seq.empty[ModuleID]
       }
@@ -151,11 +151,11 @@ lazy val ijp_color_ui = (project in file("ijp-color-ui"))
     libraryDependencies ++= Seq(
       "org.jfree"           % "jfreechart-fx"       % "1.0.1",
       "org.jfree"           % "fxgraphics2d"        % "1.8",
-      "org.scalafx"        %% "scalafx"             % "15.0.1-R21",
+      "org.scalafx"        %% "scalafx"             % "16.0.0-R24",
       "org.scalafx"        %% "scalafx-extras"      % "0.3.6",
       "org.scalafx"        %% "scalafxml-core-sfx8" % "0.5",
       // Test
-      "org.scalatest"      %% "scalatest"           % "3.2.3"  % "test"
+      "org.scalatest"      %% "scalatest"           % "3.2.9"  % "test"
     )
   )
   .dependsOn(ijp_color)
@@ -172,7 +172,7 @@ lazy val experimental = (project in file("experimental"))
     ),
     // Do not publish this artifact
     publishArtifact := false,
-    skip in publish := true,
+    publish / skip  := true,
     // Customize `sbt-imagej` plugin
     ijRuntimeSubDir         := "sandbox",
     ijPluginsSubDir         := "ij-plugins",

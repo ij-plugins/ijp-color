@@ -1,4 +1,5 @@
 Operations on color spaces and color images, including color calibration.
+[[ij_plugins.color `ij_plugins.color` ]] is the root package for the project.
 
 Package [[ij_plugins.color.calibration `ij_plugins.color.calibration`]] contains color calibration.
 

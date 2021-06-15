@@ -112,7 +112,7 @@ class ColorConverterView(val model: ColorConverterModel) {
 
     def addChoiceBox[T <: AnyRef](row: Int, label: String, property: ObjectProperty[T], values: Seq[T],
                                   converter: Option[StringConverter[T]] = None): Unit = {
-      val v = ObservableBuffer(values)
+      val v = ObservableBuffer.from(values)
       val cb = new ChoiceBox[T] {
         value = property()
         items = v
