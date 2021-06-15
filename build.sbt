@@ -15,7 +15,7 @@ val _scalaVersion  = _scalaVersions.head
 version             := _version
 scalaVersion        := _scalaVersion
 publishArtifact     := false
-skip in publish     := true
+publish / skip      := true
 sonatypeProfileName := "net.sf.ij-plugins"
 
 // Helper to determine Scala version-dependent settings
@@ -53,13 +53,13 @@ val commonSettings = Seq(
     "-feature",
     "-explaintypes", 
   ),
-  scalacOptions in(Compile, doc) ++= Opts.doc.title("IJP Color API"),
-  scalacOptions in(Compile, doc) ++= Opts.doc.version(_version),
-  scalacOptions in(Compile, doc) ++= Seq(
+  Compile / doc / scalacOptions ++= Opts.doc.title("IJP Color API"),
+  Compile / doc / scalacOptions ++= Opts.doc.version(_version),
+  Compile / doc / scalacOptions ++= Seq(
     "-doc-footer", s"IJP Color API v.${_version}",
     "-doc-root-content", baseDirectory.value + "/src/main/scala/root-doc.creole"
   ),
-  scalacOptions in(Compile, doc) ++= (
+  Compile / doc / scalacOptions ++= (
     Option(System.getenv("GRAPHVIZ_DOT_PATH")) match {
       case Some(path) => Seq("-diagrams", "-diagrams-dot-path", path, "-diagrams-debug")
       case None => Seq.empty[String]
@@ -172,7 +172,7 @@ lazy val experimental = (project in file("experimental"))
     ),
     // Do not publish this artifact
     publishArtifact := false,
-    skip in publish := true,
+    publish / skip  := true,
     // Customize `sbt-imagej` plugin
     ijRuntimeSubDir         := "sandbox",
     ijPluginsSubDir         := "ij-plugins",
