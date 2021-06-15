@@ -62,7 +62,7 @@ class ColorCalibratorUIController(private val imageTitleLabel: Label,
   imageTitleLabel.text <== model.imageTitle
 
   // Reference chart
-  chartTypeChoiceBox.items = ObservableBuffer(ColorCharts.values)
+  chartTypeChoiceBox.items = ObservableBuffer.from(ColorCharts.values)
   chartTypeChoiceBox.value.onChange { (_, oldValue, newValue) =>
     model.selectReferenceChart(newValue)
   }
@@ -83,11 +83,11 @@ class ColorCalibratorUIController(private val imageTitleLabel: Label,
   //  importROIButton.onAction = _ => model.onLoadLocationFromROI()
 
   // Calibration
-  referenceColorSpaceChoiceBox.items = ObservableBuffer(ReferenceColorSpace.values)
+  referenceColorSpaceChoiceBox.items = ObservableBuffer.from(ReferenceColorSpace.values)
   referenceColorSpaceChoiceBox.value <==> model.referenceColorSpace
   model.showExtraInfo <==> enableExtraInfoCB.selected
 
-  mappingMethodChoiceBox.items = ObservableBuffer(MappingMethod.values)
+  mappingMethodChoiceBox.items = ObservableBuffer.from(MappingMethod.values)
   mappingMethodChoiceBox.value <==> model.mappingMethod
   suggestCalibrationOptionsButton.onAction = _ => model.onSuggestCalibrationOptions()
   suggestCalibrationOptionsButton.disable <== !model.chipValuesObserved
