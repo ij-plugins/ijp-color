@@ -33,7 +33,7 @@ lazy val osName = System.getProperty("os.name") match {
   case _ => throw new Exception("Unknown platform!")
 }
 lazy val javaFXModules = Seq("base", "controls", "fxml", "graphics", "media", "swing", "web")
-lazy val javaFXVersion = "15.0.1"
+lazy val javaFXVersion = "16"
 
 val commonSettings = Seq(
   version      := _version,
