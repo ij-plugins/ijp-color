@@ -24,7 +24,8 @@ package ij_plugins.color.calibration.regression
 
 import ij_plugins.color.calibration.Corrector
 
-/** Three polynomials representing mapping for three color bands. */
+/** Implement color mapping using cubic polynomial.
+  * To use lower degree polynomial set higher coefficients to zero. */
 case class CubicPolynomialTriple(band1: CubicPolynomial,
                                  band2: CubicPolynomial,
                                  band3: CubicPolynomial) extends Corrector {

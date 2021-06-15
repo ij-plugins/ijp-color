@@ -29,7 +29,7 @@ import ij.process._
 import ij_plugins.color.util.IJTools
 
 
-/** Performs color space mapping using cubic polynomial cross-band functions. */
+/** Performs color space mapping. Derived classes implement specific mapping methods. */
 trait Corrector {
 
   /** Map triplet `src` to triplet `dest`

@@ -27,7 +27,12 @@ import ij_plugins.color.converter.ColorConverter
 
 /** Parameters needed to perform color correction of an image and convert it to sRGB.
   *
-  * @param imageType ImagePlus image type supported by this correction
+  * @param corrector           color correction mapping. Correction is done in the provided `referenceColorSpace`
+  * @param colorConverter      use to convert to color space other than the provided `referenceColorSpace`
+  * @param referenceColorSpace indicates color space in which `corrector` operates
+  * @param imageType           ImagePlus image type supported by this correction. Used to enforce matching image type.
+  *                            For instance, is `imageType` indicates `GRAY32`, it will result in when input is `GRAY16`,
+  *                            due to uncertainty in scaling of image values
   */
 case class CorrectionRecipe(corrector: Corrector,
                             colorConverter: ColorConverter,
