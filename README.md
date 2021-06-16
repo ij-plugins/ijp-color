@@ -47,12 +47,36 @@ Test Images
 
 You can test the calibrator plugin using images in [test/data](test/data).
 
+Installing Plugins in ImageJ
+----------------------------
+
+### ImageJ
+
+#### Option 1
+
+Prebuild binaries are published with each [Release](https://github.com/ij-plugins/ijp-color/releases).
+
+1. Look for in the asset section for an "ijp-color_plugins_*_win.zip" file,
+2. download and unzip into ImageJ's `plugins` directory. It should create subdirectory "ij-plugins".
+3. Restart ImageJ
+
+#### Option 2
+
+IJP Color is also a part of the ij-plugins-bundle. You can download from
+its [Release](https://github.com/ij-plugins/ij-plugins-bundle/releases) page.
+
+### ImageJ2/FIJI
+
+IJP Color is a part of the ij-plugins-bundle that is also distributed for FIJI/ImageJ2
+as [IJ-Plugins Update Site](https://sites.imagej.net/IJ-Plugins/): "https://sites.imagej.net/IJ-Plugins/"
+
+
 
 Stand-alone Library
 -------------------
 
-`ijp-color` was designed to be easily used as a stand-alone library. 
-Examples of use are provided in the [ijp-color/test](ijp-color/src/main/test/scala/net/ij/ij_plugins/color) directory.
+`ijp-color` was designed to be easily used as a stand-alone library. Examples of use are provided in
+the [ijp-color/test](ijp-color/src/main/test/scala/net/ij/ij_plugins/color) directory.
 
 
 Development Setup
