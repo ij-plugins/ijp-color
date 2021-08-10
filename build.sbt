@@ -97,10 +97,10 @@ lazy val ijp_color = (project in file("ijp-color"))
     description := "IJP Color Core",
     commonSettings,
     libraryDependencies ++= Seq(
-      "com.beachape"           %% "enumeratum"              % "1.6.1",
+      "com.beachape"           %% "enumeratum"              % "1.7.0",
       "net.imagej"              % "ij"                      % "1.53j",
       "org.apache.commons"      % "commons-math3"           % "3.6.1",
-      "org.scala-lang.modules" %% "scala-collection-compat" % "2.4.4",
+      "org.scala-lang.modules" %% "scala-collection-compat" % "2.5.0",
       // Test
       "org.scalatest" %% "scalatest" % "3.2.9"  % "test"
     ),
