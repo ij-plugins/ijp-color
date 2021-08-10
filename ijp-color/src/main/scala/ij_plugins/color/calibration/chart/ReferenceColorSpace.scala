@@ -39,7 +39,7 @@ sealed abstract class ReferenceColorSpace(override val entryName: String, bands:
   /** Convert color value from the current color space to CIE L*a*b* */
   def toLab(c1: Double, c2: Double, c3: Double): ColorTriple.Lab = {
     this match {
-      case ReferenceColorSpace.XYZ => new ColorConverter().xyzToLab(c1, c2, c3)
+      case ReferenceColorSpace.XYZ  => new ColorConverter().xyzToLab(c1, c2, c3)
       case ReferenceColorSpace.sRGB => new ColorConverter().toLab(ColorTriple.RGB(c1, c2, c3))
     }
   }
@@ -53,12 +53,12 @@ sealed abstract class ReferenceColorSpace(override val entryName: String, bands:
   /** Convert color value from the current color space to CIE L*a*b* */
   def toLab(fps: Array[FloatProcessor]): Array[FloatProcessor] = {
     require(fps.length == 3)
-    val w = fps(0).getWidth
-    val h = fps(0).getHeight
-    val n = w * h
-    val lFP = new FloatProcessor(w, h)
-    val aFP = new FloatProcessor(w, h)
-    val bFP = new FloatProcessor(w, h)
+    val w       = fps(0).getWidth
+    val h       = fps(0).getHeight
+    val n       = w * h
+    val lFP     = new FloatProcessor(w, h)
+    val aFP     = new FloatProcessor(w, h)
+    val bFP     = new FloatProcessor(w, h)
     val pixels0 = fps(0).getPixels.asInstanceOf[Array[Float]]
     val pixels1 = fps(1).getPixels.asInstanceOf[Array[Float]]
     val pixels2 = fps(2).getPixels.asInstanceOf[Array[Float]]

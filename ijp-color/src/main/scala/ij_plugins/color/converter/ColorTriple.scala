@@ -35,10 +35,11 @@ trait ColorTriple {
 /** Color triples with band/channel names specific to color spaces. */
 object ColorTriple {
 
-  /** Generic color coordinates in an arbitrary color space.
-    *
-    * @author Jarek Sacha
-    */
+  /**
+   * Generic color coordinates in an arbitrary color space.
+   *
+   * @author Jarek Sacha
+   */
   case class Color123(_1: Double = 0, _2: Double = 0, _3: Double = 0) extends ColorTriple {
 
     def apply(index: Int): Double = index match {
@@ -121,4 +122,3 @@ object ColorTriple {
   }
 
 }
-

@@ -38,18 +38,14 @@ import scala.collection.immutable.ListMap
 object ColorChartToolPlugin {
 
   private var sendToROIManager: Boolean = true
-  private var measureChips: Boolean = true
+  private var measureChips: Boolean     = true
 }
 
 /**
-  * Send tiles of the chart to ROI Manager
-  * User indicates chart location by pointing to chart corners.
-  */
-class ColorChartToolPlugin
-  extends PlugIn
-    with DialogListener
-    with ImageListenerHelper
-    with LiveChartROIHelper {
+ * Send tiles of the chart to ROI Manager
+ * User indicates chart location by pointing to chart corners.
+ */
+class ColorChartToolPlugin extends PlugIn with DialogListener with ImageListenerHelper with LiveChartROIHelper {
 
   import ColorChartToolPlugin._
 
@@ -150,7 +146,6 @@ class ColorChartToolPlugin
     chartOption.nonEmpty
   }
 
-
   override protected def handleImageUpdated(): Unit = {
     // TODO: Review correctness, this code seems to do nothing
     liveChartROIOption.foreach(v => v.locatedChart)
@@ -196,14 +191,14 @@ class ColorChartToolPlugin
 
   private def statsToMap(stats: ImageStatistics): ListMap[String, Double] = {
     ListMap(
-      "Area" -> stats.area,
-      "Mean" -> stats.mean,
-      "Median" -> stats.median,
-      "Min" -> stats.min,
-      "Max" -> stats.max,
-      "StdDev" -> stats.stdDev,
+      "Area"     -> stats.area,
+      "Mean"     -> stats.mean,
+      "Median"   -> stats.median,
+      "Min"      -> stats.min,
+      "Max"      -> stats.max,
+      "StdDev"   -> stats.stdDev,
       "Kurtosis" -> stats.kurtosis,
-      "Skewness" -> stats.skewness,
+      "Skewness" -> stats.skewness
     )
   }
 }

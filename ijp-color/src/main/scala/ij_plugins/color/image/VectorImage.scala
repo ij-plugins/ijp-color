@@ -30,8 +30,8 @@ import ij.{ImagePlus, ImageStack}
 class VectorImage(private val src: ImagePlus) {
 
   val stack: ImageStack = convertToFloatStack(src)
-  val pixels: Array[Array[Float]] = for (i <- (1 to stack.getSize).toArray) yield
-    stack.getProcessor(i).getPixels.asInstanceOf[Array[Float]]
+  val pixels: Array[Array[Float]] = for (i <- (1 to stack.getSize).toArray)
+    yield stack.getProcessor(i).getPixels.asInstanceOf[Array[Float]]
 
   def this(cp: ColorProcessor) = {
     this(new ImagePlus("", cp))
@@ -39,13 +39,15 @@ class VectorImage(private val src: ImagePlus) {
 
   def this(width: Int, height: Int, nbValues: Int) = {
     this(
-      new ImagePlus("", {
-        val s = new ImageStack(width, height)
-        for (i <- 1 to nbValues) {
-          s.addSlice(i.toString, new FloatProcessor(width, height))
+      new ImagePlus(
+        "", {
+          val s = new ImageStack(width, height)
+          for (i <- 1 to nbValues) {
+            s.addSlice(i.toString, new FloatProcessor(width, height))
+          }
+          s
         }
-        s
-      })
+      )
     )
   }
 
@@ -79,12 +81,11 @@ class VectorImage(private val src: ImagePlus) {
     }
   }
 
-
   /** Convert, in place, image internal representation to stack of floating point slices */
   private def convertToFloatStack(src: ImagePlus): ImageStack = {
     require(src != null)
 
-    val imp = new Duplicator().run(src)
+    val imp       = new Duplicator().run(src)
     val doScaling = ImageConverter.getDoScaling
     try {
       ImageConverter.setDoScaling(false)
@@ -100,11 +101,8 @@ class VectorImage(private val src: ImagePlus) {
         new ImageConverter(imp).convertToGray32()
 
       imp.getStack
-    }
-    finally {
+    } finally {
       ImageConverter.setDoScaling(doScaling)
     }
   }
 }
-
-

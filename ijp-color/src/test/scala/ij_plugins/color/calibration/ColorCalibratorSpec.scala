@@ -32,8 +32,8 @@ import org.scalatest.matchers.should.Matchers._
 import java.io.File
 
 /**
-  * @author Jarek Sacha
-  */
+ * @author Jarek Sacha
+ */
 class ColorCalibratorSpec extends AnyFlatSpec {
 
   "ColorCalibrator" should "perform color calibration in XYZ" in {
@@ -64,25 +64,19 @@ class ColorCalibratorSpec extends AnyFlatSpec {
       Array(4647.7389183849855, 5868.471663168292, 5809.715520434622),
       Array(1399.1883257192246, 1857.1423632547228, 1683.8465242622547),
       Array(376.3981937853972, 466.053053727231, 423.635542629726)
-
     )
 
     // Parameters
-    val chart = ColorCharts.XRitePassportColorChecker.copyWithNewChipMargin(0.25)
+    val chart      = ColorCharts.XRitePassportColorChecker.copyWithNewChipMargin(0.25)
     val colorSpace = ReferenceColorSpace.XYZ
-    val method = MappingMethod.LinearCrossBand
+    val method     = MappingMethod.LinearCrossBand
 
-    val expectedXYZDeltas = Array(
-      1.240, 3.884, 3.085, 0.512, 1.109, 2.427,
-      1.906, 1.420, 2.287, 1.491, 1.783, 5.575,
-      3.046, 1.190, 2.417, 2.491, 2.795, 0.992,
-      0.527, 0.940, 1.070, 2.671, 2.808, 1.951
-
-    )
+    val expectedXYZDeltas = Array(1.240, 3.884, 3.085, 0.512, 1.109, 2.427, 1.906, 1.420, 2.287, 1.491, 1.783, 5.575,
+      3.046, 1.190, 2.417, 2.491, 2.795, 0.992, 0.527, 0.940, 1.070, 2.671, 2.808, 1.951)
 
     // Create color calibration
     val colorCalibrator = new ColorCalibrator(chart, colorSpace, method, clipReferenceRGB = true)
-    val fit = colorCalibrator.computeCalibrationMapping(observed)
+    val fit             = colorCalibrator.computeCalibrationMapping(observed)
 
     //    fit.observed.foreach(a => println(a.mkString("Array(", ",", ")\n")))
 
@@ -93,30 +87,28 @@ class ColorCalibratorSpec extends AnyFlatSpec {
     }
   }
 
-
   "ColorCalibrator" should "perform color calibration of an image in XYZ" in {
 
     // Parameters
-    val chart = ColorCharts.XRitePassportColorChecker.copyWithNewChipMargin(0.25)
+    val chart      = ColorCharts.XRitePassportColorChecker.copyWithNewChipMargin(0.25)
     val colorSpace = ReferenceColorSpace.XYZ
-    val method = MappingMethod.LinearCrossBand
-    val testImage = new File("../test/data/Passport-linear-25.tif")
+    val method     = MappingMethod.LinearCrossBand
+    val testImage  = new File("../test/data/Passport-linear-25.tif")
     assert(testImage.exists(), "File must exists: " + testImage.getCanonicalPath)
 
     val chartLocationROI = Array(
-      point2D(25, 18), point2D(25 + 546, 18),
-      point2D(25 + 546, 18 + 362), point2D(25, 18 + 362)
+      point2D(25, 18),
+      point2D(25 + 546, 18),
+      point2D(25 + 546, 18 + 362),
+      point2D(25, 18 + 362)
     )
     val newChart = chart.copyWith(PerspectiveTransform.quadToQuad(
-      chart.referenceOutline.toArray, chartLocationROI))
+      chart.referenceOutline.toArray,
+      chartLocationROI
+    ))
 
-    val expectedXYZDeltas = Array(
-      1.240, 3.884, 3.085, 0.512, 1.109, 2.427,
-      1.906, 1.420, 2.287, 1.491, 1.783, 5.575,
-      3.046, 1.190, 2.417, 2.491, 2.795, 0.992,
-      0.527, 0.940, 1.070, 2.671, 2.808, 1.951
-
-    )
+    val expectedXYZDeltas = Array(1.240, 3.884, 3.085, 0.512, 1.109, 2.427, 1.906, 1.420, 2.287, 1.491, 1.783, 5.575,
+      3.046, 1.190, 2.417, 2.491, 2.795, 0.992, 0.527, 0.940, 1.070, 2.671, 2.808, 1.951)
 
     // Load test image
     val imp = IJ.openImage(testImage.getCanonicalPath)
@@ -124,8 +116,8 @@ class ColorCalibratorSpec extends AnyFlatSpec {
 
     // Create color calibration
     val clipReferenceRGB = false
-    val colorCalibrator = new ColorCalibrator(newChart, colorSpace, method, clipReferenceRGB)
-    val fit = colorCalibrator.computeCalibrationMapping(imp)
+    val colorCalibrator  = new ColorCalibrator(newChart, colorSpace, method, clipReferenceRGB)
+    val fit              = colorCalibrator.computeCalibrationMapping(imp)
 
     // Check deltas, this is a consistency check, deltas may be lower if the fit algorithm is improved
     val deltas = fit.correctedDeltas
@@ -137,25 +129,24 @@ class ColorCalibratorSpec extends AnyFlatSpec {
   "ColorCalibrator" should "be fast :) - benchmark test" in {
 
     // Parameters
-    val chart = ColorCharts.XRitePassportColorChecker.copyWithNewChipMargin(0.25)
+    val chart      = ColorCharts.XRitePassportColorChecker.copyWithNewChipMargin(0.25)
     val colorSpace = ReferenceColorSpace.XYZ
-    val method = MappingMethod.LinearCrossBand
-    val testImage = "../test/data/Passport-linear-25.tif"
+    val method     = MappingMethod.LinearCrossBand
+    val testImage  = "../test/data/Passport-linear-25.tif"
 
     val chartLocationROI = Array(
-      point2D(25, 18), point2D(25 + 546, 18),
-      point2D(25 + 546, 18 + 362), point2D(25, 18 + 362)
+      point2D(25, 18),
+      point2D(25 + 546, 18),
+      point2D(25 + 546, 18 + 362),
+      point2D(25, 18 + 362)
     )
     val newChart = chart.copyWith(PerspectiveTransform.quadToQuad(
-      chart.referenceOutline.toArray, chartLocationROI))
+      chart.referenceOutline.toArray,
+      chartLocationROI
+    ))
 
-    val expectedXYZDeltas = Array(
-      1.240, 3.884, 3.085, 0.512, 1.109, 2.427,
-      1.906, 1.420, 2.287, 1.491, 1.783, 5.575,
-      3.046, 1.190, 2.417, 2.491, 2.795, 0.992,
-      0.527, 0.940, 1.070, 2.671, 2.808, 1.951
-
-    )
+    val expectedXYZDeltas = Array(1.240, 3.884, 3.085, 0.512, 1.109, 2.427, 1.906, 1.420, 2.287, 1.491, 1.783, 5.575,
+      3.046, 1.190, 2.417, 2.491, 2.795, 0.992, 0.527, 0.940, 1.070, 2.671, 2.808, 1.951)
 
     // Load test image
     val imp = IJ.openImage(testImage)
@@ -163,8 +154,8 @@ class ColorCalibratorSpec extends AnyFlatSpec {
 
     // Create color calibration
     val clipReferenceRGB = false
-    val colorCalibrator = new ColorCalibrator(newChart, colorSpace, method, clipReferenceRGB)
-    val fit = colorCalibrator.computeCalibrationMapping(imp)
+    val colorCalibrator  = new ColorCalibrator(newChart, colorSpace, method, clipReferenceRGB)
+    val fit              = colorCalibrator.computeCalibrationMapping(imp)
 
     // Check deltas, this is a consistency check, deltas may be lower if the fit algorithm is improved
     val deltas = fit.correctedDeltas
@@ -172,12 +163,12 @@ class ColorCalibratorSpec extends AnyFlatSpec {
       deltas(i) should be(expectedXYZDeltas(i) +- 0.1)
     }
 
-    var bestTime = Long.MaxValue
+    var bestTime  = Long.MaxValue
     val corrector = fit.corrector
     for (_ <- 1 to 10) {
       val startTime: Long = System.currentTimeMillis
-      val correctedImp = corrector.map(imp)
-      val time: Long = System.currentTimeMillis - startTime
+      val correctedImp    = corrector.map(imp)
+      val time: Long      = System.currentTimeMillis - startTime
       println("Correction time: " + time + " ms")
       assert(correctedImp != null)
       bestTime = math.min(bestTime, time)

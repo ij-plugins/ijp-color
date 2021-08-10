@@ -27,21 +27,23 @@ import java.awt.image.BufferedImage
 /** Tools for converting images between AWT and JavaFX. */
 object ImageConverter {
 
-  /** Convert AWT image to BufferedImage.
-    *
-    * @param image AWT image.
-    */
+  /**
+   * Convert AWT image to BufferedImage.
+   *
+   * @param image AWT image.
+   */
   def toBufferImage(image: java.awt.Image): BufferedImage = toBufferImage(image, BufferedImage.TYPE_INT_ARGB)
 
-  /** Convert AWT image to BufferedImage.
-    *
-    * @param image     image to convert
-    * @param imageType `BufferedImage` type
-    * @see [[java.awt.image.BufferedImage]]
-    */
+  /**
+   * Convert AWT image to BufferedImage.
+   *
+   * @param image     image to convert
+   * @param imageType `BufferedImage` type
+   * @see [[java.awt.image.BufferedImage]]
+   */
   def toBufferImage(image: java.awt.Image, imageType: Int): BufferedImage = {
     val bi = new BufferedImage(image.getWidth(null), image.getHeight(null), imageType)
-    val g = bi.createGraphics
+    val g  = bi.createGraphics
     g.drawImage(image, null, null)
     bi
   }

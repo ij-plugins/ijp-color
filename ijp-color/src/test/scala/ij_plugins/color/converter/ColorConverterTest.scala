@@ -28,13 +28,14 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers._
 
 /**
-  * @author Jarek Sacha
-  * @since 10/16/12 8:14 PM
-  */
+ * @author Jarek Sacha
+ * @since 10/16/12 8:14 PM
+ */
 class ColorConverterTest extends AnyFlatSpec {
+
   /**
-    * From http://www.brucelindbloom.com/downloads/ColorCheckerSpreadsheets.zip, assumes D65 and 2 degree observer
-    */
+   * From http://www.brucelindbloom.com/downloads/ColorCheckerSpreadsheets.zip, assumes D65 and 2 degree observer
+   */
   private val labColorChecker: Array[Lab] = Array(
     Lab(37.257, 12.752, 14.852),
     Lab(65.959, 13.538, 17.198),
@@ -60,10 +61,11 @@ class ColorConverterTest extends AnyFlatSpec {
     Lab(35.379, -0.118, -0.144),
     Lab(20.522, 0.352, -0.201)
   )
+
   /**
-    * Converted to XYZ from using http://www.brucelindbloom.com/iPhone/ColorConv.html
-    * D65, no adaptation, x100.
-    */
+   * Converted to XYZ from using http://www.brucelindbloom.com/iPhone/ColorConv.html
+   * D65, no adaptation, x100.
+   */
   private val xyzColorChecker: Array[XYZ] = Array(
     XYZ(0.108176, 0.096773, 0.062064),
     XYZ(0.375276, 0.352709, 0.260194),
@@ -99,7 +101,6 @@ class ColorConverterTest extends AnyFlatSpec {
     rgb.b should be(18.0 +- 0.0001)
   }
 
-
   it should "convert RGB to XYZ" in {
     val converter = new ColorConverter(ReferenceWhite.D50, AdobeRGB1998, None, rgbScale = 1, xyzScale = 1)
 
@@ -120,9 +121,8 @@ class ColorConverterTest extends AnyFlatSpec {
     xyz.z should be(0.064729 +- 0.00001)
   }
 
-
   it should "convert RGB to XYZ with scaled XYZ" in {
-    val xyzScale = 100
+    val xyzScale  = 100
     val converter = new ColorConverter(ReferenceWhite.D50, AdobeRGB1998, None, rgbScale = 1, xyzScale = xyzScale)
 
     val rgb = RGB(178 / 255d, 217 / 255d, 18 / 255d)
@@ -131,7 +131,6 @@ class ColorConverterTest extends AnyFlatSpec {
     xyz.y should be(0.574946 * xyzScale +- 0.00001 * xyzScale)
     xyz.z should be(0.064729 * xyzScale +- 0.00001 * xyzScale)
   }
-
 
   it should "convert RGB to XYZ with scaled RGB" in {
     val converter = new ColorConverter(ReferenceWhite.D50, AdobeRGB1998, None, rgbScale = 255, xyzScale = 1)
@@ -143,11 +142,13 @@ class ColorConverterTest extends AnyFlatSpec {
     xyz.z should be(0.064729 +- 0.00001)
   }
 
-
   it should "convert AdobeRGB1998 to XYZ/D50 with chromatic adaptation" in {
     val converter = new ColorConverter(
-      ReferenceWhite.D50, AdobeRGB1998, Some(ChromaticAdaptation.Bradford),
-      rgbScale = 255, xyzScale = 1
+      ReferenceWhite.D50,
+      AdobeRGB1998,
+      Some(ChromaticAdaptation.Bradford),
+      rgbScale = 255,
+      xyzScale = 1
     )
 
     val rgb = RGB(178, 217, 18)
@@ -161,9 +162,9 @@ class ColorConverterTest extends AnyFlatSpec {
     val converter = new ColorConverter(ReferenceWhite.D65, RGBWorkingSpace.sRGB, None, xyzScale = 1)
 
     for (i <- xyzColorChecker.indices) {
-      val xyz = xyzColorChecker(i)
+      val xyz         = xyzColorChecker(i)
       val expectedLab = labColorChecker(i)
-      val actualLab = converter.toLab(xyz)
+      val actualLab   = converter.toLab(xyz)
       actualLab.l should be(expectedLab.l +- 0.001)
       actualLab.a should be(expectedLab.a +- 0.001)
       actualLab.b should be(expectedLab.b +- 0.001)
@@ -176,12 +177,13 @@ class ColorConverterTest extends AnyFlatSpec {
       rgbSpace = RGBWorkingSpace.sRGB,
       chromaticAdaptation = None,
       xyzScale = 100,
-      rgbScale = 255)
+      rgbScale = 255
+    )
 
     val xyz = XYZ(9.31, 7.11, 15.33)
     // Expected values computed using http://www.brucelindbloom.com/index.html?ColorCalculator.html
     val expectedLab = Lab(32.0560, 23.3458, -21.1905)
-    val actualLab = converter.toLab(xyz)
+    val actualLab   = converter.toLab(xyz)
     actualLab.l should be(expectedLab.l +- 0.0001)
     actualLab.a should be(expectedLab.a +- 0.0001)
     actualLab.b should be(expectedLab.b +- 0.0001)

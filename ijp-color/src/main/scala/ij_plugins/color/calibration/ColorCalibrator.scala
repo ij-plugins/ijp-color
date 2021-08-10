@@ -32,17 +32,20 @@ import ij_plugins.color.util.{clipUInt8D, delta}
 /** Color calibration helper methods */
 object ColorCalibrator {
 
-  /** Results of computing color calibration.
-    *
-    * @param reference reference color values
-    * @param observed  observed color values
-    * @param corrected color values after calibration
-    * @param corrector coefficients of the polynomial mapping functions.
-    */
-  case class CalibrationFit(reference: Array[Array[Double]],
-                            observed: Array[Array[Double]],
-                            corrected: Array[Array[Double]],
-                            corrector: CubicPolynomialTriple) {
+  /**
+   * Results of computing color calibration.
+   *
+   * @param reference reference color values
+   * @param observed  observed color values
+   * @param corrected color values after calibration
+   * @param corrector coefficients of the polynomial mapping functions.
+   */
+  case class CalibrationFit(
+    reference: Array[Array[Double]],
+    observed: Array[Array[Double]],
+    corrected: Array[Array[Double]],
+    corrector: CubicPolynomialTriple
+  ) {
     // Validate inputs
     require(reference.length > 0)
     require(reference.forall(_.length == 3))
@@ -51,58 +54,66 @@ object ColorCalibrator {
     require(corrected.length == reference.length)
     require(corrected.forall(_.length == 3))
 
-    /** */
+    /**
+     */
     def correctedDeltas: Array[Double] = reference zip corrected map (p => delta(p._1, p._2))
   }
 
   /** Create instance of ColorCalibrator */
-  def apply(chart: ColorChart,
-            referenceColorSpace: ReferenceColorSpace,
-            mappingMethod: MappingMethod,
-            clipReferenceRGB: Boolean = true): ColorCalibrator = {
+  def apply(
+    chart: ColorChart,
+    referenceColorSpace: ReferenceColorSpace,
+    mappingMethod: MappingMethod,
+    clipReferenceRGB: Boolean = true
+  ): ColorCalibrator = {
     new ColorCalibrator(chart, referenceColorSpace, mappingMethod, clipReferenceRGB)
   }
 }
 
-
-/** Performs color calibration using a color chart.
-  *
-  * The calibration in performed in the specified reference color space.
-  * For the best results the reference color space should be similar to the color space of the input image.
-  * That is, in optimal conditions function mapping from the actual color space to the reference color space
-  * should be close to linear.
-  * For instance for raw images the CIE XYZ color space is better reference than sRGB since mapping between the input and
-  * the reference can be done with good accuracy using low order polynomial.
-  * If the input image is a typical JPEG image it is best to select sRGB as a reference color space.
-  *
-  * @param chart               color chart providing reference color values, location of chips, and the alignment transform
-  *                            to spatially map color chip locations fro the reference to input image.
-  * @param referenceColorSpace assumption about the color space of the input image.
-  *                            Reference color values will be generated in that color space.
-  * @param mappingMethod       type of polynomial function used to map from input to the reference color space.
-  * @param clipReferenceRGB    if the reference was selected as RGB, the reference color values can be outside the gamut
-  *                            of that color space (lower than 0 or larger than 255). This parameter gives an option
-  *                            to clip reference color value to fit within the gamut.
-  */
-class ColorCalibrator(val chart: ColorChart,
-                      val referenceColorSpace: ReferenceColorSpace,
-                      val mappingMethod: MappingMethod,
-                      val clipReferenceRGB: Boolean) {
+/**
+ * Performs color calibration using a color chart.
+ *
+ * The calibration in performed in the specified reference color space.
+ * For the best results the reference color space should be similar to the color space of the input image.
+ * That is, in optimal conditions function mapping from the actual color space to the reference color space
+ * should be close to linear.
+ * For instance for raw images the CIE XYZ color space is better reference than sRGB since mapping between the input and
+ * the reference can be done with good accuracy using low order polynomial.
+ * If the input image is a typical JPEG image it is best to select sRGB as a reference color space.
+ *
+ * @param chart               color chart providing reference color values, location of chips, and the alignment transform
+ *                            to spatially map color chip locations fro the reference to input image.
+ * @param referenceColorSpace assumption about the color space of the input image.
+ *                            Reference color values will be generated in that color space.
+ * @param mappingMethod       type of polynomial function used to map from input to the reference color space.
+ * @param clipReferenceRGB    if the reference was selected as RGB, the reference color values can be outside the gamut
+ *                            of that color space (lower than 0 or larger than 255). This parameter gives an option
+ *                            to clip reference color value to fit within the gamut.
+ */
+class ColorCalibrator(
+  val chart: ColorChart,
+  val referenceColorSpace: ReferenceColorSpace,
+  val mappingMethod: MappingMethod,
+  val clipReferenceRGB: Boolean
+) {
 
   import ColorCalibrator._
 
-  /** Compute coefficients of a polynomial color mapping between the reference and observed colors.
-    *
-    * @param observed Actually observed color values.
-    * @return color mapping coefficients.
-    * @throws java.lang.IllegalArgumentException when the reference and observed values are not sufficient
-    *                                            to compute mapping polynomial coefficients, for instance,
-    *                                            if the desired polynomial order is
-    *                                            too high given the number of reference colors.
-    */
+  /**
+   * Compute coefficients of a polynomial color mapping between the reference and observed colors.
+   *
+   * @param observed Actually observed color values.
+   * @return color mapping coefficients.
+   * @throws java.lang.IllegalArgumentException when the reference and observed values are not sufficient
+   *                                            to compute mapping polynomial coefficients, for instance,
+   *                                            if the desired polynomial order is
+   *                                            too high given the number of reference colors.
+   */
   def computeCalibrationMapping(observed: Array[Array[Double]]): CalibrationFit = {
-    require(observed.length == chart.referenceChips.length,
-      s"Expecting ${chart.referenceChips.length} observations, got ${observed.length}.")
+    require(
+      observed.length == chart.referenceChips.length,
+      s"Expecting ${chart.referenceChips.length} observations, got ${observed.length}."
+    )
     require(observed.forall(_.length == 3))
 
     val reference = chart.referenceColor(referenceColorSpace).clone()
@@ -121,17 +132,17 @@ class ColorCalibrator(val chart: ColorChart,
     CalibrationFit(reference = reference, observed = observed, corrected = corrected, corrector)
   }
 
-  /** Estimate calibration coefficient. This method does not clip reference color values.
-    *
-    * @param bands input image bands to measure observed color value of chart's chips.
-    * @throws java.lang.IllegalArgumentException if one of the calibration mapping functions cannot be computed.
-    */
+  /**
+   * Estimate calibration coefficient. This method does not clip reference color values.
+   *
+   * @param bands input image bands to measure observed color value of chart's chips.
+   * @throws java.lang.IllegalArgumentException if one of the calibration mapping functions cannot be computed.
+   */
   def computeCalibrationMapping[T <: ImageProcessor](bands: Array[T]): CalibrationFit = {
     require(
       (bands.forall(_.isInstanceOf[ByteProcessor]) |
         bands.forall(_.isInstanceOf[ShortProcessor]) |
-        bands.forall(_.isInstanceOf[FloatProcessor])
-        ) & (bands.length == 3),
+        bands.forall(_.isInstanceOf[FloatProcessor])) & (bands.length == 3),
       "Expecting 3 gray-level images, got " + bands.length
     )
 
@@ -139,25 +150,27 @@ class ColorCalibrator(val chart: ColorChart,
     computeCalibrationMapping(observed)
   }
 
-  /** Estimate calibration coefficients. Reference color values will be clipped if reference color space is RGB and
-    * `clipReferenceRGB` is true.
-    *
-    * @param image input image to measure observed color value of chart's chips.
-    * @throws java.lang.IllegalArgumentException if one of the calibration mapping functions cannot be computed.
-    */
+  /**
+   * Estimate calibration coefficients. Reference color values will be clipped if reference color space is RGB and
+   * `clipReferenceRGB` is true.
+   *
+   * @param image input image to measure observed color value of chart's chips.
+   * @throws java.lang.IllegalArgumentException if one of the calibration mapping functions cannot be computed.
+   */
   def computeCalibrationMapping(image: ColorProcessor): CalibrationFit = {
     val observed = chart.averageChipColor(image)
     computeCalibrationMapping(observed)
   }
 
-  /** Estimate calibration coefficients. Reference color values will be clipped if reference color space is RGB and
-    * `clipReferenceRGB` is true.
-    *
-    * @param image input image to measure observed color value of chart's chips.
-    * @throws java.lang.IllegalArgumentException if one of the calibration mapping functions cannot be computed or
-    *                                            if the input image is not RGB or not a three slice stack of
-    *                                            gray level images.
-    */
+  /**
+   * Estimate calibration coefficients. Reference color values will be clipped if reference color space is RGB and
+   * `clipReferenceRGB` is true.
+   *
+   * @param image input image to measure observed color value of chart's chips.
+   * @throws java.lang.IllegalArgumentException if one of the calibration mapping functions cannot be computed or
+   *                                            if the input image is not RGB or not a three slice stack of
+   *                                            gray level images.
+   */
   def computeCalibrationMapping(image: ImagePlus): CalibrationFit = {
     (image.getType, image.getStackSize) match {
       case (COLOR_RGB, 1) =>
@@ -167,7 +180,9 @@ class ColorCalibrator(val chart: ColorChart,
         val src = (1 to 3).map(image.getStack.getProcessor).toArray
         computeCalibrationMapping(src)
       case _ =>
-        throw new IllegalArgumentException("Input image must be either single slice RGB image or three slice gray level image.")
+        throw new IllegalArgumentException(
+          "Input image must be either single slice RGB image or three slice gray level image."
+        )
     }
   }
 }

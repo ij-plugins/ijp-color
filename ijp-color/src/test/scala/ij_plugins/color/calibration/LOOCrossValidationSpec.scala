@@ -30,7 +30,6 @@ import org.scalatest.matchers.should.Matchers._
 
 import java.io.File
 
-
 class LOOCrossValidationSpec extends AnyFlatSpec {
 
   behavior of "LOOCrossValidation"
@@ -55,14 +54,17 @@ class LOOCrossValidationSpec extends AnyFlatSpec {
 
     // Do LOO validation
     val referenceColorSpaces = ReferenceColorSpace.values
-    val mappingMethods = MappingMethod.values
-    val crossValidations = LOOCrossValidation.crossValidationStatsAll(chart, observed, referenceColorSpaces, mappingMethods)
+    val mappingMethods       = MappingMethod.values
+    val crossValidations =
+      LOOCrossValidation.crossValidationStatsAll(chart, observed, referenceColorSpaces, mappingMethods)
 
     crossValidations should have length (referenceColorSpaces.length * mappingMethods.length)
 
     // Sort, best first
     val bestByMean = crossValidations.toArray.minBy(_.statsDeltaE.getMean)
-    println(s"Best by mean: ${bestByMean.method} - ${bestByMean.referenceColorSpace}: ${bestByMean.statsDeltaE.getMean} ")
+    println(
+      s"Best by mean: ${bestByMean.method} - ${bestByMean.referenceColorSpace}: ${bestByMean.statsDeltaE.getMean} "
+    )
     bestByMean.referenceColorSpace should be(ReferenceColorSpace.XYZ)
     bestByMean.method should be(MappingMethod.QuadraticCrossBand)
     bestByMean.statsDeltaE.getMean should be(4.854 +- 0.1)

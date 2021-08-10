@@ -25,8 +25,8 @@ package ij_plugins.color.ui.util
 import ij.gui.Roi
 
 /**
-  * Helps using LiveChartROI. Handles adding and removing ROI Listener
-  */
+ * Helps using LiveChartROI. Handles adding and removing ROI Listener
+ */
 trait LiveChartROIHelper {
   private var _liveChartROIOption: Option[LiveChartROI] = None
 

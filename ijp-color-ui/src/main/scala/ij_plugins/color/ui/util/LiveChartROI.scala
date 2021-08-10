@@ -33,31 +33,27 @@ import scalafx.geometry.Point2D
 import java.awt.Color
 
 object LiveChartROI {
-  def apply[T <: GridChartFrame](imp: ImagePlus,
-                                 referenceChart: ObjectProperty[Option[T]]): LiveChartROI = {
+  def apply[T <: GridChartFrame](imp: ImagePlus, referenceChart: ObjectProperty[Option[T]]): LiveChartROI = {
     // This a hack so we can pass `referenceChart` argument to `LiveChartROI` constructor without
     // compiler complaining about incorrect types. There may be some smarted way to deal with this. Suggestions welcomed.
     val _referenceChartFrameOption =
-    new ObjectProperty[Option[GridChartFrame]](this, "", referenceChart())
+      new ObjectProperty[Option[GridChartFrame]](this, "", referenceChart())
     _referenceChartFrameOption <== referenceChart
     new LiveChartROI(imp, _referenceChartFrameOption)
   }
 }
 
 /**
-  *
-  * @param imp Image which ROI is observed
-  */
-class LiveChartROI(imp: ImagePlus,
-                   referenceChart: ObjectProperty[Option[GridChartFrame]])
-  extends RoiListener {
+ * @param imp Image which ROI is observed
+ */
+class LiveChartROI(imp: ImagePlus, referenceChart: ObjectProperty[Option[GridChartFrame]]) extends RoiListener {
 
   private val overlyColor = new Color(255, 0, 255, 128)
 
-  private val _status = new ReadOnlyStringWrapper()
+  private val _status                = new ReadOnlyStringWrapper()
   val status: ReadOnlyStringProperty = _status.readOnlyProperty
 
-  private val _locatedChart = new ReadOnlyObjectWrapper[Option[GridChartFrame]](this, "locatedChart", None)
+  private val _locatedChart                                        = new ReadOnlyObjectWrapper[Option[GridChartFrame]](this, "locatedChart", None)
   val locatedChart: ReadOnlyObjectProperty[Option[GridChartFrame]] = _locatedChart.readOnlyProperty
 
   referenceChart.onChange((_, _, _) => updateChartLocation())
@@ -71,8 +67,8 @@ class LiveChartROI(imp: ImagePlus,
   }
 
   /**
-    * Check ROI in the current image and if valid update locatedChart. If invalid remove located chart.
-    */
+   * Check ROI in the current image and if valid update locatedChart. If invalid remove located chart.
+   */
   private def updateChartLocation(): Unit = {
 
     val roi = imp.getRoi
@@ -81,10 +77,10 @@ class LiveChartROI(imp: ImagePlus,
       case Some(refChart) if roi != null && roi.getType == Roi.POLYGON && roi.getPolygon.npoints == 4 =>
         val polygon = roi.getPolygon
         // Get location of the chart corners from the selected poly-line
-        val p0 = new Point2D(polygon.xpoints(0), polygon.ypoints(0))
-        val p1 = new Point2D(polygon.xpoints(1), polygon.ypoints(1))
-        val p2 = new Point2D(polygon.xpoints(2), polygon.ypoints(2))
-        val p3 = new Point2D(polygon.xpoints(3), polygon.ypoints(3))
+        val p0     = new Point2D(polygon.xpoints(0), polygon.ypoints(0))
+        val p1     = new Point2D(polygon.xpoints(1), polygon.ypoints(1))
+        val p2     = new Point2D(polygon.xpoints(2), polygon.ypoints(2))
+        val p3     = new Point2D(polygon.xpoints(3), polygon.ypoints(3))
         val points = Array(p0, p1, p2, p3)
 
         // Create alignment transform
@@ -103,10 +99,9 @@ class LiveChartROI(imp: ImagePlus,
     updateOverlay()
   }
 
-
   /**
-    * Update overlay displayed on ImagePlus
-    */
+   * Update overlay displayed on ImagePlus
+   */
   def updateOverlay(): Unit = {
     locatedChart() match {
       case Some(chart) =>

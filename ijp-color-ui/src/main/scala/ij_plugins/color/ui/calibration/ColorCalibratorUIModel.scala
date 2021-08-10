@@ -41,7 +41,6 @@ import java.util.concurrent.Future
 object ColorCalibratorUIModel {
   val HelpURL = "https://github.com/ij-plugins/ijp-color/wiki/Color-Calibrator"
 
-
   object Config {
 
     private val ReferencePrefix = classOf[Config].getName
@@ -49,38 +48,40 @@ object ColorCalibratorUIModel {
     def loadFromIJPref(): Option[Config] = {
       // We will use `null` to indicate missing values from Java API
       for {
-        referenceColorSpaceName <- Option(Prefs.get(ReferencePrefix + ".referenceColorSpace", null.asInstanceOf[String]))
+        referenceColorSpaceName <-
+          Option(Prefs.get(ReferencePrefix + ".referenceColorSpace", null.asInstanceOf[String]))
         referenceColorSpace <- ReferenceColorSpace.withNameOption(referenceColorSpaceName)
 
         mappingMethodName <- Option(Prefs.get(ReferencePrefix + ".mappingMethod", null.asInstanceOf[String]))
-        mappingMethod <- MappingMethod.withNameOption(mappingMethodName)
+        mappingMethod     <- MappingMethod.withNameOption(mappingMethodName)
 
-        chartName <- Option(Prefs.get(ReferencePrefix + ".chartName", null.asInstanceOf[String]))
-        chipMargin <- Option(Prefs.get(ReferencePrefix + ".chipMargin", null.asInstanceOf[Double]))
+        chartName     <- Option(Prefs.get(ReferencePrefix + ".chartName", null.asInstanceOf[String]))
+        chipMargin    <- Option(Prefs.get(ReferencePrefix + ".chipMargin", null.asInstanceOf[Double]))
         showExtraInfo <- Option(Prefs.get(ReferencePrefix + ".showExtraInfo", null.asInstanceOf[Boolean]))
-      } yield
-        Config(
-          referenceColorSpace,
-          mappingMethod,
-          chartName = chartName,
-          chipMargin = chipMargin,
-          showExtraInfo = showExtraInfo)
+      } yield Config(
+        referenceColorSpace,
+        mappingMethod,
+        chartName = chartName,
+        chipMargin = chipMargin,
+        showExtraInfo = showExtraInfo
+      )
     }
   }
 
   /**
-    *
-    * @param referenceColorSpace
-    * @param mappingMethod
-    * @param chartName name of a predefined chart from ij_plugins.color.calibration.chart.ColorCharts
-    * @param chipMargin
-    * @param showExtraInfo
-    */
-  case class Config(referenceColorSpace: ReferenceColorSpace,
-                    mappingMethod: MappingMethod,
-                    chartName: String,
-                    chipMargin: Double,
-                    showExtraInfo: Boolean) {
+   * @param referenceColorSpace
+   * @param mappingMethod
+   * @param chartName name of a predefined chart from ij_plugins.color.calibration.chart.ColorCharts
+   * @param chipMargin
+   * @param showExtraInfo
+   */
+  case class Config(
+    referenceColorSpace: ReferenceColorSpace,
+    mappingMethod: MappingMethod,
+    chartName: String,
+    chipMargin: Double,
+    showExtraInfo: Boolean
+  ) {
 
     import Config._
 
@@ -96,8 +97,8 @@ object ColorCalibratorUIModel {
 }
 
 /**
-  * Model for color calibrator UI.
-  */
+ * Model for color calibrator UI.
+ */
 class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends ModelFX with ShowMessage {
 
   import ColorCalibratorUIModel._
@@ -105,14 +106,14 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
   require(parentWindow != null, "Argument `parentStage` cannot be null.")
 
   val imageTitle = new StringProperty(this, "imageTitle", image.getTitle)
-  val referenceColorSpace = new ObjectProperty[ReferenceColorSpace](this, "referenceColorSpace", ReferenceColorSpace.sRGB)
+  val referenceColorSpace =
+    new ObjectProperty[ReferenceColorSpace](this, "referenceColorSpace", ReferenceColorSpace.sRGB)
   val referenceChartOption = new ObjectProperty[Option[GridColorChart]](this, "chart", None)
-  val chipMarginPercent = new ObjectProperty[Integer](this, "chipMargin", 20)
-  val mappingMethod = new ObjectProperty[MappingMethod](this, "mappingMethod", MappingMethod.LinearCrossBand)
-  val clipReferenceRGB = new BooleanProperty(this, "clipReferenceRGB", true)
-  val showExtraInfo = new BooleanProperty(this, "showExtraInfo", false)
-  val correctionRecipe = new ObjectProperty[Option[CorrectionRecipe]](this, "correctionRecipe", None)
-
+  val chipMarginPercent    = new ObjectProperty[Integer](this, "chipMargin", 20)
+  val mappingMethod        = new ObjectProperty[MappingMethod](this, "mappingMethod", MappingMethod.LinearCrossBand)
+  val clipReferenceRGB     = new BooleanProperty(this, "clipReferenceRGB", true)
+  val showExtraInfo        = new BooleanProperty(this, "showExtraInfo", false)
+  val correctionRecipe     = new ObjectProperty[Option[CorrectionRecipe]](this, "correctionRecipe", None)
 
   val liveChartROI: LiveChartROI = LiveChartROI(image, referenceChartOption)
 
@@ -133,12 +134,13 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
   private def currentChart: GridColorChart = {
     liveChartROI.locatedChart.value match {
       case Some(c) => c match {
-        case gcc: GridColorChart =>
-          gcc
-        case x =>
-          throw new IllegalStateException(
-            s"Internal error. Unexpected class type. Expecting ${classOf[GridColorChart]}, got ${x.getClass}")
-      }
+          case gcc: GridColorChart =>
+            gcc
+          case x =>
+            throw new IllegalStateException(
+              s"Internal error. Unexpected class type. Expecting ${classOf[GridColorChart]}, got ${x.getClass}"
+            )
+        }
       case None => throw new IllegalStateException(s"Internal error. Option is empty.")
 
     }
@@ -165,13 +167,12 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
     referenceChartOption() = Option(newValue)
   }
 
-
   def onRenderReferenceChart(): Unit = busyWorker.doTask("onRenderReferenceChart") { () =>
     renderReferenceChart(referenceChart).show()
   }
 
   def onShowReferenceColors(): Unit = busyWorker.doTask("onShowReferenceColors") { () =>
-    val rt = new ResultsTable()
+    val rt    = new ResultsTable()
     val chips = referenceChart.referenceChips
     for (i <- chips.indices) {
       rt.incrementCounter()
@@ -215,11 +216,13 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
   }
 
   def toConfig: Config = {
-    Config(referenceColorSpace.value,
+    Config(
+      referenceColorSpace.value,
       mappingMethod.value,
       currentChart.name: String,
       currentChart.chipMargin,
-      showExtraInfo.value)
+      showExtraInfo.value
+    )
   }
 
   def fromConfig(config: Config): Unit = {

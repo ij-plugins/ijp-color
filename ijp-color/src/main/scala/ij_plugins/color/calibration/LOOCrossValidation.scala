@@ -30,55 +30,62 @@ import ij_plugins.color.converter.ColorTriple.Lab
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
 
 /**
-  * @author Jarek Sacha
-  */
+ * @author Jarek Sacha
+ */
 object LOOCrossValidation {
 
   case class Deltas(deltaE: Double, deltaL: Double, deltaA: Double, deltaB: Double)
 
-  case class CrossValidationData(referenceColorSpace: ReferenceColorSpace,
-                                 method: MappingMethod,
-                                 statsDeltaE: DescriptiveStatistics,
-                                 statsDeltaL: DescriptiveStatistics,
-                                 statsDeltaA: DescriptiveStatistics,
-                                 statsDeltaB: DescriptiveStatistics)
+  case class CrossValidationData(
+    referenceColorSpace: ReferenceColorSpace,
+    method: MappingMethod,
+    statsDeltaE: DescriptiveStatistics,
+    statsDeltaL: DescriptiveStatistics,
+    statsDeltaA: DescriptiveStatistics,
+    statsDeltaB: DescriptiveStatistics
+  )
 
-  /** Compute leave-one-out error for each of the chips in the chart.
-    *
-    * The error for a given chip is computed by excluding that chip from a chart.
-    * Color corrector is computed using all but that selected chip, then a delta between value of that chip and
-    * color computed for that chip by the corrector is determined (square root of sum of squares of
-    * color components differences).
-    *
-    * @return deltas when each of the chips, in turn, is excluded.
-    *         Index of the delta is the same as of the excluded (test) chip.
-    */
-  def crossValidation(chart: ColorChart,
-                      referenceColorSpace: ReferenceColorSpace,
-                      mappingMethod: MappingMethod,
-                      image: ImagePlus): IndexedSeq[Deltas] = {
+  /**
+   * Compute leave-one-out error for each of the chips in the chart.
+   *
+   * The error for a given chip is computed by excluding that chip from a chart.
+   * Color corrector is computed using all but that selected chip, then a delta between value of that chip and
+   * color computed for that chip by the corrector is determined (square root of sum of squares of
+   * color components differences).
+   *
+   * @return deltas when each of the chips, in turn, is excluded.
+   *         Index of the delta is the same as of the excluded (test) chip.
+   */
+  def crossValidation(
+    chart: ColorChart,
+    referenceColorSpace: ReferenceColorSpace,
+    mappingMethod: MappingMethod,
+    image: ImagePlus
+  ): IndexedSeq[Deltas] = {
     val observed: Array[Array[Double]] = chart.averageChipColor(image)
 
     crossValidation(chart, referenceColorSpace, mappingMethod, observed)
   }
 
+  /**
+   * Compute leave-one-out error for each of the chips in the chart.
+   *
+   * The error for a given chip is computed by excluding that chip from a chart.
+   * Color corrector is computed using all but that selected chip, then a delta between value of that chip and
+   * color computed for that chip by the corrector is determined (square root of sum of squares of
+   * color components differences).
+   *
+   * @return deltas when each of the chips, in turn, is excluded. Each element in the sequence is
+   *         a tuple: (deltaE, deltaL, deltaA, deltaB)
+   */
+  def crossValidation(
+    chart: ColorChart,
+    referenceColorSpace: ReferenceColorSpace,
+    mappingMethod: MappingMethod,
+    observedSamples: Array[Array[Double]]
+  ): IndexedSeq[Deltas] = {
 
-  /** Compute leave-one-out error for each of the chips in the chart.
-    *
-    * The error for a given chip is computed by excluding that chip from a chart.
-    * Color corrector is computed using all but that selected chip, then a delta between value of that chip and
-    * color computed for that chip by the corrector is determined (square root of sum of squares of
-    * color components differences).
-    *
-    * @return deltas when each of the chips, in turn, is excluded. Each element in the sequence is
-    *         a tuple: (deltaE, deltaL, deltaA, deltaB)
-    */
-  def crossValidation(chart: ColorChart,
-                      referenceColorSpace: ReferenceColorSpace,
-                      mappingMethod: MappingMethod,
-                      observedSamples: Array[Array[Double]]): IndexedSeq[Deltas] = {
-
-    val n = chart.referenceChips.size
+    val n              = chart.referenceChips.size
     val expectedColors = chart.referenceColor(referenceColorSpace)
 
     for (i <- 0 until n) yield {
@@ -89,7 +96,7 @@ object LOOCrossValidation {
 
       // Compute color mapping coefficients
       val clipReferenceRGB = false
-      val colorCalibrator = new ColorCalibrator(leaveOneOutChart, referenceColorSpace, mappingMethod, clipReferenceRGB)
+      val colorCalibrator  = new ColorCalibrator(leaveOneOutChart, referenceColorSpace, mappingMethod, clipReferenceRGB)
 
       //      val fit = try {
       //        colorCalibrator.computeCalibrationMapping(chipMargin, image)
@@ -110,15 +117,14 @@ object LOOCrossValidation {
         (train.map(_._1), test(0)._1)
       }
 
-
-      val fit = colorCalibrator.computeCalibrationMapping(observedTrain)
+      val fit       = colorCalibrator.computeCalibrationMapping(observedTrain)
       val corrector = fit.corrector
 
       // Measure correction quality on the disabled chip
       // Computation of the mean is be done in L*a*b*
 
-      val correctedTest = corrector.map(observedTest)
-      val correctedTestLab = referenceColorSpace.toLab(correctedTest)
+      val correctedTest         = corrector.map(observedTest)
+      val correctedTestLab      = referenceColorSpace.toLab(correctedTest)
       val expectedColorLab: Lab = referenceColorSpace.toLab(expectedColors(i))
 
       val deltaL = math.abs(expectedColorLab.l - correctedTestLab.l)
@@ -133,25 +139,29 @@ object LOOCrossValidation {
     }
   }
 
-  def crossValidationStats(chart: ColorChart,
-                           referenceColorSpace: ReferenceColorSpace,
-                           mappingMethod: MappingMethod,
-                           image: ImagePlus): CrossValidationData = {
+  def crossValidationStats(
+    chart: ColorChart,
+    referenceColorSpace: ReferenceColorSpace,
+    mappingMethod: MappingMethod,
+    image: ImagePlus
+  ): CrossValidationData = {
 
     val observedSamples: Array[Array[Double]] = chart.averageChipColor(image)
 
     crossValidationStats(chart, referenceColorSpace, mappingMethod, observedSamples)
   }
 
-  def crossValidationStats(chart: ColorChart,
-                           referenceColorSpace: ReferenceColorSpace,
-                           mappingMethod: MappingMethod,
-                           observedSamples: Array[Array[Double]]): CrossValidationData = {
+  def crossValidationStats(
+    chart: ColorChart,
+    referenceColorSpace: ReferenceColorSpace,
+    mappingMethod: MappingMethod,
+    observedSamples: Array[Array[Double]]
+  ): CrossValidationData = {
     val _statsDeltaE = new DescriptiveStatistics()
     val _statsDeltaL = new DescriptiveStatistics()
     val _statsDeltaA = new DescriptiveStatistics()
     val _statsDeltaB = new DescriptiveStatistics()
-    val deltas = LOOCrossValidation.crossValidation(chart, referenceColorSpace, mappingMethod, observedSamples)
+    val deltas       = LOOCrossValidation.crossValidation(chart, referenceColorSpace, mappingMethod, observedSamples)
     deltas.foreach { case Deltas(deltaE, deltaL, deltaA, deltaB) =>
       _statsDeltaE.addValue(deltaE)
       _statsDeltaL.addValue(deltaL)
@@ -168,24 +178,29 @@ object LOOCrossValidation {
     )
   }
 
-  def crossValidationStatsAll(chart: ColorChart,
-                              image: ImagePlus,
-                              referenceColorSpaces: Seq[ReferenceColorSpace],
-                              mappingMethods: Seq[MappingMethod],
-                             ): Seq[CrossValidationData] = {
+  def crossValidationStatsAll(
+    chart: ColorChart,
+    image: ImagePlus,
+    referenceColorSpaces: Seq[ReferenceColorSpace],
+    mappingMethods: Seq[MappingMethod]
+  ): Seq[CrossValidationData] = {
+
     val observedSamples: Array[Array[Double]] = chart.averageChipColor(image)
 
     crossValidationStatsAll(chart, observedSamples, referenceColorSpaces, mappingMethods)
   }
 
+  def crossValidationStatsAll(
+    chart: ColorChart,
+    observedSamples: Array[Array[Double]],
+    referenceColorSpaces: Seq[ReferenceColorSpace],
+    mappingMethods: Seq[MappingMethod]
+  ): Seq[CrossValidationData] = {
 
-  def crossValidationStatsAll(chart: ColorChart,
-                              observedSamples: Array[Array[Double]],
-                              referenceColorSpaces: Seq[ReferenceColorSpace],
-                              mappingMethods: Seq[MappingMethod],
-                             ): Seq[CrossValidationData] = {
-    val refSpaceMethods = for (rcs <- referenceColorSpaces;
-                               method <- mappingMethods) yield (rcs, method)
+    val refSpaceMethods = for (
+      rcs    <- referenceColorSpaces;
+      method <- mappingMethods
+    ) yield (rcs, method)
 
     for (((rcs, _method), i) <- refSpaceMethods.zipWithIndex) yield {
       LOOCrossValidation.crossValidationStats(chart, rcs, _method, observedSamples)

@@ -26,10 +26,9 @@ import ij_plugins.color.calibration.regression.{CubicPolynomial, CubicPolynomial
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers._
 
-
 /**
-  * @author Jarek Sacha
-  */
+ * @author Jarek Sacha
+ */
 class CorrectorSpec extends AnyFlatSpec {
 
   "Corrector" should "map correctly" in {
@@ -94,7 +93,7 @@ class CorrectorSpec extends AnyFlatSpec {
     )
 
     val corrected = corrector.map(observed)
-     for (i <- 0 until expected.length) {
+    for (i <- 0 until expected.length) {
       for (j <- 0 until 3)
         corrected(i)(j) should be(expected(i)(j) +- 0.001)
     }

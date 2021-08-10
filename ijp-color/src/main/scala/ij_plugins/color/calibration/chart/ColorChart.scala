@@ -31,58 +31,59 @@ import ij_plugins.color.util.{IJTools, PerspectiveTransform}
 
 import scala.collection.immutable
 
-/** Generic color chart.
-  *
-  * It represents the reference parameters:
-  * <ul>
-  * <li>Color chip values</li>
-  * <li>Reference color space parameters like, reference, white, color value scaling, etc.</li>
-  * <li>Arrangement, location, and names of chips in the chart.</li>
-  * </ul>
-  *
-  * Contains information about location of the actual chart.
-  * This information is represented as an alignment transform between original chart coordinates (reference)
-  * and actual chart coordinates.
-  */
+/**
+ * Generic color chart.
+ *
+ * It represents the reference parameters:
+ * <ul>
+ * <li>Color chip values</li>
+ * <li>Reference color space parameters like, reference, white, color value scaling, etc.</li>
+ * <li>Arrangement, location, and names of chips in the chart.</li>
+ * </ul>
+ *
+ * Contains information about location of the actual chart.
+ * This information is represented as an alignment transform between original chart coordinates (reference)
+ * and actual chart coordinates.
+ */
 trait ColorChart {
 
   /** Reference white for for the reference color expressed in CIE XYZ. */
   def refWhite: ReferenceWhite = ReferenceWhite.D65
 
-  /** Default converter for transforming color values between different color spaces.
-    *
-    * Use it to ensure proper scaling for XYZ and RGB color space.
-    */
-  final val colorConverter = new ColorConverter(refWhite = refWhite,
-    rgbSpace = sRGB,
-    xyzScale = 100,
-    rgbScale = 255
-  )
+  /**
+   * Default converter for transforming color values between different color spaces.
+   *
+   * Use it to ensure proper scaling for XYZ and RGB color space.
+   */
+  final val colorConverter = new ColorConverter(refWhite = refWhite, rgbSpace = sRGB, xyzScale = 100, rgbScale = 255)
 
   /** Alignment between the reference chips and chips found in the actual chart. */
   def alignmentTransform: PerspectiveTransform
 
-  /** Compute average color within aligned chips from an RGB image.
-    *
-    * @param cp RGB image
-    */
+  /**
+   * Compute average color within aligned chips from an RGB image.
+   *
+   * @param cp RGB image
+   */
   def averageChipColor(cp: ColorProcessor): Array[Array[Double]] =
     averageChipColor(IJTools.splitRGB(cp))
 
-  /** Compute average color within aligned chips from an an image.
-    *
-    * Input images is represented by 3 bands. There is no assumption made about image color space.
-    *
-    * @param src image represented by 3 bands
-    */
+  /**
+   * Compute average color within aligned chips from an an image.
+   *
+   * Input images is represented by 3 bands. There is no assumption made about image color space.
+   *
+   * @param src image represented by 3 bands
+   */
   def averageChipColor[T <: ImageProcessor](src: Array[T]): Array[Array[Double]]
 
-  /** Compute average color within aligned chips from an an image.
-    *
-    * @param image is either single slice RGB image (ColorProcessor)
-    *              or three slices of gray processors representing color bands.
-    * @return average for each band in each color chip (array of triples).
-    */
+  /**
+   * Compute average color within aligned chips from an an image.
+   *
+   * @param image is either single slice RGB image (ColorProcessor)
+   *              or three slices of gray processors representing color bands.
+   * @return average for each band in each color chip (array of triples).
+   */
   def averageChipColor(image: ImagePlus): Array[Array[Double]] = {
     (image.getType, image.getStackSize) match {
       case (COLOR_RGB, 1) =>
@@ -92,15 +93,17 @@ trait ColorChart {
         val src = (1 to 3).map(image.getStack.getProcessor).toArray
         averageChipColor(src)
       case _ =>
-        throw new IllegalArgumentException("Input image must be either single slice RGB image or three slice gray level image.")
+        throw new IllegalArgumentException(
+          "Input image must be either single slice RGB image or three slice gray level image."
+        )
     }
   }
 
   /** Return reference colors represented in given color space. */
   def referenceColor(colorSpace: ReferenceColorSpace): Array[Array[Double]] = colorSpace match {
-    case ReferenceColorSpace.XYZ => referenceColorXYZ
+    case ReferenceColorSpace.XYZ  => referenceColorXYZ
     case ReferenceColorSpace.sRGB => referenceColorSRGB
-    case _ => throw new IllegalArgumentException("Unsupported reference color space: '" + colorSpace + "'.")
+    case _                        => throw new IllegalArgumentException("Unsupported reference color space: '" + colorSpace + "'.")
   }
 
   /** Return reference color expressed in CIE XYZ color space assuming default reference white for this chart. */
@@ -111,12 +114,13 @@ trait ColorChart {
     referenceColorXYZ.map(xyz => colorConverter.xyzToRGB(xyz(0), xyz(1), xyz(2)).toArray)
   }
 
-  /** Creates a copy of this chart in which some chips cn be enabled/disabled.
-    *
-    * @param enabled array with indexes corresponding to ones returned by `referenceColor` methods.
-    *                If value is `true` chip with corresponding index is enabled, if `false` it is disabled.
-    * @return
-    */
+  /**
+   * Creates a copy of this chart in which some chips cn be enabled/disabled.
+   *
+   * @param enabled array with indexes corresponding to ones returned by `referenceColor` methods.
+   *                If value is `true` chip with corresponding index is enabled, if `false` it is disabled.
+   * @return
+   */
   def copyWithEnableChips(enabled: Array[Boolean]): ColorChart
 
   /** Reference chips without transform applied to their coordinates. */

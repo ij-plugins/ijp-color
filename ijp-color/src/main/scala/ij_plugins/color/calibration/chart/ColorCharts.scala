@@ -25,17 +25,19 @@ package ij_plugins.color.calibration.chart
 import ij_plugins.color.converter.ColorTriple.Lab
 import ij_plugins.color.converter.ReferenceWhite
 
-
 /** Enumeration of some common color charts. */
 object ColorCharts {
 
-  /** GretagMacbeth ColorChecker with values measured by Robin D. Myers, average of two charts manufactured 2002-10.
-    *
-    * Illuminant D65.
-    * [[http://www.rmimaging.com/spectral_library/Reflective/Charts-Calibration/ColorChecker_2002-10_averaged.ss3.zip]]
-    */
+  /**
+   * GretagMacbeth ColorChecker with values measured by Robin D. Myers, average of two charts manufactured 2002-10.
+   *
+   * Illuminant D65.
+   * [[http://www.rmimaging.com/spectral_library/Reflective/Charts-Calibration/ColorChecker_2002-10_averaged.ss3.zip]]
+   */
   val GretagMacbethColorChecker = new GridColorChart(
-    "GretagMacbeth ColorChecker", 6, 4,
+    "GretagMacbeth ColorChecker",
+    6,
+    4,
     List(
       ("Dark skin", Lab(40.59, 14.68, 16.83)),
       ("Light skin", Lab(68.22, 22.21, 20.33)),
@@ -66,12 +68,16 @@ object ColorCharts {
     refWhite = ReferenceWhite.D65
   )
 
-  /** X-Rite Passport ColorChecker chart, based on the values from "ColorChecker Passport Technical Review"
-    *
-    * Illuminant D65.
-    * [[http://www.rmimaging.com/information/ColorChecker_Passport_Technical_Report.pdf]]
-    */
-  val XRitePassportColorChecker = new GridColorChart("X-Rite Passport", 6, 4,
+  /**
+   * X-Rite Passport ColorChecker chart, based on the values from "ColorChecker Passport Technical Review"
+   *
+   * Illuminant D65.
+   * [[http://www.rmimaging.com/information/ColorChecker_Passport_Technical_Report.pdf]]
+   */
+  val XRitePassportColorChecker = new GridColorChart(
+    "X-Rite Passport",
+    6,
+    4,
     List(
       ("Dark Skin", Lab(38.96, 12.13, 13.84)),
       ("Light Skin", Lab(65.50, 15.59, 16.81)),
@@ -102,13 +108,17 @@ object ColorCharts {
     refWhite = ReferenceWhite.D65
   )
 
-  /** Image Science ColorGauge Matte Neutral Patch Versions
-    * Data retrieved on 2019/01/08.
-    *
-    * Illuminant D50
-    * [[http://www.imagescienceassociates.com/mm5/pubs/Micro_Nano_Pico_Rez_TargetData.xls]]
-    */
-  val ImageScienceColorGaugeMatte = new GridColorChart("Image Science ColorGauge Matte", 6, 5,
+  /**
+   * Image Science ColorGauge Matte Neutral Patch Versions
+   * Data retrieved on 2019/01/08.
+   *
+   * Illuminant D50
+   * [[http://www.imagescienceassociates.com/mm5/pubs/Micro_Nano_Pico_Rez_TargetData.xls]]
+   */
+  val ImageScienceColorGaugeMatte = new GridColorChart(
+    "Image Science ColorGauge Matte",
+    6,
+    5,
     List(
       ("1", Lab(38.76, 13.81, 14.69)),
       ("2", Lab(65.15, 19.21, 17.92)),
@@ -139,12 +149,11 @@ object ColorCharts {
       ("27", Lab(29.51, 13.42, -47.69)),
       ("28", Lab(72.10, 19.51, 67.85)),
       ("29", Lab(72.50, -22.92, 56.08)),
-      ("30", Lab(30.32, 22.13, -19.02)),
+      ("30", Lab(30.32, 22.13, -19.02))
     ),
     chipMargin = 0,
     refWhite = ReferenceWhite.D50
   )
-
 
   /** All pre-defined color charts */
   val values = List(GretagMacbethColorChecker, XRitePassportColorChecker, ImageScienceColorGaugeMatte)

@@ -40,17 +40,14 @@ object ColorCalibratorPlugin {
 }
 
 /**
-  * ImageJ plugin for running image color calibration.
-  */
-class ColorCalibratorPlugin
-  extends PlugIn
-    with ImageListenerHelper
-    with LiveChartROIHelper {
+ * ImageJ plugin for running image color calibration.
+ */
+class ColorCalibratorPlugin extends PlugIn with ImageListenerHelper with LiveChartROIHelper {
 
   import ColorCalibratorPlugin._
 
   private var model: Option[ColorCalibratorUIModel] = None
-  private var dialogStage: Option[Stage] = None
+  private var dialogStage: Option[Stage]            = None
 
   def run(arg: String): Unit = {
     IJ.showStatus("Preparing UI for " + Title + "...")
@@ -64,7 +61,7 @@ class ColorCalibratorPlugin
 
     // Verify the input images is of correct type.
     (image.get.getType, image.get.getStackSize) match {
-      case (COLOR_RGB, 1) =>
+      case (COLOR_RGB, 1)               =>
       case (GRAY8 | GRAY16 | GRAY32, 3) =>
       case _ =>
         IJ.error(Title, "Unsupported image. It must be either single slice RGB image or three slice gray level image.")
@@ -132,12 +129,11 @@ class ColorCalibratorPlugin
     }
   }
 
-
   override protected def handleImageUpdated(): Unit = onFX {
     // Update image title
     model.foreach { m =>
       m.imageTitle() = image.getOrElse(new ImagePlus("<No Image>")).getTitle
-      //      m.resetROI()
+    //      m.resetROI()
     }
   }
 

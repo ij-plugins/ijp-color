@@ -35,21 +35,21 @@ object GridChartFrameUtils {
   }
 
   /**
-    * Measure ROIs in the source image. The images is assumed to consts of bands (slices).
-    * For `COLOR_RGB` (`ColorProcessor`) images there can be only one slice - it is interpreted as 3 bands:
-    * "Red", "Green", and "Blue".
-    * For images with "GRAY*" slices, each slice is interpreted as a "band".
-    *
-    * Measurements for each "ROI" are grouped together.
-    * Measurements are reported as `ImageStatistics`, so you have flexibility extracting desired measurement, like
-    * mean, area, min, max, and so on.
-    *
-    * @param imp  input image
-    * @param rois rois to measure
-    * @return ordered map of measurements: key are rois, values are measurement for each band.
-    *         Order corresponds to the order of input `rois`.
-    *         Values are ordered maps as well, where key is band name, and value is `ImageStatistics` for the roi.
-    */
+   * Measure ROIs in the source image. The images is assumed to consts of bands (slices).
+   * For `COLOR_RGB` (`ColorProcessor`) images there can be only one slice - it is interpreted as 3 bands:
+   * "Red", "Green", and "Blue".
+   * For images with "GRAY*" slices, each slice is interpreted as a "band".
+   *
+   * Measurements for each "ROI" are grouped together.
+   * Measurements are reported as `ImageStatistics`, so you have flexibility extracting desired measurement, like
+   * mean, area, min, max, and so on.
+   *
+   * @param imp  input image
+   * @param rois rois to measure
+   * @return ordered map of measurements: key are rois, values are measurement for each band.
+   *         Order corresponds to the order of input `rois`.
+   *         Values are ordered maps as well, where key is band name, and value is `ImageStatistics` for the roi.
+   */
   def measureRois(imp: ImagePlus, rois: IndexedSeq[Roi]): ListMap[Roi, ListMap[String, ImageStatistics]] = {
 
     // So safety remember original ROI in the source image
@@ -60,14 +60,14 @@ object GridChartFrameUtils {
       case ImagePlus.COLOR_RGB =>
         val cp = imp.getProcessor.asInstanceOf[ColorProcessor]
         ListMap(
-          "Red" -> cp.getChannel(1, null),
+          "Red"   -> cp.getChannel(1, null),
           "Green" -> cp.getChannel(2, null),
-          "Blue" -> cp.getChannel(3, null),
+          "Blue"  -> cp.getChannel(3, null)
         )
       case _ =>
         val stack = imp.getStack
         val slices = for (i <- 1 to stack.getSize) yield {
-          val ip = stack.getProcessor(i)
+          val ip    = stack.getProcessor(i)
           val label = stack.getSliceLabel(i)
           (label, ip)
         }
@@ -85,7 +85,6 @@ object GridChartFrameUtils {
           }
         (roi, bandStats)
       }
-
 
     // Restore ROI
     imp.setRoi(impRoi)

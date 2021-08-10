@@ -59,15 +59,15 @@ package object calibration {
   }
 
   def renderReferenceChart(referenceChart: GridColorChart): ImagePlus = {
-    val scale = 80
+    val scale  = 80
     val margin = 0.1 * scale
 
-    val chart = referenceChart.copyWithNewChipMargin(0.1).copyWith(new PerspectiveTransform())
-    val maxX = chart.referenceOutline.map(_.getX).max * scale
-    val maxY = chart.referenceOutline.map(_.getY).max * scale
-    val width: Int = (maxX + 2 * margin).toInt
+    val chart       = referenceChart.copyWithNewChipMargin(0.1).copyWith(new PerspectiveTransform())
+    val maxX        = chart.referenceOutline.map(_.getX).max * scale
+    val maxY        = chart.referenceOutline.map(_.getY).max * scale
+    val width: Int  = (maxX + 2 * margin).toInt
     val height: Int = (maxY + 2 * margin).toInt
-    val cp = new ColorProcessor(width, height)
+    val cp          = new ColorProcessor(width, height)
     cp.setColor(Color.BLACK)
     cp.fill()
     val converter = chart.colorConverter
@@ -76,7 +76,7 @@ package object calibration {
       val outline = chip.outline
       val xPoints = outline.map(p => (margin + p.getX * scale).toInt).toArray
       val yPoints = outline.map(p => (margin + p.getY * scale).toInt).toArray
-      val roi = new PolygonRoi(new Polygon(xPoints, yPoints, xPoints.length), Roi.POLYGON)
+      val roi     = new PolygonRoi(new Polygon(xPoints, yPoints, xPoints.length), Roi.POLYGON)
       cp.setRoi(roi)
       // Color
       val color = {
@@ -94,35 +94,38 @@ package object calibration {
           Array(margin.toInt, (maxX + margin).toInt, (maxX + margin).toInt, margin.toInt),
           Array(margin.toInt, margin.toInt, (maxY + margin).toInt, (maxY + margin).toInt),
           4
-        ), Roi.POLYGON
+        ),
+        Roi.POLYGON
       )
     )
     imp
   }
 
   /**
-    * Convert floating point color bands to an RGB image (24-bit ColorProcessor)
-    *
-    * @param bands      color bands
-    * @param colorSpace color space of the `bands`
-    * @param converter  color converter, used if color space is XYZ
-    * @return RGB color image
-    */
-  def convertToSRGB(bands: Array[FloatProcessor],
-                    colorSpace: ReferenceColorSpace,
-                    converter: ColorConverter): ImagePlus = {
+   * Convert floating point color bands to an RGB image (24-bit ColorProcessor)
+   *
+   * @param bands      color bands
+   * @param colorSpace color space of the `bands`
+   * @param converter  color converter, used if color space is XYZ
+   * @return RGB color image
+   */
+  def convertToSRGB(
+    bands: Array[FloatProcessor],
+    colorSpace: ReferenceColorSpace,
+    converter: ColorConverter
+  ): ImagePlus = {
     colorSpace match {
       case ReferenceColorSpace.sRGB => new ImagePlus("", IJTools.mergeRGB(bands))
-      case ReferenceColorSpace.XYZ =>
+      case ReferenceColorSpace.XYZ  =>
         // Convert XYZ to sRGB
         val cp = new ColorProcessor(bands(0).getWidth, bands(0).getHeight)
-        val n = bands(0).getWidth * bands(0).getHeight
+        val n  = bands(0).getWidth * bands(0).getHeight
         for (i <- new ParRange(0 until n)) {
-          val rgb = converter.xyzToRGB(bands(0).getf(i), bands(1).getf(i), bands(2).getf(i))
-          val r = clipUInt8(rgb.r)
-          val g = clipUInt8(rgb.g)
-          val b = clipUInt8(rgb.b)
-          val color = ((r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF) << 0)
+          val rgb   = converter.xyzToRGB(bands(0).getf(i), bands(1).getf(i), bands(2).getf(i))
+          val r     = clipUInt8(rgb.r)
+          val g     = clipUInt8(rgb.g)
+          val b     = clipUInt8(rgb.b)
+          val color = ((r & 0xff) << 16) | ((g & 0xff) << 8) | ((b & 0xff) << 0)
           cp.set(i, color)
         }
         new ImagePlus("", cp)
@@ -130,22 +133,27 @@ package object calibration {
     }
   }
 
-  def applyCorrection(recipe: CorrectionRecipe,
-                      imp: ImagePlus,
-                      showError: (String, String, Throwable) => Unit): Option[Array[FloatProcessor]] = {
-    val correctedBands = try {
-      recipe.corrector.map(imp)
-    } catch {
-      case t: Throwable =>
-        showError("Error while color correcting the image.", t.getMessage, t)
-        return None
-    }
+  def applyCorrection(
+    recipe: CorrectionRecipe,
+    imp: ImagePlus,
+    showError: (String, String, Throwable) => Unit
+  ): Option[Array[FloatProcessor]] = {
+    val correctedBands =
+      try {
+        recipe.corrector.map(imp)
+      } catch {
+        case t: Throwable =>
+          showError("Error while color correcting the image.", t.getMessage, t)
+          return None
+      }
 
     // Show floating point stack in the reference color space
     val correctedInReference = {
       val stack = new ImageStack(imp.getWidth, imp.getHeight)
       (recipe.referenceColorSpace.bandsNames zip correctedBands).foreach(v => stack.addSlice(v._1, v._2))
-      val mode = if (recipe.referenceColorSpace == ReferenceColorSpace.sRGB) CompositeImage.COMPOSITE else CompositeImage.GRAYSCALE
+      val mode =
+        if (recipe.referenceColorSpace == ReferenceColorSpace.sRGB) CompositeImage.COMPOSITE
+        else CompositeImage.GRAYSCALE
       new CompositeImage(new ImagePlus(imp.getTitle + "+corrected_" + recipe.referenceColorSpace, stack), mode)
     }
     correctedInReference.show()
@@ -157,6 +165,5 @@ package object calibration {
 
     Option(correctedBands)
   }
-
 
 }

@@ -37,9 +37,9 @@ import java.text.DecimalFormat
 object ColorValueUI {
 
   private class NumberTextField extends TextField {
-    private val format = new DecimalFormat("0.000000")
+    private val format    = new DecimalFormat("0.000000")
     private val converter = new FormatStringConverter[Number](format)
-    val model = new TextFormatter(converter)
+    val model             = new TextFormatter(converter)
     textFormatter = model
   }
 
@@ -69,7 +69,6 @@ class ColorValueUI {
       updating = false
     }
   }
-
 
   val control = new HBox {
     children ++= Seq(band1NTF, band2NTF, band3NTF)

@@ -36,25 +36,26 @@ import scalafx.stage.Window
 
 object SuggestCalibrationOptionsTask {
 
-  private case class CrossValidationData(referenceColorSpace: ReferenceColorSpace,
-                                         method: MappingMethod,
-                                         statsDeltaE: DescriptiveStatistics,
-                                         statsDeltaL: DescriptiveStatistics,
-                                         statsDeltaA: DescriptiveStatistics,
-                                         statsDeltaB: DescriptiveStatistics)
+  private case class CrossValidationData(
+    referenceColorSpace: ReferenceColorSpace,
+    method: MappingMethod,
+    statsDeltaE: DescriptiveStatistics,
+    statsDeltaL: DescriptiveStatistics,
+    statsDeltaA: DescriptiveStatistics,
+    statsDeltaB: DescriptiveStatistics
+  )
 
 }
 
-class SuggestCalibrationOptionsTask(chart: GridColorChart,
-                                    image: ImagePlus,
-                                    val parentWindow: Option[Window]) extends SimpleTask[Unit] with ShowMessage {
+class SuggestCalibrationOptionsTask(chart: GridColorChart, image: ImagePlus, val parentWindow: Option[Window])
+    extends SimpleTask[Unit]
+    with ShowMessage {
 
   def call(): Unit = {
 
-
     IJ.showStatus("Computing cross validations...")
-    val crossValidations = LOOCrossValidation.crossValidationStatsAll(chart, image,
-      ReferenceColorSpace.values, MappingMethod.values)
+    val crossValidations =
+      LOOCrossValidation.crossValidationStatsAll(chart, image, ReferenceColorSpace.values, MappingMethod.values)
 
     val best = crossValidations.minBy(_.statsDeltaE.getMean)
     IJ.showStatus("Best: " + best.referenceColorSpace + ":" + best.method + " -> " + best.statsDeltaE.getMean)
@@ -75,7 +76,6 @@ class SuggestCalibrationOptionsTask(chart: GridColorChart,
     }
     rt.show(image.getTitle + " Method LOO Cross Validation Error")
 
-
     // Show chart with comparison of results
     //    val data: Seq[ValueErrorEntry] = hSorted.flatMap { m =>
     //      Seq(ValueErrorEntry("Delta E", m.referenceColorSpace + " + " + m.method, m.statsDeltaE.getMean, m.statsDeltaE.getStandardDeviation),
@@ -84,7 +84,12 @@ class SuggestCalibrationOptionsTask(chart: GridColorChart,
     //        ValueErrorEntry("Delta b*", m.referenceColorSpace + " + " + m.method, m.statsDeltaB.getMean, m.statsDeltaB.getStandardDeviation))
     //    }
     val data = hSorted.map { m =>
-      ValueErrorEntry("Delta E", s"${m.referenceColorSpace} + ${m.method}", m.statsDeltaE.getMean, m.statsDeltaE.getStandardDeviation)
+      ValueErrorEntry(
+        "Delta E",
+        s"${m.referenceColorSpace} + ${m.method}",
+        m.statsDeltaE.getMean,
+        m.statsDeltaE.getStandardDeviation
+      )
     }.toIndexedSeq
     PlotUtils.createBarErrorPlot(
       title = "Method Comparison by Cross-Validation: " + image.getTitle,

@@ -72,5 +72,3 @@ case object ReferenceWhite extends Enum[ReferenceWhite] {
   /** All predefined reference whites. */
   val values: immutable.IndexedSeq[ReferenceWhite] = findValues
 }
-
-

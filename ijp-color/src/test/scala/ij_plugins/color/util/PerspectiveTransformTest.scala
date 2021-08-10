@@ -46,7 +46,7 @@ class PerspectiveTransformTest extends AnyFlatSpec {
     )
 
     val alignmentTransform = PerspectiveTransform.quadToQuad(referenceQuad, deformedQuad)
-    val pm = alignmentTransform.transform(point2D(3, 2))
+    val pm                 = alignmentTransform.transform(point2D(3, 2))
 
     pm.getX should be(317.07786 +- 0.00001)
     pm.getY should be(199.30959 +- 0.00001)

@@ -33,20 +33,20 @@ import java.net.URL
 object ColorFXUI {
 
   /**
-    * Return string representing URL to stylesheet used by `ColorFXUI` user interface.
-    *
-    * Returns empty string if stylesheet is not present.
-    */
+   * Return string representing URL to stylesheet used by `ColorFXUI` user interface.
+   *
+   * Returns empty string if stylesheet is not present.
+   */
   def stylesheets: Seq[String] = List(
     "ijp-color.css"
   ).flatMap(check(_).map(_.toExternalForm))
 
   /**
-    * Show `node` in a new window.
-    *
-    * @param node        node to show.
-    * @param windowTitle window title.
-    */
+   * Show `node` in a new window.
+   *
+   * @param node        node to show.
+   * @param windowTitle window title.
+   */
   def showInNewWindow(node: Node, windowTitle: String): Unit = {
     Platform.runLater {
       val dialogStage = new Stage() {

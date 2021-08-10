@@ -25,10 +25,10 @@ package ij_plugins.color.ui.util
 import ij.{ImageListener, ImagePlus}
 
 /**
-  * Helps managing use of [[ij.ImageListener]]
-  *
-  * Use of the helper is responsible for calling `setupImageListener` and `removeImageListener`
-  */
+ * Helps managing use of [[ij.ImageListener]]
+ *
+ * Use of the helper is responsible for calling `setupImageListener` and `removeImageListener`
+ */
 trait ImageListenerHelper {
 
   private var imageListener: Option[ImageListener] = None
@@ -36,18 +36,15 @@ trait ImageListenerHelper {
   /** Image of interest, when changed `handleImageUpdated` or `handleImageClosed` will be called. */
   protected var image: Option[ImagePlus] = None
 
-
   /**
-    * Called when the image is updated
-    */
+   * Called when the image is updated
+   */
   protected def handleImageUpdated(): Unit
 
-
   /**
-    * Called when the image is closed
-    */
+   * Called when the image is closed
+   */
   protected def handleImageClosed(): Unit
-
 
   protected def setupImageListener(): Unit = {
 
@@ -76,11 +73,10 @@ trait ImageListenerHelper {
     ImagePlus.addImageListener(imageListener.get)
   }
 
-
   protected def removeImageListener(): Unit = {
     imageListener match {
       case Some(il) => ImagePlus.removeImageListener(il)
-      case _ =>
+      case _        =>
     }
   }
 }

@@ -28,8 +28,8 @@ import org.scalatest.flatspec.AnyFlatSpec
 import java.awt.geom.Point2D
 
 /**
-  * @author Jarek Sacha
-  */
+ * @author Jarek Sacha
+ */
 class ChartGridSpec extends AnyFlatSpec {
 
   "ChartGrid" should "locate chips with 0 margin" in {
@@ -43,7 +43,7 @@ class ChartGridSpec extends AnyFlatSpec {
     )
 
     val chartGrid = new ChartGrid(6, 4)
-    val chip = chartGrid.chipAt(1, 1, margin)
+    val chip      = chartGrid.chipAt(1, 1, margin)
 
     assert(expected.length === chip.length)
 
@@ -61,7 +61,7 @@ class ChartGridSpec extends AnyFlatSpec {
     )
 
     val chartGrid = new ChartGrid(6, 4)
-    val chip = chartGrid.chipAt(1, 1, margin)
+    val chip      = chartGrid.chipAt(1, 1, margin)
 
     assert(expected.length === chip.length)
 
@@ -70,8 +70,8 @@ class ChartGridSpec extends AnyFlatSpec {
 
   it should "locate chips with different column and row margin" in {
 
-    val c = 1
-    val r = 2
+    val c       = 1
+    val r       = 2
     val cMargin = 0.1
     val rMargin = 0.25
     val expected = Array(
@@ -82,19 +82,16 @@ class ChartGridSpec extends AnyFlatSpec {
     )
 
     val chartGrid = new ChartGrid(6, 4)
-    val chip = chartGrid.chipAt(c, r, cMargin, rMargin)
+    val chip      = chartGrid.chipAt(c, r, cMargin, rMargin)
 
     assert(expected.length === chip.length)
 
     expected.zip(chip).foreach(v => assertEquals(v._1, v._2, 0.0001))
   }
 
-
   def assertEquals(expected: Point2D, actual: Point2D, tolerance: Double): Unit = {
-    assert(math.abs(expected.getX - actual.getX) <= tolerance,
-      "Expecting x=" + expected.getX + ", got " + actual.getX)
-    assert(math.abs(expected.getY - actual.getY) <= tolerance,
-      "Expecting y=" + expected.getY + ", got " + actual.getY)
+    assert(math.abs(expected.getX - actual.getX) <= tolerance, "Expecting x=" + expected.getX + ", got " + actual.getX)
+    assert(math.abs(expected.getY - actual.getY) <= tolerance, "Expecting y=" + expected.getY + ", got " + actual.getY)
   }
 
 }

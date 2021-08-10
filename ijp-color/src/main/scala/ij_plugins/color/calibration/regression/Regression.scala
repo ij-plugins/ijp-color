@@ -28,39 +28,53 @@ import org.apache.commons.math3.stat.regression.OLSMultipleLinearRegression
 object Regression {
 
   /** Result returned by regression methods. */
-  case class Result(var beta: Array[Double],
-                    var rSquared: Double,
-                    var adjustedRSquared: Double,
-                    var regressandVariance: Double,
-                    var regressionStandardError: Double)
+  case class Result(
+    var beta: Array[Double],
+    var rSquared: Double,
+    var adjustedRSquared: Double,
+    var regressandVariance: Double,
+    var regressionStandardError: Double
+  )
 
-  /** Compute linear fit coefficient
-    * {{{
-    *   s = A*o.
-    * }}}
-    *
-    * @param standard    array of expected output values.
-    * @param observation array of input values
-    * @return linear fit coefficients
-    * @see #regression(double[], double[][], boolean)
-    */
+  /**
+   * Compute linear fit coefficient
+   * {{{
+   *   s = A*o.
+   * }}}
+   *
+   * @param standard    array of expected output values.
+   * @param observation array of input values
+   * @return linear fit coefficients
+   * @see #regression(double[], double[][], boolean)
+   */
   def regression(standard: Array[Double], observation: Array[Array[Double]]): Regression.Result = {
     regression(standard, observation, noIntercept = true)
   }
 
-  /** Compute linear fit coefficient `s = A*o` if `noIntercept` is true or `s = A*o + b` if `noIntercept` is `false`.
-    *
-    * @param standard    array of expected output values.
-    * @param observation array of input values
-    * @param noIntercept true means the model is to be estimated without an intercept term
-    * @return linear fit coefficients
-    */
-  def regression(standard: Array[Double], observation: Array[Array[Double]], noIntercept: Boolean): Regression.Result = {
+  /**
+   * Compute linear fit coefficient `s = A*o` if `noIntercept` is true or `s = A*o + b` if `noIntercept` is `false`.
+   *
+   * @param standard    array of expected output values.
+   * @param observation array of input values
+   * @param noIntercept true means the model is to be estimated without an intercept term
+   * @return linear fit coefficients
+   */
+  def regression(
+    standard: Array[Double],
+    observation: Array[Array[Double]],
+    noIntercept: Boolean
+  ): Regression.Result = {
     require(standard != null, "Argument `standard` cannot be null.")
     require(observation != null, "Argument `observation` cannot be null.")
     require(observation.length == standard.length)
-    require(observation.length == standard.length, s"observation.length=${observation.length} must equal standard.length=${standard.length}.")
-    require(observation.length > observation(0).length, s"observation.length=${observation.length} must be greater than observation(0).length={observation(0).length}.")
+    require(
+      observation.length == standard.length,
+      s"observation.length=${observation.length} must equal standard.length=${standard.length}."
+    )
+    require(
+      observation.length > observation(0).length,
+      s"observation.length=${observation.length} must be greater than observation(0).length={observation(0).length}."
+    )
 
     val regression = new OLSMultipleLinearRegression()
     regression.setNoIntercept(noIntercept)
