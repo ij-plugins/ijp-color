@@ -22,22 +22,77 @@
 
 package ij_plugins.color.ui.calibration
 
-import ij.ImagePlus
 import ij.measure.ResultsTable
 import ij.plugin.BrowserLauncher
-import ij_plugins.color.calibration.chart.{GridColorChart, ReferenceColorSpace}
+import ij.{ImagePlus, Prefs}
+import ij_plugins.color.calibration.chart.{ColorCharts, GridColorChart, ReferenceColorSpace}
 import ij_plugins.color.calibration.regression.MappingMethod
 import ij_plugins.color.calibration.{CorrectionRecipe, renderReferenceChart}
 import ij_plugins.color.ui.calibration.tasks.{ApplyToCurrentImageTask, CalibrateTask, SuggestCalibrationOptionsTask}
 import ij_plugins.color.ui.util.LiveChartROI
 import javafx.beans.property.ReadOnlyBooleanProperty
 import org.scalafx.extras.mvcfx.ModelFX
-import org.scalafx.extras.{BusyWorker, ShowMessage}
+import org.scalafx.extras.{BusyWorker, ShowMessage, onFX}
 import scalafx.beans.property._
 import scalafx.stage.Window
 
+import java.util.concurrent.Future
+
 object ColorCalibratorUIModel {
   val HelpURL = "https://github.com/ij-plugins/ijp-color/wiki/Color-Calibrator"
+
+
+  object Config {
+
+    private val ReferencePrefix = classOf[Config].getName
+
+    def loadFromIJPref(): Option[Config] = {
+      // We will use `null` to indicate missing values from Java API
+      for {
+        referenceColorSpaceName <- Option(Prefs.get(ReferencePrefix + ".referenceColorSpace", null.asInstanceOf[String]))
+        referenceColorSpace <- ReferenceColorSpace.withNameOption(referenceColorSpaceName)
+
+        mappingMethodName <- Option(Prefs.get(ReferencePrefix + ".mappingMethod", null.asInstanceOf[String]))
+        mappingMethod <- MappingMethod.withNameOption(mappingMethodName)
+
+        chartName <- Option(Prefs.get(ReferencePrefix + ".chartName", null.asInstanceOf[String]))
+        chipMargin <- Option(Prefs.get(ReferencePrefix + ".chipMargin", null.asInstanceOf[Double]))
+        showExtraInfo <- Option(Prefs.get(ReferencePrefix + ".showExtraInfo", null.asInstanceOf[Boolean]))
+      } yield
+        Config(
+          referenceColorSpace,
+          mappingMethod,
+          chartName = chartName,
+          chipMargin = chipMargin,
+          showExtraInfo = showExtraInfo)
+    }
+  }
+
+  /**
+    *
+    * @param referenceColorSpace
+    * @param mappingMethod
+    * @param chartName name of a predefined chart from ij_plugins.color.calibration.chart.ColorCharts
+    * @param chipMargin
+    * @param showExtraInfo
+    */
+  case class Config(referenceColorSpace: ReferenceColorSpace,
+                    mappingMethod: MappingMethod,
+                    chartName: String,
+                    chipMargin: Double,
+                    showExtraInfo: Boolean) {
+
+    import Config._
+
+    def saveToIJPref(): Unit = {
+      Prefs.set(ReferencePrefix + ".referenceColorSpace", referenceColorSpace.entryName)
+      Prefs.set(ReferencePrefix + ".mappingMethod", mappingMethod.entryName)
+      Prefs.set(ReferencePrefix + ".chartName", chartName)
+      Prefs.set(ReferencePrefix + ".chipMargin", s"$chipMargin")
+      Prefs.set(ReferencePrefix + ".showExtraInfo", s"$showExtraInfo")
+    }
+
+  }
 }
 
 /**
@@ -142,7 +197,13 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
   }
 
   def onCalibrate(): Unit = busyWorker.doTask("onCalibrate") {
-    new CalibrateTask(correctionRecipe, referenceColorSpace, mappingMethod, image, currentChart, showExtraInfo, Option(parentWindow))
+    new CalibrateTask(referenceColorSpace, mappingMethod, image, currentChart, showExtraInfo, Option(parentWindow)) {
+      override def onFinish(result: Future[Option[CorrectionRecipe]], successful: Boolean): Unit = {
+        if (successful) onFX {
+          correctionRecipe.value = result.get()
+        }
+      }
+    }
   }
 
   def onApplyToCurrentImage(): Unit = busyWorker.doTask("onApplyToCurrentImage") {
@@ -151,5 +212,30 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
 
   def onHelp(): Unit = busyWorker.doTask("onHelp") { () =>
     BrowserLauncher.openURL(HelpURL)
+  }
+
+  def toConfig: Config = {
+    Config(referenceColorSpace.value,
+      mappingMethod.value,
+      currentChart.name: String,
+      currentChart.chipMargin,
+      showExtraInfo.value)
+  }
+
+  def fromConfig(config: Config): Unit = {
+    onFX {
+      referenceColorSpace.value = config.referenceColorSpace
+      mappingMethod.value = config.mappingMethod
+      showExtraInfo.value = config.showExtraInfo
+
+      ColorCharts.values
+        .find(c => c.name == config.chartName)
+        .foreach { c =>
+          referenceChart = c
+        }
+
+      chipMarginPercent.value = math.round(config.chipMargin * 100).toInt
+      updateChipMarginPercent()
+    }
   }
 }

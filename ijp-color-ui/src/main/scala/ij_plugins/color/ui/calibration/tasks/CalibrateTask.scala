@@ -50,17 +50,14 @@ import scalafx.stage.{Stage, Window}
 import java.net.URL
 
 
-class CalibrateTask(correctionRecipe: ObjectProperty[Option[CorrectionRecipe]],
-                    referenceColorSpace: ObjectProperty[ReferenceColorSpace],
+class CalibrateTask(referenceColorSpace: ObjectProperty[ReferenceColorSpace],
                     mappingMethod: ObjectProperty[MappingMethod],
                     image: ImagePlus,
                     chart: GridColorChart,
                     showExtraInfo: BooleanProperty,
-                    val parentWindow: Option[Window]) extends SimpleTask[Unit] with ShowMessage {
+                    val parentWindow: Option[Window]) extends SimpleTask[Option[CorrectionRecipe]] with ShowMessage {
 
-  def call(): Unit = {
-
-    correctionRecipe() = None
+  def call(): Option[CorrectionRecipe] = {
 
     // Compute color mapping coefficients
     val clipReferenceRGB = false
@@ -71,7 +68,7 @@ class CalibrateTask(correctionRecipe: ObjectProperty[Option[CorrectionRecipe]],
     } catch {
       case t: Throwable =>
         showException("Error while computing color calibration.", t.getMessage, t)
-        return
+        return None
     }
 
     val recipe = CorrectionRecipe(
@@ -81,12 +78,10 @@ class CalibrateTask(correctionRecipe: ObjectProperty[Option[CorrectionRecipe]],
       imageType = image.getType
     )
 
-    correctionRecipe() = Option(recipe)
-
     val correctedBands = applyCorrection(recipe, image, showException) match {
       case Some(cb) => cb
       case None =>
-        return
+        return None
     }
 
     if (showExtraInfo()) {
@@ -211,6 +206,8 @@ class CalibrateTask(correctionRecipe: ObjectProperty[Option[CorrectionRecipe]],
         "\n"
       )
     }
+
+    Option(recipe)
   }
 
   private def showColorErrorChart(x: Array[Array[Double]],

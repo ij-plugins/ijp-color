@@ -34,6 +34,8 @@ import scalafx.scene.control._
 import scalafx.scene.layout.GridPane
 import scalafxml.core.macros.sfxml
 
+import java.util.concurrent.atomic.AtomicBoolean
+
 /**
   * Binds ColorCalibrator FXML to UI model.
   */
@@ -63,10 +65,22 @@ class ColorCalibratorUIController(private val imageTitleLabel: Label,
 
   // Reference chart
   chartTypeChoiceBox.items = ObservableBuffer.from(ColorCharts.values)
-  chartTypeChoiceBox.value.onChange { (_, oldValue, newValue) =>
-    model.selectReferenceChart(newValue)
+
+  private val chartIsChanging = new AtomicBoolean(false)
+  chartTypeChoiceBox.selectionModel().selectedItem.onChange { (_, oldValue, newValue) =>
+    chartIsChanging.synchronized {
+      if (!chartIsChanging.getAndSet(true)) {
+        model.selectReferenceChart(newValue)
+      }
+      chartIsChanging.set(false)
+    }
   }
   chartTypeChoiceBox.selectionModel().selectFirst()
+
+  model.referenceChartOption.onChange { (_, _, newValue) =>
+    newValue.foreach(c => chartTypeChoiceBox.selectionModel().select(c))
+  }
+
 
   renderReferenceChartSplitButton.onAction = _ => model.onRenderReferenceChart()
   renderReferenceChartSplitButton.items = List(

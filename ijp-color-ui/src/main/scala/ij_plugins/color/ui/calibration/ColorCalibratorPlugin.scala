@@ -25,6 +25,7 @@ package ij_plugins.color.ui.calibration
 import ij.ImagePlus.{COLOR_RGB, GRAY16, GRAY32, GRAY8}
 import ij.plugin.PlugIn
 import ij.{IJ, ImagePlus}
+import ij_plugins.color.ui.calibration.ColorCalibratorUIModel.Config
 import ij_plugins.color.ui.fx.{ColorFXUI, imageJIconAsFXImage, initializeFX}
 import ij_plugins.color.ui.util.{ImageListenerHelper, LiveChartROIHelper}
 import org.scalafx.extras._
@@ -34,6 +35,10 @@ import scalafx.stage.Stage
 
 import scala.util.control.NonFatal
 
+object ColorCalibratorPlugin {
+  private final val Title = "Color Calibrator"
+}
+
 /**
   * ImageJ plugin for running image color calibration.
   */
@@ -42,7 +47,7 @@ class ColorCalibratorPlugin
     with ImageListenerHelper
     with LiveChartROIHelper {
 
-  private final val Title = "Color Calibrator"
+  import ColorCalibratorPlugin._
 
   private var model: Option[ColorCalibratorUIModel] = None
   private var dialogStage: Option[Stage] = None
@@ -95,23 +100,34 @@ class ColorCalibratorPlugin
       )
 
       val mvc = new ColorCalibratorUI(image.get, dialogStage.get)
-      model = Some(mvc.model)
+      model = Option(mvc.model)
       val mainView = mvc.view
       dialogStage.get.scene = new Scene {
         stylesheets ++= ColorFXUI.stylesheets
         root = mainView
       }
+
       IJ.showStatus("")
       dialogStage.get.show()
 
       setupImageListener()
       setupROIListener(mvc.model.liveChartROI)
 
+      // Load previous options, if available
+      Config
+        .loadFromIJPref()
+        .foreach { config =>
+          mvc.model.fromConfig(config)
+        }
+
       dialogStage.get.onCloseRequest = () => {
-        // TODO Remove image listener
-        // TODO Remove ROI listener
+        // Remove image listener
         removeImageListener()
+        // Remove ROI listener
         removeROIListener()
+
+        // Save current UI selections
+        mvc.model.toConfig.saveToIJPref()
       }
     }
   }
@@ -129,4 +145,5 @@ class ColorCalibratorPlugin
     //    model.foreach(_.resetROI())
     dialogStage.foreach(_.hide())
   }
+
 }
