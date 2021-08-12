@@ -33,27 +33,27 @@ import scalafx.geometry.Point2D
 import java.awt.Color
 
 object LiveChartROI {
-  def apply[T <: GridChartFrame](imp: ImagePlus, referenceChart: ObjectProperty[Option[T]]): LiveChartROI = {
+  def apply[T <: GridChartFrame](imp: ImagePlus, referenceChart: ReadOnlyObjectProperty[Option[T]]): LiveChartROI = {
     // This a hack so we can pass `referenceChart` argument to `LiveChartROI` constructor without
     // compiler complaining about incorrect types. There may be some smarted way to deal with this. Suggestions welcomed.
     val _referenceChartFrameOption =
-      new ObjectProperty[Option[GridChartFrame]](this, "", referenceChart())
+    new ObjectProperty[Option[GridChartFrame]](this, "", referenceChart())
     _referenceChartFrameOption <== referenceChart
     new LiveChartROI(imp, _referenceChartFrameOption)
   }
 }
 
 /**
- * @param imp Image which ROI is observed
- */
-class LiveChartROI(imp: ImagePlus, referenceChart: ObjectProperty[Option[GridChartFrame]]) extends RoiListener {
+  * @param imp Image which ROI is observed
+  */
+class LiveChartROI(imp: ImagePlus, referenceChart: ReadOnlyObjectProperty[Option[GridChartFrame]]) extends RoiListener {
 
   private val overlyColor = new Color(255, 0, 255, 128)
 
-  private val _status                = new ReadOnlyStringWrapper()
+  private val _status = new ReadOnlyStringWrapper()
   val status: ReadOnlyStringProperty = _status.readOnlyProperty
 
-  private val _locatedChart                                        = new ReadOnlyObjectWrapper[Option[GridChartFrame]](this, "locatedChart", None)
+  private val _locatedChart = new ReadOnlyObjectWrapper[Option[GridChartFrame]](this, "locatedChart", None)
   val locatedChart: ReadOnlyObjectProperty[Option[GridChartFrame]] = _locatedChart.readOnlyProperty
 
   referenceChart.onChange((_, _, _) => updateChartLocation())

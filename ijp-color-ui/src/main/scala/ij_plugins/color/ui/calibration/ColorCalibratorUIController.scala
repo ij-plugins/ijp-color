@@ -22,7 +22,7 @@
 
 package ij_plugins.color.ui.calibration
 
-import ij_plugins.color.calibration.chart.{ColorCharts, GridColorChart, ReferenceColorSpace}
+import ij_plugins.color.calibration.chart.{ColorChartType, ReferenceColorSpace}
 import ij_plugins.color.calibration.regression.MappingMethod
 import ij_plugins.color.ui.util.IJPUtils
 import org.scalafx.extras.mvcfx.ControllerFX
@@ -37,24 +37,24 @@ import scalafxml.core.macros.sfxml
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
- * Binds ColorCalibrator FXML to UI model.
- */
+  * Binds ColorCalibrator FXML to UI model.
+  */
 @sfxml
 class ColorCalibratorUIController(
-  private val imageTitleLabel: Label,
-  private val chartTypeChoiceBox: ChoiceBox[GridColorChart],
-  private val renderReferenceChartSplitButton: SplitMenuButton,
-  private val marginsSpinner: Spinner[java.lang.Integer],
-  private val referenceColorSpaceChoiceBox: ChoiceBox[ReferenceColorSpace],
-  private val enableExtraInfoCB: CheckBox,
-  private val mappingMethodChoiceBox: ChoiceBox[MappingMethod],
-  private val suggestCalibrationOptionsButton: Button,
-  private val calibrateButton: Button,
-  private val applyToCurrentImageButton: Button,
-  private val helpButton: Button,
-  private val rootGridPane: GridPane,
-  private val model: ColorCalibratorUIModel
-) extends ControllerFX {
+                                   private val imageTitleLabel: Label,
+                                   private val chartTypeChoiceBox: ChoiceBox[ColorChartType],
+                                   private val renderReferenceChartSplitButton: SplitMenuButton,
+                                   private val marginsSpinner: Spinner[java.lang.Integer],
+                                   private val referenceColorSpaceChoiceBox: ChoiceBox[ReferenceColorSpace],
+                                   private val enableExtraInfoCB: CheckBox,
+                                   private val mappingMethodChoiceBox: ChoiceBox[MappingMethod],
+                                   private val suggestCalibrationOptionsButton: Button,
+                                   private val calibrateButton: Button,
+                                   private val applyToCurrentImageButton: Button,
+                                   private val helpButton: Button,
+                                   private val rootGridPane: GridPane,
+                                   private val model: ColorCalibratorUIModel
+                                 ) extends ControllerFX {
 
   // Dialog header
   private val headerNode = IJPUtils.createHeaderNode(
@@ -67,21 +67,21 @@ class ColorCalibratorUIController(
   imageTitleLabel.text <== model.imageTitle
 
   // Reference chart
-  chartTypeChoiceBox.items = ObservableBuffer.from(ColorCharts.values)
+  chartTypeChoiceBox.items = ObservableBuffer.from(ColorChartType.values)
 
   private val chartIsChanging = new AtomicBoolean(false)
   chartTypeChoiceBox.selectionModel().selectedItem.onChange { (_, oldValue, newValue) =>
     chartIsChanging.synchronized {
       if (!chartIsChanging.getAndSet(true)) {
-        model.selectReferenceChart(newValue)
+        model.selectReferenceChartType(newValue)
       }
       chartIsChanging.set(false)
     }
   }
   chartTypeChoiceBox.selectionModel().selectFirst()
 
-  model.referenceChartOption.onChange { (_, _, newValue) =>
-    newValue.foreach(c => chartTypeChoiceBox.selectionModel().select(c))
+  model.referenceChartType.onChange { (_, _, newValue) =>
+    chartTypeChoiceBox.selectionModel().select(newValue)
   }
 
   renderReferenceChartSplitButton.onAction = _ => model.onRenderReferenceChart()

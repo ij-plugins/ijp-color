@@ -25,7 +25,7 @@ package ij_plugins.color.ui.calibration
 import ij.measure.ResultsTable
 import ij.plugin.BrowserLauncher
 import ij.{ImagePlus, Prefs}
-import ij_plugins.color.calibration.chart.{ColorCharts, GridColorChart, ReferenceColorSpace}
+import ij_plugins.color.calibration.chart.{ColorChartType, ColorCharts, GridColorChart, ReferenceColorSpace}
 import ij_plugins.color.calibration.regression.MappingMethod
 import ij_plugins.color.calibration.{CorrectionRecipe, renderReferenceChart}
 import ij_plugins.color.ui.calibration.tasks.{ApplyToCurrentImageTask, CalibrateTask, SuggestCalibrationOptionsTask}
@@ -40,6 +40,7 @@ import java.util.concurrent.Future
 
 object ColorCalibratorUIModel {
   val HelpURL = "https://github.com/ij-plugins/ijp-color/wiki/Color-Calibrator"
+  val Title = "IJP Color Calibrator"
 
   object Config {
 
@@ -47,48 +48,57 @@ object ColorCalibratorUIModel {
 
     def loadFromIJPref(): Option[Config] = {
       // We will use `null` to indicate missing values from Java API
+
+      {
+        val colorChartTypeName = Option(Prefs.get(ReferencePrefix + ".colorChartType", null.asInstanceOf[String]))
+        val colorChartType = ColorChartType.withNameOption(colorChartTypeName.get)
+        println(colorChartType)
+      }
+
       for {
         referenceColorSpaceName <-
           Option(Prefs.get(ReferencePrefix + ".referenceColorSpace", null.asInstanceOf[String]))
         referenceColorSpace <- ReferenceColorSpace.withNameOption(referenceColorSpaceName)
 
         mappingMethodName <- Option(Prefs.get(ReferencePrefix + ".mappingMethod", null.asInstanceOf[String]))
-        mappingMethod     <- MappingMethod.withNameOption(mappingMethodName)
+        mappingMethod <- MappingMethod.withNameOption(mappingMethodName)
 
-        chartName     <- Option(Prefs.get(ReferencePrefix + ".chartName", null.asInstanceOf[String]))
-        chipMargin    <- Option(Prefs.get(ReferencePrefix + ".chipMargin", null.asInstanceOf[Double]))
+        colorChartTypeName <- Option(Prefs.get(ReferencePrefix + ".colorChartType", null.asInstanceOf[String]))
+        colorChartType <- ColorChartType.withNameOption(colorChartTypeName)
+
+        chipMargin <- Option(Prefs.get(ReferencePrefix + ".chipMargin", null.asInstanceOf[Double]))
         showExtraInfo <- Option(Prefs.get(ReferencePrefix + ".showExtraInfo", null.asInstanceOf[Boolean]))
       } yield Config(
         referenceColorSpace,
         mappingMethod,
-        chartName = chartName,
-        chipMargin = chipMargin,
-        showExtraInfo = showExtraInfo
+        colorChartType,
+        chipMargin,
+        showExtraInfo
       )
     }
   }
 
   /**
-   * @param referenceColorSpace
-   * @param mappingMethod
-   * @param chartName name of a predefined chart from ij_plugins.color.calibration.chart.ColorCharts
-   * @param chipMargin
-   * @param showExtraInfo
-   */
+    * @param referenceColorSpace
+    * @param mappingMethod
+    * @param chartName name of a predefined chart from ij_plugins.color.calibration.chart.ColorCharts
+    * @param chipMargin
+    * @param showExtraInfo
+    */
   case class Config(
-    referenceColorSpace: ReferenceColorSpace,
-    mappingMethod: MappingMethod,
-    chartName: String,
-    chipMargin: Double,
-    showExtraInfo: Boolean
-  ) {
+                     referenceColorSpace: ReferenceColorSpace,
+                     mappingMethod: MappingMethod,
+                     colorChartType: ColorChartType,
+                     chipMargin: Double,
+                     showExtraInfo: Boolean
+                   ) {
 
     import Config._
 
     def saveToIJPref(): Unit = {
       Prefs.set(ReferencePrefix + ".referenceColorSpace", referenceColorSpace.entryName)
       Prefs.set(ReferencePrefix + ".mappingMethod", mappingMethod.entryName)
-      Prefs.set(ReferencePrefix + ".chartName", chartName)
+      Prefs.set(ReferencePrefix + ".colorChartType", colorChartType.entryName)
       Prefs.set(ReferencePrefix + ".chipMargin", s"$chipMargin")
       Prefs.set(ReferencePrefix + ".showExtraInfo", s"$showExtraInfo")
     }
@@ -108,12 +118,26 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
   val imageTitle = new StringProperty(this, "imageTitle", image.getTitle)
   val referenceColorSpace =
     new ObjectProperty[ReferenceColorSpace](this, "referenceColorSpace", ReferenceColorSpace.sRGB)
-  val referenceChartOption = new ObjectProperty[Option[GridColorChart]](this, "chart", None)
-  val chipMarginPercent    = new ObjectProperty[Integer](this, "chipMargin", 20)
-  val mappingMethod        = new ObjectProperty[MappingMethod](this, "mappingMethod", MappingMethod.LinearCrossBand)
-  val clipReferenceRGB     = new BooleanProperty(this, "clipReferenceRGB", true)
-  val showExtraInfo        = new BooleanProperty(this, "showExtraInfo", false)
-  val correctionRecipe     = new ObjectProperty[Option[CorrectionRecipe]](this, "correctionRecipe", None)
+
+  // Parameters defining chart, beside ROI that will be handled by `liveChartROI`
+  val referenceChartType = new ObjectProperty[ColorChartType](this, "chart", ColorChartType.XRitePassportColorChecker)
+  referenceChartType.onChange { (_, _, _) =>
+    recreateReferenceChart()
+  }
+  val chipMarginPercent = new ObjectProperty[Integer](this, "chipMargin", 20)
+  chipMarginPercent.onChange { (_, _, _) =>
+    recreateReferenceChart()
+  }
+
+  // This is a derived value that needs to be updated when UI selections change: `referenceChartType` and `chipMarginPercent`
+  private val referenceChartOptionWrapper = new ReadOnlyObjectWrapper[Option[GridColorChart]](this, "chart", None)
+  val referenceChartOption: ReadOnlyObjectProperty[Option[GridColorChart]] =
+    referenceChartOptionWrapper.readOnlyProperty
+
+  val mappingMethod = new ObjectProperty[MappingMethod](this, "mappingMethod", MappingMethod.LinearCrossBand)
+  val clipReferenceRGB = new BooleanProperty(this, "clipReferenceRGB", true)
+  val showExtraInfo = new BooleanProperty(this, "showExtraInfo", false)
+  val correctionRecipe = new ObjectProperty[Option[CorrectionRecipe]](this, "correctionRecipe", None)
 
   val liveChartROI: LiveChartROI = LiveChartROI(image, referenceChartOption)
 
@@ -131,16 +155,26 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
     p.getReadOnlyProperty
   }
 
+  recreateReferenceChart()
+
+  def recreateReferenceChart(): Unit = {
+    val chartOpt =
+      ColorCharts
+        .withColorChartType(referenceChartType.value)
+        .map(c => c.copyWithNewChipMargin(chipMarginPercent.value / 100d))
+    referenceChartOptionWrapper.value = chartOpt
+  }
+
   private def currentChart: GridColorChart = {
     liveChartROI.locatedChart.value match {
       case Some(c) => c match {
-          case gcc: GridColorChart =>
-            gcc
-          case x =>
-            throw new IllegalStateException(
-              s"Internal error. Unexpected class type. Expecting ${classOf[GridColorChart]}, got ${x.getClass}"
-            )
-        }
+        case gcc: GridColorChart =>
+          gcc
+        case x =>
+          throw new IllegalStateException(
+            s"Internal error. Unexpected class type. Expecting ${classOf[GridColorChart]}, got ${x.getClass}"
+          )
+      }
       case None => throw new IllegalStateException(s"Internal error. Option is empty.")
 
     }
@@ -148,49 +182,52 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
 
   private val busyWorker: BusyWorker = new BusyWorker("Color Calibrator", parentWindow)
 
-  chipMarginPercent.onChange { (_, _, _) =>
-    updateChipMarginPercent()
-  }
-
-  private def updateChipMarginPercent(): Unit = {
-    referenceChart = referenceChart.copyWithNewChipMargin(chipMarginPercent() / 100d)
-  }
-
-  def selectReferenceChart(newValue: GridColorChart): Unit = {
-    referenceChart = newValue
-    updateChipMarginPercent()
-  }
-
-  private def referenceChart = referenceChartOption().get
-
-  private def referenceChart_=(newValue: GridColorChart): Unit = {
-    referenceChartOption() = Option(newValue)
+  def selectReferenceChartType(newValue: ColorChartType): Unit = {
+    referenceChartType.value = newValue
   }
 
   def onRenderReferenceChart(): Unit = busyWorker.doTask("onRenderReferenceChart") { () =>
-    renderReferenceChart(referenceChart).show()
+    referenceChartOption.value match {
+      case Some(referenceChart) =>
+        renderReferenceChart(referenceChart).show()
+      case None =>
+        showError(
+          Title,
+          "Internal error: Reference Chart not defined to render.",
+          "Report the error in project issue tracker at https://github.com/ij-plugins/ijp-color/issues"
+        )
+    }
   }
 
   def onShowReferenceColors(): Unit = busyWorker.doTask("onShowReferenceColors") { () =>
-    val rt    = new ResultsTable()
-    val chips = referenceChart.referenceChips
-    for (i <- chips.indices) {
-      rt.incrementCounter()
-      rt.setLabel(chips(i).name, i)
-      val lab = chips(i).color
-      val xyz = referenceChart.colorConverter.toXYZ(lab)
-      val rgb = referenceChart.colorConverter.toRGB(xyz)
-      rt.setValue("CIE L*", i, lab.l)
-      rt.setValue("CIE a*", i, lab.a)
-      rt.setValue("CIE b*", i, lab.b)
-      rt.setValue("CIE X", i, xyz.x)
-      rt.setValue("CIE Y", i, xyz.y)
-      rt.setValue("CIE Z", i, xyz.z)
-      rt.setValue("sRGB R", i, rgb.r)
-      rt.setValue("sRGB G", i, rgb.g)
-      rt.setValue("sRGB B", i, rgb.b)
+    referenceChartOption.value match {
+      case Some(referenceChart) =>
+        val rt = new ResultsTable()
+        val chips = referenceChart.referenceChips
+        for (i <- chips.indices) {
+          rt.incrementCounter()
+          rt.setLabel(chips(i).name, i)
+          val lab = chips(i).color
+          val xyz = referenceChart.colorConverter.toXYZ(lab)
+          val rgb = referenceChart.colorConverter.toRGB(xyz)
+          rt.setValue("CIE L*", i, lab.l)
+          rt.setValue("CIE a*", i, lab.a)
+          rt.setValue("CIE b*", i, lab.b)
+          rt.setValue("CIE X", i, xyz.x)
+          rt.setValue("CIE Y", i, xyz.y)
+          rt.setValue("CIE Z", i, xyz.z)
+          rt.setValue("sRGB R", i, rgb.r)
+          rt.setValue("sRGB G", i, rgb.g)
+          rt.setValue("sRGB B", i, rgb.b)
+        }
+        rt.show(referenceChart.name + " / " + referenceChart.refWhite)
+      case None =>
+        showError(
+          Title,
+          "Internal error: Reference Chart not defined to show color reference.",
+          "Report the error in project issue tracker at https://github.com/ij-plugins/ijp-color/issues"
+        )
     }
-    rt.show(referenceChart.name + " / " + referenceChart.refWhite)
   }
 
   def onSuggestCalibrationOptions(): Unit = busyWorker.doTask("onSuggestCalibrationOptions") {
@@ -219,8 +256,8 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
     Config(
       referenceColorSpace.value,
       mappingMethod.value,
-      currentChart.name: String,
-      currentChart.chipMargin,
+      referenceChartType.value,
+      chipMarginPercent.value / 100d,
       showExtraInfo.value
     )
   }
@@ -230,15 +267,8 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
       referenceColorSpace.value = config.referenceColorSpace
       mappingMethod.value = config.mappingMethod
       showExtraInfo.value = config.showExtraInfo
-
-      ColorCharts.values
-        .find(c => c.name == config.chartName)
-        .foreach { c =>
-          referenceChart = c
-        }
-
+      referenceChartType.value = config.colorChartType
       chipMarginPercent.value = math.round(config.chipMargin * 100).toInt
-      updateChipMarginPercent()
     }
   }
 }

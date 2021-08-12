@@ -35,7 +35,7 @@ object ColorCharts {
    * [[http://www.rmimaging.com/spectral_library/Reflective/Charts-Calibration/ColorChecker_2002-10_averaged.ss3.zip]]
    */
   val GretagMacbethColorChecker = new GridColorChart(
-    "GretagMacbeth ColorChecker",
+    ColorChartType.GretagMacbethColorChecker.name,
     6,
     4,
     List(
@@ -75,7 +75,7 @@ object ColorCharts {
    * [[http://www.rmimaging.com/information/ColorChecker_Passport_Technical_Report.pdf]]
    */
   val XRitePassportColorChecker = new GridColorChart(
-    "X-Rite Passport",
+    ColorChartType.XRitePassportColorChecker.name,
     6,
     4,
     List(
@@ -116,7 +116,7 @@ object ColorCharts {
    * [[http://www.imagescienceassociates.com/mm5/pubs/Micro_Nano_Pico_Rez_TargetData.xls]]
    */
   val ImageScienceColorGaugeMatte = new GridColorChart(
-    "Image Science ColorGauge Matte",
+    ColorChartType.ImageScienceColorGaugeMatte.name,
     6,
     5,
     List(
@@ -157,4 +157,9 @@ object ColorCharts {
 
   /** All pre-defined color charts */
   val values = List(GretagMacbethColorChecker, XRitePassportColorChecker, ImageScienceColorGaugeMatte)
+
+  def withColorChartType(colorChartType: ColorChartType): Option[GridColorChart] = {
+    require(colorChartType != null, "'colorChartType' cannot be null.")
+    values.find(_.name == colorChartType.name)
+  }
 }
