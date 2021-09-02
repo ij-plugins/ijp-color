@@ -20,7 +20,7 @@
  * Latest release available at https://github.com/ij-plugins/ijp-color/
  */
 
-package ij_plugins.color.ui.util
+package ij_plugins.color.ui.charttool
 
 import ij.gui._
 import ij.measure.ResultsTable
@@ -28,6 +28,7 @@ import ij.plugin.PlugIn
 import ij.process.ImageStatistics
 import ij.{IJ, ImagePlus}
 import ij_plugins.color.calibration.chart.{GridChartFrame, GridChartFrameUtils}
+import ij_plugins.color.ui.util.{IJPUtils, ImageListenerHelper, LiveChartROI, LiveChartROIHelper}
 import ij_plugins.color.util.{IJTools, PerspectiveTransform}
 import scalafx.beans.property.ObjectProperty
 
@@ -38,7 +39,8 @@ import scala.collection.immutable.ListMap
 object ColorChartToolPlugin {
 
   private var sendToROIManager: Boolean = true
-  private var measureChips: Boolean     = true
+  private var measureChips: Boolean = true
+  private var listChipVertices: Boolean = false
 }
 
 /**
@@ -97,6 +99,10 @@ class ColorChartToolPlugin extends PlugIn with DialogListener with ImageListener
       if (measureChips) {
         doMeasureChips(imp, chart)
       }
+
+      if (listChipVertices) {
+        doListChipVertices(imp.getTitle, chart)
+      }
     }
   }
 
@@ -110,6 +116,8 @@ class ColorChartToolPlugin extends PlugIn with DialogListener with ImageListener
       addMessage("")
       addCheckbox("Send chip ROI to ROI Manager", sendToROIManager)
       addCheckbox("Measure chips", measureChips)
+      addCheckbox("List_chip_vertices", listChipVertices)
+
       addHelp("https://github.com/ij-plugins/ijp-color/wiki/Color-Chart-ROI-Tool")
     }
     gd.addDialogListener(this)
@@ -142,6 +150,7 @@ class ColorChartToolPlugin extends PlugIn with DialogListener with ImageListener
 
     sendToROIManager = gd.getNextBoolean
     measureChips = gd.getNextBoolean
+    listChipVertices = gd.getNextBoolean
 
     chartOption.nonEmpty
   }
@@ -186,17 +195,33 @@ class ColorChartToolPlugin extends PlugIn with DialogListener with ImageListener
       }
     }
 
-    rt.show("Chip Measurements")
+    rt.show(imp.getTitle + " - Chip Measurements")
+  }
+
+  private def doListChipVertices(imageTitle: String, chart: GridChartFrame): Unit = {
+    val rt = new ResultsTable()
+
+    chart.alignedChipROIs.foreach { roi =>
+      rt.incrementCounter()
+      rt.addValue("Chip", roi.getName)
+      val poly = roi.getPolygon
+      for (i <- 0 until poly.npoints) {
+        rt.addValue(s"x$i", poly.xpoints(i))
+        rt.addValue(s"y$i", poly.ypoints(i))
+      }
+    }
+
+    rt.show(imageTitle + " - Chip Vertices")
   }
 
   private def statsToMap(stats: ImageStatistics): ListMap[String, Double] = {
     ListMap(
-      "Area"     -> stats.area,
-      "Mean"     -> stats.mean,
-      "Median"   -> stats.median,
-      "Min"      -> stats.min,
-      "Max"      -> stats.max,
-      "StdDev"   -> stats.stdDev,
+      "Area" -> stats.area,
+      "Mean" -> stats.mean,
+      "Median" -> stats.median,
+      "Min" -> stats.min,
+      "Max" -> stats.max,
+      "StdDev" -> stats.stdDev,
       "Kurtosis" -> stats.kurtosis,
       "Skewness" -> stats.skewness
     )
