@@ -44,6 +44,8 @@ class ColorCalibratorUIController(
                                    private val imageTitleLabel: Label,
                                    private val chartTypeChoiceBox: ChoiceBox[ColorChartType],
                                    private val renderReferenceChartSplitButton: SplitMenuButton,
+                                   private val chartInfoLabel: Label,
+                                   private val editChartButton: Button,
                                    private val marginsSpinner: Spinner[java.lang.Integer],
                                    private val referenceColorSpaceChoiceBox: ChoiceBox[ReferenceColorSpace],
                                    private val enableExtraInfoCB: CheckBox,
@@ -90,6 +92,13 @@ class ColorCalibratorUIController(
       onAction = _ => model.onShowReferenceColors()
     }
   )
+
+  renderReferenceChartSplitButton.disable <== !model.referenceChartDefined
+
+  editChartButton.onAction = _ => model.onEditChart()
+  editChartButton.disable <== !model.referenceChartEditEnabled
+
+  chartInfoLabel.text <== model.chartInfoText
 
   // Actual chart
   marginsSpinner.valueFactory = new IntegerSpinnerValueFactory(0, 49) {

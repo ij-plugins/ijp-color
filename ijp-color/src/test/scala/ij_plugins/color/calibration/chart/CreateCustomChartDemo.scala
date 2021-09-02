@@ -22,38 +22,25 @@
 
 package ij_plugins.color.calibration.chart
 
-import org.scalatest.flatspec.AnyFlatSpec
-import org.scalatest.matchers.should.Matchers._
+import ij_plugins.color.converter.ReferenceWhite
 
 import java.io.File
 
-class ColorChartsTest extends AnyFlatSpec {
+object CreateCustomChartDemo {
 
-  behavior of "ColorCharts"
-
-  it should "correspond to unique names" in {
-
-    val chartNames = ColorCharts.values.map(_.name)
-
-    chartNames.distinct should contain theSameElementsAs chartNames
+  def main(args: Array[String]): Unit = {
+    val colorChart = createCustomChart()
+    println(colorChart)
   }
 
-  it should "have value for each ColorChartType" in {
+  def createCustomChart(): GridColorChart = {
+    val chartName = "Custom Color Gauge"
+    val nbColumns = 6
+    val nbRows = 5
+    val chipsList = ColorCharts.loadReferenceValues(new File("../test/data/Color_Gauge_Chart_3.csv"))
+    val chipMargin = 0
+    val referenceWhite = ReferenceWhite.D50
 
-    ColorChartType
-      .values
-      .filter(c => c != ColorChartType.Custom)
-      .forall(t => ColorCharts.withColorChartType(t).isDefined) should be(true)
+    new GridColorChart(chartName, nbColumns, nbRows, chipsList, chipMargin, referenceWhite)
   }
-
-  it should "read reference values from a file" in {
-    val srcFile = new File("../test/data/Color_Gauge_Chart_3.csv")
-    assert(srcFile.exists())
-
-    val chipsList = ColorCharts.loadReferenceValues(srcFile)
-
-    chipsList.size should be(30)
-
-  }
-
 }

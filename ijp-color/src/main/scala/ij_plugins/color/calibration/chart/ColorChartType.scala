@@ -39,6 +39,8 @@ case object ColorChartType extends Enum[ColorChartType] {
 
   case object ImageScienceColorGaugeMatte extends ColorChartType("Image Science ColorGauge Matte")
 
+  case object Custom extends ColorChartType("Custom")
+
   /** All refined reference color spaces. */
   val values: immutable.IndexedSeq[ColorChartType] = findValues
 }

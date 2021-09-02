@@ -22,12 +22,14 @@
 
 package ij_plugins.color.ui.calibration
 
+import ij.gui.GenericDialog
 import ij.measure.ResultsTable
 import ij.plugin.BrowserLauncher
 import ij.{ImagePlus, Prefs}
 import ij_plugins.color.calibration.chart.{ColorChartType, ColorCharts, GridColorChart, ReferenceColorSpace}
 import ij_plugins.color.calibration.regression.MappingMethod
 import ij_plugins.color.calibration.{CorrectionRecipe, renderReferenceChart}
+import ij_plugins.color.converter.ReferenceWhite
 import ij_plugins.color.ui.calibration.tasks.{ApplyToCurrentImageTask, CalibrateTask, SuggestCalibrationOptionsTask}
 import ij_plugins.color.ui.util.LiveChartROI
 import javafx.beans.property.ReadOnlyBooleanProperty
@@ -36,6 +38,7 @@ import org.scalafx.extras.{BusyWorker, ShowMessage, onFX}
 import scalafx.beans.property._
 import scalafx.stage.Window
 
+import java.io.File
 import java.util.concurrent.Future
 
 object ColorCalibratorUIModel {
@@ -124,15 +127,26 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
   referenceChartType.onChange { (_, _, _) =>
     recreateReferenceChart()
   }
-  val chipMarginPercent = new ObjectProperty[Integer](this, "chipMargin", 20)
-  chipMarginPercent.onChange { (_, _, _) =>
-    recreateReferenceChart()
-  }
 
   // This is a derived value that needs to be updated when UI selections change: `referenceChartType` and `chipMarginPercent`
   private val referenceChartOptionWrapper = new ReadOnlyObjectWrapper[Option[GridColorChart]](this, "chart", None)
   val referenceChartOption: ReadOnlyObjectProperty[Option[GridColorChart]] =
     referenceChartOptionWrapper.readOnlyProperty
+
+  private val referenceChartDefinedWrapper = new ReadOnlyBooleanWrapper()
+  val referenceChartDefined: ReadOnlyBooleanProperty = referenceChartDefinedWrapper.readOnlyProperty
+
+  private val referenceChartEditEnabledWrapper = new ReadOnlyBooleanWrapper()
+  val referenceChartEditEnabled: ReadOnlyBooleanProperty = referenceChartEditEnabledWrapper.readOnlyProperty
+
+  private var customChartOption: Option[GridColorChart] = None
+
+  val chartInfoText = new StringProperty("???")
+
+  val chipMarginPercent = new ObjectProperty[Integer](this, "chipMargin", 20)
+  chipMarginPercent.onChange { (_, _, _) =>
+    recreateReferenceChart()
+  }
 
   val mappingMethod = new ObjectProperty[MappingMethod](this, "mappingMethod", MappingMethod.LinearCrossBand)
   val clipReferenceRGB = new BooleanProperty(this, "clipReferenceRGB", true)
@@ -155,14 +169,29 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
     p.getReadOnlyProperty
   }
 
+  // Initialize reference chart
   recreateReferenceChart()
 
   def recreateReferenceChart(): Unit = {
     val chartOpt =
-      ColorCharts
-        .withColorChartType(referenceChartType.value)
-        .map(c => c.copyWithNewChipMargin(chipMarginPercent.value / 100d))
+      (
+        if (referenceChartType.value != ColorChartType.Custom) {
+          ColorCharts.withColorChartType(referenceChartType.value)
+        } else {
+          customChartOption
+        }
+        ).map(c => c.copyWithNewChipMargin(chipMarginPercent.value / 100d))
+
     referenceChartOptionWrapper.value = chartOpt
+
+    referenceChartDefinedWrapper.value = referenceChartOptionWrapper.value.isDefined
+
+    referenceChartEditEnabledWrapper.value = referenceChartType.value == ColorChartType.Custom
+
+    chartInfoText.value =
+      referenceChartOptionWrapper.value
+        .map(c => s"${c.nbColumns} x ${c.nbRows}, ${c.refWhite}")
+        .getOrElse("Chart not defined")
   }
 
   private def currentChart: GridColorChart = {
@@ -228,6 +257,61 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
           "Report the error in project issue tracker at https://github.com/ij-plugins/ijp-color/issues"
         )
     }
+  }
+
+  def onEditChart(): Unit = {
+
+    val _nbRows = customChartOption.map(_.nbRows).getOrElse(5)
+    val _nbColumns = customChartOption.map(_.nbColumns).getOrElse(6)
+    val _refWhite = customChartOption.map(_.refWhite).getOrElse(ReferenceWhite.D50)
+    val _defaultPath = ""
+
+    val gd = new GenericDialog("Edit Custom Reference Chart") {
+      addMessage("Chart Layout")
+      addNumericField("Rows", _nbRows, 0, 3, "")
+      addNumericField("Columns", _nbColumns, 0, 3, "")
+      addChoice("Reference White", ReferenceWhite.values.map(_.toString).toArray, _refWhite.toString)
+      addFileField("Reference values file", _defaultPath)
+    }
+
+    gd.showDialog()
+
+    if (gd.wasOKed()) {
+      val nbRows = {
+        val v = gd.getNextNumber
+        math.max(1, math.round(v).toInt)
+      }
+
+      val nbCols = {
+        val v = gd.getNextNumber
+        math.max(1, math.round(v).toInt)
+      }
+
+      val refWhite: ReferenceWhite = {
+        val v = gd.getNextChoice
+        ReferenceWhite.withName(v)
+      }
+
+      val filePath = gd.getNextString
+      val file = new File(filePath)
+
+      val chips = ColorCharts.loadReferenceValues(file)
+
+      val chart = new GridColorChart(
+        s"Custom - ${file.getName}",
+        nbColumns = nbCols,
+        nbRows = nbRows,
+        chips = chips,
+        chipMargin = 0.2,
+        refWhite = refWhite
+      )
+
+      customChartOption = Option(chart)
+      recreateReferenceChart()
+    } else {
+      //
+    }
+
   }
 
   def onSuggestCalibrationOptions(): Unit = busyWorker.doTask("onSuggestCalibrationOptions") {

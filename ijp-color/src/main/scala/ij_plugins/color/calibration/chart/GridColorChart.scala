@@ -58,17 +58,21 @@ final class GridColorChart(
   require(chipMargin >= 0 && chipMargin < 0.5, "Margin value must at least 0 but less than 0.5, got " + chipMargin)
   require(nbColumns > 0)
   require(nbRows > 0)
-  require(nbColumns * nbRows == chips.size)
+  require(
+    nbColumns * nbRows == chips.size,
+    "Number of chips must equal number of columns times number of rows. " +
+      s"Expecting ${nbColumns * nbRows}, got ${chips.size}."
+  )
   require(chips.size == enabled.size)
   require(refWhite != null)
   require(alignmentTransform != null)
 
   /**
-   * Construct chart with all chips enabled.
-   *
-   * @param name      chart's name
-   * @param nbColumns number of columns
-   * @param nbRows    number of rows
+    * Construct chart with all chips enabled.
+    *
+    * @param name      chart's name
+    * @param nbColumns number of columns
+    * @param nbRows    number of rows
    * @param chips     chip names and CIE L*a*b* / D65 color values, row by row, starting at (0,0) or top left corner.
    */
   def this(

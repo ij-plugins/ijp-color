@@ -22,18 +22,21 @@
 
 package ij_plugins.color.calibration.chart
 
+import ij.measure.ResultsTable
 import ij_plugins.color.converter.ColorTriple.Lab
-import ij_plugins.color.converter.ReferenceWhite
+import ij_plugins.color.converter.{ColorTriple, ReferenceWhite}
+
+import java.io.File
 
 /** Enumeration of some common color charts. */
 object ColorCharts {
 
   /**
-   * GretagMacbeth ColorChecker with values measured by Robin D. Myers, average of two charts manufactured 2002-10.
-   *
-   * Illuminant D65.
-   * [[http://www.rmimaging.com/spectral_library/Reflective/Charts-Calibration/ColorChecker_2002-10_averaged.ss3.zip]]
-   */
+    * GretagMacbeth ColorChecker with values measured by Robin D. Myers, average of two charts manufactured 2002-10.
+    *
+    * Illuminant D65.
+    * [[http://www.rmimaging.com/spectral_library/Reflective/Charts-Calibration/ColorChecker_2002-10_averaged.ss3.zip]]
+    */
   val GretagMacbethColorChecker = new GridColorChart(
     ColorChartType.GretagMacbethColorChecker.name,
     6,
@@ -161,5 +164,52 @@ object ColorCharts {
   def withColorChartType(colorChartType: ColorChartType): Option[GridColorChart] = {
     require(colorChartType != null, "'colorChartType' cannot be null.")
     values.find(_.name == colorChartType.name)
+  }
+
+  /**
+    * Load chart reference values from a CSV file represented in CIE L*a*b* color space.
+    *
+    * The file is expected to have at least 4 columns: "SAMPLE_NAME", "LAB_L", "LAB_A", "LAB_B".
+    * Any additional columns will be ignored.
+    *
+    * Example of a file with 4 chips:
+    *
+    * {{{
+    * SAMPLE_NAME,LAB_L,LAB_A,LAB_B
+    * 1,38.675,12.907,14.358,19.306
+    * 2,65.750,19.811,17.790,26.626
+    * 3,50.373,-3.646,-22.360,22.656
+    * 4,43.697,-13.342,22.858,26.466
+    * }}}
+    *
+    * @return list of tuples representing chip name and reference value in CIE L*a*b*
+    */
+  def loadReferenceValues(file: File): List[(String, ColorTriple.Lab)] = {
+    require(file.exists(), "File must exist: " + file.getCanonicalPath)
+    val rt = ResultsTable.open(file.getCanonicalPath)
+
+    val headingName = "SAMPLE_NAME"
+    val headingL = "LAB_L"
+    val headingA = "LAB_A"
+    val headingB = "LAB_B"
+
+    require(rt.columnExists(headingName))
+    require(rt.columnExists(headingL))
+    require(rt.columnExists(headingA))
+    require(rt.columnExists(headingB))
+
+    val chips =
+      (0 until rt.size())
+        .map { r =>
+          val name = rt.getStringValue(headingName, r)
+          val l = rt.getValue(headingL, r)
+          val a = rt.getValue(headingA, r)
+          val b = rt.getValue(headingB, r)
+
+          (name, ColorTriple.Lab(l, a, b))
+        }
+        .toList
+
+    chips
   }
 }
