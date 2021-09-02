@@ -280,7 +280,7 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
 
   def onSelectOutputs(): Unit = busyWorker.doTask("onSelectOutputs") {
 
-    new SelectCalibrationOutputsTask(outputConfig) {
+    new SelectCalibrationOutputsTask(outputConfig, Option(parentWindow)) {
       override def onFinish(result: Future[Option[OutputConfig]], successful: Boolean): Unit = {
         if (successful) onFX {
           result.get().foreach { oc =>
