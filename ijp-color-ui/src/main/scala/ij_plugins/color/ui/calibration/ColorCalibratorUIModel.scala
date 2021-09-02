@@ -22,15 +22,14 @@
 
 package ij_plugins.color.ui.calibration
 
-import ij.gui.GenericDialog
 import ij.measure.ResultsTable
 import ij.plugin.BrowserLauncher
 import ij.{ImagePlus, Prefs}
 import ij_plugins.color.calibration.chart.{ColorChartType, ColorCharts, GridColorChart, ReferenceColorSpace}
 import ij_plugins.color.calibration.regression.MappingMethod
 import ij_plugins.color.calibration.{CorrectionRecipe, renderReferenceChart}
-import ij_plugins.color.converter.ReferenceWhite
-import ij_plugins.color.ui.calibration.tasks.{ApplyToCurrentImageTask, CalibrateTask, SuggestCalibrationOptionsTask}
+import ij_plugins.color.ui.calibration.tasks.CalibrateTask.OutputConfig
+import ij_plugins.color.ui.calibration.tasks._
 import ij_plugins.color.ui.util.LiveChartROI
 import javafx.beans.property.ReadOnlyBooleanProperty
 import org.scalafx.extras.mvcfx.ModelFX
@@ -38,7 +37,6 @@ import org.scalafx.extras.{BusyWorker, ShowMessage, onFX}
 import scalafx.beans.property._
 import scalafx.stage.Window
 
-import java.io.File
 import java.util.concurrent.Future
 
 object ColorCalibratorUIModel {
@@ -70,13 +68,15 @@ object ColorCalibratorUIModel {
         colorChartType <- ColorChartType.withNameOption(colorChartTypeName)
 
         chipMargin <- Option(Prefs.get(ReferencePrefix + ".chipMargin", null.asInstanceOf[Double]))
-        showExtraInfo <- Option(Prefs.get(ReferencePrefix + ".showExtraInfo", null.asInstanceOf[Boolean]))
+        // TODO: Implement reading of outputConfig
+        //        outputConfig <- Option(Prefs.get(ReferencePrefix + ".showExtraInfo", null.asInstanceOf[Boolean]))
+        outputConfig <- Option(OutputConfig())
       } yield Config(
         referenceColorSpace,
         mappingMethod,
         colorChartType,
         chipMargin,
-        showExtraInfo
+        outputConfig
       )
     }
   }
@@ -93,7 +93,7 @@ object ColorCalibratorUIModel {
                      mappingMethod: MappingMethod,
                      colorChartType: ColorChartType,
                      chipMargin: Double,
-                     showExtraInfo: Boolean
+                     outputConfig: OutputConfig
                    ) {
 
     import Config._
@@ -103,7 +103,8 @@ object ColorCalibratorUIModel {
       Prefs.set(ReferencePrefix + ".mappingMethod", mappingMethod.entryName)
       Prefs.set(ReferencePrefix + ".colorChartType", colorChartType.entryName)
       Prefs.set(ReferencePrefix + ".chipMargin", s"$chipMargin")
-      Prefs.set(ReferencePrefix + ".showExtraInfo", s"$showExtraInfo")
+      // TODO: Implement writing of outputConfig
+      //      Prefs.set(ReferencePrefix + ".showExtraInfo", s"$showExtraInfo")
     }
 
   }
@@ -148,9 +149,12 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
     recreateReferenceChart()
   }
 
+  private val outputConfigWrapper = new ReadOnlyObjectWrapper[OutputConfig](this, "outputConfig", OutputConfig())
+
+  def outputConfig: OutputConfig = outputConfigWrapper.value
+
   val mappingMethod = new ObjectProperty[MappingMethod](this, "mappingMethod", MappingMethod.LinearCrossBand)
   val clipReferenceRGB = new BooleanProperty(this, "clipReferenceRGB", true)
-  val showExtraInfo = new BooleanProperty(this, "showExtraInfo", false)
   val correctionRecipe = new ObjectProperty[Option[CorrectionRecipe]](this, "correctionRecipe", None)
 
   val liveChartROI: LiveChartROI = LiveChartROI(image, referenceChartOption)
@@ -259,67 +263,37 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
     }
   }
 
-  def onEditChart(): Unit = {
-
-    val _nbRows = customChartOption.map(_.nbRows).getOrElse(5)
-    val _nbColumns = customChartOption.map(_.nbColumns).getOrElse(6)
-    val _refWhite = customChartOption.map(_.refWhite).getOrElse(ReferenceWhite.D50)
-    val _defaultPath = ""
-
-    val gd = new GenericDialog("Edit Custom Reference Chart") {
-      addMessage("Chart Layout")
-      addNumericField("Rows", _nbRows, 0, 3, "")
-      addNumericField("Columns", _nbColumns, 0, 3, "")
-      addChoice("Reference White", ReferenceWhite.values.map(_.toString).toArray, _refWhite.toString)
-      addFileField("Reference values file", _defaultPath)
+  def onEditChart(): Unit = busyWorker.doTask("onEditChart") {
+    new EditCustomChartTask(customChartOption) {
+      override def onFinish(result: Future[Option[GridColorChart]], successful: Boolean): Unit = {
+        if (successful) onFX {
+          customChartOption = result.get()
+          recreateReferenceChart()
+        }
+      }
     }
-
-    gd.showDialog()
-
-    if (gd.wasOKed()) {
-      val nbRows = {
-        val v = gd.getNextNumber
-        math.max(1, math.round(v).toInt)
-      }
-
-      val nbCols = {
-        val v = gd.getNextNumber
-        math.max(1, math.round(v).toInt)
-      }
-
-      val refWhite: ReferenceWhite = {
-        val v = gd.getNextChoice
-        ReferenceWhite.withName(v)
-      }
-
-      val filePath = gd.getNextString
-      val file = new File(filePath)
-
-      val chips = ColorCharts.loadReferenceValues(file)
-
-      val chart = new GridColorChart(
-        s"Custom - ${file.getName}",
-        nbColumns = nbCols,
-        nbRows = nbRows,
-        chips = chips,
-        chipMargin = 0.2,
-        refWhite = refWhite
-      )
-
-      customChartOption = Option(chart)
-      recreateReferenceChart()
-    } else {
-      //
-    }
-
   }
 
   def onSuggestCalibrationOptions(): Unit = busyWorker.doTask("onSuggestCalibrationOptions") {
     new SuggestCalibrationOptionsTask(currentChart, image, Option(parentWindow))
   }
 
+  def onSelectOutputs(): Unit = busyWorker.doTask("onSelectOutputs") {
+
+    new SelectCalibrationOutputsTask(outputConfig) {
+      override def onFinish(result: Future[Option[OutputConfig]], successful: Boolean): Unit = {
+        if (successful) onFX {
+          result.get().foreach { oc =>
+            outputConfigWrapper.value = oc
+          }
+        }
+      }
+    }
+  }
+
   def onCalibrate(): Unit = busyWorker.doTask("onCalibrate") {
-    new CalibrateTask(referenceColorSpace, mappingMethod, image, currentChart, showExtraInfo, Option(parentWindow)) {
+
+    new CalibrateTask(referenceColorSpace, mappingMethod, image, currentChart, outputConfig, Option(parentWindow)) {
       override def onFinish(result: Future[Option[CorrectionRecipe]], successful: Boolean): Unit = {
         if (successful) onFX {
           correctionRecipe.value = result.get()
@@ -329,7 +303,7 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
   }
 
   def onApplyToCurrentImage(): Unit = busyWorker.doTask("onApplyToCurrentImage") {
-    new ApplyToCurrentImageTask(correctionRecipe, showExtraInfo, Option(parentWindow))
+    new ApplyToCurrentImageTask(correctionRecipe, outputConfig, Option(parentWindow))
   }
 
   def onHelp(): Unit = busyWorker.doTask("onHelp") { () =>
@@ -342,7 +316,7 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
       mappingMethod.value,
       referenceChartType.value,
       chipMarginPercent.value / 100d,
-      showExtraInfo.value
+      outputConfig
     )
   }
 
@@ -350,7 +324,7 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
     onFX {
       referenceColorSpace.value = config.referenceColorSpace
       mappingMethod.value = config.mappingMethod
-      showExtraInfo.value = config.showExtraInfo
+      outputConfigWrapper.value = config.outputConfig
       referenceChartType.value = config.colorChartType
       chipMarginPercent.value = math.round(config.chipMargin * 100).toInt
     }

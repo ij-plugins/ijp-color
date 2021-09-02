@@ -22,9 +22,9 @@
 
 package ij_plugins.color
 
+import ij.ImagePlus
 import ij.gui.{PolygonRoi, Roi}
 import ij.process.{ColorProcessor, FloatProcessor}
-import ij.{CompositeImage, ImagePlus, ImageStack}
 import ij_plugins.color.calibration.chart.{ColorChip, GridColorChart, ReferenceColorSpace}
 import ij_plugins.color.converter.ColorConverter
 import ij_plugins.color.util.{IJTools, PerspectiveTransform, clipUInt8}
@@ -132,38 +132,4 @@ package object calibration {
       case _ => throw new IllegalArgumentException("Unsupported reference color space '" + colorSpace + "'.")
     }
   }
-
-  def applyCorrection(
-    recipe: CorrectionRecipe,
-    imp: ImagePlus,
-    showError: (String, String, Throwable) => Unit
-  ): Option[Array[FloatProcessor]] = {
-    val correctedBands =
-      try {
-        recipe.corrector.map(imp)
-      } catch {
-        case t: Throwable =>
-          showError("Error while color correcting the image.", t.getMessage, t)
-          return None
-      }
-
-    // Show floating point stack in the reference color space
-    val correctedInReference = {
-      val stack = new ImageStack(imp.getWidth, imp.getHeight)
-      (recipe.referenceColorSpace.bandsNames zip correctedBands).foreach(v => stack.addSlice(v._1, v._2))
-      val mode =
-        if (recipe.referenceColorSpace == ReferenceColorSpace.sRGB) CompositeImage.COMPOSITE
-        else CompositeImage.GRAYSCALE
-      new CompositeImage(new ImagePlus(imp.getTitle + "+corrected_" + recipe.referenceColorSpace, stack), mode)
-    }
-    correctedInReference.show()
-
-    // Convert corrected image to sRGB
-    val correctedImage: ImagePlus = convertToSRGB(correctedBands, recipe.referenceColorSpace, recipe.colorConverter)
-    correctedImage.setTitle(imp.getTitle + "+corrected_" + recipe.referenceColorSpace + "+sRGB")
-    correctedImage.show()
-
-    Option(correctedBands)
-  }
-
 }

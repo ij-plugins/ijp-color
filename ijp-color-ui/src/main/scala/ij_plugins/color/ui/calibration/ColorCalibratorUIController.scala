@@ -48,9 +48,9 @@ class ColorCalibratorUIController(
                                    private val editChartButton: Button,
                                    private val marginsSpinner: Spinner[java.lang.Integer],
                                    private val referenceColorSpaceChoiceBox: ChoiceBox[ReferenceColorSpace],
-                                   private val enableExtraInfoCB: CheckBox,
                                    private val mappingMethodChoiceBox: ChoiceBox[MappingMethod],
                                    private val suggestCalibrationOptionsButton: Button,
+                                   private val selectOutputsButton: Button,
                                    private val calibrateButton: Button,
                                    private val applyToCurrentImageButton: Button,
                                    private val helpButton: Button,
@@ -105,12 +105,12 @@ class ColorCalibratorUIController(
     value = model.chipMarginPercent()
     value <==> model.chipMarginPercent
   }
-  //  importROIButton.onAction = _ => model.onLoadLocationFromROI()
+
+  selectOutputsButton.onAction = _ => model.onSelectOutputs()
 
   // Calibration
   referenceColorSpaceChoiceBox.items = ObservableBuffer.from(ReferenceColorSpace.values)
   referenceColorSpaceChoiceBox.value <==> model.referenceColorSpace
-  model.showExtraInfo <==> enableExtraInfoCB.selected
 
   mappingMethodChoiceBox.items = ObservableBuffer.from(MappingMethod.values)
   mappingMethodChoiceBox.value <==> model.mappingMethod
