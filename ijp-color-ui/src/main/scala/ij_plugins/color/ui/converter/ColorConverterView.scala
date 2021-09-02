@@ -24,7 +24,6 @@ package ij_plugins.color.ui.converter
 
 import ij.plugin.BrowserLauncher
 import ij_plugins.color.converter._
-import ij_plugins.color.ui.ColorValueUI
 import ij_plugins.color.ui.converter.ColorConverterModel.Update
 import ij_plugins.color.ui.util.IJPUtils
 import javafx.beans.{binding => jfxbb}

@@ -50,12 +50,6 @@ object ColorCalibratorUIModel {
     def loadFromIJPref(): Option[Config] = {
       // We will use `null` to indicate missing values from Java API
 
-      {
-        val colorChartTypeName = Option(Prefs.get(ReferencePrefix + ".colorChartType", null.asInstanceOf[String]))
-        val colorChartType = ColorChartType.withNameOption(colorChartTypeName.get)
-        println(colorChartType)
-      }
-
       for {
         referenceColorSpaceName <-
           Option(Prefs.get(ReferencePrefix + ".referenceColorSpace", null.asInstanceOf[String]))
@@ -81,13 +75,6 @@ object ColorCalibratorUIModel {
     }
   }
 
-  /**
-    * @param referenceColorSpace
-    * @param mappingMethod
-    * @param chartName name of a predefined chart from ij_plugins.color.calibration.chart.ColorCharts
-    * @param chipMargin
-    * @param showExtraInfo
-    */
   case class Config(
                      referenceColorSpace: ReferenceColorSpace,
                      mappingMethod: MappingMethod,
@@ -264,7 +251,7 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
   }
 
   def onEditChart(): Unit = busyWorker.doTask("onEditChart") {
-    new EditCustomChartTask(customChartOption) {
+    new EditCustomChartTask(customChartOption, Option(parentWindow)) {
       override def onFinish(result: Future[Option[GridColorChart]], successful: Boolean): Unit = {
         if (successful) onFX {
           customChartOption = result.get()

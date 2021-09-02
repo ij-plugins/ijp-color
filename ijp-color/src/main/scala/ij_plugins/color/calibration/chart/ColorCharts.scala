@@ -185,18 +185,19 @@ object ColorCharts {
     * @return list of tuples representing chip name and reference value in CIE L*a*b*
     */
   def loadReferenceValues(file: File): List[(String, ColorTriple.Lab)] = {
+
     require(file.exists(), "File must exist: " + file.getCanonicalPath)
     val rt = ResultsTable.open(file.getCanonicalPath)
+
+    def checkForColumn(name: String): Unit = {
+      require(rt.columnExists(name), s"Input file must contain column '$name'.")
+    }
 
     val headingName = "SAMPLE_NAME"
     val headingL = "LAB_L"
     val headingA = "LAB_A"
     val headingB = "LAB_B"
-
-    require(rt.columnExists(headingName))
-    require(rt.columnExists(headingL))
-    require(rt.columnExists(headingA))
-    require(rt.columnExists(headingB))
+    Seq(headingName, headingL, headingA, headingB).foreach(checkForColumn)
 
     val chips =
       (0 until rt.size())

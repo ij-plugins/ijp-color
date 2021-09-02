@@ -23,14 +23,19 @@
 package ij_plugins.color.ui.calibration.tasks
 
 import ij.IJ
-import ij.gui.GenericDialog
 import ij_plugins.color.calibration.chart.{ColorCharts, GridColorChart}
 import ij_plugins.color.converter.ReferenceWhite
+import ij_plugins.color.ui.fx.GenericDialogFX
 import org.scalafx.extras.BusyWorker.SimpleTask
+import scalafx.stage.Window
 
 import java.io.File
+import scala.util.control.NonFatal
 
-class EditCustomChartTask(customChartOption: Option[GridColorChart]) extends SimpleTask[Option[GridColorChart]] {
+class EditCustomChartTask(customChartOption: Option[GridColorChart], parentWindow: Option[Window])
+  extends SimpleTask[Option[GridColorChart]] {
+
+  private val Title = "Edit Custom Reference Chart"
 
   override def call(): Option[GridColorChart] = {
 
@@ -44,50 +49,63 @@ class EditCustomChartTask(customChartOption: Option[GridColorChart]) extends Sim
     //  it should open in front of its parent dialog, but not be forced to be always on top of all other windows
 
     val gd =
-      new GenericDialog("Edit Custom Reference Chart", IJ.getInstance()) {
-        addMessage("Chart Layout")
+      new GenericDialogFX(
+        Title,
+        Option("Define chart layout and select a CSV file with CIE L*a*b* reference colors."),
+        parentWindow
+      ) {
         addNumericField("Rows", _nbRows, 0, 3, "")
         addNumericField("Columns", _nbColumns, 0, 3, "")
-        addChoice("Reference White", ReferenceWhite.values.map(_.toString).toArray, _refWhite.toString)
-        addFileField("Reference values file", _defaultPath)
-
-        // A workaround for popping down behind JavaFX dialogs
-        setAlwaysOnTop(true)
+        addChoice("Reference_White", ReferenceWhite.values.map(_.toString).toArray, _refWhite.toString)
+        addFileField("Reference_values_file", _defaultPath)
       }
 
     gd.showDialog()
 
-    if (gd.wasOKed()) {
-      val nbRows = {
-        val v = gd.getNextNumber
-        math.max(1, math.round(v).toInt)
+    if (gd.wasOKed) {
+      try {
+        val nbRows = {
+          val v = gd.getNextNumber()
+          math.max(1, math.round(v).toInt)
+        }
+
+        val nbCols = {
+          val v = gd.getNextNumber()
+          math.max(1, math.round(v).toInt)
+        }
+
+        val refWhite: ReferenceWhite = {
+          val v = gd.getNextChoice()
+          ReferenceWhite.withName(v)
+        }
+
+        val filePath = gd.getNextString()
+        val file = new File(filePath)
+
+        val chipsOpt =
+          try {
+            Option(ColorCharts.loadReferenceValues(file))
+          } catch {
+            case NonFatal(ex) =>
+              IJ.error(Title, s"Error loading reference chart values. ${Option(ex.getMessage).getOrElse("")}")
+              None
+          }
+
+        chipsOpt.map { chips =>
+          new GridColorChart(
+            s"Custom - ${file.getName}",
+            nbColumns = nbCols,
+            nbRows = nbRows,
+            chips = chips,
+            chipMargin = 0.2,
+            refWhite = refWhite
+          )
+        }
+      } catch {
+        case NonFatal(ex) =>
+          IJ.error(Title, s"Error when creating custom chart. ${Option(ex.getMessage).getOrElse("")}")
+          None
       }
-
-      val nbCols = {
-        val v = gd.getNextNumber
-        math.max(1, math.round(v).toInt)
-      }
-
-      val refWhite: ReferenceWhite = {
-        val v = gd.getNextChoice
-        ReferenceWhite.withName(v)
-      }
-
-      val filePath = gd.getNextString
-      val file = new File(filePath)
-
-      val chips = ColorCharts.loadReferenceValues(file)
-
-      val chart = new GridColorChart(
-        s"Custom - ${file.getName}",
-        nbColumns = nbCols,
-        nbRows = nbRows,
-        chips = chips,
-        chipMargin = 0.2,
-        refWhite = refWhite
-      )
-
-      Option(chart)
     } else
       None
   }

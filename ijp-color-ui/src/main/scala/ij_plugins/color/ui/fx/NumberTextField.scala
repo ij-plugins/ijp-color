@@ -20,27 +20,24 @@
  * Latest release available at https://github.com/ij-plugins/ijp-color/
  */
 
-package ij_plugins.color.ui
+package ij_plugins.color.ui.fx
 
-import enumeratum.{Enum, EnumEntry}
+import scalafx.scene.control.{TextField, TextFormatter}
+import scalafx.util.converter.FormatStringConverter
 
-import scala.collection.immutable
+import java.text.DecimalFormat
 
-sealed abstract class Gamma(override val entryName: String, val value: Double) extends EnumEntry {
-  override def toString: String = entryName
-}
+class NumberTextField(decimalPlaces: Int = 6) extends TextField {
+  private val format = {
+    val pattern =
+      if (decimalPlaces > 0) {
+        "0." + ("0" * decimalPlaces)
+      } else
+        "0"
 
-case object Gamma extends Enum[Gamma] {
-
-  case object v10 extends Gamma("1.0", 1.0)
-
-  case object v18 extends Gamma("1.8", 1.8)
-
-  case object v22 extends Gamma("2.2", 2.2)
-
-  case object sRGB extends Gamma("sRGB", -2.2)
-
-  case object L extends Gamma("L*", 0.0)
-
-  val values: immutable.IndexedSeq[Gamma] = findValues
+    new DecimalFormat(pattern)
+  }
+  private val converter = new FormatStringConverter[Number](format)
+  val model = new TextFormatter(converter)
+  textFormatter = model
 }

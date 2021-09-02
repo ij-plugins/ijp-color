@@ -55,9 +55,9 @@ final class GridColorChart(
     with ColorChart {
 
   // TODO: add requirement messages
-  require(chipMargin >= 0 && chipMargin < 0.5, "Margin value must at least 0 but less than 0.5, got " + chipMargin)
-  require(nbColumns > 0)
-  require(nbRows > 0)
+  require(chipMargin >= 0 && chipMargin < 0.5, s"Margin value must at least 0 but less than 0.5, got $chipMargin.")
+  require(nbColumns > 0, s"Number of columns must be greater than 0, got $nbColumns.")
+  require(nbRows > 0, s"Number of rows must be greater than 0, got $nbColumns.")
   require(
     nbColumns * nbRows == chips.size,
     "Number of chips must equal number of columns times number of rows. " +
@@ -73,8 +73,8 @@ final class GridColorChart(
     * @param name      chart's name
     * @param nbColumns number of columns
     * @param nbRows    number of rows
-   * @param chips     chip names and CIE L*a*b* / D65 color values, row by row, starting at (0,0) or top left corner.
-   */
+    * @param chips     chip names and CIE L*a*b* / D65 color values, row by row, starting at (0,0) or top left corner.
+    */
   def this(
     name: String,
     nbColumns: Int,

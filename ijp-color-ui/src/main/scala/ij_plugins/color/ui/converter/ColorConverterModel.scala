@@ -23,7 +23,7 @@
 package ij_plugins.color.ui.converter
 
 import ij_plugins.color.converter._
-import ij_plugins.color.ui.Gamma
+import ij_plugins.color.ui.util.Gamma
 import scalafx.beans.property.ObjectProperty
 
 object ColorConverterModel {
