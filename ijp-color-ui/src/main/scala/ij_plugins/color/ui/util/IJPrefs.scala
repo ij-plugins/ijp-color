@@ -31,17 +31,40 @@ object IJPrefs {
     * Uses the keyword key to retrieve a boolean from the preferences file.
     * Returns `None` if key not found or value is `null`.
     */
-  def getBooleanOption(key: String): Option[Boolean] = Option(Prefs.get(key, null.asInstanceOf[Boolean]))
+  def getBooleanOption(key: String): Option[Boolean] =
+    if (hasKey(key))
+      Option(Prefs.get(key, null.asInstanceOf[Boolean]))
+    else
+      None
 
   /**
     * Uses the keyword key to retrieve a double from the preferences file.
     * Returns `None` if key not found or value is `null`.
     */
-  def getDoubleOption(key: String): Option[Double] = Option(Prefs.get(key, null.asInstanceOf[Double]))
+  def getDoubleOption(key: String): Option[Double] = {
+    if (hasKey(key))
+      Option(Prefs.get(key, null.asInstanceOf[Double]))
+    else
+      None
+  }
+
+  /**
+    * Uses the keyword key to retrieve a double from the preferences file.
+    * Returns `None` if key not found or value is `null`.
+    */
+  def getIntOption(key: String): Option[Int] =
+    getDoubleOption(key).map(v => math.round(v).toInt)
 
   /**
     * Uses the keyword key to retrieve a string from the preferences file.
     * Returns `None` if key not found or value is `null`.
     */
-  def getStringOption(key: String): Option[String] = Option(Prefs.get(key, null.asInstanceOf[String]))
+  def getStringOption(key: String): Option[String] =
+    Option(Prefs.get(key, null.asInstanceOf[String]))
+
+  /**
+    * Test if ImageJ Prefs has a given key.
+    */
+  def hasKey(key: String): Boolean =
+    getStringOption(key).isDefined
 }

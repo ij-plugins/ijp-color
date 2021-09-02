@@ -26,9 +26,9 @@ import ij.gui._
 import ij.measure.ResultsTable
 import ij.plugin.PlugIn
 import ij.process.ImageStatistics
-import ij.{IJ, ImagePlus}
+import ij.{IJ, ImagePlus, Prefs}
 import ij_plugins.color.calibration.chart.{GridChartFrame, GridChartFrameUtils}
-import ij_plugins.color.ui.util.{IJPUtils, ImageListenerHelper, LiveChartROI, LiveChartROIHelper}
+import ij_plugins.color.ui.util._
 import ij_plugins.color.util.{IJTools, PerspectiveTransform}
 import scalafx.beans.property.ObjectProperty
 
@@ -38,9 +38,45 @@ import scala.collection.immutable.ListMap
 
 object ColorChartToolPlugin {
 
-  private var sendToROIManager: Boolean = true
-  private var measureChips: Boolean = true
-  private var listChipVertices: Boolean = false
+  private val ReferencePrefix = classOf[ColorChartToolPlugin].getName
+
+  object Config {
+    def loadFromIJPref(): Option[Config] = {
+      for {
+        nbColumns <- IJPrefs.getIntOption(ReferencePrefix + ".nbColumns")
+        nbRows <- IJPrefs.getIntOption(ReferencePrefix + ".nbRows")
+        chipMargin <- IJPrefs.getDoubleOption(ReferencePrefix + ".chipMargin")
+        sendToROIManager <- IJPrefs.getBooleanOption(ReferencePrefix + ".sendToROIManager")
+        measureChips <- IJPrefs.getBooleanOption(ReferencePrefix + ".measureChips")
+        listChipVertices <- IJPrefs.getBooleanOption(ReferencePrefix + ".listChipVertices")
+      } yield Config(
+        nbColumns = nbColumns,
+        nbRows = nbRows,
+        chipMargin = chipMargin,
+        sendToROIManager = sendToROIManager,
+        measureChips = measureChips,
+        listChipVertices = listChipVertices
+      )
+    }
+  }
+
+  case class Config(
+                     nbColumns: Int = 6,
+                     nbRows: Int = 4,
+                     chipMargin: Double = 0.2,
+                     sendToROIManager: Boolean = true,
+                     measureChips: Boolean = true,
+                     listChipVertices: Boolean = false
+                   ) {
+    def saveToIJPref(): Unit = {
+      Prefs.set(ReferencePrefix + ".nbColumns", nbColumns)
+      Prefs.set(ReferencePrefix + ".nbRows", nbRows)
+      Prefs.set(ReferencePrefix + ".chipMargin", chipMargin)
+      Prefs.set(ReferencePrefix + ".sendToROIManager", sendToROIManager)
+      Prefs.set(ReferencePrefix + ".measureChips", measureChips)
+      Prefs.set(ReferencePrefix + ".listChipVertices", listChipVertices)
+    }
+  }
 }
 
 /**
@@ -49,7 +85,7 @@ object ColorChartToolPlugin {
  */
 class ColorChartToolPlugin extends PlugIn with DialogListener with ImageListenerHelper with LiveChartROIHelper {
 
-  import ColorChartToolPlugin._
+  import ColorChartToolPlugin.Config
 
   private val Title = "Color Chart ROI Tool"
   private val Description = "" +
@@ -57,9 +93,11 @@ class ColorChartToolPlugin extends PlugIn with DialogListener with ImageListener
     "Measures color of each chip."
 
   private var dialog: Option[NonBlockingGenericDialog] = None
+  private var config: Config = Config.loadFromIJPref().getOrElse(Config())
 
   private val referenceChartOption = {
-    val chart = new GridChartFrame(6, 4, chipMargin = 0.1, new PerspectiveTransform())
+    val chart =
+      new GridChartFrame(config.nbColumns, config.nbRows, chipMargin = config.chipMargin, new PerspectiveTransform())
     new ObjectProperty(this, "chart", Option(chart))
   }
 
@@ -92,15 +130,15 @@ class ColorChartToolPlugin extends PlugIn with DialogListener with ImageListener
           return
       }
 
-      if (sendToROIManager) {
+      if (config.sendToROIManager) {
         doSendToROIManager(chart)
       }
 
-      if (measureChips) {
+      if (config.measureChips) {
         doMeasureChips(imp, chart)
       }
 
-      if (listChipVertices) {
+      if (config.listChipVertices) {
         doListChipVertices(imp.getTitle, chart)
       }
     }
@@ -114,9 +152,9 @@ class ColorChartToolPlugin extends PlugIn with DialogListener with ImageListener
       addNumericField("Columns", referenceChart.nbColumns, 0, 3, "")
       addSlider("Chip margin", 0, 0.49, referenceChart.chipMargin, 0.01)
       addMessage("")
-      addCheckbox("Send chip ROI to ROI Manager", sendToROIManager)
-      addCheckbox("Measure chips", measureChips)
-      addCheckbox("List_chip_vertices", listChipVertices)
+      addCheckbox("Send chip ROI to ROI Manager", config.sendToROIManager)
+      addCheckbox("Measure chips", config.measureChips)
+      addCheckbox("List_chip_vertices", config.listChipVertices)
 
       addHelp("https://github.com/ij-plugins/ijp-color/wiki/Color-Chart-ROI-Tool")
     }
@@ -131,7 +169,8 @@ class ColorChartToolPlugin extends PlugIn with DialogListener with ImageListener
     })
 
     // Set dialog icon that is not set in NonBlockingGenericDialog by default
-    Option(IJ.getInstance()).foreach(ij => gd.setIconImage(ij.getIconImage))
+    Option(IJ.getInstance())
+      .foreach(ij => gd.setIconImage(ij.getIconImage))
 
     gd
   }
@@ -141,18 +180,31 @@ class ColorChartToolPlugin extends PlugIn with DialogListener with ImageListener
       val v = gd.getNextNumber
       math.max(1, math.round(v).toInt)
     }
-    val nbCols = {
+    val nbColumns = {
       val v = gd.getNextNumber
       math.max(1, math.round(v).toInt)
     }
     val chipMargin = math.max(0, math.min(0.49, gd.getNextNumber))
-    referenceChartOption.value = Some(new GridChartFrame(nbCols, nbRows, chipMargin, referenceChart.alignmentTransform))
 
-    sendToROIManager = gd.getNextBoolean
-    measureChips = gd.getNextBoolean
-    listChipVertices = gd.getNextBoolean
+    val sendToROIManager = gd.getNextBoolean
+    val measureChips = gd.getNextBoolean
+    val listChipVertices = gd.getNextBoolean
 
-    chartOption.nonEmpty
+    config = Config(
+      nbColumns = nbColumns,
+      nbRows = nbRows,
+      chipMargin = chipMargin,
+      sendToROIManager = sendToROIManager,
+      measureChips = measureChips,
+      listChipVertices = listChipVertices
+    )
+
+    config.saveToIJPref()
+
+    referenceChartOption.value =
+      Option(new GridChartFrame(config.nbColumns, config.nbRows, config.chipMargin, referenceChart.alignmentTransform))
+
+    true
   }
 
   override protected def handleImageUpdated(): Unit = {
