@@ -24,17 +24,17 @@ package ij_plugins.color.ui.calibration.tasks
 
 import ij.measure.ResultsTable
 import ij.process.FloatProcessor
-import ij.{IJ, ImagePlus}
+import ij.{IJ, ImagePlus, Prefs}
 import ij_plugins.color.DeltaE
 import ij_plugins.color.calibration._
 import ij_plugins.color.calibration.chart.{ColorChip, GridColorChart, ReferenceColorSpace}
 import ij_plugins.color.calibration.regression.MappingMethod
 import ij_plugins.color.converter.ColorTriple.Lab
-import ij_plugins.color.ui.calibration.tasks.CalibrateTask.OutputConfig
+import ij_plugins.color.ui.calibration.tasks.CalibrateTask.{OutputConfig, showScatterChart}
 import ij_plugins.color.ui.calibration.{CalibrationUtils, IJPError}
 import ij_plugins.color.ui.fx.ColorFXUI
-import ij_plugins.color.ui.util.PlotUtils
 import ij_plugins.color.ui.util.PlotUtils.ValueEntry
+import ij_plugins.color.ui.util.{IJPrefs, PlotUtils}
 import ij_plugins.color.util.delta
 import javafx.scene.{chart => jfxsc}
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
@@ -53,6 +53,37 @@ import scalafx.stage.{Stage, Window}
 import java.net.URL
 
 object CalibrateTask {
+
+  object OutputConfig {
+    private val ReferencePrefix = classOf[OutputConfig].getName
+
+    def loadFromIJPref(): Option[OutputConfig] = {
+      for {
+        imageInSRGB <- IJPrefs.getBooleanOption(ReferencePrefix + ".imageInSRGB")
+        imageInReferenceColorSpace <- IJPrefs.getBooleanOption(ReferencePrefix + ".imageInReferenceColorSpace")
+        imageInLab <- IJPrefs.getBooleanOption(ReferencePrefix + ".imageInLab")
+        plotScatterFit <- IJPrefs.getBooleanOption(ReferencePrefix + ".plotScatterFit")
+        plotIndividualChipError <- IJPrefs.getBooleanOption(ReferencePrefix + ".plotIndividualChipError")
+        tableExpectedVsCorrected <- IJPrefs.getBooleanOption(ReferencePrefix + ".tableExpectedVsCorrected")
+        tableRegressionResults <- IJPrefs.getBooleanOption(ReferencePrefix + ".tableRegressionResults")
+        tableIndividualChipDeltaInLab <- IJPrefs.getBooleanOption(ReferencePrefix + ".tableIndividualChipDeltaInLab")
+        logDeltaInReferenceColorSpace <- IJPrefs.getBooleanOption(ReferencePrefix + ".logDeltaInReferenceColorSpace")
+      } yield {
+        OutputConfig(
+          imageInSRGB,
+          imageInReferenceColorSpace,
+          imageInLab,
+          plotScatterFit,
+          plotIndividualChipError,
+          tableExpectedVsCorrected,
+          tableRegressionResults,
+          tableIndividualChipDeltaInLab,
+          logDeltaInReferenceColorSpace
+        )
+      }
+    }
+  }
+
   case class OutputConfig(
                            imageInSRGB: Boolean = true,
                            imageInReferenceColorSpace: Boolean = false,
@@ -63,7 +94,74 @@ object CalibrateTask {
                            tableRegressionResults: Boolean = false,
                            tableIndividualChipDeltaInLab: Boolean = false,
                            logDeltaInReferenceColorSpace: Boolean = false
-                         )
+                         ) {
+
+    def saveToIJPref(): Unit = {
+      import OutputConfig.ReferencePrefix
+      Prefs.set(ReferencePrefix + ".imageInSRGB", imageInSRGB)
+      Prefs.set(ReferencePrefix + ".imageInReferenceColorSpace", imageInReferenceColorSpace)
+      Prefs.set(ReferencePrefix + ".imageInLab", imageInLab)
+      Prefs.set(ReferencePrefix + ".plotScatterFit", plotScatterFit)
+      Prefs.set(ReferencePrefix + ".plotIndividualChipError", plotIndividualChipError)
+      Prefs.set(ReferencePrefix + ".tableExpectedVsCorrected", tableExpectedVsCorrected)
+      Prefs.set(ReferencePrefix + ".tableRegressionResults", tableRegressionResults)
+      Prefs.set(ReferencePrefix + ".tableIndividualChipDeltaInLab", tableIndividualChipDeltaInLab)
+      Prefs.set(ReferencePrefix + ".logDeltaInReferenceColorSpace", logDeltaInReferenceColorSpace)
+    }
+
+  }
+
+  private def showScatterChart(
+                                x: Array[Array[Double]],
+                                y: Array[Array[Double]],
+                                seriesLabels: Array[String],
+                                chartTitle: String
+                              ): Unit = {
+
+    require(x.length == y.length)
+    require(seriesLabels.length == 3)
+
+    def check(name: String): Option[URL] = {
+      val stylesheetURL = getClass.getResource(name)
+      Option(stylesheetURL)
+    }
+
+    def myStylesheets: Seq[String] = List(
+      "RGBScatterChart.css"
+    ).flatMap(check(_).map(_.toExternalForm))
+
+    // Create plot
+    val xAxis = new NumberAxis()
+    val yAxis = new NumberAxis()
+    val scatterChart = ScatterChart(xAxis, yAxis)
+    scatterChart.data = {
+      val answer = new ObservableBuffer[jfxsc.XYChart.Series[Number, Number]]()
+      val bands = (0 to 2).map {
+        b =>
+          new XYChart.Series[Number, Number] {
+            name = seriesLabels(b)
+          }
+      }
+      for (i <- x.indices; b <- 0 to 2) {
+        bands(b).data.get += XYChart.Data[Number, Number](x(i)(b), y(i)(b))
+      }
+      bands.foreach(answer.add(_))
+      answer
+    }
+    Platform.runLater {
+      val dialogStage = new Stage() {
+        title = chartTitle
+        scene = new Scene {
+          root = new StackPane {
+            children = scatterChart
+            stylesheets ++= ColorFXUI.stylesheets
+            stylesheets ++= myStylesheets
+          }
+        }
+      }
+      dialogStage.show()
+    }
+  }
 }
 
 class CalibrateTask(
@@ -111,7 +209,7 @@ class CalibrateTask(
 
       correctionOutputLR.foreach { co =>
         val titlePrefix = s"${image.getTitle} - ${colorCalibrator.referenceColorSpace}+${colorCalibrator.mappingMethod}"
-        val chips: Seq[ColorChip] = chart.referenceChips
+        val chips: Seq[ColorChip] = chart.referenceChipsEnabled
         val bands: Array[String] = recipe.referenceColorSpace.bandsNames
 
         co.correctedInSRGB.foreach { imp =>
@@ -338,58 +436,6 @@ class CalibrateTask(
     }.toIndexedSeq
     val barColors = Seq(Color(1, 0.33, 0.33, 0.75), Color(0.33, 1, 0.33, 0.5), Color(0.33, 0.33, 1, 0.25))
     PlotUtils.createBarPlot(titlePrefix + " - Individual Chip Error", data, "Chip", "Error", barColors)
-  }
-
-  private def showScatterChart(
-    x: Array[Array[Double]],
-    y: Array[Array[Double]],
-    seriesLabels: Array[String],
-    chartTitle: String
-  ): Unit = {
-
-    require(seriesLabels.length == 3)
-
-    def check(name: String): Option[URL] = {
-      val stylesheetURL = getClass.getResource(name)
-      Option(stylesheetURL)
-    }
-
-    def myStylesheets: Seq[String] = List(
-      "RGBScatterChart.css"
-    ).flatMap(check(_).map(_.toExternalForm))
-
-    // Create plot
-    val xAxis        = new NumberAxis()
-    val yAxis        = new NumberAxis()
-    val scatterChart = ScatterChart(xAxis, yAxis)
-    scatterChart.data = {
-      val answer = new ObservableBuffer[jfxsc.XYChart.Series[Number, Number]]()
-      val bands = (0 to 2).map {
-        b =>
-          new XYChart.Series[Number, Number] {
-            name = seriesLabels(b)
-          }
-      }
-      val chips = chart.referenceChips
-      for (i <- chips.indices; b <- 0 to 2) {
-        bands(b).data.get += XYChart.Data[Number, Number](x(i)(b), y(i)(b))
-      }
-      bands.foreach(answer.add(_))
-      answer
-    }
-    Platform.runLater {
-      val dialogStage = new Stage() {
-        title = chartTitle
-        scene = new Scene {
-          root = new StackPane {
-            children = scatterChart
-            stylesheets ++= ColorFXUI.stylesheets
-            stylesheets ++= myStylesheets
-          }
-        }
-      }
-      dialogStage.show()
-    }
   }
 
   private def showResidualScatterChart(x: Array[Array[Double]], y: Array[Array[Double]], chartTitle: String): Unit = {

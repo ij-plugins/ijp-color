@@ -30,7 +30,7 @@ import ij_plugins.color.calibration.regression.MappingMethod
 import ij_plugins.color.calibration.{CorrectionRecipe, renderReferenceChart}
 import ij_plugins.color.ui.calibration.tasks.CalibrateTask.OutputConfig
 import ij_plugins.color.ui.calibration.tasks._
-import ij_plugins.color.ui.util.LiveChartROI
+import ij_plugins.color.ui.util.{IJPrefs, LiveChartROI}
 import javafx.beans.property.ReadOnlyBooleanProperty
 import org.scalafx.extras.mvcfx.ModelFX
 import org.scalafx.extras.{BusyWorker, ShowMessage, onFX}
@@ -51,20 +51,14 @@ object ColorCalibratorUIModel {
       // We will use `null` to indicate missing values from Java API
 
       for {
-        referenceColorSpaceName <-
-          Option(Prefs.get(ReferencePrefix + ".referenceColorSpace", null.asInstanceOf[String]))
+        referenceColorSpaceName <- IJPrefs.getStringOption(ReferencePrefix + ".referenceColorSpace")
         referenceColorSpace <- ReferenceColorSpace.withNameOption(referenceColorSpaceName)
-
-        mappingMethodName <- Option(Prefs.get(ReferencePrefix + ".mappingMethod", null.asInstanceOf[String]))
+        mappingMethodName <- IJPrefs.getStringOption(ReferencePrefix + ".mappingMethod")
         mappingMethod <- MappingMethod.withNameOption(mappingMethodName)
-
-        colorChartTypeName <- Option(Prefs.get(ReferencePrefix + ".colorChartType", null.asInstanceOf[String]))
+        colorChartTypeName <- IJPrefs.getStringOption(ReferencePrefix + ".colorChartType")
         colorChartType <- ColorChartType.withNameOption(colorChartTypeName)
-
-        chipMargin <- Option(Prefs.get(ReferencePrefix + ".chipMargin", null.asInstanceOf[Double]))
-        // TODO: Implement reading of outputConfig
-        //        outputConfig <- Option(Prefs.get(ReferencePrefix + ".showExtraInfo", null.asInstanceOf[Boolean]))
-        outputConfig <- Option(OutputConfig())
+        chipMargin <- IJPrefs.getDoubleOption(ReferencePrefix + ".chipMargin")
+        outputConfig <- OutputConfig.loadFromIJPref()
       } yield Config(
         referenceColorSpace,
         mappingMethod,
@@ -90,8 +84,7 @@ object ColorCalibratorUIModel {
       Prefs.set(ReferencePrefix + ".mappingMethod", mappingMethod.entryName)
       Prefs.set(ReferencePrefix + ".colorChartType", colorChartType.entryName)
       Prefs.set(ReferencePrefix + ".chipMargin", s"$chipMargin")
-      // TODO: Implement writing of outputConfig
-      //      Prefs.set(ReferencePrefix + ".showExtraInfo", s"$showExtraInfo")
+      outputConfig.saveToIJPref()
     }
 
   }
@@ -113,6 +106,10 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
   // Parameters defining chart, beside ROI that will be handled by `liveChartROI`
   val referenceChartType = new ObjectProperty[ColorChartType](this, "chart", ColorChartType.XRitePassportColorChecker)
   referenceChartType.onChange { (_, _, _) =>
+    if (enabledChipsType.value == ChipsEnabledType.Custom) {
+      // Chart changed, so custom chip selection got invalid, assume that "All" are selected
+      enabledChipsType.value = ChipsEnabledType.All
+    }
     recreateReferenceChart()
   }
 
@@ -124,15 +121,18 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
   private val referenceChartDefinedWrapper = new ReadOnlyBooleanWrapper()
   val referenceChartDefined: ReadOnlyBooleanProperty = referenceChartDefinedWrapper.readOnlyProperty
 
-  private val referenceChartEditEnabledWrapper = new ReadOnlyBooleanWrapper()
-  val referenceChartEditEnabled: ReadOnlyBooleanProperty = referenceChartEditEnabledWrapper.readOnlyProperty
-
   private var customChartOption: Option[GridColorChart] = None
 
   val chartInfoText = new StringProperty("???")
 
   val chipMarginPercent = new ObjectProperty[Integer](this, "chipMargin", 20)
   chipMarginPercent.onChange { (_, _, _) =>
+    recreateReferenceChart()
+  }
+
+  // Parameters defining chart, beside ROI that will be handled by `liveChartROI`
+  val enabledChipsType = new ObjectProperty[ChipsEnabledType](this, "chipsEnabledType", ChipsEnabledType.All)
+  enabledChipsType.onChange { (_, _, _) =>
     recreateReferenceChart()
   }
 
@@ -164,20 +164,32 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
   recreateReferenceChart()
 
   def recreateReferenceChart(): Unit = {
-    val chartOpt =
+    val newChartOpt =
       (
-        if (referenceChartType.value != ColorChartType.Custom) {
-          ColorCharts.withColorChartType(referenceChartType.value)
-        } else {
+        if (referenceChartType.value == ColorChartType.Custom) {
           customChartOption
+        } else {
+          ColorCharts.withColorChartType(referenceChartType.value)
         }
         ).map(c => c.copyWithNewChipMargin(chipMarginPercent.value / 100d))
 
-    referenceChartOptionWrapper.value = chartOpt
+    // Transfer enabled chips if chart are defines and we have custom chip enabled
+    val newChartOpt2 =
+      for {
+        currentChart <- referenceChartOptionWrapper.value
+        newChart <- newChartOpt
+        if enabledChipsType.value == ChipsEnabledType.Custom
+      } yield {
+        newChart.copyWithEnableChips(currentChart.enabled.toArray)
+      }
+
+    referenceChartOptionWrapper.value = if (newChartOpt2.isDefined) newChartOpt2 else newChartOpt
 
     referenceChartDefinedWrapper.value = referenceChartOptionWrapper.value.isDefined
 
-    referenceChartEditEnabledWrapper.value = referenceChartType.value == ColorChartType.Custom
+    if (referenceChartType.value == ColorChartType.Custom) {
+      customChartOption = if (newChartOpt2.isDefined) newChartOpt2 else newChartOpt
+    }
 
     chartInfoText.value =
       referenceChartOptionWrapper.value
@@ -187,16 +199,15 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
 
   private def currentChart: GridColorChart = {
     liveChartROI.locatedChart.value match {
-      case Some(c) => c match {
-        case gcc: GridColorChart =>
-          gcc
-        case x =>
-          throw new IllegalStateException(
-            s"Internal error. Unexpected class type. Expecting ${classOf[GridColorChart]}, got ${x.getClass}"
-          )
-      }
-      case None => throw new IllegalStateException(s"Internal error. Option is empty.")
-
+      case Some(c) =>
+        referenceChartOption.value match {
+          case Some(rc) =>
+            rc.copyWith(c.alignmentTransform)
+          case None =>
+            throw new IllegalStateException(s"Internal error. referenceChartOptiont Option is empty.")
+        }
+      case None =>
+        throw new IllegalStateException(s"Internal error. liveChartROI.locatedChart Option is empty.")
     }
   }
 
@@ -260,6 +271,31 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
       }
     }
   }
+
+  def onSelectEnabledChips(): Unit =
+    referenceChartOption.value match {
+      case Some(chart) =>
+        busyWorker.doTask("onSelectEnabledChips") {
+          new SelectEnabledChipsTask(chart, Option(parentWindow)) {
+            override def onFinish(result: Future[Option[GridColorChart]], successful: Boolean): Unit = {
+              if (successful) onFX {
+                // Update charts
+                val newChartOpt = result.get()
+                if (newChartOpt.isDefined) {
+                  if (referenceChartType.value == ColorChartType.Custom) {
+                    customChartOption = newChartOpt
+                  }
+                  referenceChartOptionWrapper.value = newChartOpt
+                  recreateReferenceChart()
+                }
+              }
+            }
+          }
+        }
+
+      case None =>
+        showError(Title, "Cannot select which chips are enabled.", "Chart is not defined.")
+    }
 
   def onSuggestCalibrationOptions(): Unit = busyWorker.doTask("onSuggestCalibrationOptions") {
     new SuggestCalibrationOptionsTask(currentChart, image, Option(parentWindow))

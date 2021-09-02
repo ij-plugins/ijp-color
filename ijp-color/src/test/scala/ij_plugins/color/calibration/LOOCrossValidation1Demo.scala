@@ -78,7 +78,14 @@ object LOOCrossValidation1Demo {
     println("All chips enables")
     printBestInfo(crossValidations)
 
-    // TODO: LOO-CV with invalid-reference-chips disabled
+    // LOO-CV with invalid-reference-chips disabled
+    val enabled2 = chart.enabled.toArray
+    enabled2(6) = false
+    val chart2 = chart.copyWithEnableChips(enabled2)
+    val crossValidations2 =
+      LOOCrossValidation.crossValidationStatsAll(chart2, imp, ReferenceColorSpace.values, MappingMethod.values)
+    println("\nWith invalid reference disabled")
+    printBestInfo(crossValidations2)
   }
 
   private def printBestInfo(crossValidations: Seq[CrossValidationData]): Unit = {

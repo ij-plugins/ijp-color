@@ -47,6 +47,8 @@ class ColorCalibratorUIController(
                                    private val chartInfoLabel: Label,
                                    private val editChartButton: Button,
                                    private val marginsSpinner: Spinner[java.lang.Integer],
+                                   private val enabledChipsChoiceBox: ChoiceBox[ChipsEnabledType],
+                                   private val selectChipsButton: Button,
                                    private val referenceColorSpaceChoiceBox: ChoiceBox[ReferenceColorSpace],
                                    private val mappingMethodChoiceBox: ChoiceBox[MappingMethod],
                                    private val suggestCalibrationOptionsButton: Button,
@@ -86,6 +88,9 @@ class ColorCalibratorUIController(
     chartTypeChoiceBox.selectionModel().select(newValue)
   }
 
+  editChartButton.onAction = _ => model.onEditChart()
+  editChartButton.disable <== model.referenceChartType =!= ColorChartType.Custom
+
   renderReferenceChartSplitButton.onAction = _ => model.onRenderReferenceChart()
   renderReferenceChartSplitButton.items = List(
     new MenuItem("Reference Colors") {
@@ -95,9 +100,6 @@ class ColorCalibratorUIController(
 
   renderReferenceChartSplitButton.disable <== !model.referenceChartDefined
 
-  editChartButton.onAction = _ => model.onEditChart()
-  editChartButton.disable <== !model.referenceChartEditEnabled
-
   chartInfoLabel.text <== model.chartInfoText
 
   // Actual chart
@@ -105,6 +107,27 @@ class ColorCalibratorUIController(
     value = model.chipMarginPercent()
     value <==> model.chipMarginPercent
   }
+
+  // Enabled chips type choice
+  enabledChipsChoiceBox.items = ObservableBuffer.from(ChipsEnabledType.values)
+  // Update model when UI changed
+  private val enabledChipsIsChanging = new AtomicBoolean(false)
+  enabledChipsChoiceBox.selectionModel().selectedItem.onChange { (_, oldValue, newValue) =>
+    enabledChipsIsChanging.synchronized {
+      if (!enabledChipsIsChanging.getAndSet(true)) {
+        model.enabledChipsType.value = newValue
+      }
+      enabledChipsIsChanging.set(false)
+    }
+  }
+  enabledChipsChoiceBox.selectionModel().selectFirst()
+  // Update UI when enabledChipsType changed
+  model.enabledChipsType.onChange { (_, _, newValue) =>
+    enabledChipsChoiceBox.selectionModel().select(newValue)
+  }
+
+  selectChipsButton.onAction = _ => model.onSelectEnabledChips()
+  selectChipsButton.disable <== (model.enabledChipsType =!= ChipsEnabledType.Custom) or !model.referenceChartDefined
 
   selectOutputsButton.onAction = _ => model.onSelectOutputs()
 

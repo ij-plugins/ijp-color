@@ -8,7 +8,7 @@ import scala.xml.{Node => XmlNode, NodeSeq => XmlNodeSeq, _}
 
 name := "ijp-color-project"
 
-val _version       = "0.10.2.1-SNAPSHOT"
+val _version       = "0.10.2.2-SNAPSHOT"
 val _scalaVersions = Seq("2.13.6", "2.12.14")
 val _scalaVersion  = _scalaVersions.head
 
@@ -151,7 +151,7 @@ lazy val ijp_color_ui = (project in file("ijp-color-ui"))
     libraryDependencies ++= Seq(
       "org.jfree"           % "jfreechart-fx"       % "1.0.1",
       "org.jfree"           % "fxgraphics2d"        % "1.8",
-      "org.scalafx"        %% "scalafx"             % "16.0.0-R24",
+      "org.scalafx"        %% "scalafx"             % "16.0.0-R25-SNAPSHOT",
       "org.scalafx"        %% "scalafx-extras"      % "0.3.6",
       "org.scalafx"        %% "scalafxml-core-sfx8" % "0.5",
       // Test

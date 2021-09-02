@@ -111,12 +111,12 @@ class ColorCalibrator(
    */
   def computeCalibrationMapping(observed: Array[Array[Double]]): CalibrationFit = {
     require(
-      observed.length == chart.referenceChips.length,
-      s"Expecting ${chart.referenceChips.length} observations, got ${observed.length}."
+      observed.length == chart.referenceChipsEnabled.length,
+      s"Expecting ${chart.referenceChipsEnabled.length} observations, got ${observed.length}."
     )
     require(observed.forall(_.length == 3))
 
-    val reference = chart.referenceColor(referenceColorSpace).clone()
+    val reference = chart.referenceColorEnabled(referenceColorSpace).clone()
     if (clipReferenceRGB && ReferenceColorSpace.sRGB == referenceColorSpace) {
       reference.foreach(r => {
         // Values should be clipped, but decimal precision should net be truncated
@@ -125,6 +125,8 @@ class ColorCalibrator(
         r(2) = clipUInt8D(r(2))
       })
     }
+
+    require(reference.length == observed.length)
 
     val corrector = MappingFactory.createCubicPolynomialTriple(reference, observed, mappingMethod)
     val corrected = observed.map(corrector.map)
@@ -146,7 +148,7 @@ class ColorCalibrator(
       "Expecting 3 gray-level images, got " + bands.length
     )
 
-    val observed = chart.averageChipColor(bands)
+    val observed = chart.averageChipColorEnabled(bands)
     computeCalibrationMapping(observed)
   }
 
@@ -158,7 +160,7 @@ class ColorCalibrator(
    * @throws java.lang.IllegalArgumentException if one of the calibration mapping functions cannot be computed.
    */
   def computeCalibrationMapping(image: ColorProcessor): CalibrationFit = {
-    val observed = chart.averageChipColor(image)
+    val observed = chart.averageChipColorEnabled(image)
     computeCalibrationMapping(observed)
   }
 

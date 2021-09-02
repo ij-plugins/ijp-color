@@ -61,29 +61,34 @@ trait ColorChart {
   def alignmentTransform: PerspectiveTransform
 
   /**
-   * Compute average color within aligned chips from an RGB image.
-   *
-   * @param cp RGB image
-   */
+    * Compute average color within aligned chips from an RGB image.
+    *
+    * @param cp RGB image
+    */
   def averageChipColor(cp: ColorProcessor): Array[Array[Double]] =
     averageChipColor(IJTools.splitRGB(cp))
 
-  /**
-   * Compute average color within aligned chips from an an image.
-   *
-   * Input images is represented by 3 bands. There is no assumption made about image color space.
-   *
-   * @param src image represented by 3 bands
-   */
-  def averageChipColor[T <: ImageProcessor](src: Array[T]): Array[Array[Double]]
+  def averageChipColorEnabled(cp: ColorProcessor): Array[Array[Double]] = filterEnabled(averageChipColor(cp))
 
   /**
-   * Compute average color within aligned chips from an an image.
-   *
-   * @param image is either single slice RGB image (ColorProcessor)
-   *              or three slices of gray processors representing color bands.
-   * @return average for each band in each color chip (array of triples).
-   */
+    * Compute average color within aligned chips from an an image.
+    *
+    * Input images is represented by 3 bands. There is no assumption made about image color space.
+    *
+    * @param src image represented by 3 bands
+    */
+  def averageChipColor[T <: ImageProcessor](src: Array[T]): Array[Array[Double]]
+
+  def averageChipColorEnabled[T <: ImageProcessor](src: Array[T]): Array[Array[Double]] =
+    filterEnabled(averageChipColor(src))
+
+  /**
+    * Compute average color within aligned chips from an an image.
+    *
+    * @param image is either single slice RGB image (ColorProcessor)
+    *              or three slices of gray processors representing color bands.
+    * @return average for each band in each color chip (array of triples).
+    */
   def averageChipColor(image: ImagePlus): Array[Array[Double]] = {
     (image.getType, image.getStackSize) match {
       case (COLOR_RGB, 1) =>
@@ -99,12 +104,18 @@ trait ColorChart {
     }
   }
 
+  def averageChipColorEnabled(image: ImagePlus): Array[Array[Double]] = filterEnabled(averageChipColor(image))
+
   /** Return reference colors represented in given color space. */
   def referenceColor(colorSpace: ReferenceColorSpace): Array[Array[Double]] = colorSpace match {
-    case ReferenceColorSpace.XYZ  => referenceColorXYZ
+    case ReferenceColorSpace.XYZ => referenceColorXYZ
     case ReferenceColorSpace.sRGB => referenceColorSRGB
-    case _                        => throw new IllegalArgumentException("Unsupported reference color space: '" + colorSpace + "'.")
+    case _ => throw new IllegalArgumentException("Unsupported reference color space: '" + colorSpace + "'.")
   }
+
+  /** Return reference colors represented in given color space. Only enabled chips are returned. */
+  def referenceColorEnabled(colorSpace: ReferenceColorSpace): Array[Array[Double]] =
+    filterEnabled(referenceColor(colorSpace))
 
   /** Return reference color expressed in CIE XYZ color space assuming default reference white for this chart. */
   def referenceColorXYZ: Array[Array[Double]]
@@ -115,17 +126,36 @@ trait ColorChart {
   }
 
   /**
-   * Creates a copy of this chart in which some chips cn be enabled/disabled.
-   *
-   * @param enabled array with indexes corresponding to ones returned by `referenceColor` methods.
-   *                If value is `true` chip with corresponding index is enabled, if `false` it is disabled.
-   * @return
-   */
+    * Creates a copy of this chart in which some chips cn be enabled/disabled.
+    *
+    * @param enabled array with indexes corresponding to ones returned by `referenceColor` methods.
+    *                If value is `true` chip with corresponding index is enabled, if `false` it is disabled.
+    * @return
+    */
   def copyWithEnableChips(enabled: Array[Boolean]): ColorChart
 
+  /**
+    * Which chips should be used in computations. If value is 'true' chip is active' if 'false' not used in computations.
+    */
+  def enabled: Seq[Boolean]
+
   /** Reference chips without transform applied to their coordinates. */
-  def referenceChips: immutable.IndexedSeq[ColorChip]
+  def referenceChips: immutable.Seq[ColorChip]
+
+  /** Reference chips without transform applied to their coordinates. Only enabled chips are returned. */
+  def referenceChipsEnabled: immutable.Seq[ColorChip] = filterEnabled(referenceChips)
 
   /** Color chips with alignment transform applied to their outline. */
   def alignedChips: immutable.IndexedSeq[ColorChip]
+
+  private def filterEnabled[T](s: immutable.Seq[T]): immutable.Seq[T] = {
+    require(s.length == enabled.length)
+    s.zip(enabled).filter(_._2).map(_._1)
+  }
+
+  private def filterEnabled(s: Array[Array[Double]]): Array[Array[Double]] = {
+    require(s.length == enabled.length)
+    //    s.zipWithIndex.filter(v => enabled(v._2)).map(_._1)
+    s.zip(enabled).filter(_._2).map(_._1)
+  }
 }

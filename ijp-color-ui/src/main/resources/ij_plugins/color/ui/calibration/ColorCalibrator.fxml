@@ -90,23 +90,23 @@
                     </padding>
                 </HBox>
                 <Label id="ijp-label" alignment="CENTER_RIGHT" text="Reference" GridPane.halignment="RIGHT"
-                       GridPane.rowIndex="8" GridPane.valignment="CENTER"/>
+                       GridPane.rowIndex="9"/>
                 <ChoiceBox fx:id="referenceColorSpaceChoiceBox" maxWidth="1.7976931348623157E308" prefWidth="150.0"
-                           GridPane.columnIndex="1" GridPane.rowIndex="8"/>
-                <Label id="ijp-label" text="Mapping method" GridPane.rowIndex="9"/>
-                <ChoiceBox fx:id="mappingMethodChoiceBox" maxWidth="1.7976931348623157E308" prefWidth="150.0"
                            GridPane.columnIndex="1" GridPane.rowIndex="9"/>
-                <Button fx:id="suggestCalibrationOptionsButton" mnemonicParsing="false" text="Sugget Options"
-                        GridPane.columnIndex="2" GridPane.rowIndex="8"/>
+                <Label id="ijp-label" text="Mapping method" GridPane.rowIndex="10"/>
+                <ChoiceBox fx:id="mappingMethodChoiceBox" maxWidth="1.7976931348623157E308" prefWidth="150.0"
+                           GridPane.columnIndex="1" GridPane.rowIndex="10"/>
+                <Button fx:id="suggestCalibrationOptionsButton" maxWidth="1.7976931348623157E308"
+                        mnemonicParsing="false" text="Sugget Options" GridPane.columnIndex="2" GridPane.rowIndex="9"/>
                 <Button id="ijp-button" fx:id="calibrateButton" contentDisplay="CENTER"
                         maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Calibrate"
-                        GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="11">
+                        GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="12">
                     <GridPane.margin>
                         <Insets bottom="5.0" top="5.0"/>
                     </GridPane.margin>
                 </Button>
                 <Button fx:id="applyToCurrentImageButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
-                        text="Apply" GridPane.columnIndex="1" GridPane.rowIndex="13">
+                        text="Apply" GridPane.columnIndex="1" GridPane.rowIndex="14">
                     <padding>
                         <Insets bottom="5.0" top="5.0"/>
                     </padding>
@@ -114,7 +114,7 @@
                         <Insets bottom="5.0" top="5.0"/>
                     </GridPane.margin>
                 </Button>
-                <HBox prefWidth="200.0" GridPane.columnSpan="2147483647" GridPane.rowIndex="12">
+                <HBox prefWidth="200.0" GridPane.columnSpan="2147483647" GridPane.rowIndex="13">
                     <children>
                         <Label id="ijp-separator" text="Apply to Another Image"/>
                         <Separator id="ijp-separator" valignment="TOP" HBox.hgrow="ALWAYS">
@@ -128,7 +128,7 @@
                     </padding>
                 </HBox>
                 <Button fx:id="helpButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Help"
-                        GridPane.columnIndex="2" GridPane.rowIndex="13"/>
+                        GridPane.columnIndex="2" GridPane.rowIndex="14"/>
                 <Label id="ijp-label" text="Info" GridPane.halignment="RIGHT" GridPane.rowIndex="4"
                        GridPane.valignment="CENTER"/>
                 <Label id="ijp-label" fx:id="chartInfoLabel" text="???" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
@@ -136,7 +136,12 @@
                         text="Edit Chart" GridPane.columnIndex="2" GridPane.rowIndex="3"/>
                 <Button fx:id="selectOutputsButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
                         text="Select Outputs..." GridPane.columnIndex="1" GridPane.halignment="CENTER"
-                        GridPane.rowIndex="10"/>
+                        GridPane.rowIndex="11"/>
+                <Label alignment="CENTER_RIGHT" text="Enabled Chips" GridPane.halignment="RIGHT" GridPane.rowIndex="8"/>
+                <ChoiceBox fx:id="enabledChipsChoiceBox" maxWidth="1.7976931348623157E308" prefWidth="150.0"
+                           GridPane.columnIndex="1" GridPane.rowIndex="8"/>
+                <Button fx:id="selectChipsButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+                        text="Select Chips" GridPane.columnIndex="2" GridPane.rowIndex="8"/>
             </children>
             <rowConstraints>
                 <RowConstraints minHeight="10.0"/>
@@ -147,6 +152,7 @@
                 <RowConstraints minHeight="10.0"/>
                 <RowConstraints minHeight="10.0"/>
                 <RowConstraints minHeight="10.0"/>
+                <RowConstraints minHeight="10.0" prefHeight="30.0"/>
                 <RowConstraints minHeight="10.0"/>
                 <RowConstraints minHeight="10.0"/>
                 <RowConstraints minHeight="10.0"/>

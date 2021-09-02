@@ -43,18 +43,17 @@ import scala.collection.immutable
  * @param enabled    which chips are active. If value is 'true' chip is active' if 'false' not used in computations.
  */
 final class GridColorChart(
-  val name: String,
-  nbColumns: Int,
-  nbRows: Int,
-  val chips: List[(String, Lab)],
-  chipMargin: Double,
-  val enabled: List[Boolean],
-  override val refWhite: ReferenceWhite,
-  alignmentTransform: PerspectiveTransform
-) extends GridChartFrame(nbColumns, nbRows, chipMargin, alignmentTransform)
+                            val name: String,
+                            nbColumns: Int,
+                            nbRows: Int,
+                            val chips: Seq[(String, Lab)],
+                            chipMargin: Double,
+                            override val enabled: Seq[Boolean],
+                            override val refWhite: ReferenceWhite,
+                            alignmentTransform: PerspectiveTransform
+                          ) extends GridChartFrame(nbColumns, nbRows, chipMargin, alignmentTransform)
     with ColorChart {
 
-  // TODO: add requirement messages
   require(chipMargin >= 0 && chipMargin < 0.5, s"Margin value must at least 0 but less than 0.5, got $chipMargin.")
   require(nbColumns > 0, s"Number of columns must be greater than 0, got $nbColumns.")
   require(nbRows > 0, s"Number of rows must be greater than 0, got $nbColumns.")
@@ -63,9 +62,12 @@ final class GridColorChart(
     "Number of chips must equal number of columns times number of rows. " +
       s"Expecting ${nbColumns * nbRows}, got ${chips.size}."
   )
-  require(chips.size == enabled.size)
-  require(refWhite != null)
-  require(alignmentTransform != null)
+  require(
+    chips.size == enabled.size,
+    s"Number of 'enabled' flags mut match number of chips. Expecting ${chips.size}, got ${enabled.size}."
+  )
+  require(refWhite != null, "'refWhite' cannot be null.")
+  require(alignmentTransform != null, "'alignmentTransform', cannot be null.")
 
   /**
     * Construct chart with all chips enabled.
@@ -76,14 +78,14 @@ final class GridColorChart(
     * @param chips     chip names and CIE L*a*b* / D65 color values, row by row, starting at (0,0) or top left corner.
     */
   def this(
-    name: String,
-    nbColumns: Int,
-    nbRows: Int,
-    chips: List[(String, Lab)],
-    chipMargin: Double = 0,
-    refWhite: ReferenceWhite,
-    alignmentTransform: PerspectiveTransform = new PerspectiveTransform()
-  ) = {
+            name: String,
+            nbColumns: Int,
+            nbRows: Int,
+            chips: Seq[(String, Lab)],
+            chipMargin: Double = 0,
+            refWhite: ReferenceWhite,
+            alignmentTransform: PerspectiveTransform = new PerspectiveTransform()
+          ) = {
     this(name, nbColumns, nbRows, chips, chipMargin, List.fill(nbColumns * nbRows)(true), refWhite, alignmentTransform)
   }
 
@@ -102,16 +104,14 @@ final class GridColorChart(
   def referenceChips: immutable.IndexedSeq[ColorChip] = {
     val a = chips.toArray
     for {
-      row    <- 0 until nbRows
+      row <- 0 until nbRows
       column <- 0 until nbColumns
       i = row * nbColumns + column
-      if enabled(i)
     } yield ColorChip(a(i)._1, a(i)._2, column, row, chipMargin)
-  }
+  } ensuring (_.length == chips.size)
 
   override def referenceColorXYZ: Array[Array[Double]] = {
-    val enabledChips = chips.zipWithIndex.filter { case (_, i) => enabled(i) }.map(_._1)
-    enabledChips.map { v => colorConverter.toXYZ(v._2).toArray }.toArray
+    chips.map { v => colorConverter.toXYZ(v._2).toArray }.toArray
   }
 
   /**
@@ -184,9 +184,9 @@ final class GridColorChart(
 
   /** Creates a copy of this chart with different `chipMargin`. Value of the margin must be between 0 and 0.5. */
   override def copyWithNewChipMargin(newChipMargin: Double): GridColorChart =
-    new GridColorChart(name, nbColumns, nbRows, chips, newChipMargin, refWhite, alignmentTransform)
+    new GridColorChart(name, nbColumns, nbRows, chips, newChipMargin, enabled, refWhite, alignmentTransform)
 
   /** Creates a copy of this chart with different `alignmentTransform`. */
   override def copyWith(newAlignmentTransform: PerspectiveTransform): GridColorChart =
-    new GridColorChart(name, nbColumns, nbRows, chips, chipMargin, refWhite, newAlignmentTransform)
+    new GridColorChart(name, nbColumns, nbRows, chips, chipMargin, enabled, refWhite, newAlignmentTransform)
 }

@@ -22,10 +22,11 @@
 
 package ij_plugins.color.ui.calibration.tasks
 
-import ij.IJ
+import ij.{IJ, Prefs}
 import ij_plugins.color.calibration.chart.{ColorCharts, GridColorChart}
 import ij_plugins.color.converter.ReferenceWhite
 import ij_plugins.color.ui.fx.GenericDialogFX
+import ij_plugins.color.ui.util.IJPrefs
 import org.scalafx.extras.BusyWorker.SimpleTask
 import scalafx.stage.Window
 
@@ -36,18 +37,18 @@ class EditCustomChartTask(customChartOption: Option[GridColorChart], parentWindo
   extends SimpleTask[Option[GridColorChart]] {
 
   private val Title = "Edit Custom Reference Chart"
+  private val ReferencePrefix = classOf[EditCustomChartTask].getName
+  private val defaultPathPrefName = ReferencePrefix + ".defaultPath"
 
   override def call(): Option[GridColorChart] = {
 
     val _nbRows = customChartOption.map(_.nbRows).getOrElse(5)
     val _nbColumns = customChartOption.map(_.nbColumns).getOrElse(6)
     val _refWhite = customChartOption.map(_.refWhite).getOrElse(ReferenceWhite.D50)
-    // TODO Save last path in preferences
-    val _defaultPath = ""
+    // Load last path from ImageJ preferences
+    val _defaultPath = IJPrefs.getStringOption(defaultPathPrefName).getOrElse("")
 
-    // TODO Implement using JavaFX to preserve correct window order when dialog opens,
-    //  it should open in front of its parent dialog, but not be forced to be always on top of all other windows
-
+    // Implement using JavaFX to preserve correct window order when dialog opens
     val gd =
       new GenericDialogFX(
         Title,
@@ -91,7 +92,7 @@ class EditCustomChartTask(customChartOption: Option[GridColorChart], parentWindo
               None
           }
 
-        chipsOpt.map { chips =>
+        val chart = chipsOpt.map { chips =>
           new GridColorChart(
             s"Custom - ${file.getName}",
             nbColumns = nbCols,
@@ -101,6 +102,11 @@ class EditCustomChartTask(customChartOption: Option[GridColorChart], parentWindo
             refWhite = refWhite
           )
         }
+
+        // Save defaultPath one we know that it can be used to create a chart
+        Prefs.set(defaultPathPrefName, file.getPath)
+
+        chart
       } catch {
         case NonFatal(ex) =>
           IJ.error(Title, s"Error when creating custom chart. ${Option(ex.getMessage).getOrElse("")}")
