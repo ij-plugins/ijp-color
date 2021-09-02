@@ -146,6 +146,7 @@ class GenericDialogFX(
     val label2 = label.replace('_', ' ')
 
     val fileSelectionField = new FileSelectionField(label2, parentWindowOption)
+    fileSelectionField.path.value = defaultPath
 
     _grid.add(new Label(label2), 0, _rowIndex)
     _grid.add(fileSelectionField.view, 1, _rowIndex, GridPane.Remaining, 1)
