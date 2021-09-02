@@ -208,11 +208,22 @@ final class ColorConverter(
       }
 
     val xyz2rgb = rgbSpace.xyz2rgb
-    val r       = compand(x2 * xyz2rgb.m00 + y2 * xyz2rgb.m10 + z2 * xyz2rgb.m20) * rgbScale
-    val g       = compand(x2 * xyz2rgb.m01 + y2 * xyz2rgb.m11 + z2 * xyz2rgb.m21) * rgbScale
-    val b       = compand(x2 * xyz2rgb.m02 + y2 * xyz2rgb.m12 + z2 * xyz2rgb.m22) * rgbScale
+    val r = compand(x2 * xyz2rgb.m00 + y2 * xyz2rgb.m10 + z2 * xyz2rgb.m20) * rgbScale
+    val g = compand(x2 * xyz2rgb.m01 + y2 * xyz2rgb.m11 + z2 * xyz2rgb.m21) * rgbScale
+    val b = compand(x2 * xyz2rgb.m02 + y2 * xyz2rgb.m12 + z2 * xyz2rgb.m22) * rgbScale
 
     RGB(r, g, b)
+  }
+
+  /** Create copy of this object with a modified field. */
+  def copyWith(
+                refWhite: ReferenceWhite = refWhite,
+                rgbSpace: RGBWorkingSpace = rgbSpace,
+                chromaticAdaptation: Option[ChromaticAdaptation] = chromaticAdaptation,
+                rgbScale: Double = rgbScale,
+                xyzScale: Double = xyzScale
+              ): ColorConverter = {
+    new ColorConverter(refWhite, rgbSpace, chromaticAdaptation, rgbScale, xyzScale)
   }
 
   private def compand(linear: Double): Double = {
@@ -220,7 +231,7 @@ final class ColorConverter(
       case RGBWorkingSpace.sRGB =>
         assert(rgbSpace.gamma < 0)
         val (l, sign) = if (linear < 0.0) (-linear, -1.0) else (linear, 1.0)
-        val c         = if (l <= 0.0031308) l * 12.92 else 1.055 * math.pow(l, 1.0 / 2.4) - 0.055
+        val c = if (l <= 0.0031308) l * 12.92 else 1.055 * math.pow(l, 1.0 / 2.4) - 0.055
         c * sign
       case RGBWorkingSpace.ECIRGBv2 =>
         assert(rgbSpace.gamma == 0)
