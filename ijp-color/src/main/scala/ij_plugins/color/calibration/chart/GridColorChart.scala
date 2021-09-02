@@ -152,17 +152,27 @@ final class GridColorChart(
 
   override def averageChipColor[T <: ImageProcessor](src: Array[T]): Array[Array[Double]] = {
     val chips = alignedChips
-    val r     = for (chip <- chips) yield IJTools.measureColor(src, chip.outline.toArray)
+    val r = for (chip <- chips) yield IJTools.measureColor(src, chip.outline.toArray)
     r.toArray
   }
 
   /**
-   * Creates a copy of this chart in which some chips cn be enabled/disabled.
-   *
-   * @param enabled array with indexes corresponding to ones returned by `referenceColor` methods.
-   *                If value is `true` chip with corresponding index is enabled, if `false` it is disabled.
-   * @return
-   */
+    * Creates a copy of this chart that has its chip outline aligned gto given ROI.
+    *
+    * @param roi desired chip outline ROI.
+    */
+  override def copyAlignedTo(roi: Roi): GridColorChart = {
+    val t = GridChartFrameUtils.computeAlignmentTransform(roi, this)
+    this.copyWith(t)
+  }
+
+  /**
+    * Creates a copy of this chart in which some chips cn be enabled/disabled.
+    *
+    * @param enabled array with indexes corresponding to ones returned by `referenceColor` methods.
+    *                If value is `true` chip with corresponding index is enabled, if `false` it is disabled.
+    * @return
+    */
   override def copyWithEnableChips(enabled: Array[Boolean]): GridColorChart = {
     require(
       chips.length == enabled.length,

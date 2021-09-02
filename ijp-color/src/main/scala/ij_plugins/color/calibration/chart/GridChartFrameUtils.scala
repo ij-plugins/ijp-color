@@ -25,7 +25,9 @@ package ij_plugins.color.calibration.chart
 import ij.ImagePlus
 import ij.gui.Roi
 import ij.process.{ColorProcessor, ImageProcessor, ImageStatistics}
+import ij_plugins.color.util.PerspectiveTransform
 
+import java.awt.geom.Point2D
 import scala.collection.immutable.ListMap
 
 object GridChartFrameUtils {
@@ -90,5 +92,29 @@ object GridChartFrameUtils {
     imp.setRoi(impRoi)
 
     ListMap(roiMeasurementMaps: _*)
+  }
+
+  def computeAlignmentTransform(chartROI: Roi, refChartFrame: GridChartFrame): PerspectiveTransform = {
+    require(chartROI != null, "'chartROI' cannot be null.")
+    require(
+      chartROI.getType == Roi.POLYGON,
+      s"'chartROI's type must be a 'Roi.POLYGON', got ${chartROI.getTypeAsString}."
+    )
+    require(chartROI.getPolygon.npoints == 4, s"'chartROI's must have 4 vertices, got ${chartROI.getPolygon.npoints}.")
+    require(refChartFrame != null)
+
+    val polygon = chartROI.getFloatPolygon
+    // Get location of the chart corners from the selected poly-line
+    val p0 = new Point2D.Float(polygon.xpoints(0), polygon.ypoints(0))
+    val p1 = new Point2D.Float(polygon.xpoints(1), polygon.ypoints(1))
+    val p2 = new Point2D.Float(polygon.xpoints(2), polygon.ypoints(2))
+    val p3 = new Point2D.Float(polygon.xpoints(3), polygon.ypoints(3))
+    val points = Array[Point2D](p0, p1, p2, p3)
+
+    // Create alignment transform
+    PerspectiveTransform.quadToQuad(
+      refChartFrame.referenceOutline.toArray,
+      points
+    )
   }
 }
