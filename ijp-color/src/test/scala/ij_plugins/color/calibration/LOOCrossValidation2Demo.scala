@@ -28,14 +28,14 @@ import ij_plugins.color.calibration.regression.MappingMethod
 
 import java.io.File
 
-object LOOCrossValidationDemo extends App {
+object LOOCrossValidation2Demo extends App {
 
   main()
 
   def main(): Unit = {
     // Read chart values
     val tableFile = "../test/data/Passport-linear-25_color_values.csv"
-    val srcRT     = ResultsTable.open(tableFile)
+    val srcRT = ResultsTable.open(tableFile)
 
     // Extract chart values as an array
     val observed = new Array[Array[Double]](srcRT.getCounter)
@@ -55,17 +55,17 @@ object LOOCrossValidationDemo extends App {
 
     val bestByMean = crossValidations.minBy(v => v.statsDeltaE.getMean)
     println(
-      s"Best by mean: ${bestByMean.method} - ${bestByMean.referenceColorSpace}: ${bestByMean.statsDeltaE.getMean} "
+      s"Best by mean  : ${bestByMean.referenceColorSpace} - ${bestByMean.method}: ${bestByMean.statsDeltaE.getMean} "
     )
 
     val bestByMedian = crossValidations.minBy(v => v.statsDeltaE.getPercentile(50))
     println(
-      s"Best by median: ${bestByMedian.method} - ${bestByMedian.referenceColorSpace}: ${bestByMedian.statsDeltaE.getPercentile(50)} "
+      s"Best by median: ${bestByMedian.referenceColorSpace} - ${bestByMedian.method}: ${bestByMedian.statsDeltaE.getPercentile(50)} "
     )
 
     val bestBy95 = crossValidations.minBy(v => v.statsDeltaE.getPercentile(95))
     println(
-      s"Best by 95%: ${bestBy95.method} - ${bestBy95.referenceColorSpace}: ${bestBy95.statsDeltaE.getPercentile(95)} "
+      s"Best by 95%   : ${bestBy95.referenceColorSpace} - ${bestBy95.method}: ${bestBy95.statsDeltaE.getPercentile(95)} "
     )
 
     // Convert to a table for saving
