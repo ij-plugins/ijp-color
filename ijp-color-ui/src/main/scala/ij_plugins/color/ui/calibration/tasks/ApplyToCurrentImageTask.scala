@@ -36,13 +36,13 @@ import scalafx.stage.Window
   *
   * @param correctionRecipe correction recipe
   * @param parentWindow     parent window for dialogs
- */
+  */
 class ApplyToCurrentImageTask(
                                correctionRecipe: ObjectProperty[Option[CorrectionRecipe]],
                                outputConfig: OutputConfig,
                                val parentWindow: Option[Window]
                              ) extends SimpleTask[Unit]
-    with ShowMessage {
+  with ShowMessage {
 
   def call(): Unit = {
     val errorTitle = "Cannot apply Correction"
@@ -84,6 +84,9 @@ class ApplyToCurrentImageTask(
             imp.getShortTitle + " - CIE L*a*b*"
           )
         }
+
+      case Left(error) =>
+        showException(error.message, error.t.getMessage, error.t)
     }
   }
 }
