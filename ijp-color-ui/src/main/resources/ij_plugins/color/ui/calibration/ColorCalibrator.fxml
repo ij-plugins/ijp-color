@@ -53,7 +53,7 @@
                 <ChoiceBox fx:id="chartTypeChoiceBox" maxWidth="1.7976931348623157E308" prefWidth="200.0"
                            GridPane.columnIndex="1" GridPane.rowIndex="3"/>
                 <SplitMenuButton fx:id="renderReferenceChartSplitButton" maxWidth="1.7976931348623157E308"
-                                 mnemonicParsing="false" text="Render" GridPane.columnIndex="2" GridPane.rowIndex="3">
+                                 mnemonicParsing="false" text="Render" GridPane.columnIndex="2" GridPane.rowIndex="4">
                     <items>
                         <MenuItem mnemonicParsing="false" text="Action 1"/>
                         <MenuItem mnemonicParsing="false" text="Action 2"/>
@@ -133,10 +133,10 @@
                        GridPane.valignment="CENTER"/>
                 <Label id="ijp-label" fx:id="chartInfoLabel" text="???" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
                 <Button fx:id="editChartButton" disable="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
-                        text="Edit Chart" GridPane.columnIndex="2" GridPane.rowIndex="4"/>
+                        text="Edit Chart" GridPane.columnIndex="2" GridPane.rowIndex="3"/>
                 <Button fx:id="selectOutputsButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
-                        text="Select Outputs..."
-                        GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="10"/>
+                        text="Select Outputs..." GridPane.columnIndex="1" GridPane.halignment="CENTER"
+                        GridPane.rowIndex="10"/>
             </children>
             <rowConstraints>
                 <RowConstraints minHeight="10.0"/>
