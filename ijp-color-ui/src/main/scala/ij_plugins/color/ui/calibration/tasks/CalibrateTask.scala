@@ -346,7 +346,7 @@ class CalibrateTask(
 
     // Delta in reference color space
     val deltaStats = {
-      val chips = chart.referenceChips
+      val chips = chart.referenceChipsEnabled
       //      val before = new DescriptiveStatistics()
       val after = new DescriptiveStatistics()
       for (i <- chips.indices) {
