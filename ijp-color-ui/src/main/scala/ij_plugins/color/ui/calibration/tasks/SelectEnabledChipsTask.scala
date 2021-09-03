@@ -74,20 +74,19 @@ object SelectEnabledChipsTask {
     new TableView[ColorChipData](data) {
       editable = true
       columns ++= Seq(
-        new TableColumn[ColorChipData, java.lang.Boolean] {
-          text = "Enabled"
-          cellValueFactory = _.value.enabled.asInstanceOf[ObservableValue[java.lang.Boolean, java.lang.Boolean]]
-          cellFactory = CheckBoxTableCell.forTableColumn[ColorChipData](this)
-          editable = true
-        },
         new TableColumn[ColorChipData, Number] {
-          text = "Index"
           cellValueFactory =
             (v: TableColumn.CellDataFeatures[ColorChipData, Number]) => ObjectProperty[Number](v.value.index)
           cellFactory = (cell, value) => {
             cell.text = s"${value.intValue()}"
             cell.setStyle("-fx-alignment: CENTER-RIGHT;")
           }
+        },
+        new TableColumn[ColorChipData, java.lang.Boolean] {
+          text = "Enabled"
+          cellValueFactory = _.value.enabled.asInstanceOf[ObservableValue[java.lang.Boolean, java.lang.Boolean]]
+          cellFactory = CheckBoxTableCell.forTableColumn[ColorChipData](this)
+          editable = true
         },
         new TableColumn[ColorChipData, String] {
           text = "Name"
