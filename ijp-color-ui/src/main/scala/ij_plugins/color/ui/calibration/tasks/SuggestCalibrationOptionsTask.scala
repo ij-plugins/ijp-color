@@ -60,12 +60,12 @@ class SuggestCalibrationOptionsTask(chart: GridColorChart, image: ImagePlus, val
     val best = crossValidations.minBy(_.statsDeltaE.getMean)
     IJ.showStatus("Best: " + best.referenceColorSpace + ":" + best.method + " -> " + best.statsDeltaE.getMean)
 
-    // Sort, worst first
+    // Sort, best first
     val hSorted = crossValidations.toArray.sortBy(_.statsDeltaE.getMean)
 
     // Show as results table
     val rt = new ResultsTable()
-    for ((v, i) <- hSorted.reverse.zipWithIndex) {
+    for ((v, i) <- hSorted.zipWithIndex) {
       rt.setValue("Reference", i, v.referenceColorSpace.toString)
       rt.setValue("Method", i, v.method.toString)
       rt.setValue("Mean DeltaE", i, v.statsDeltaE.getMean)
