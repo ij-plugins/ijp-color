@@ -67,7 +67,7 @@ class ColorCalibratorSpec extends AnyFlatSpec {
     )
 
     // Parameters
-    val chart      = ColorCharts.XRitePassportColorChecker.copyWithNewChipMargin(0.25)
+    val chart = ColorCharts.XRitePassportColorChecker.copyWithChipMargin(0.25)
     val colorSpace = ReferenceColorSpace.XYZ
     val method     = MappingMethod.LinearCrossBand
 
@@ -90,7 +90,7 @@ class ColorCalibratorSpec extends AnyFlatSpec {
   "ColorCalibrator" should "perform color calibration of an image in XYZ" in {
 
     // Parameters
-    val chart      = ColorCharts.XRitePassportColorChecker.copyWithNewChipMargin(0.25)
+    val chart = ColorCharts.XRitePassportColorChecker.copyWithChipMargin(0.25)
     val colorSpace = ReferenceColorSpace.XYZ
     val method     = MappingMethod.LinearCrossBand
     val testImage  = new File("../test/data/Passport-linear-25.tif")
@@ -129,7 +129,7 @@ class ColorCalibratorSpec extends AnyFlatSpec {
   "ColorCalibrator" should "be fast :) - benchmark test" in {
 
     // Parameters
-    val chart      = ColorCharts.XRitePassportColorChecker.copyWithNewChipMargin(0.25)
+    val chart = ColorCharts.XRitePassportColorChecker.copyWithChipMargin(0.25)
     val colorSpace = ReferenceColorSpace.XYZ
     val method     = MappingMethod.LinearCrossBand
     val testImage  = "../test/data/Passport-linear-25.tif"

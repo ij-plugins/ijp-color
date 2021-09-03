@@ -120,7 +120,7 @@ object LOOCrossValidation {
       // Disable i-th chip when computing calibration coefficients
       val enabled = enabledChips.clone()
       enabled(i) = false
-      val leaveOneOutChart = chart.copyWithEnableChips(enabled)
+      val leaveOneOutChart = chart.copyWithEnabled(enabled)
 
       // Compute color mapping coefficients
       val colorCalibrator = new ColorCalibrator(leaveOneOutChart, referenceColorSpace, mappingMethod, clipReferenceRGB)

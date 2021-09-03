@@ -102,7 +102,7 @@ class LOOCrossValidationSpec extends AnyFlatSpec {
     // LOO-CV with invalid-reference-chips disabled
     val enabled = chart.enabled.toArray
     enabled(6) = false
-    val chart2 = chart.copyWithEnableChips(enabled)
+    val chart2 = chart.copyWithEnabled(enabled)
     val crossValidations =
       LOOCrossValidation.crossValidationStatsAll(chart2, imp, ReferenceColorSpace.values, MappingMethod.values)
 

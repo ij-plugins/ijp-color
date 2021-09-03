@@ -79,7 +79,7 @@ class GridChartFrame(
   /**
     * Creates a copy of this chart with different `chipMargin`. Value of the margin must be between 0 and 0.5.
     */
-  def copyWithNewChipMargin(newChipMargin: Double): GridChartFrame =
+  def copyWithChipMargin(newChipMargin: Double): GridChartFrame =
     new GridChartFrame(nbColumns, nbRows, newChipMargin, alignmentTransform)
 
   /**

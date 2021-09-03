@@ -173,7 +173,7 @@ final class GridColorChart(
     *                If value is `true` chip with corresponding index is enabled, if `false` it is disabled.
     * @return
     */
-  override def copyWithEnableChips(enabled: Array[Boolean]): GridColorChart = {
+  override def copyWithEnabled(enabled: Array[Boolean]): GridColorChart = {
     require(
       chips.length == enabled.length,
       "Expecting " + chips.length + " elements in the input array, got " + enabled.length
@@ -182,8 +182,11 @@ final class GridColorChart(
     new GridColorChart(name, nbColumns, nbRows, chips, chipMargin, enabled.toList, refWhite, alignmentTransform)
   }
 
+  override def copyWithEnabledAll: GridColorChart = copyWithEnabled(Array.fill(enabled.length)(true))
+
+
   /** Creates a copy of this chart with different `chipMargin`. Value of the margin must be between 0 and 0.5. */
-  override def copyWithNewChipMargin(newChipMargin: Double): GridColorChart =
+  override def copyWithChipMargin(newChipMargin: Double): GridColorChart =
     new GridColorChart(name, nbColumns, nbRows, chips, newChipMargin, enabled, refWhite, alignmentTransform)
 
   /** Creates a copy of this chart with different `alignmentTransform`. */

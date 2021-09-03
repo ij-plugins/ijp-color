@@ -158,7 +158,7 @@ class SelectEnabledChipsTask(chart: GridColorChart, parentWindow: Option[Window]
       dialog.resultConverter = dialogButton =>
         if (dialogButton == ButtonType.OK) {
           val enabled: Array[Boolean] = data.sortBy(_.index).map(_.enabled.value).toArray
-          chart.copyWithEnableChips(enabled)
+          chart.copyWithEnabled(enabled)
         } else
           null
 

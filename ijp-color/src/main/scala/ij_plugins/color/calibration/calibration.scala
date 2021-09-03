@@ -62,8 +62,8 @@ package object calibration {
     val scale  = 80
     val margin = 0.1 * scale
 
-    val chart       = referenceChart.copyWithNewChipMargin(0.1).copyWith(new PerspectiveTransform())
-    val maxX        = chart.referenceOutline.map(_.getX).max * scale
+    val chart = referenceChart.copyWithChipMargin(0.1).copyWith(new PerspectiveTransform())
+    val maxX = chart.referenceOutline.map(_.getX).max * scale
     val maxY        = chart.referenceOutline.map(_.getY).max * scale
     val width: Int  = (maxX + 2 * margin).toInt
     val height: Int = (maxY + 2 * margin).toInt

@@ -164,32 +164,43 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
   recreateReferenceChart()
 
   def recreateReferenceChart(): Unit = {
-    val newChartOpt =
-      (
-        if (referenceChartType.value == ColorChartType.Custom) {
-          customChartOption
-        } else {
-          ColorCharts.withColorChartType(referenceChartType.value)
-        }
-        ).map(c => c.copyWithNewChipMargin(chipMarginPercent.value / 100d))
-
-    // Transfer enabled chips if chart are defines and we have custom chip enabled
-    val newChartOpt2 =
-      for {
-        currentChart <- referenceChartOptionWrapper.value
-        newChart <- newChartOpt
-        if enabledChipsType.value == ChipsEnabledType.Custom
-      } yield {
-        newChart.copyWithEnableChips(currentChart.enabled.toArray)
+    // Select active chart: custom or pre-defined
+    val newChartOpt1: Option[GridColorChart] =
+      if (referenceChartType.value == ColorChartType.Custom) {
+        customChartOption
+      } else {
+        ColorCharts.withColorChartType(referenceChartType.value)
       }
 
-    referenceChartOptionWrapper.value = if (newChartOpt2.isDefined) newChartOpt2 else newChartOpt
+    // Copy current chipMargin
+    val newChartOpt2: Option[GridColorChart] = newChartOpt1.map(_.copyWithChipMargin(chipMarginPercent.value / 100d))
+
+    // Copy enabled chips
+    val newChartOpt3: Option[GridColorChart] =
+      if (enabledChipsType.value == ChipsEnabledType.Custom) {
+        // Transfer enabled chips, if possible
+        newChartOpt2.map { newChart2 =>
+          (
+            for {
+              currentChart <- referenceChartOptionWrapper.value
+            } yield {
+              newChart2.copyWithEnabled(currentChart.enabled.toArray)
+            }
+            ).getOrElse(newChart2)
+        }
+      } else {
+        newChartOpt2.map(_.copyWithEnabledAll)
+      }
+
+    referenceChartOptionWrapper.value = newChartOpt3
 
     referenceChartDefinedWrapper.value = referenceChartOptionWrapper.value.isDefined
 
     if (referenceChartType.value == ColorChartType.Custom) {
-      customChartOption = if (newChartOpt2.isDefined) newChartOpt2 else newChartOpt
+      customChartOption = newChartOpt3
     }
+
+    if (enabledChipsType.value != ChipsEnabledType.Custom) {}
 
     chartInfoText.value =
       referenceChartOptionWrapper.value
@@ -204,7 +215,7 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
           case Some(rc) =>
             rc.copyWith(c.alignmentTransform)
           case None =>
-            throw new IllegalStateException(s"Internal error. referenceChartOptiont Option is empty.")
+            throw new IllegalStateException(s"Internal error. referenceChartOption is empty.")
         }
       case None =>
         throw new IllegalStateException(s"Internal error. liveChartROI.locatedChart Option is empty.")

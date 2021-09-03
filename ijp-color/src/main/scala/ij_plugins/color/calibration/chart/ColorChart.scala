@@ -132,7 +132,12 @@ trait ColorChart {
     *                If value is `true` chip with corresponding index is enabled, if `false` it is disabled.
     * @return
     */
-  def copyWithEnableChips(enabled: Array[Boolean]): ColorChart
+  def copyWithEnabled(enabled: Array[Boolean]): ColorChart
+
+  /**
+    * Create a copy with all chips enabled
+    */
+  def copyWithEnabledAll: ColorChart = copyWithEnabled(Array.fill(enabled.length)(true))
 
   /**
     * Which chips should be used in computations. If value is 'true' chip is active' if 'false' not used in computations.
