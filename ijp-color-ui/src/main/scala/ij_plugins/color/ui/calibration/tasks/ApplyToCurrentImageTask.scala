@@ -78,10 +78,12 @@ class ApplyToCurrentImageTask(
         correctionOutput.correctedInReferenceSpace.foreach(_.show())
 
         if (outputConfig.imageInLab) {
+          val refWhite = recipe.colorConverter.refWhite
           CalibrationUtils.showImageInLab(
             recipe.referenceColorSpace,
+            refWhite,
             correctionOutput.correctedBands,
-            imp.getShortTitle + " - CIE L*a*b*"
+            imp.getShortTitle + s" - CIE L*a*b* ${refWhite.entryName}"
           )
         }
 

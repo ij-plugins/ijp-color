@@ -30,6 +30,7 @@ import ij_plugins.color.calibration._
 import ij_plugins.color.calibration.chart.{ColorChip, GridColorChart, ReferenceColorSpace}
 import ij_plugins.color.calibration.regression.MappingMethod
 import ij_plugins.color.converter.ColorTriple.Lab
+import ij_plugins.color.converter.ReferenceWhite
 import ij_plugins.color.ui.calibration.tasks.CalibrateTask.{OutputConfig, showScatterChart}
 import ij_plugins.color.ui.calibration.{CalibrationUtils, IJPError}
 import ij_plugins.color.ui.fx.ColorFXUI
@@ -221,8 +222,16 @@ class CalibrateTask(
           imp.show()
         }
 
-        if (outputConfig.imageInLab)
-          CalibrationUtils.showImageInLab(recipe.referenceColorSpace, co.correctedBands, s"$titlePrefix - CIE L*a*b*")
+        val refWhite = recipe.colorConverter.refWhite
+
+        if (outputConfig.imageInLab) {
+          CalibrationUtils.showImageInLab(
+            recipe.referenceColorSpace,
+            refWhite,
+            co.correctedBands,
+            s"$titlePrefix - CIE L*a*b* ${refWhite.entryName}"
+          )
+        }
 
         if (outputConfig.plotScatterFit)
           showFitScatterPlots(fit, titlePrefix)
@@ -243,7 +252,7 @@ class CalibrateTask(
           showTableWithRegressionResults(bands, fit, s"$titlePrefix - Regression Coefficients")
 
         if (outputConfig.tableIndividualChipDeltaInLab)
-          tableIndividualChipDeltaInLab(co.correctedBands, titlePrefix)
+          tableIndividualChipDeltaInLab(refWhite, co.correctedBands, titlePrefix)
 
         if (outputConfig.logDeltaInReferenceColorSpace)
           logDeltaInReferenceColorSpace(fit, titlePrefix)
@@ -365,13 +374,17 @@ class CalibrateTask(
       "\n")
   }
 
-  private def tableIndividualChipDeltaInLab(correctedBands: Array[FloatProcessor], titlePrefix: String): Unit = {
+  private def tableIndividualChipDeltaInLab(
+                                             refWhite: ReferenceWhite,
+                                             correctedBands: Array[FloatProcessor],
+                                             titlePrefix: String
+                                           ): Unit = {
 
     // Delta in L*a*b*
     val deltaEStats = {
       val rt = new ResultsTable()
       val stats = new DescriptiveStatistics()
-      val labFPs = referenceColorSpace().toLab(correctedBands)
+      val labFPs = referenceColorSpace().toLab(correctedBands, refWhite)
       IJ.log(titlePrefix)
       for (chip <- chart.alignedChips) {
         val poly = toPolygonROI(chip.outline)

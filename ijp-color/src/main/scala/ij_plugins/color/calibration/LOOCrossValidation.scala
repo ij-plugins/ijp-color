@@ -136,8 +136,8 @@ object LOOCrossValidation {
       // Computation of the mean is be done in L*a*b*
 
       val correctedTest = corrector.map(observedTest)
-      val correctedTestLab = referenceColorSpace.toLab(correctedTest)
-      val expectedColorLab: Lab = referenceColorSpace.toLab(expectedColors(i))
+      val correctedTestLab = referenceColorSpace.toLab(correctedTest, chart.refWhite)
+      val expectedColorLab: Lab = referenceColorSpace.toLab(expectedColors(i), chart.refWhite)
 
       val deltaL = math.abs(expectedColorLab.l - correctedTestLab.l)
       val deltaA = math.abs(expectedColorLab.a - correctedTestLab.a)

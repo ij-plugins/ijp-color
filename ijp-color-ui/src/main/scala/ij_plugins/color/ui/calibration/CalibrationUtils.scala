@@ -26,6 +26,7 @@ import ij.process.FloatProcessor
 import ij.{CompositeImage, ImagePlus, ImageStack}
 import ij_plugins.color.calibration.chart.ReferenceColorSpace
 import ij_plugins.color.calibration.{CorrectionRecipe, convertToSRGB}
+import ij_plugins.color.converter.ReferenceWhite
 
 object CalibrationUtils {
 
@@ -81,16 +82,16 @@ object CalibrationUtils {
     }
   }
 
-  def showImageInLab(
-                      colorSpace: ReferenceColorSpace,
-                      correctedBands: Array[FloatProcessor],
-                      title: String
+  def showImageInLab(colorSpace: ReferenceColorSpace,
+                     refWhite: ReferenceWhite,
+                     correctedBands: Array[FloatProcessor],
+                     title: String
                     ): Unit = {
-    toLab(colorSpace, correctedBands, title).show()
+    toLab(colorSpace, refWhite, correctedBands, title).show()
   }
 
-  def toLab(colorSpace: ReferenceColorSpace, correctedBands: Array[FloatProcessor], title: String): ImagePlus = {
-    val labFPs = colorSpace.toLab(correctedBands)
+  def toLab(colorSpace: ReferenceColorSpace, refWhite: ReferenceWhite, correctedBands: Array[FloatProcessor], title: String): ImagePlus = {
+    val labFPs = colorSpace.toLab(correctedBands, refWhite)
     val stack = new ImageStack(labFPs(0).getWidth, labFPs(0).getHeight)
     stack.addSlice("L*", labFPs(0))
     stack.addSlice("a*", labFPs(1))

@@ -92,7 +92,7 @@ class LOOCrossValidationSpec extends AnyFlatSpec {
     bestByMean.method should be(MappingMethod.QuadraticCrossBand)
     bestByMean.statsDeltaE.getMean should be(5.321 +- 0.1)
     bestByMean.statsDeltaE.getPercentile(50) should be(3.958 +- 0.1)
-    bestByMean.statsDeltaE.getPercentile(95) should be(13.723 +- 0.1)
+    bestByMean.statsDeltaE.getPercentile(95) should be(13.450 +- 0.1)
   }
 
   it should "compute cross validation stats with a chip disabled (from an image)" in {
@@ -114,7 +114,7 @@ class LOOCrossValidationSpec extends AnyFlatSpec {
     bestByMean.method should be(MappingMethod.QuadraticCrossBand)
     bestByMean.statsDeltaE.getMean should be(5.132 +- 0.1)
     bestByMean.statsDeltaE.getPercentile(50) should be(3.839 +- 0.1)
-    bestByMean.statsDeltaE.getPercentile(95) should be(12.250 +- 0.1)
+    bestByMean.statsDeltaE.getPercentile(95) should be(12.140 +- 0.1)
   }
 
   def loadImageChart(): (ImagePlus, GridColorChart) = {
