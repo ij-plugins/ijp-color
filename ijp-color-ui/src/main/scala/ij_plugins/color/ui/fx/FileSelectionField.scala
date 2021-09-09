@@ -69,9 +69,13 @@ class FileSelectionField(val title: String, val ownerWindow: Option[Window]) {
         if (!initialPath.isBlank) {
           val file = new File(initialPath)
           fileChooser.initialFileName = file.getName
-          fileChooser.initialDirectory = file.getParentFile
+          if (file.getParentFile.exists()) {
+            fileChooser.initialDirectory = file.getParentFile
+          }
         } else {
-          fileChooser.initialDirectory = new File(OpenDialog.getDefaultDirectory)
+          val parent = new File(OpenDialog.getDefaultDirectory)
+          if (parent.exists())
+            fileChooser.initialDirectory = parent
         }
 
         val selection = fileChooser.showOpenDialog(ownerWindow.orNull)
