@@ -26,6 +26,7 @@ import ij.IJ
 import ij_plugins.color.calibration.CorrectionRecipe
 import ij_plugins.color.ui.calibration.CalibrationUtils
 import ij_plugins.color.ui.calibration.tasks.CalibrateTask.OutputConfig
+import ij_plugins.color.util.ImagePlusType
 import org.scalafx.extras.BusyWorker.SimpleTask
 import org.scalafx.extras.ShowMessage
 import scalafx.beans.property.ObjectProperty
@@ -63,8 +64,13 @@ class ApplyToCurrentImageTask(
     }
 
     // Verify that image is of correct type
-    if (imp.getType != recipe.imageType) {
-      showError(errorTitle, "Image type does not match expected: [" + recipe.imageType + "]", "")
+    if (imp.getType != recipe.imageType.value) {
+      showError(
+        errorTitle,
+        s"Image type does not match expected: ${recipe.imageType} [${recipe.imageType.value}],  " +
+          s"got ${ImagePlusType.withValueOpt(imp.getType).getOrElse("???")} [${imp.getType}]",
+        ""
+      )
       return
     }
 

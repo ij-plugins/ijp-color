@@ -36,7 +36,7 @@ import ij_plugins.color.ui.calibration.{CalibrationUtils, IJPError}
 import ij_plugins.color.ui.fx.ColorFXUI
 import ij_plugins.color.ui.util.PlotUtils.ValueEntry
 import ij_plugins.color.ui.util.{IJPrefs, PlotUtils}
-import ij_plugins.color.util.delta
+import ij_plugins.color.util.{ImagePlusType, delta}
 import javafx.scene.{chart => jfxsc}
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
 import org.scalafx.extras.BusyWorker.SimpleTask
@@ -196,7 +196,7 @@ class CalibrateTask(
         corrector = fit.corrector,
         colorConverter = colorCalibrator.chart.colorConverter,
         referenceColorSpace = referenceColorSpace(),
-        imageType = image.getType
+        imageType = ImagePlusType.withValue(image.getType)
       )
 
       // Applies correction and displays image in reference color space and sRGB color image
@@ -208,6 +208,7 @@ class CalibrateTask(
           computeInSRGB = outputConfig.imageInSRGB
         )
 
+      // TODO: properly deal with the error
       correctionOutputLR.foreach { co =>
         val titlePrefix = s"${image.getTitle} - ${colorCalibrator.referenceColorSpace}+${colorCalibrator.mappingMethod}"
         val chips: Seq[ColorChip] = chart.referenceChipsEnabled

@@ -23,7 +23,9 @@
 package ij_plugins.color.calibration
 
 import ij_plugins.color.calibration.chart.ReferenceColorSpace
+import ij_plugins.color.calibration.regression.CubicPolynomialTriple
 import ij_plugins.color.converter.ColorConverter
+import ij_plugins.color.util.ImagePlusType
 
 /**
  * Parameters needed to perform color correction of an image and convert it to sRGB.
@@ -36,8 +38,8 @@ import ij_plugins.color.converter.ColorConverter
  *                            due to uncertainty in scaling of image values
  */
 case class CorrectionRecipe(
-  corrector: Corrector,
-  colorConverter: ColorConverter,
-  referenceColorSpace: ReferenceColorSpace,
-  imageType: Int
-)
+                             corrector: CubicPolynomialTriple,
+                             colorConverter: ColorConverter,
+                             referenceColorSpace: ReferenceColorSpace,
+                             imageType: ImagePlusType
+                           )
