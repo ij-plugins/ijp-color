@@ -108,7 +108,7 @@ class ColorCalibratorPlugin extends PlugIn with ImageListenerHelper with LiveCha
       dialogStage.get.show()
 
       setupImageListener()
-      setupROIListener(mvc.model.liveChartROI)
+      setupLiveChartROI(mvc.model.liveChartROI)
 
       // Load previous options, if available
       Config

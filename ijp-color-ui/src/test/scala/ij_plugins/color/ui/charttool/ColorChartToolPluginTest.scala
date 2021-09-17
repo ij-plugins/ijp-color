@@ -20,30 +20,14 @@
  * Latest release available at https://github.com/ij-plugins/ijp-color/
  */
 
-package ij_plugins.color.ui.util
+package ij_plugins.color.ui.charttool
 
-import ij.gui.Roi
+import ij_plugins.color.ui.util.ImageJUIColors
+import org.scalatest.flatspec.AnyFlatSpec
 
-/**
- * Helps using LiveChartROI. Handles adding and removing ROI Listener
- */
-trait LiveChartROIHelper {
-  private var _liveChartROIOption: Option[LiveChartROI] = None
-
-  protected def liveChartROIOption: Option[LiveChartROI] = _liveChartROIOption
-
-  final protected def setupLiveChartROI(liveChartROI: LiveChartROI): Unit = {
-
-    if (liveChartROIOption.nonEmpty) {
-      throw new IllegalStateException("RoiListener already created")
-    }
-
-    _liveChartROIOption = Some(liveChartROI)
-
-    liveChartROIOption.foreach(Roi.addRoiListener)
-  }
-
-  final protected def removeROIListener(): Unit = {
-    liveChartROIOption.foreach(Roi.removeRoiListener)
+class ColorChartToolPluginTest extends AnyFlatSpec {
+  it should "have valid default overlay color name" in {
+    val c = ColorChartToolPlugin.Config().chipOverlayColorName
+    ImageJUIColors.validNameOr(c, c)
   }
 }
