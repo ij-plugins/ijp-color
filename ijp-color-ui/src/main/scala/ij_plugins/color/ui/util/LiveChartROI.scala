@@ -37,7 +37,7 @@ object LiveChartROI {
     // This a hack so we can pass `referenceChart` argument to `LiveChartROI` constructor without
     // compiler complaining about incorrect types. There may be some smarted way to deal with this. Suggestions welcomed.
     val _referenceChartFrameOption =
-    new ObjectProperty[Option[GridChartFrame]](this, "", referenceChart())
+      new ObjectProperty[Option[GridChartFrame]](this, "", referenceChart())
     _referenceChartFrameOption <== referenceChart
     new LiveChartROI(imp, _referenceChartFrameOption)
   }
@@ -48,7 +48,7 @@ object LiveChartROI {
   */
 class LiveChartROI(imp: ImagePlus, referenceChart: ReadOnlyObjectProperty[Option[GridChartFrame]]) extends RoiListener {
 
-  private val overlyColor = new Color(255, 0, 255, 128)
+  private val overlyColorProperty = new ObjectProperty(this, "overlyColorProperty", new Color(255, 0, 255, 128))
 
   private val _status = new ReadOnlyStringWrapper()
   val status: ReadOnlyStringProperty = _status.readOnlyProperty
@@ -57,6 +57,7 @@ class LiveChartROI(imp: ImagePlus, referenceChart: ReadOnlyObjectProperty[Option
   val locatedChart: ReadOnlyObjectProperty[Option[GridChartFrame]] = _locatedChart.readOnlyProperty
 
   referenceChart.onChange((_, _, _) => updateChartLocation())
+  overlyColorProperty.onChange((_, _, _) => updateOverlay())
 
   updateChartLocation()
 
@@ -66,9 +67,15 @@ class LiveChartROI(imp: ImagePlus, referenceChart: ReadOnlyObjectProperty[Option
     updateChartLocation()
   }
 
+  def overlyColor: Color = overlyColorProperty.value
+
+  def overlyColor_=(v: Color): Unit = {
+    overlyColorProperty.value = v
+  }
+
   /**
-   * Check ROI in the current image and if valid update locatedChart. If invalid remove located chart.
-   */
+    * Check ROI in the current image and if valid update locatedChart. If invalid remove located chart.
+    */
   private def updateChartLocation(): Unit = {
 
     val roi = imp.getRoi
