@@ -151,11 +151,11 @@ lazy val ijp_color_ui = (project in file("ijp-color-ui"))
     libraryDependencies ++= Seq(
       "org.jfree"           % "jfreechart-fx"       % "1.0.1",
       "org.jfree"           % "fxgraphics2d"        % "1.8",
-      "org.scalafx"        %% "scalafx"             % "16.0.0-R25-SNAPSHOT",
+      "org.scalafx"        %% "scalafx"             % "16.0.0-R25",
       "org.scalafx"        %% "scalafx-extras"      % "0.3.6",
       "org.scalafx"        %% "scalafxml-core-sfx8" % "0.5",
       // Test
-      "org.scalatest"      %% "scalatest"           % "3.2.9"  % "test"
+      "org.scalatest"      %% "scalatest"           % "3.2.10"  % "test"
     )
   )
   .dependsOn(ijp_color)
