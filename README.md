@@ -4,7 +4,6 @@ ijp-color
 Operations on color spaces and color images. Can be used as a stand-alone library or a plugin for [ImageJ](http://rsb.info.nih.gov/ij)
 
 [![Actions Status](https://github.com/ij-plugins/ijp-color/workflows/Scala%20CI/badge.svg)](https://github.com/ij-plugins/ijp-color/actions) 
-[![Build Status](https://travis-ci.org/ij-plugins/ijp-color.svg?branch=develop)](https://travis-ci.org/ij-plugins/ijp-color) 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/net.sf.ij-plugins/ijp-color_2.13/badge.svg)](https://maven-badges.herokuapp.com/maven-central/net.sf.ij-plugins/ijp-color_2.13)
 [![Scaladoc](https://javadoc.io/badge2/net.sf.ij-plugins/ijp-color_2.13/scaladoc.svg)](https://javadoc.io/doc/net.sf.ij-plugins/ijp-color_2.13)
 
