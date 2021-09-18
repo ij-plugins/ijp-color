@@ -24,7 +24,7 @@ package ij_plugins.color.ui.calibration
 
 import ij_plugins.color.calibration.chart.{ColorChartType, ReferenceColorSpace}
 import ij_plugins.color.calibration.regression.MappingMethod
-import ij_plugins.color.ui.util.IJPUtils
+import ij_plugins.color.ui.util.{IJPUtils, ImageJUIColors}
 import org.scalafx.extras.mvcfx.ControllerFX
 import scalafx.Includes._
 import scalafx.collections.ObservableBuffer
@@ -47,6 +47,7 @@ class ColorCalibratorUIController(
                                    private val chartInfoLabel: Label,
                                    private val editChartButton: Button,
                                    private val marginsSpinner: Spinner[java.lang.Integer],
+                                   private val chipOverlayColorChoiceBox: ChoiceBox[String],
                                    private val enabledChipsChoiceBox: ChoiceBox[ChipsEnabledType],
                                    private val selectChipsButton: Button,
                                    private val referenceColorSpaceChoiceBox: ChoiceBox[ReferenceColorSpace],
@@ -106,6 +107,15 @@ class ColorCalibratorUIController(
   marginsSpinner.valueFactory = new IntegerSpinnerValueFactory(0, 49) {
     value = model.chipMarginPercent()
     value <==> model.chipMarginPercent
+  }
+
+  chipOverlayColorChoiceBox.items = ObservableBuffer.from(ImageJUIColors.listColorNames)
+  chipOverlayColorChoiceBox.selectionModel.value.select(model.chipOverlayColorName.value)
+  chipOverlayColorChoiceBox.selectionModel.value.selectedItem.onChange { (_, _, newValue) =>
+    model.chipOverlayColorName.value = newValue
+  }
+  model.chipOverlayColorName.onChange { (_, _, newValue) =>
+    chipOverlayColorChoiceBox.selectionModel.value.select(newValue)
   }
 
   // Enabled chips type choice

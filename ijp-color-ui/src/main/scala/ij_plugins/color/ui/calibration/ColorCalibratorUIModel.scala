@@ -30,7 +30,7 @@ import ij_plugins.color.calibration.regression.MappingMethod
 import ij_plugins.color.calibration.{CorrectionRecipe, renderReferenceChart}
 import ij_plugins.color.ui.calibration.tasks.CalibrateTask.OutputConfig
 import ij_plugins.color.ui.calibration.tasks._
-import ij_plugins.color.ui.util.{IJPrefs, LiveChartROI}
+import ij_plugins.color.ui.util.{IJPrefs, ImageJUIColors, LiveChartROI}
 import javafx.beans.property.ReadOnlyBooleanProperty
 import org.scalafx.extras.mvcfx.ModelFX
 import org.scalafx.extras.{BusyWorker, ShowMessage, onFX}
@@ -47,6 +47,8 @@ object ColorCalibratorUIModel {
 
     private val ReferencePrefix = classOf[Config].getName
 
+    val chipOverlayColorNameDefault: String = "magenta"
+
     def loadFromIJPref(): Option[Config] = {
       // We will use `null` to indicate missing values from Java API
 
@@ -58,12 +60,14 @@ object ColorCalibratorUIModel {
         colorChartTypeName <- IJPrefs.getStringOption(ReferencePrefix + ".colorChartType")
         colorChartType <- ColorChartType.withNameOption(colorChartTypeName)
         chipMargin <- IJPrefs.getDoubleOption(ReferencePrefix + ".chipMargin")
+        chipOverlayColorName <- IJPrefs.getStringOption(ReferencePrefix + ".chipOverlayColorName")
         outputConfig <- OutputConfig.loadFromIJPref()
       } yield Config(
         referenceColorSpace,
         mappingMethod,
         colorChartType,
         chipMargin,
+        chipOverlayColorName = chipOverlayColorName,
         outputConfig
       )
     }
@@ -74,6 +78,7 @@ object ColorCalibratorUIModel {
                      mappingMethod: MappingMethod,
                      colorChartType: ColorChartType,
                      chipMargin: Double,
+                     chipOverlayColorName: String,
                      outputConfig: OutputConfig
                    ) {
 
@@ -84,6 +89,7 @@ object ColorCalibratorUIModel {
       Prefs.set(ReferencePrefix + ".mappingMethod", mappingMethod.entryName)
       Prefs.set(ReferencePrefix + ".colorChartType", colorChartType.entryName)
       Prefs.set(ReferencePrefix + ".chipMargin", s"$chipMargin")
+      Prefs.set(ReferencePrefix + ".chipOverlayColorName", chipOverlayColorName)
       outputConfig.saveToIJPref()
     }
 
@@ -130,6 +136,12 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
     recreateReferenceChart()
   }
 
+  val chipOverlayColorName =
+    new ObjectProperty[String](this, "chipOverlayColorName", Config.chipOverlayColorNameDefault)
+  chipOverlayColorName.onChange((_, _, newValue) =>
+    liveChartROI.overlyColor = ImageJUIColors.colorWithNameAWT(newValue)
+  )
+
   // Parameters defining chart, beside ROI that will be handled by `liveChartROI`
   val enabledChipsType = new ObjectProperty[ChipsEnabledType](this, "chipsEnabledType", ChipsEnabledType.All)
   enabledChipsType.onChange { (_, _, _) =>
@@ -145,6 +157,7 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
   val correctionRecipe = new ObjectProperty[Option[CorrectionRecipe]](this, "correctionRecipe", None)
 
   val liveChartROI: LiveChartROI = LiveChartROI(image, referenceChartOption)
+  liveChartROI.overlyColor = ImageJUIColors.colorWithNameAWT(chipOverlayColorName.value)
 
   val chipValuesObserved: ReadOnlyBooleanProperty = {
     val p = new ReadOnlyBooleanWrapper(this, "chipValuesObserved", false)
@@ -350,6 +363,7 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
       mappingMethod.value,
       referenceChartType.value,
       chipMarginPercent.value / 100d,
+      chipOverlayColorName = chipOverlayColorName.value,
       outputConfig
     )
   }
@@ -361,6 +375,7 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
       outputConfigWrapper.value = config.outputConfig
       referenceChartType.value = config.colorChartType
       chipMarginPercent.value = math.round(config.chipMargin * 100).toInt
+      chipOverlayColorName.value = config.chipOverlayColorName
     }
   }
 }
