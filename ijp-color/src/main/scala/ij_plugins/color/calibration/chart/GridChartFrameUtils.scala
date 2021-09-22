@@ -69,8 +69,8 @@ object GridChartFrameUtils {
       case _ =>
         val stack = imp.getStack
         val slices = for (i <- 1 to stack.getSize) yield {
-          val ip    = stack.getProcessor(i)
-          val label = stack.getSliceLabel(i)
+          val ip = stack.getProcessor(i)
+          val label = Option(stack.getSliceLabel(i)).getOrElse(s"$i")
           (label, ip)
         }
         ListMap(slices: _*)
