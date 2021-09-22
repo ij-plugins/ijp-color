@@ -142,8 +142,8 @@
                            GridPane.columnIndex="1" GridPane.rowIndex="9"/>
                 <Button fx:id="selectChipsButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
                         text="Select Chips" GridPane.columnIndex="2" GridPane.rowIndex="9"/>
-                <Label fx:id="chipOverlayColorChoiceBox" text="Chip overlay color" GridPane.rowIndex="7"/>
-                <ChoiceBox maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="7"/>
+                <Label text="Chip overlay color" GridPane.rowIndex="7"/>
+                <ChoiceBox fx:id="chipOverlayColorChoiceBox" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="7"/>
             </children>
             <rowConstraints>
                 <RowConstraints minHeight="10.0"/>
