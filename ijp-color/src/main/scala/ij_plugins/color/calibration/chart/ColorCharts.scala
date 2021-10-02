@@ -76,6 +76,8 @@ object ColorCharts {
    *
    * Illuminant D65.
    * [[http://www.rmimaging.com/information/ColorChecker_Passport_Technical_Report.pdf]]
+   * alternate link location
+   * [[https://chromaxion.com/information/ColorChecker_Passport_Technical_Report.pdf]]
    */
   val XRitePassportColorChecker = new GridColorChart(
     ColorChartType.XRitePassportColorChecker.name,
