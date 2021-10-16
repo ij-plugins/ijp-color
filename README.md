@@ -22,7 +22,7 @@ Color calibrates images using a color chart. Supported charts:
 
 Supports 8, 16, 32 bit per channel color images, including raw.
 
-![Image Calibrator](https://github.com/ij-plugins/ijp-color/wiki/assets/Color_Calibrator_0.6_01.png)
+![Image Calibrator](https://github.com/ij-plugins/ijp-color/wiki/assets/Color_Calibrator_quick_usage.png)
 
 More details in [project Wiki]
 
