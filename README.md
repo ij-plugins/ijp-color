@@ -19,6 +19,7 @@ Color calibrates images using a color chart. Supported charts:
 * GretagMacbeth ColorChecker
 * X-Rite Passport
 * Image Science Associates ColorGauge
+* Custom charts - provide your own layout and CIE L*a*b* color values
 
 Supports 8, 16, 32 bit per channel color images, including raw.
 
