@@ -23,7 +23,7 @@
 package ij_plugins.color.ui
 
 import ij.IJ
-import ij_plugins.color.util.ImageConverter.toBufferImage
+import ij_plugins.color.util.AWTtoFXImageConverter.toBufferImage
 import javafx.embed.{swing => jfxes}
 import org.scalafx.extras._
 import scalafx.Includes._

@@ -31,13 +31,13 @@ import java.awt.geom.Point2D
 import scala.collection.compat._
 
 /** Helper methods for working with ImageJ. */
-object IJTools {
+object ImageJUtils {
 
   /**
-   * Returns icon used by ImageJ main frame. Returns `null` if main frame is not instantiated or has no icon.
-   *
-   * @return ImageJ icon or `null`.
-   */
+    * Returns icon used by ImageJ main frame. Returns `null` if main frame is not instantiated or has no icon.
+    *
+    * @return ImageJ icon or `null`.
+    */
   def imageJIconAsAWTImage: java.awt.Image = {
     val imageJ: ImageJ = IJ.getInstance
     if (imageJ != null) imageJ.getIconImage else null

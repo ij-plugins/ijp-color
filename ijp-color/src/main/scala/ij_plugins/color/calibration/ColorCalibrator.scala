@@ -27,7 +27,7 @@ import ij.ImagePlus._
 import ij.process._
 import ij_plugins.color.calibration.chart.{ColorChart, ReferenceColorSpace}
 import ij_plugins.color.calibration.regression.{CubicPolynomialTriple, MappingFactory, MappingMethod}
-import ij_plugins.color.util.{clipUInt8D, delta}
+import ij_plugins.color.util.Utils.{clipUInt8D, delta}
 
 /** Color calibration helper methods */
 object ColorCalibrator {
@@ -55,18 +55,27 @@ object ColorCalibrator {
     require(corrected.forall(_.length == 3))
 
     /**
-     */
+      */
     def correctedDeltas: Array[Double] = reference zip corrected map (p => delta(p._1, p._2))
   }
 
   /** Create instance of ColorCalibrator */
   def apply(
-    chart: ColorChart,
-    referenceColorSpace: ReferenceColorSpace,
-    mappingMethod: MappingMethod,
-    clipReferenceRGB: Boolean = true
-  ): ColorCalibrator = {
-    new ColorCalibrator(chart, referenceColorSpace, mappingMethod, clipReferenceRGB)
+             chart: ColorChart,
+             referenceColorSpace: ReferenceColorSpace,
+             mappingMethod: MappingMethod
+           ): ColorCalibrator = {
+    new ColorCalibrator(chart, referenceColorSpace, mappingMethod, clipReferenceRGB = false)
+  }
+
+  def apply(
+             chart: ColorChart,
+             referenceColorSpaceName: String,
+             mappingMethodName: String
+           ): ColorCalibrator = {
+    val referenceColorSpace = ReferenceColorSpace.withName(referenceColorSpaceName)
+    val mappingMethod = MappingMethod.withName(mappingMethodName)
+    new ColorCalibrator(chart, referenceColorSpace, mappingMethod, clipReferenceRGB = false)
   }
 }
 

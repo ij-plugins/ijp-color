@@ -24,8 +24,9 @@ package ij_plugins.color.ui.calibration
 
 import ij.process.FloatProcessor
 import ij.{CompositeImage, ImagePlus, ImageStack}
+import ij_plugins.color.calibration.CalibrationUtils.convertToSRGB
+import ij_plugins.color.calibration.CorrectionRecipe
 import ij_plugins.color.calibration.chart.ReferenceColorSpace
-import ij_plugins.color.calibration.{CorrectionRecipe, convertToSRGB}
 import ij_plugins.color.converter.ReferenceWhite
 
 object CalibrationUtils {

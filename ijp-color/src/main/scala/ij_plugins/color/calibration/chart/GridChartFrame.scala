@@ -23,18 +23,18 @@
 package ij_plugins.color.calibration.chart
 
 import ij.gui.Roi
-import ij_plugins.color.calibration.point2D
-import ij_plugins.color.util.{IJTools, PerspectiveTransform}
+import ij_plugins.color.calibration.CalibrationUtils.point2D
+import ij_plugins.color.util.{ImageJUtils, PerspectiveTransform}
 
 import java.awt.geom.Point2D
 import scala.collection.compat.immutable.ArraySeq
 
 /**
- * Represents only layout of chips similar to `GridColorChart`:  a regular grid of square chips, arranged in rows and columns.
- *
- * @param nbColumns          number of columns
- * @param nbRows             number of rows
- * @param chipMargin         reduction of chip from their maximum size on the grid (as fraction of its width or height).
+  * Represents only layout of chips similar to `GridColorChart`:  a regular grid of square chips, arranged in rows and columns.
+  *
+  * @param nbColumns         number of columns
+  * @param nbRows            number of rows
+  * @param chipMargin        reduction of chip from their maximum size on the grid (as fraction of its width or height).
  *                           Value of the margin must be between 0 and 0.5.
  * @param alignmentTransform Alignment between the reference chips and chips found in the actual chart.
  */
@@ -47,7 +47,7 @@ class GridChartFrame(
 
   private val chipOutlines: IndexedSeq[Seq[Point2D]] = {
     for {
-      row    <- 0 until nbRows;
+      row <- 0 until nbRows
       column <- 0 until nbColumns
     } yield {
       Seq(
@@ -94,7 +94,7 @@ class GridChartFrame(
   def alignedChipROIs: IndexedSeq[Roi] = {
     for ((oSrc, i) <- chipOutlines.zipWithIndex) yield {
       val oDst = alignmentTransform.transform(oSrc)
-      val roi  = IJTools.toRoi(oDst)
+      val roi = ImageJUtils.toRoi(oDst)
       roi.setName(s"${i + 1}")
       roi
     }

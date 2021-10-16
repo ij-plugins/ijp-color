@@ -22,7 +22,7 @@
 
 package ij_plugins.color.calibration.chart
 
-import ij_plugins.color.calibration.point2D
+import ij_plugins.color.calibration.CalibrationUtils.point2D
 import ij_plugins.color.converter.ColorTriple.Lab
 
 import java.awt.geom.Point2D

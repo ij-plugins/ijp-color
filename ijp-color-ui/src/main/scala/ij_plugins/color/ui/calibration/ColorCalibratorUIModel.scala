@@ -25,9 +25,10 @@ package ij_plugins.color.ui.calibration
 import ij.measure.ResultsTable
 import ij.plugin.BrowserLauncher
 import ij.{ImagePlus, Prefs}
+import ij_plugins.color.calibration.CalibrationUtils.renderReferenceChart
+import ij_plugins.color.calibration.CorrectionRecipe
 import ij_plugins.color.calibration.chart.{ColorChartType, ColorCharts, GridColorChart, ReferenceColorSpace}
 import ij_plugins.color.calibration.regression.MappingMethod
-import ij_plugins.color.calibration.{CorrectionRecipe, renderReferenceChart}
 import ij_plugins.color.ui.calibration.tasks.CalibrateTask.OutputConfig
 import ij_plugins.color.ui.calibration.tasks._
 import ij_plugins.color.ui.util.{IJPrefs, ImageJUIColors, LiveChartROI}

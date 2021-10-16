@@ -22,7 +22,7 @@
 
 package ij_plugins.color.util
 
-import ij_plugins.color.calibration.point2D
+import ij_plugins.color.calibration.CalibrationUtils.point2D
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers._
 

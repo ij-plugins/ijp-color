@@ -27,7 +27,7 @@ import ij.ImagePlus.{COLOR_RGB, GRAY16, GRAY32, GRAY8}
 import ij.process.{ColorProcessor, ImageProcessor}
 import ij_plugins.color.converter.RGBWorkingSpace.sRGB
 import ij_plugins.color.converter.{ColorConverter, ReferenceWhite}
-import ij_plugins.color.util.{IJTools, PerspectiveTransform}
+import ij_plugins.color.util.{ImageJUtils, PerspectiveTransform}
 
 import scala.collection.immutable
 
@@ -66,7 +66,7 @@ trait ColorChart {
     * @param cp RGB image
     */
   def averageChipColor(cp: ColorProcessor): Array[Array[Double]] =
-    averageChipColor(IJTools.splitRGB(cp))
+    averageChipColor(ImageJUtils.splitRGB(cp))
 
   def averageChipColorEnabled(cp: ColorProcessor): Array[Array[Double]] = filterEnabled(averageChipColor(cp))
 

@@ -29,7 +29,7 @@ import ij.process.ImageStatistics
 import ij.{IJ, ImagePlus, Prefs}
 import ij_plugins.color.calibration.chart.{GridChartFrame, GridChartFrameUtils}
 import ij_plugins.color.ui.util._
-import ij_plugins.color.util.{IJTools, PerspectiveTransform}
+import ij_plugins.color.util.{ImageJUtils, PerspectiveTransform}
 import scalafx.beans.property.ObjectProperty
 
 import java.awt.event.{WindowAdapter, WindowEvent}
@@ -247,7 +247,7 @@ class ColorChartToolPlugin extends PlugIn with DialogListener with ImageListener
   }
 
   private def doSendToROIManager(chart: GridChartFrame): Unit = {
-    IJTools.addToROIManager(chart.alignedChipROIs)
+    ImageJUtils.addToROIManager(chart.alignedChipROIs)
   }
 
   private def doMeasureChips(imp: ImagePlus, chart: GridChartFrame): Unit = {

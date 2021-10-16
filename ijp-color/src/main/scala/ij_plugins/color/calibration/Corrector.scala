@@ -26,7 +26,7 @@ import ij.ImagePlus
 import ij.ImagePlus._
 import ij.gui.{PolygonRoi, Roi}
 import ij.process._
-import ij_plugins.color.util.IJTools
+import ij_plugins.color.util.ImageJUtils
 
 /** Performs color space mapping. Derived classes implement specific mapping methods. */
 trait Corrector {
@@ -70,7 +70,7 @@ trait Corrector {
    * @see #map[T <: ImageProcessor](src: Array[T])
    */
   def mapToFloat(src: ColorProcessor): Array[FloatProcessor] = {
-    map(IJTools.splitRGB(src))
+    map(ImageJUtils.splitRGB(src))
   }
 
   /**
@@ -84,7 +84,7 @@ trait Corrector {
   def map(src: ColorProcessor): RGBMappingResult = {
     require(src != null, "Argument 'src' cannot be null.")
 
-    map(IJTools.convertToFloat(src))
+    map(ImageJUtils.convertToFloat(src))
   }
 
   /**
@@ -104,7 +104,7 @@ trait Corrector {
    */
   def map[T <: ImageProcessor](src: Array[T]): Array[FloatProcessor] = {
     // Sanity checks
-    IJTools.validateSameTypeAndDimensions(src, 3)
+    ImageJUtils.validateSameTypeAndDimensions(src, 3)
     require(
       src(0).isInstanceOf[ByteProcessor] | src(0).isInstanceOf[ShortProcessor] | src(0).isInstanceOf[FloatProcessor],
       "The input image slices must be of a a grey level type: `ByteProcessor`, `ShortProcessor`, or `FloatProcessor`, " +

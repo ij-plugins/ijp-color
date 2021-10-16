@@ -23,6 +23,7 @@
 package ij_plugins.color.calibration
 
 import ij.IJ
+import ij_plugins.color.calibration.CalibrationUtils.point2D
 import ij_plugins.color.calibration.chart.{ColorCharts, ReferenceColorSpace}
 import ij_plugins.color.calibration.regression.MappingMethod
 import ij_plugins.color.util.PerspectiveTransform

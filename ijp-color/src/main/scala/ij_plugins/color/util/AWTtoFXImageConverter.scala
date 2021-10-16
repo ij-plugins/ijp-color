@@ -25,17 +25,17 @@ package ij_plugins.color.util
 import java.awt.image.BufferedImage
 
 /** Tools for converting images between AWT and JavaFX. */
-object ImageConverter {
+object AWTtoFXImageConverter {
 
   /**
-   * Convert AWT image to BufferedImage.
-   *
-   * @param image AWT image.
-   */
+    * Convert AWT image to BufferedImage.
+    *
+    * @param image AWT image.
+    */
   def toBufferImage(image: java.awt.Image): BufferedImage = toBufferImage(image, BufferedImage.TYPE_INT_ARGB)
 
   /**
-   * Convert AWT image to BufferedImage.
+    * Convert AWT image to BufferedImage.
    *
    * @param image     image to convert
    * @param imageType `BufferedImage` type

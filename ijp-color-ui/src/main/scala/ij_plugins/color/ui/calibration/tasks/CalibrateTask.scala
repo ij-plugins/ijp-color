@@ -26,6 +26,7 @@ import ij.measure.ResultsTable
 import ij.process.FloatProcessor
 import ij.{IJ, ImagePlus, Prefs}
 import ij_plugins.color.DeltaE
+import ij_plugins.color.calibration.CalibrationUtils.toPolygonROI
 import ij_plugins.color.calibration._
 import ij_plugins.color.calibration.chart.{ColorChip, GridColorChart, ReferenceColorSpace}
 import ij_plugins.color.calibration.regression.MappingMethod
@@ -36,7 +37,8 @@ import ij_plugins.color.ui.calibration.{CalibrationUtils, IJPError}
 import ij_plugins.color.ui.fx.ColorFXUI
 import ij_plugins.color.ui.util.PlotUtils.ValueEntry
 import ij_plugins.color.ui.util.{IJPrefs, PlotUtils}
-import ij_plugins.color.util.{ImagePlusType, delta}
+import ij_plugins.color.util.ImagePlusType
+import ij_plugins.color.util.Utils.delta
 import javafx.scene.{chart => jfxsc}
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
 import org.scalafx.extras.BusyWorker.SimpleTask

@@ -22,42 +22,5 @@
 
 package ij_plugins.color
 
-import ij.IJ
-import ij.process.ColorProcessor
-import ij_plugins.color.image.VectorImage
-
 /** Color space conversions. */
-package object converter {
-
-  /**
-   * Convert between RGB and CIE L*a*b* color image representation.
-   *
-   * @param cp RGB image to be converted
-   * @return CIE L*a*b* image represented by { @link VectorProcessor}.
-   */
-  def rgbToLab(cp: ColorProcessor): VectorImage = {
-    val width  = cp.getWidth
-    val height = cp.getHeight
-    val size   = width * height
-    val src    = new VectorImage(cp)
-    val dest   = new VectorImage(width, height, 3)
-
-    val progressStep: Int = Math.max(size / 10, 1)
-    val converter = new ColorConverter(
-      refWhite = ReferenceWhite.D65,
-      rgbSpace = RGBWorkingSpace.sRGB,
-      rgbScale = 255
-    )
-    for (i <- 0 until size) {
-      if (i % progressStep == 0) {
-        IJ.showProgress(i, size)
-      }
-      val rgb = src.getDouble(i)
-      val xyz = converter.rgbToXYZ(rgb(0), rgb(1), rgb(2))
-      val lab = converter.toLab(xyz).toArray
-      dest.set(i, lab)
-    }
-    IJ.showProgress(size, size)
-    dest
-  }
-}
+package object converter

@@ -26,7 +26,7 @@ import ij.gui.Roi
 import ij.process.ImageProcessor
 import ij_plugins.color.converter.ColorTriple.Lab
 import ij_plugins.color.converter.ReferenceWhite
-import ij_plugins.color.util.{IJTools, PerspectiveTransform}
+import ij_plugins.color.util.{ImageJUtils, PerspectiveTransform}
 
 import java.awt.geom.Point2D
 import scala.collection.immutable
@@ -136,7 +136,7 @@ final class GridColorChart(
    * Color chips with alignment transform applied to their outline.
    */
   override def alignedChipROIs: immutable.IndexedSeq[Roi] = alignedChips.map { chip =>
-    val roi = IJTools.toRoi(chip.outline)
+    val roi = ImageJUtils.toRoi(chip.outline)
     roi.setName(chip.name)
     roi
   }
@@ -152,7 +152,7 @@ final class GridColorChart(
 
   override def averageChipColor[T <: ImageProcessor](src: Array[T]): Array[Array[Double]] = {
     val chips = alignedChips
-    val r = for (chip <- chips) yield IJTools.measureColor(src, chip.outline.toArray)
+    val r = for (chip <- chips) yield ImageJUtils.measureColor(src, chip.outline.toArray)
     r.toArray
   }
 
