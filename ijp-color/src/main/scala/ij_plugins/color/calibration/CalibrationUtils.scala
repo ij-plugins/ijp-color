@@ -22,11 +22,11 @@
 
 package ij_plugins.color.calibration
 
-import ij.ImagePlus
 import ij.gui.{PolygonRoi, Roi}
 import ij.process.{ColorProcessor, FloatProcessor}
+import ij.{CompositeImage, ImagePlus, ImageStack}
 import ij_plugins.color.calibration.chart.{ColorChip, GridColorChart, ReferenceColorSpace}
-import ij_plugins.color.converter.ColorConverter
+import ij_plugins.color.converter.{ColorConverter, ReferenceWhite}
 import ij_plugins.color.util.Utils.clipUInt8
 import ij_plugins.color.util.{ImageJUtils, PerspectiveTransform}
 
@@ -128,9 +128,30 @@ object CalibrationUtils {
           val color = ((r & 0xff) << 16) | ((g & 0xff) << 8) | ((b & 0xff) << 0)
           cp.set(i, color)
         }
-        new ImagePlus("", cp)
+        new ImagePlus("sRGB", cp)
       case _ => throw new IllegalArgumentException("Unsupported reference color space '" + colorSpace + "'.")
     }
+  }
+
+  /**
+    * Convert floating point color bands to an CIE L*a*b* image (floating point bands)
+    *
+    * @param bands      input color bands
+    * @param colorSpace color space of the input `bands`
+    * @param refWhite   assumed reference while
+    * @return CIE L*a*b* color image
+    */
+  def convertToLab(
+                    bands: Array[FloatProcessor],
+                    colorSpace: ReferenceColorSpace,
+                    refWhite: ReferenceWhite
+                  ): ImagePlus = {
+    val labFPs = colorSpace.toLab(bands, refWhite)
+    val stack = new ImageStack(labFPs(0).getWidth, labFPs(0).getHeight)
+    stack.addSlice("L*", labFPs(0))
+    stack.addSlice("a*", labFPs(1))
+    stack.addSlice("b*", labFPs(2))
+    new CompositeImage(new ImagePlus("L*a*b*", stack), CompositeImage.GRAYSCALE)
   }
 
 }
