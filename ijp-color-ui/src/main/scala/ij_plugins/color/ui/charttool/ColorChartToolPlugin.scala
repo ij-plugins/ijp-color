@@ -26,7 +26,7 @@ import ij.gui._
 import ij.measure.ResultsTable
 import ij.plugin.PlugIn
 import ij.process.ImageStatistics
-import ij.{IJ, ImagePlus, Prefs}
+import ij.{IJ, ImagePlus}
 import ij_plugins.color.calibration.chart.{GridChartFrame, GridChartFrameUtils}
 import ij_plugins.color.ui.util._
 import ij_plugins.color.util.{ImageJUtils, PerspectiveTransform}
@@ -74,13 +74,13 @@ object ColorChartToolPlugin {
     require(ImageJUIColors.listColorNames.contains(chipOverlayColorName))
 
     def saveToIJPref(): Unit = {
-      Prefs.set(ReferencePrefix + ".nbColumns", nbColumns)
-      Prefs.set(ReferencePrefix + ".nbRows", nbRows)
-      Prefs.set(ReferencePrefix + ".chipMargin", chipMargin)
-      Prefs.set(ReferencePrefix + ".chipOverlayColorName", chipOverlayColorName)
-      Prefs.set(ReferencePrefix + ".sendToROIManager", sendToROIManager)
-      Prefs.set(ReferencePrefix + ".measureChips", measureChips)
-      Prefs.set(ReferencePrefix + ".listChipVertices", listChipVertices)
+      IJPrefs.set(ReferencePrefix + ".nbColumns", nbColumns)
+      IJPrefs.set(ReferencePrefix + ".nbRows", nbRows)
+      IJPrefs.set(ReferencePrefix + ".chipMargin", chipMargin)
+      IJPrefs.set(ReferencePrefix + ".chipOverlayColorName", chipOverlayColorName)
+      IJPrefs.set(ReferencePrefix + ".sendToROIManager", sendToROIManager)
+      IJPrefs.set(ReferencePrefix + ".measureChips", measureChips)
+      IJPrefs.set(ReferencePrefix + ".listChipVertices", listChipVertices)
     }
 
     def chipOverlayColor: Color = ImageJUIColors.colorWithNameAWT(chipOverlayColorName)

@@ -22,7 +22,7 @@
 
 package ij_plugins.color.ui.calibration.tasks
 
-import ij.{IJ, Prefs}
+import ij.IJ
 import ij_plugins.color.calibration.chart.{ColorCharts, GridColorChart}
 import ij_plugins.color.converter.ReferenceWhite
 import ij_plugins.color.ui.fx.GenericDialogFX
@@ -105,7 +105,7 @@ class EditCustomChartTask(customChartOption: Option[GridColorChart], parentWindo
         }
 
         // Save defaultPath one we know that it can be used to create a chart
-        Prefs.set(defaultPathPrefName, file.getPath)
+        IJPrefs.set(defaultPathPrefName, file.getPath)
 
         chart
       } catch {

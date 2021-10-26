@@ -67,4 +67,12 @@ object IJPrefs {
     */
   def hasKey(key: String): Boolean =
     getStringOption(key).isDefined
+
+  def set(key: String, value: String): Unit = Prefs.set(key, value)
+
+  def set(key: String, value: Boolean): Unit = Prefs.set(key, value)
+
+  def set(key: String, value: Int): Unit = Prefs.set(key, value)
+
+  def set(key: String, value: Double): Unit = Prefs.set(key, value)
 }

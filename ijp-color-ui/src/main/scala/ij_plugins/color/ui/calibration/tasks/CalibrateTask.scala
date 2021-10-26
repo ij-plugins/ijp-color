@@ -24,7 +24,7 @@ package ij_plugins.color.ui.calibration.tasks
 
 import ij.measure.ResultsTable
 import ij.process.FloatProcessor
-import ij.{IJ, ImagePlus, Prefs}
+import ij.{IJ, ImagePlus}
 import ij_plugins.color.DeltaE
 import ij_plugins.color.calibration.CalibrationUtils.toPolygonROI
 import ij_plugins.color.calibration._
@@ -101,15 +101,15 @@ object CalibrateTask {
 
     def saveToIJPref(): Unit = {
       import OutputConfig.ReferencePrefix
-      Prefs.set(ReferencePrefix + ".imageInSRGB", imageInSRGB)
-      Prefs.set(ReferencePrefix + ".imageInReferenceColorSpace", imageInReferenceColorSpace)
-      Prefs.set(ReferencePrefix + ".imageInLab", imageInLab)
-      Prefs.set(ReferencePrefix + ".plotScatterFit", plotScatterFit)
-      Prefs.set(ReferencePrefix + ".plotIndividualChipError", plotIndividualChipError)
-      Prefs.set(ReferencePrefix + ".tableExpectedVsCorrected", tableExpectedVsCorrected)
-      Prefs.set(ReferencePrefix + ".tableRegressionResults", tableRegressionResults)
-      Prefs.set(ReferencePrefix + ".tableIndividualChipDeltaInLab", tableIndividualChipDeltaInLab)
-      Prefs.set(ReferencePrefix + ".logDeltaInReferenceColorSpace", logDeltaInReferenceColorSpace)
+      IJPrefs.set(ReferencePrefix + ".imageInSRGB", imageInSRGB)
+      IJPrefs.set(ReferencePrefix + ".imageInReferenceColorSpace", imageInReferenceColorSpace)
+      IJPrefs.set(ReferencePrefix + ".imageInLab", imageInLab)
+      IJPrefs.set(ReferencePrefix + ".plotScatterFit", plotScatterFit)
+      IJPrefs.set(ReferencePrefix + ".plotIndividualChipError", plotIndividualChipError)
+      IJPrefs.set(ReferencePrefix + ".tableExpectedVsCorrected", tableExpectedVsCorrected)
+      IJPrefs.set(ReferencePrefix + ".tableRegressionResults", tableRegressionResults)
+      IJPrefs.set(ReferencePrefix + ".tableIndividualChipDeltaInLab", tableIndividualChipDeltaInLab)
+      IJPrefs.set(ReferencePrefix + ".logDeltaInReferenceColorSpace", logDeltaInReferenceColorSpace)
     }
 
   }
