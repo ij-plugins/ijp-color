@@ -46,7 +46,7 @@ class ApplyToCurrentImageTask(
   with ShowMessage {
 
   def call(): Unit = {
-    val errorTitle = "Cannot apply Correction"
+    val errorTitle = "Cannot Apply Correction"
 
     // Check that calibration recipe is computed
     val recipe = correctionRecipe() match {
