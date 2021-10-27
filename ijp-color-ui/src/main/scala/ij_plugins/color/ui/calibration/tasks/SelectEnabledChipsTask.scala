@@ -25,16 +25,16 @@ package ij_plugins.color.ui.calibration.tasks
 import ij_plugins.color.calibration.chart.GridColorChart
 import ij_plugins.color.converter.ColorConverter
 import ij_plugins.color.converter.ColorTriple.{Lab, RGB, XYZ}
+import ij_plugins.color.ui.fx.GenericDialogFX
 import org.scalafx.extras.BusyWorker.SimpleTask
 import org.scalafx.extras.onFXAndWait
-import scalafx.Includes._
 import scalafx.beans.property.{BooleanProperty, ObjectProperty, StringProperty}
 import scalafx.beans.value.ObservableValue
 import scalafx.collections.ObservableBuffer
 import scalafx.scene.control.cell.CheckBoxTableCell
 // Explicit import of sfxTableColumn2jfx is to cover implicit resolution limitation in Scala 2.12
 import scalafx.scene.control.TableColumn.sfxTableColumn2jfx
-import scalafx.scene.control.{ButtonType, Dialog, TableColumn, TableView}
+import scalafx.scene.control.{TableColumn, TableView}
 import scalafx.scene.paint.Color
 import scalafx.scene.shape.Rectangle
 import scalafx.stage.Window
@@ -138,33 +138,32 @@ class SelectEnabledChipsTask(chart: GridColorChart, parentWindow: Option[Window]
         .referenceChips
         .zip(chart.enabled)
         .zipWithIndex
-        .map { case ((chip, enabled), i) => new ColorChipData(i, chip.name, chip.color, enabled, chart.colorConverter) }
+        .map { case ((chip, enabled), i) =>
+          new ColorChipData(i, chip.name, chip.color, enabled, chart.colorConverter)
+        }
 
     val data: ObservableBuffer[ColorChipData] = ObservableBuffer.from[ColorChipData](chips)
 
     onFXAndWait {
 
-      // Create the custom dialog.
-      val dialog = new Dialog[GridColorChart]() {
-        parentWindow.foreach(w => initOwner(w))
-        title = Title
-        headerText = "Select chips that will be used to compute calibration transform."
-        resizable = true
-      }
+      val dialog =
+        new GenericDialogFX(
+          title = Title,
+          header = Option("An attempt to emulate ImageJ's GenericDialog."),
+          parentWindowOption = parentWindow
+        ) {
+          addNode(createTableView(data))
+          addHelp("https://github.com/ij-plugins/ijp-color/wiki/Select-Enabled-Chips")
+        }
 
-      dialog.dialogPane().content = createTableView(data)
-      dialog.dialogPane().buttonTypes = Seq(ButtonType.OK, ButtonType.Cancel)
+      dialog.showDialog()
 
-      dialog.resultConverter = dialogButton =>
-        if (dialogButton == ButtonType.OK) {
-          val enabled: Array[Boolean] = data.sortBy(_.index).map(_.enabled.value).toArray
-          chart.copyWithEnabled(enabled)
-        } else
-          null
-
-      dialog.showAndWait() match {
-        case c: Option[GridColorChart] => c
-        case _ => None
+      if (dialog.wasOKed) {
+        val enabled: Array[Boolean] = data.sortBy(_.index).map(_.enabled.value).toArray
+        val c = chart.copyWithEnabled(enabled)
+        Option(c)
+      } else {
+        None
       }
     }
   }

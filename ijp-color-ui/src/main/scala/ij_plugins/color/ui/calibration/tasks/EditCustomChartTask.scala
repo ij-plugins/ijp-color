@@ -59,6 +59,7 @@ class EditCustomChartTask(customChartOption: Option[GridColorChart], parentWindo
         addNumericField("Columns", _nbColumns, 0, 3, "")
         addChoice("Reference_White", ReferenceWhite.values.map(_.toString).toArray, _refWhite.toString)
         addFileField("Reference_values_file", _defaultPath)
+        addHelp("https://github.com/ij-plugins/ijp-color/wiki/Custom-Color-Chart")
       }
 
     gd.showDialog()

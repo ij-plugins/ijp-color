@@ -29,6 +29,7 @@ import scalafx.beans.property.StringProperty
 import scalafx.collections.ObservableBuffer
 import scalafx.geometry.Insets
 import scalafx.scene.Node
+import scalafx.scene.control.ButtonBar.ButtonData
 import scalafx.scene.control._
 import scalafx.scene.layout.{ColumnConstraints, GridPane, Priority}
 import scalafx.scene.text.Font
@@ -40,7 +41,12 @@ object GenericDialogFX {
   // Take a chance to initialize JavaFX Toolkit
   initFX()
 
-  case class Result(checkboxes: Seq[Boolean])
+  //  case class Result(checkboxes: Seq[Boolean])
+
+  /**
+    * @param buttonPressed button used to close the dialog
+    */
+  case class Result(buttonPressed: Option[ButtonType])
 }
 
 /**
@@ -86,6 +92,11 @@ class GenericDialogFX(
   private var _numberTextFieldNextIndex = 0
   private val _stringProperties = ListBuffer.empty[StringProperty]
   private var _stringPropertyNextIndex = 0
+  private var _helpURLOption: Option[String] = None
+
+  private var _helpLabel: String = "Help"
+
+  val ButtonTypeHelp = new ButtonType("Help", ButtonData.Help)
 
   private val _grid: GridPane = new GridPane() {
     hgap = 5
@@ -157,6 +168,15 @@ class GenericDialogFX(
   }
 
   /**
+    * Adds a "Help" button that opens the specified URL in the default browser.
+    * Displays an HTML formatted message if 'url' starts with "<html>". There is an example at
+    * http://imagej.nih.gov/ij/macros/js/DialogWithHelp.js
+    */
+  def addHelp(url: String): Unit = {
+    _helpURLOption = Option(url)
+  }
+
+  /**
     * Adds a message consisting of one or more lines of text.
     */
   def addMessage(message: String, font: Option[Font] = None): Unit = {
@@ -169,6 +189,22 @@ class GenericDialogFX(
 
   def addMessage(message: String, font: Font): Unit = {
     addMessage(message, Option(font))
+  }
+
+  /**
+    * Adds a Panel to the dialog.
+    *
+    * @deprecated this is only for compatibility with ImageJ GenericDialog API, it delegates to addNode()
+    */
+  @deprecated("This is only for compatibility with ImageJ GenericDialog API, it delegates to addNode()")
+  def addPanel(node: Node): Unit = {
+    addNode(node)
+  }
+
+  /** Add a custom node that will occupy a whole row */
+  def addNode(node: Node): Unit = {
+    _grid.add(node, 0, _rowIndex, GridPane.Remaining, 1)
+    _rowIndex += 1
   }
 
   def addNumericField(label: String, defaultValue: Double): Unit = {
@@ -256,38 +292,75 @@ class GenericDialogFX(
         resizable = true
       }
 
-      dialog.dialogPane().buttonTypes = Seq(ButtonType.OK, ButtonType.Cancel)
+      dialog.dialogPane().buttonTypes =
+        if (_helpURLOption.isDefined)
+          Seq(ButtonType.OK, ButtonType.Cancel, ButtonTypeHelp)
+        else
+          Seq(ButtonType.OK, ButtonType.Cancel)
 
       // Place to add validation to enable OK button
-      //    // Enable/Disable login button depending on whether a username was entered.
-      //    val loginButton = dialog.dialogPane().lookupButton(loginButtonType)
-      //    loginButton.disable = true
+      //    // Enable/Disable OK button depending on whether data is validated
+      //    val okButton = dialog.dialogPane().lookupButton(ButtonType.OK)
+      //    okButton.disable = true
 
       //    // Do some validation (disable when username is empty).
       //    username.text.onChange { (_, _, newValue) =>
-      //      loginButton.disable = newValue.trim().isEmpty
+      //      okButton.disable = newValue.trim().isEmpty
       //    }
 
       dialog.dialogPane().content = _grid
 
-      // Request focus on the username field by default.
+      // Request focus on the first label by default
       _labeledControls.headOption.foreach(l => Platform.runLater(l._2.requestFocus()))
 
-      // When the login button is clicked, convert the result to a username-password-pair.
-      dialog.resultConverter = dialogButton =>
-        if (dialogButton == ButtonType.OK)
-          Result(_checkBoxes.map(_.selected.value).toSeq)
-        else
-          null
+      // Pressing any of the "official" dialog pane buttons will come with close request.
+      // If a help button was pressed we do not want to close this dialog, but we want to display Help dialog
+      dialog.onCloseRequest = e => {
+        e.getSource match {
+          case d: javafx.scene.control.Dialog[Result] =>
+            if (d.getResult.buttonPressed.forall(_ == ButtonTypeHelp)) {
+              // Show help
+              showHelp()
+              // Cancel closing request
+              e.consume()
+            }
+          case _ =>
+        }
+      }
+
+      // When an "official" button is clicked, convert the result containing that button.
+      // We use it to detect when Help button is pressed
+      dialog.resultConverter = dialogButton => Result(Option(dialogButton))
 
       // We could use some more digested result
       val result = dialog.showAndWait()
 
-      _wasOKed = result.isDefined
+      _wasOKed = result.contains(Result(Some(ButtonType.OK)))
     }
   }
 
   def wasCanceled: Boolean = !_wasOKed
 
   def wasOKed: Boolean = _wasOKed
+
+  def helpLabel: String = _helpLabel
+
+  def helpLabel_=(label: String): Unit = {
+    require(label != null, "Argument 'label' cannot be null.")
+  }
+
+  private def showHelp(): Unit = {
+    _helpURLOption.foreach { helpURL =>
+      if (helpURL.startsWith("<html>")) {
+        //        val title1 = title + " " + helpLabel
+        //        if (this.isInstanceOf[NonBlockingGenericDialog]) new HTMLDialog(title, helpURL, false) // non blocking
+        //        else new HTMLDialog(this, title, helpURL)                                              //modal
+        ???
+      } else {
+        //        val `macro` = "call('ij.plugin.BrowserLauncher.open', '" + helpURL + "');"
+        //        new MacroRunner(`macro`) // open on separate thread using BrowserLauncher
+        ij.plugin.BrowserLauncher.open(helpURL)
+      }
+    }
+  }
 }
