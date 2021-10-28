@@ -22,9 +22,9 @@
 
 package ij_plugins.color.ui.calibration
 
+import ij.ImagePlus
 import ij.measure.ResultsTable
 import ij.plugin.BrowserLauncher
-import ij.{ImagePlus, Prefs}
 import ij_plugins.color.calibration.CalibrationUtils.renderReferenceChart
 import ij_plugins.color.calibration.CorrectionRecipe
 import ij_plugins.color.calibration.chart.{ColorChartType, ColorCharts, GridColorChart, ReferenceColorSpace}
@@ -50,7 +50,7 @@ object ColorCalibratorUIModel {
 
     val chipOverlayColorNameDefault: String = "magenta"
 
-    def loadFromIJPref(): Option[Config] = {
+    def loadFromIJPrefOption(): Option[Config] = {
       // We will use `null` to indicate missing values from Java API
 
       for {
@@ -86,11 +86,11 @@ object ColorCalibratorUIModel {
     import Config._
 
     def saveToIJPref(): Unit = {
-      Prefs.set(ReferencePrefix + ".referenceColorSpace", referenceColorSpace.entryName)
-      Prefs.set(ReferencePrefix + ".mappingMethod", mappingMethod.entryName)
-      Prefs.set(ReferencePrefix + ".colorChartType", colorChartType.entryName)
-      Prefs.set(ReferencePrefix + ".chipMargin", s"$chipMargin")
-      Prefs.set(ReferencePrefix + ".chipOverlayColorName", chipOverlayColorName)
+      IJPrefs.set(ReferencePrefix + ".referenceColorSpace", referenceColorSpace.entryName)
+      IJPrefs.set(ReferencePrefix + ".mappingMethod", mappingMethod.entryName)
+      IJPrefs.set(ReferencePrefix + ".colorChartType", colorChartType.entryName)
+      IJPrefs.set(ReferencePrefix + ".chipMargin", s"$chipMargin")
+      IJPrefs.set(ReferencePrefix + ".chipOverlayColorName", chipOverlayColorName)
       outputConfig.saveToIJPref()
     }
 
@@ -352,6 +352,10 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
 
   def onApplyToCurrentImage(): Unit = busyWorker.doTask("onApplyToCurrentImage") {
     new ApplyToCurrentImageTask(correctionRecipe, outputConfig, Option(parentWindow))
+  }
+
+  def onApplyInBatch(): Unit = busyWorker.doTask("onApplyInBatch") {
+    new ApplyInBatchTask(correctionRecipe, Option(parentWindow))
   }
 
   def onHelp(): Unit = busyWorker.doTask("onHelp") { () =>

@@ -112,7 +112,7 @@ class ColorCalibratorPlugin extends PlugIn with ImageListenerHelper with LiveCha
 
       // Load previous options, if available
       Config
-        .loadFromIJPref()
+        .loadFromIJPrefOption()
         .foreach { config =>
           mvc.model.fromConfig(config)
         }

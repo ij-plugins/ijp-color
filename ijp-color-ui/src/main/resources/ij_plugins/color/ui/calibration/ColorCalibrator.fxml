@@ -25,7 +25,7 @@
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<StackPane xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1"
+<StackPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
            fx:controller="ij_plugins.color.ui.calibration.ColorCalibratorUIController">
     <children>
         <GridPane fx:id="rootGridPane" hgap="10.0" vgap="10.0">
@@ -105,15 +105,6 @@
                         <Insets bottom="5.0" top="5.0"/>
                     </GridPane.margin>
                 </Button>
-                <Button fx:id="applyToCurrentImageButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
-                        text="Apply" GridPane.columnIndex="1" GridPane.rowIndex="15">
-                    <padding>
-                        <Insets bottom="5.0" top="5.0"/>
-                    </padding>
-                    <GridPane.margin>
-                        <Insets bottom="5.0" top="5.0"/>
-                    </GridPane.margin>
-                </Button>
                 <HBox prefWidth="200.0" GridPane.columnSpan="2147483647" GridPane.rowIndex="14">
                     <children>
                         <Label id="ijp-separator" text="Apply to Another Image"/>
@@ -127,8 +118,6 @@
                         <Insets bottom="5.0" top="10.0"/>
                     </padding>
                 </HBox>
-                <Button fx:id="helpButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Help"
-                        GridPane.columnIndex="2" GridPane.rowIndex="15"/>
                 <Label id="ijp-label" text="Info" GridPane.halignment="RIGHT" GridPane.rowIndex="4"
                        GridPane.valignment="CENTER"/>
                 <Label id="ijp-label" fx:id="chartInfoLabel" text="???" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
@@ -143,7 +132,29 @@
                 <Button fx:id="selectChipsButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
                         text="Select Chips" GridPane.columnIndex="2" GridPane.rowIndex="9"/>
                 <Label text="Chip overlay color" GridPane.rowIndex="7"/>
-                <ChoiceBox fx:id="chipOverlayColorChoiceBox" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="7"/>
+                <ChoiceBox fx:id="chipOverlayColorChoiceBox" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1"
+                           GridPane.rowIndex="7"/>
+                <HBox alignment="CENTER_RIGHT" maxWidth="1.7976931348623157E308" spacing="10.0"
+                      GridPane.columnSpan="2147483647" GridPane.halignment="LEFT" GridPane.rowIndex="15">
+                    <children>
+                        <Button fx:id="applyToCurrentImageButton" minWidth="100.0" mnemonicParsing="false" text="Apply">
+                            <tooltip>
+                                <Tooltip text="Apply calibration to currently selected image"/>
+                            </tooltip>
+                        </Button>
+                        <Button fx:id="applyInBatchButton" minWidth="100.0" mnemonicParsing="false"
+                                text="Batch Apply...">
+                            <tooltip>
+                                <Tooltip text="Apply calibration to images on disk"/>
+                            </tooltip>
+                        </Button>
+                        <Button fx:id="helpButton" minWidth="100.0" mnemonicParsing="false" text="Help">
+                            <HBox.margin>
+                                <Insets left="10.0"/>
+                            </HBox.margin>
+                        </Button>
+                    </children>
+                </HBox>
             </children>
             <rowConstraints>
                 <RowConstraints minHeight="10.0"/>
@@ -161,6 +172,7 @@
                 <RowConstraints minHeight="10.0"/>
                 <RowConstraints minHeight="10.0"/>
                 <RowConstraints minHeight="10.0"/>
+                <RowConstraints minHeight="10.0" prefHeight="30.0"/>
                 <RowConstraints minHeight="10.0"/>
             </rowConstraints>
             <columnConstraints>

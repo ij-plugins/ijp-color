@@ -56,6 +56,7 @@ class ColorCalibratorUIController(
                                    private val selectOutputsButton: Button,
                                    private val calibrateButton: Button,
                                    private val applyToCurrentImageButton: Button,
+                                   private val applyInBatchButton: Button,
                                    private val helpButton: Button,
                                    private val rootGridPane: GridPane,
                                    private val model: ColorCalibratorUIModel
@@ -75,7 +76,7 @@ class ColorCalibratorUIController(
   chartTypeChoiceBox.items = ObservableBuffer.from(ColorChartType.values)
 
   private val chartIsChanging = new AtomicBoolean(false)
-  chartTypeChoiceBox.selectionModel().selectedItem.onChange { (_, oldValue, newValue) =>
+  chartTypeChoiceBox.selectionModel().selectedItem.onChange { (_, _, newValue) =>
     chartIsChanging.synchronized {
       if (!chartIsChanging.getAndSet(true)) {
         model.selectReferenceChartType(newValue)
@@ -122,7 +123,7 @@ class ColorCalibratorUIController(
   enabledChipsChoiceBox.items = ObservableBuffer.from(ChipsEnabledType.values)
   // Update model when UI changed
   private val enabledChipsIsChanging = new AtomicBoolean(false)
-  enabledChipsChoiceBox.selectionModel().selectedItem.onChange { (_, oldValue, newValue) =>
+  enabledChipsChoiceBox.selectionModel().selectedItem.onChange { (_, _, newValue) =>
     enabledChipsIsChanging.synchronized {
       if (!enabledChipsIsChanging.getAndSet(true)) {
         model.enabledChipsType.value = newValue
@@ -156,6 +157,9 @@ class ColorCalibratorUIController(
 
   applyToCurrentImageButton.onAction = _ => model.onApplyToCurrentImage()
   applyToCurrentImageButton.disable <== !model.correctionRecipeAvailable
+
+  applyInBatchButton.onAction = _ => model.onApplyInBatch()
+  applyInBatchButton.disable <== !model.correctionRecipeAvailable
 
   helpButton.onAction = _ => model.onHelp()
 }

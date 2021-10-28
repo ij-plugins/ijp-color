@@ -29,11 +29,12 @@ object Regression {
 
   /** Result returned by regression methods. */
   case class Result(
-    var beta: Array[Double],
-    var rSquared: Double,
-    var adjustedRSquared: Double,
-    var regressandVariance: Double,
-    var regressionStandardError: Double
+    numberOfSamples: Int,
+    beta: Array[Double],
+    rSquared: Double,
+    adjustedRSquared: Double,
+    regressandVariance: Double,
+    regressionStandardError: Double
   )
 
   /**
@@ -80,6 +81,7 @@ object Regression {
     regression.setNoIntercept(noIntercept)
     regression.newSampleData(standard, observation)
     Regression.Result(
+      numberOfSamples = standard.length,
       beta = regression.estimateRegressionParameters,
       rSquared = regression.calculateRSquared,
       adjustedRSquared = regression.calculateAdjustedRSquared,

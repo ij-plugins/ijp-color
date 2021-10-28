@@ -94,9 +94,9 @@ class GenericDialogFX(
   private var _stringPropertyNextIndex = 0
   private var _helpURLOption: Option[String] = None
 
-  private var _helpLabel: String = "Help"
+  private val _helpLabel: String = "Help"
 
-  val ButtonTypeHelp = new ButtonType("Help", ButtonData.Help)
+  val ButtonTypeHelp = new ButtonType(helpLabel, ButtonData.Help)
 
   private val _grid: GridPane = new GridPane() {
     hgap = 5
@@ -153,6 +153,33 @@ class GenericDialogFX(
 
   }
 
+  /**
+    * Adds a directory text field and "Browse" button, where the
+    * field width is determined by the length of 'defaultPath', with
+    * a minimum of 25 columns. Use getNextString to retrieve the
+    * directory path.
+    */
+  def addDirectoryField(label: String, defaultPath: String): Unit = {
+    val columns =
+      if (defaultPath != null) Math.max(defaultPath.length, 25)
+      else 25
+    addDirectoryField(label, defaultPath, columns)
+  }
+
+  def addDirectoryField(label: String, defaultPath: String, columns: Int): Unit = {
+    val label2 = label.replace('_', ' ')
+
+    val directorySelectionField = new DirectorySelectionField(label2, parentWindowOption)
+    directorySelectionField.path.value = defaultPath
+
+    _grid.add(new Label(label2), 0, _rowIndex)
+    _grid.add(directorySelectionField.view, 1, _rowIndex, GridPane.Remaining, 1)
+    _rowIndex += 1
+
+    _labeledControls.append((label, directorySelectionField.view))
+    _stringProperties += directorySelectionField.path
+  }
+
   def addFileField(label: String, defaultPath: String = ""): Unit = {
     val label2 = label.replace('_', ' ')
 
@@ -196,7 +223,7 @@ class GenericDialogFX(
     *
     * @deprecated this is only for compatibility with ImageJ GenericDialog API, it delegates to addNode()
     */
-  @deprecated("This is only for compatibility with ImageJ GenericDialog API, it delegates to addNode()")
+  @deprecated("This is only for compatibility with ImageJ GenericDialog API, it delegates to addNode()", "0.11")
   def addPanel(node: Node): Unit = {
     addNode(node)
   }
@@ -280,6 +307,38 @@ class GenericDialogFX(
     next
   }
 
+  /**
+    * Adds an 8 column text field.
+    *
+    * @param label       the label
+    * @param defaultText the text initially displayed
+    */
+  def addStringField(label: String, defaultText: String): Unit = {
+    addStringField(label, defaultText, 8)
+  }
+
+  /**
+    * Adds a text field.
+    *
+    * @param label       the label
+    * @param defaultText text initially displayed
+    * @param columns     width of the text field. If columns is 8 or more, additional items may be added to this line with addToSameRow()
+    */
+  def addStringField(label: String, defaultText: String, columns: Int): Unit = {
+    val label2 = label.replace('_', ' ')
+    val textField = new TextField() {
+      prefColumnCount = columns
+      text.value = defaultText
+    }
+
+    _grid.add(new Label(label2), 0, _rowIndex)
+    _grid.add(textField, 1, _rowIndex)
+    _rowIndex += 1
+
+    _labeledControls.append((label, textField))
+    _stringProperties += textField.text
+  }
+
   def showDialog(): Unit = {
 
     onFXAndWait {
@@ -345,9 +404,10 @@ class GenericDialogFX(
 
   def helpLabel: String = _helpLabel
 
-  def helpLabel_=(label: String): Unit = {
-    require(label != null, "Argument 'label' cannot be null.")
-  }
+  //  def helpLabel_=(label: String): Unit = {
+  //    require(label != null, "Argument 'label' cannot be null.")
+  //    _helpLabel = label
+  //  }
 
   private def showHelp(): Unit = {
     _helpURLOption.foreach { helpURL =>

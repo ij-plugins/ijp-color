@@ -106,7 +106,7 @@ lazy val ijp_color = (project in file("ijp-color"))
     ),
     libraryDependencies ++= (
       if (isScala2_13plus(scalaVersion.value)) {
-        Seq("org.scala-lang.modules" %% "scala-parallel-collections" % "1.0.3")
+        Seq("org.scala-lang.modules" %% "scala-parallel-collections" % "1.0.4")
       } else {
         Seq.empty[ModuleID]
       }
