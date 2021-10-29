@@ -98,7 +98,9 @@ object ColorCorrectionBatchItem {
 
   def saveImage(imp: ImagePlus, dstDir: File, name: String, imageFileType: String): Unit = {
     val dstFile = new File(dstDir, name + "." + imageFileType)
-    dstFile.getParentFile.mkdirs()
+    this.synchronized {
+      dstFile.getParentFile.mkdirs()
+    }
     IJ.save(imp, dstFile.getCanonicalPath)
   }
 }
@@ -112,7 +114,7 @@ class ColorCorrectionBatchItem(recipe: CorrectionRecipe, srcFile: File, dstDir: 
   private val sRGBExt = "png"
   private val LabExt = "tif"
 
-  override def name: String = nameWithoutExtension(srcFile)
+  override val name: String = nameWithoutExtension(srcFile)
 
   override def run(): String = {
     val srcImp = openImage(srcFile)
