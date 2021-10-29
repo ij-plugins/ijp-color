@@ -245,7 +245,7 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
   def onRenderReferenceChart(): Unit = busyWorker.doTask("onRenderReferenceChart") { () =>
     referenceChartOption.value match {
       case Some(referenceChart) =>
-        renderReferenceChart(referenceChart).show()
+        renderReferenceChart(referenceChart.copyWithChipMargin(chipMarginPercent.value / 100d)).show()
       case None =>
         showError(
           Title,

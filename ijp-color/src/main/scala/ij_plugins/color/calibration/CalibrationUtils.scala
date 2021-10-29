@@ -60,9 +60,9 @@ object CalibrationUtils {
 
   def renderReferenceChart(referenceChart: GridColorChart): ImagePlus = {
     val scale = 80
-    val margin = 0.1 * scale
+    val margin = referenceChart.chipMargin * scale
 
-    val chart = referenceChart.copyWithChipMargin(0.1).copyWith(new PerspectiveTransform())
+    val chart = referenceChart.copyWith(new PerspectiveTransform())
     val maxX = chart.referenceOutline.map(_.getX).max * scale
     val maxY = chart.referenceOutline.map(_.getY).max * scale
     val width: Int = (maxX + 2 * margin).toInt
