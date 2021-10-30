@@ -8,8 +8,11 @@ import scala.xml.{Node => XmlNode, NodeSeq => XmlNodeSeq, _}
 
 name := "ijp-color-project"
 
+val Scala2_12 = "2.12.15"
+val Scala2_13 = "2.13.6"
+
 val _version       = "0.10.2.2-SNAPSHOT"
-val _scalaVersions = Seq("2.13.6")
+val _scalaVersions = Seq(Scala2_13, Scala2_12)
 val _scalaVersion  = _scalaVersions.head
 
 version             := _version
@@ -23,6 +26,14 @@ def isScala2_13plus(scalaVersion: String): Boolean =
   CrossVersion.partialVersion(scalaVersion) match {
     case Some((2, n)) if n >= 13 => true
     case _ => false
+  }
+
+// Add src/main/scala-2.13+ for Scala 2.13 and newer
+//   and src/main/scala-2.12- for Scala versions older than 2.13
+def versionSubDir(scalaVersion: String): String =
+  CrossVersion.partialVersion(scalaVersion) match {
+    case Some((2, n)) if n < 13 => "scala-2.12-"
+    case Some((_, _)) => "scala-2.13+"
   }
 
 // Determine OS version of JavaFX binaries
@@ -44,6 +55,9 @@ val commonSettings = Seq(
   //
   crossScalaVersions := _scalaVersions,
   scalaVersion       := _scalaVersion,
+  // Use different directories for code that is not source compatible between Scala versions
+  Compile / unmanagedSourceDirectories += (Compile / sourceDirectory).value / versionSubDir(scalaVersion.value),
+  Test / unmanagedSourceDirectories += (Test / sourceDirectory).value / versionSubDir(scalaVersion.value),
   //
   scalacOptions ++= Seq(
     "-encoding", "UTF-8",

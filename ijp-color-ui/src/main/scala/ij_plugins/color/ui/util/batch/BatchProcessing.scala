@@ -27,7 +27,7 @@ import org.scalafx.extras.ShowMessage
 import scalafx.stage.Window
 
 import java.util.concurrent.atomic.{AtomicBoolean, AtomicInteger}
-import scala.collection.parallel.CollectionConverters._
+//import scala.collection.parallel.CollectionConverters._
 import scala.jdk.CollectionConverters._
 import scala.util.control.NonFatal
 
@@ -74,7 +74,7 @@ class BatchProcessing(override val parentWindow: Option[Window]) extends ShowMes
       val errors = new java.util.concurrent.ConcurrentHashMap[String, Throwable]()
       val abortingMessage = title + " - processing aborted by user. Waiting to complete..."
 
-      //      val runningItems = new AtomicInteger(0)
+      val runningItems = new AtomicInteger(0)
 
       IJ.showStatus(s"Processed 0 of $numberOfItems. Press ESC to abort.")
       //      onFX {
@@ -91,48 +91,49 @@ class BatchProcessing(override val parentWindow: Option[Window]) extends ShowMes
       //        pc
       //      }
 
-      itemTasks.par.foreach { item =>
-        //        println(s"Running items: ${runningItems.incrementAndGet()}")
+      ParHelper.par(itemTasks)
+        .foreach { item =>
+          ijDebug(s"Running items: ${runningItems.incrementAndGet()}")
 
-        //        if (enableParallelProcessing)
-        Thread.currentThread().setPriority(Thread.MIN_PRIORITY)
+          //        if (enableParallelProcessing)
+          Thread.currentThread().setPriority(Thread.MIN_PRIORITY)
 
-        if (!abort.get()) {
-          try {
-            item.run()
-            successfulCount.incrementAndGet()
-          } catch {
-            case NonFatal(t) =>
-              errors.put(item.name, t)
+          if (!abort.get()) {
+            try {
+              item.run()
+              successfulCount.incrementAndGet()
+            } catch {
+              case NonFatal(t) =>
+                errors.put(item.name, t)
+            }
+            val c = progressCount.incrementAndGet()
+            IJ.showProgress(c, numberOfItems)
+            IJ.showStatus(if (abort.get) abortingMessage else s"Processed $c of $numberOfItems. Press ESC to abort.")
+            //          onFX {
+            //            progressStatus.progress.value = c / numberOfItems.toDouble
+            //            progressStatus.statusText.value = if (abort.get) abortingMessage else s"Processed $c of $numberOfItems..."
+            //          }
           }
-          val c = progressCount.incrementAndGet()
-          IJ.showProgress(c, numberOfItems)
-          IJ.showStatus(if (abort.get) abortingMessage else s"Processed $c of $numberOfItems. Press ESC to abort.")
-          //          onFX {
-          //            progressStatus.progress.value = c / numberOfItems.toDouble
-          //            progressStatus.statusText.value = if (abort.get) abortingMessage else s"Processed $c of $numberOfItems..."
-          //          }
-        }
 
-        abort.synchronized {
-          if (!abort.get) {
-            //            abort.set(IJ.escapePressed || progressStatus.abortFlag.value)
-            abort.set(IJ.escapePressed)
-            if (abort.get) {
-              //              onFX {
-              //                progressStatus.abortFlag.value = true
-              //                progressStatus.statusText.value =
-              //                  "Batch processing aborted by user. Waiting for running tasks to complete..."
-              //              }
-              IJ.beep()
-              IJ.showStatus(abortingMessage)
-              showWarning(title, "Batch processing aborted by user", "")
+          abort.synchronized {
+            if (!abort.get) {
+              //            abort.set(IJ.escapePressed || progressStatus.abortFlag.value)
+              abort.set(IJ.escapePressed)
+              if (abort.get) {
+                //              onFX {
+                //                progressStatus.abortFlag.value = true
+                //                progressStatus.statusText.value =
+                //                  "Batch processing aborted by user. Waiting for running tasks to complete..."
+                //              }
+                IJ.beep()
+                IJ.showStatus(abortingMessage)
+                showWarning(title, "Batch processing aborted by user", "")
+              }
             }
           }
-        }
 
-        //        println(s"Running items (end loop): ${runningItems.decrementAndGet()}")
-      }
+          ijDebug(s"Running items (end loop): ${runningItems.decrementAndGet()}")
+        }
       if (abort.get()) {
         IJ.showStatus(title + " - batch processing aborted by user.")
       }
@@ -158,4 +159,7 @@ class BatchProcessing(override val parentWindow: Option[Window]) extends ShowMes
 
   }
 
+  private def ijDebug(message: String): Unit = {
+    if (IJ.debugMode) IJ.log(message)
+  }
 }
