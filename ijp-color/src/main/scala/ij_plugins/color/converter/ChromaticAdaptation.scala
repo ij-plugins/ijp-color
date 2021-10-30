@@ -26,53 +26,78 @@ import enumeratum.{Enum, EnumEntry}
 
 import scala.collection.immutable
 
-/** Represents chromatic adaptation when converting between color spaces using difference reference whites.
-  *
-  * @param entryName adaptation name
-  * @param ma        adaptation matrix
-  */
+/**
+ * Represents chromatic adaptation when converting between color spaces using difference reference whites.
+ *
+ * @param entryName adaptation name
+ * @param ma        adaptation matrix
+ */
 sealed abstract class ChromaticAdaptation(override val entryName: String, val ma: Matrix3x3) extends EnumEntry {
+
   /** Inverse of the adaptation matrix */
   val maI: Matrix3x3 = ma.inverse
 
   override def toString: String = entryName
 }
 
-/** Concrete coefficients for chromatic adaptation transforms.
-  *
-  * See details on [[http://www.brucelindbloom.com/index.html?Eqn_ChromAdapt.html Chromatic Adaptation]] page.
-  */
+/**
+ * Concrete coefficients for chromatic adaptation transforms.
+ *
+ * See details on [[http://www.brucelindbloom.com/index.html?Eqn_ChromAdapt.html Chromatic Adaptation]] page.
+ */
 case object ChromaticAdaptation extends Enum[ChromaticAdaptation] {
 
   /** Bradford */
-  case object Bradford extends ChromaticAdaptation("Bradford",
-    new Matrix3x3(
-      m00 = 0.8951, m01 = -0.7502, m02 = 0.0389,
-      m10 = 0.2664, m11 = 1.7135, m12 = -0.0685,
-      m20 = -0.1614, m21 = 0.0367, m22 = 1.0296
-    )
-  )
+  case object Bradford
+      extends ChromaticAdaptation(
+        "Bradford",
+        new Matrix3x3(
+          m00 = 0.8951,
+          m01 = -0.7502,
+          m02 = 0.0389,
+          m10 = 0.2664,
+          m11 = 1.7135,
+          m12 = -0.0685,
+          m20 = -0.1614,
+          m21 = 0.0367,
+          m22 = 1.0296
+        )
+      )
 
   /** von Kries */
-  case object VonKries extends ChromaticAdaptation("von Kries",
-    new Matrix3x3(
-      m00 = 0.40024, m01 = -0.22630, m02 = 0.00000,
-      m10 = 0.70760, m11 = 1.16532, m12 = 0.00000,
-      m20 = -0.08081, m21 = 0.04570, m22 = 0.91822
-    )
-  )
+  case object VonKries
+      extends ChromaticAdaptation(
+        "von Kries",
+        new Matrix3x3(
+          m00 = 0.40024,
+          m01 = -0.22630,
+          m02 = 0.00000,
+          m10 = 0.70760,
+          m11 = 1.16532,
+          m12 = 0.00000,
+          m20 = -0.08081,
+          m21 = 0.04570,
+          m22 = 0.91822
+        )
+      )
 
   /** XYZ Scaling */
-  case object XYZScaling extends ChromaticAdaptation("XYZ Scaling",
-    new Matrix3x3(
-      m00 = 1, m01 = 0, m02 = 0,
-      m10 = 0, m11 = 1, m12 = 0,
-      m20 = 0, m21 = 0, m22 = 1
-    )
-  )
+  case object XYZScaling
+      extends ChromaticAdaptation(
+        "XYZ Scaling",
+        new Matrix3x3(
+          m00 = 1,
+          m01 = 0,
+          m02 = 0,
+          m10 = 0,
+          m11 = 1,
+          m12 = 0,
+          m20 = 0,
+          m21 = 0,
+          m22 = 1
+        )
+      )
 
   /** List of all predefined chromatic adaptations. */
   val values: immutable.IndexedSeq[ChromaticAdaptation] = findValues
 }
-
-

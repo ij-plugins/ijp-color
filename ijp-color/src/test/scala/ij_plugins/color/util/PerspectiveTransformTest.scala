@@ -22,7 +22,7 @@
 
 package ij_plugins.color.util
 
-import ij_plugins.color.calibration.point2D
+import ij_plugins.color.calibration.CalibrationUtils.point2D
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers._
 
@@ -46,7 +46,7 @@ class PerspectiveTransformTest extends AnyFlatSpec {
     )
 
     val alignmentTransform = PerspectiveTransform.quadToQuad(referenceQuad, deformedQuad)
-    val pm = alignmentTransform.transform(point2D(3, 2))
+    val pm                 = alignmentTransform.transform(point2D(3, 2))
 
     pm.getX should be(317.07786 +- 0.00001)
     pm.getY should be(199.30959 +- 0.00001)

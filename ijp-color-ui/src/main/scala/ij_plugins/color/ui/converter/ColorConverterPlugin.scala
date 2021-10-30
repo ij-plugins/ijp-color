@@ -41,7 +41,6 @@ class ColorConverterPlugin extends PlugIn {
 
   private final val Title = "IJP Color Calculator"
 
-
   def run(arg: String): Unit = {
 
     try {

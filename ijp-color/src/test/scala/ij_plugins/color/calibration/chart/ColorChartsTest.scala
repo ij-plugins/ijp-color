@@ -20,29 +20,40 @@
  * Latest release available at https://github.com/ij-plugins/ijp-color/
  */
 
-package ij_plugins.color.util
+package ij_plugins.color.calibration.chart
 
-import java.awt.image.BufferedImage
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers._
 
-/** Tools for converting images between AWT and JavaFX. */
-object ImageConverter {
+import java.io.File
 
-  /** Convert AWT image to BufferedImage.
-    *
-    * @param image AWT image.
-    */
-  def toBufferImage(image: java.awt.Image): BufferedImage = toBufferImage(image, BufferedImage.TYPE_INT_ARGB)
+class ColorChartsTest extends AnyFlatSpec {
 
-  /** Convert AWT image to BufferedImage.
-    *
-    * @param image     image to convert
-    * @param imageType `BufferedImage` type
-    * @see [[java.awt.image.BufferedImage]]
-    */
-  def toBufferImage(image: java.awt.Image, imageType: Int): BufferedImage = {
-    val bi = new BufferedImage(image.getWidth(null), image.getHeight(null), imageType)
-    val g = bi.createGraphics
-    g.drawImage(image, null, null)
-    bi
+  behavior of "ColorCharts"
+
+  it should "correspond to unique names" in {
+
+    val chartNames = ColorCharts.values.map(_.name)
+
+    chartNames.distinct should contain theSameElementsAs chartNames
   }
+
+  it should "have value for each ColorChartType" in {
+
+    ColorChartType
+      .values
+      .filter(c => c != ColorChartType.Custom)
+      .forall(t => ColorCharts.withColorChartType(t).isDefined) should be(true)
+  }
+
+  it should "read reference values from a file" in {
+    val srcFile = new File("../test/data/Color_Gauge_Chart_3.csv")
+    assert(srcFile.exists())
+
+    val chipsList = ColorCharts.loadReferenceValues(srcFile)
+
+    chipsList.size should be(30)
+
+  }
+
 }

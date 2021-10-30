@@ -22,20 +22,23 @@
 
 package ij_plugins.color.calibration
 
+import ij.io.RoiDecoder
 import ij.measure.ResultsTable
-import ij_plugins.color.calibration.chart.{ColorCharts, ReferenceColorSpace}
+import ij.{IJ, ImagePlus}
+import ij_plugins.color.calibration.LOOCrossValidation.CrossValidationData
+import ij_plugins.color.calibration.chart.{ColorCharts, GridColorChart, ReferenceColorSpace}
 import ij_plugins.color.calibration.regression.MappingMethod
+import ij_plugins.color.converter.ReferenceWhite
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers._
 
 import java.io.File
 
-
 class LOOCrossValidationSpec extends AnyFlatSpec {
 
   behavior of "LOOCrossValidation"
 
-  it should "compute cross validation stats" in {
+  it should "compute cross validation stats (from a table)" in {
 
     // Read chart values
     val tableFile = new File("../test/data/Passport-linear-25_color_values.csv").getCanonicalFile
@@ -56,18 +59,114 @@ class LOOCrossValidationSpec extends AnyFlatSpec {
     // Do LOO validation
     val referenceColorSpaces = ReferenceColorSpace.values
     val mappingMethods = MappingMethod.values
-    val crossValidations = LOOCrossValidation.crossValidationStatsAll(chart, observed, referenceColorSpaces, mappingMethods)
+    val crossValidations =
+      LOOCrossValidation.crossValidationStatsAll(chart, observed, referenceColorSpaces, mappingMethods)
 
     crossValidations should have length (referenceColorSpaces.length * mappingMethods.length)
 
     // Sort, best first
     val bestByMean = crossValidations.toArray.minBy(_.statsDeltaE.getMean)
-    println(s"Best by mean: ${bestByMean.method} - ${bestByMean.referenceColorSpace}: ${bestByMean.statsDeltaE.getMean} ")
+    //    println(
+    //      s"Best by mean: ${bestByMean.method} - ${bestByMean.referenceColorSpace}: ${bestByMean.statsDeltaE.getMean} "
+    //    )
     bestByMean.referenceColorSpace should be(ReferenceColorSpace.XYZ)
     bestByMean.method should be(MappingMethod.QuadraticCrossBand)
     bestByMean.statsDeltaE.getMean should be(4.854 +- 0.1)
     bestByMean.statsDeltaE.getPercentile(50) should be(4.494 +- 0.1)
     bestByMean.statsDeltaE.getPercentile(95) should be(12.212 +- 0.1)
+  }
+
+  it should "compute cross validation stats (from an image)" in {
+
+    val (imp, chart) = loadImageChart()
+
+    // LOO-CV with all chips enabled
+    val crossValidations =
+      LOOCrossValidation.crossValidationStatsAll(chart, imp, ReferenceColorSpace.values, MappingMethod.values)
+
+    //    println("\nLOO Cross-Validation - all chips")
+    //    printInfo(crossValidations)
+
+    val bestByMean = crossValidations.toArray.minBy(_.statsDeltaE.getMean)
+    bestByMean.referenceColorSpace should be(ReferenceColorSpace.sRGB)
+    bestByMean.method should be(MappingMethod.QuadraticCrossBand)
+    bestByMean.statsDeltaE.getMean should be(5.321 +- 0.1)
+    bestByMean.statsDeltaE.getPercentile(50) should be(3.958 +- 0.1)
+    bestByMean.statsDeltaE.getPercentile(95) should be(13.450 +- 0.1)
+  }
+
+  it should "compute cross validation stats with a chip disabled (from an image)" in {
+
+    val (imp, chart) = loadImageChart()
+
+    // LOO-CV with invalid-reference-chips disabled
+    val enabled = chart.enabled.toArray
+    enabled(6) = false
+    val chart2 = chart.copyWithEnabled(enabled)
+    val crossValidations =
+      LOOCrossValidation.crossValidationStatsAll(chart2, imp, ReferenceColorSpace.values, MappingMethod.values)
+
+    //    println("\nLOO Cross-Validation - invalid reference disabled")
+    //    printInfo(crossValidations)
+
+    val bestByMean = crossValidations.toArray.minBy(_.statsDeltaE.getMean)
+    bestByMean.referenceColorSpace should be(ReferenceColorSpace.sRGB)
+    bestByMean.method should be(MappingMethod.QuadraticCrossBand)
+    bestByMean.statsDeltaE.getMean should be(5.132 +- 0.1)
+    bestByMean.statsDeltaE.getPercentile(50) should be(3.839 +- 0.1)
+    bestByMean.statsDeltaE.getPercentile(95) should be(12.140 +- 0.1)
+  }
+
+  def loadImageChart(): (ImagePlus, GridColorChart) = {
+    val dataDir = new File("../test/data")
+    require(dataDir.exists(), s"Input directory must exist: ${dataDir.getCanonicalPath}")
+
+    // Image to calibrate
+    val imageFile = new File(dataDir, "Color_Gauge_Sample_3.png")
+    val roiFile = new File(dataDir, "Color_Gauge_Sample_3.roi")
+
+    // Custom chart params
+    val nbRows = 5
+    val nbColumns = 6
+    val chipMargin = 0.2
+    val refWhite = ReferenceWhite.D50
+    val refValuesFile = new File(dataDir, "Color_Gauge_Chart_3.csv")
+
+    // Load image
+    val imp = IJ.openImage(imageFile.getPath)
+    require(imp != null)
+
+    // Load ROI
+    val roi = RoiDecoder.open(roiFile.getPath)
+    require(roi != null)
+
+    // Load reference values
+    val chipsRefValues = ColorCharts.loadReferenceValues(refValuesFile)
+
+    // Create custom calibration chart aligned to given ROI
+    val chart =
+      new GridColorChart(
+        s"Custom Color Gauge",
+        nbColumns = nbColumns,
+        nbRows = nbRows,
+        chips = chipsRefValues,
+        chipMargin = chipMargin,
+        refWhite = refWhite
+      ).copyAlignedTo(roi)
+
+    (imp, chart)
+  }
+
+  def printInfo(crossValidations: Seq[CrossValidationData]): Unit = {
+    val sortedByMean = crossValidations.sortBy(v => v.statsDeltaE.getMean)
+
+    println("Space -                Method:      Mean,    Median,       95%")
+    sortedByMean.foreach { cvd: CrossValidationData =>
+      println(
+        f"${cvd.referenceColorSpace}%5s - ${cvd.method}%21s:  " +
+          f"${cvd.statsDeltaE.getMean}%8.3f,  ${cvd.statsDeltaE.getPercentile(50)}%8.3f,  ${cvd.statsDeltaE.getPercentile(95)}%8.3f"
+      )
+    }
   }
 
 }

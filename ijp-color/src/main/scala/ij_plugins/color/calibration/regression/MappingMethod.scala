@@ -29,6 +29,12 @@ import scala.collection.immutable
 /** Enumeration of polynomial function mapping methods used by `MappingFactory`. */
 case object MappingMethod extends Enum[MappingMethod] {
 
+  /** First order polynomial with no intercept term, within single color band - single input. */
+  case object LinearNoIntercept extends MappingMethod("Linear No-intercept")
+
+  /** First order polynomial with no intercept term, within with three input for each color band. */
+  case object LinearNoInterceptCrossBand extends MappingMethod("Linear No-intercept Cross-band")
+
   /** First order polynomial, within single color band - single input. */
   case object Linear extends MappingMethod("Linear")
 

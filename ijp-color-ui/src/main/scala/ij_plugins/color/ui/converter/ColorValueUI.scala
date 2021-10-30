@@ -20,30 +20,17 @@
  * Latest release available at https://github.com/ij-plugins/ijp-color/
  */
 
-package ij_plugins.color.ui
+package ij_plugins.color.ui.converter
 
 import ij_plugins.color.converter.ColorTriple
 import ij_plugins.color.converter.ColorTriple.Color123
-import ij_plugins.color.ui.ColorValueUI.NumberTextField
+import ij_plugins.color.ui.fx.NumberTextField
 import scalafx.Includes._
 import scalafx.beans.property.ObjectProperty
 import scalafx.geometry.Pos
-import scalafx.scene.control.{TextField, TextFormatter}
 import scalafx.scene.layout.HBox
-import scalafx.util.converter.FormatStringConverter
 
-import java.text.DecimalFormat
-
-object ColorValueUI {
-
-  private class NumberTextField extends TextField {
-    private val format = new DecimalFormat("0.000000")
-    private val converter = new FormatStringConverter[Number](format)
-    val model = new TextFormatter(converter)
-    textFormatter = model
-  }
-
-}
+object ColorValueUI {}
 
 /** Row of number text fields holding color band values. */
 class ColorValueUI {
@@ -70,8 +57,7 @@ class ColorValueUI {
     }
   }
 
-
-  val control = new HBox {
+  val control: HBox = new HBox {
     children ++= Seq(band1NTF, band2NTF, band3NTF)
   }
 

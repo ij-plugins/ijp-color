@@ -30,11 +30,11 @@ import ij.{IJ, ImageJ}
 import java.awt.geom.Point2D
 import scala.collection.compat._
 
-
 /** Helper methods for working with ImageJ. */
-object IJTools {
+object ImageJUtils {
 
-  /** Returns icon used by ImageJ main frame. Returns `null` if main frame is not instantiated or has no icon.
+  /**
+    * Returns icon used by ImageJ main frame. Returns `null` if main frame is not instantiated or has no icon.
     *
     * @return ImageJ icon or `null`.
     */
@@ -43,36 +43,38 @@ object IJTools {
     if (imageJ != null) imageJ.getIconImage else null
   }
 
-  /** Splits ColorProcessor into ByteProcessors representing each of three bands (red, green, and blue).
-    *
-    * @param cp input color processor
-    * @return ByteProcessor for each band.
-    */
+  /**
+   * Splits ColorProcessor into ByteProcessors representing each of three bands (red, green, and blue).
+   *
+   * @param cp input color processor
+   * @return ByteProcessor for each band.
+   */
   def splitRGB(cp: ColorProcessor): Array[ByteProcessor] = {
-    val width = cp.getWidth
-    val height = cp.getHeight
-    val redBP = new ByteProcessor(width, height)
-    val greenBP = new ByteProcessor(width, height)
-    val blueBP = new ByteProcessor(width, height)
-    val redPixels = redBP.getPixels.asInstanceOf[Array[Byte]]
+    val width       = cp.getWidth
+    val height      = cp.getHeight
+    val redBP       = new ByteProcessor(width, height)
+    val greenBP     = new ByteProcessor(width, height)
+    val blueBP      = new ByteProcessor(width, height)
+    val redPixels   = redBP.getPixels.asInstanceOf[Array[Byte]]
     val greenPixels = greenBP.getPixels.asInstanceOf[Array[Byte]]
-    val bluePixels = blueBP.getPixels.asInstanceOf[Array[Byte]]
+    val bluePixels  = blueBP.getPixels.asInstanceOf[Array[Byte]]
     cp.getRGB(redPixels, greenPixels, bluePixels)
     Array[ByteProcessor](redBP, greenBP, blueBP)
   }
 
-  /** Merges RGB bands into a ColorProcessor.
-    *
-    * @param src ByteProcessor for red, green, and blue band.
-    * @return merged bands
-    * @see #splitRGB
-    */
+  /**
+   * Merges RGB bands into a ColorProcessor.
+   *
+   * @param src ByteProcessor for red, green, and blue band.
+   * @return merged bands
+   * @see #splitRGB
+   */
   def mergeRGB(src: Array[ByteProcessor]): ColorProcessor = {
     validateSameTypeAndDimensions(src, 3)
 
-    val width = src(0).getWidth
+    val width  = src(0).getWidth
     val height = src(0).getHeight
-    val dest = new ColorProcessor(width, height)
+    val dest   = new ColorProcessor(width, height)
     dest.setRGB(
       src(0).getPixels.asInstanceOf[Array[Byte]],
       src(1).getPixels.asInstanceOf[Array[Byte]],
@@ -81,14 +83,15 @@ object IJTools {
     dest
   }
 
-  /** Merges RGB bands into a ColorProcessor.
-    *
-    * Floating point values are assumed in the range 0 to 255.
-    *
-    * @param src ByteProcessor for red, green, and blue band.
-    * @return merged bands
-    * @see #splitRGB
-    */
+  /**
+   * Merges RGB bands into a ColorProcessor.
+   *
+   * Floating point values are assumed in the range 0 to 255.
+   *
+   * @param src ByteProcessor for red, green, and blue band.
+   * @return merged bands
+   * @see #splitRGB
+   */
   def mergeRGB(src: Array[FloatProcessor]): ColorProcessor = {
     validateSameTypeAndDimensions(src, 3)
 
@@ -99,7 +102,7 @@ object IJTools {
     if (!src.isInstanceOf[ColorProcessor]) {
       Array[FloatProcessor](src.convertToFloat.asInstanceOf[FloatProcessor])
     } else {
-      val srcBps: Array[ByteProcessor] = splitRGB(src.asInstanceOf[ColorProcessor])
+      val srcBps: Array[ByteProcessor]   = splitRGB(src.asInstanceOf[ColorProcessor])
       val destFps: Array[FloatProcessor] = new Array[FloatProcessor](3)
       for (i <- srcBps.indices) {
         destFps(i) = srcBps(i).convertToFloat.asInstanceOf[FloatProcessor]
@@ -121,24 +124,26 @@ object IJTools {
     new PolygonRoi(x, y, outline.length, Roi.POLYGON)
   }
 
-  /** Measure color within ROI.
-    *
-    * @param tri     three bands of an image, may represent only color space.
-    * @param outline outline of the region of interest.
-    * @return average color in the ROI.
-    * @see #measureColorXY(ij.process.ImageProcessor[], ij.gui.Roi)
-    */
+  /**
+   * Measure color within ROI.
+   *
+   * @param tri     three bands of an image, may represent only color space.
+   * @param outline outline of the region of interest.
+   * @return average color in the ROI.
+   * @see #measureColorXY(ij.process.ImageProcessor[], ij.gui.Roi)
+   */
   def measureColor[T <: ImageProcessor](tri: Array[T], outline: Array[Point2D]): Array[Double] = {
     measureColor(tri, toRoi(outline.toSeq))
   }
 
-  /** Measure color within ROI.
-    *
-    * @param tri three bands of an image, may represent only color space.
-    * @param roi region of interest.
-    * @return average color in the ROI.
-    * @see #measureColorXY(ij.process.ImageProcessor[], ij.gui.Roi)
-    */
+  /**
+   * Measure color within ROI.
+   *
+   * @param tri three bands of an image, may represent only color space.
+   * @param roi region of interest.
+   * @return average color in the ROI.
+   * @see #measureColorXY(ij.process.ImageProcessor[], ij.gui.Roi)
+   */
   def measureColor[T <: ImageProcessor](tri: Array[T], roi: Roi): Array[Double] = {
     val color: Array[Double] = new Array[Double](tri.length)
     for (i <- tri.indices) {
@@ -149,30 +154,34 @@ object IJTools {
   }
 
   /**
-    *
-    * @param src    images to validate
-    * @param length expected number of images
-    * @tparam T image processor type
-    * @throws java.lang.IllegalArgumentException if the images in the array are not of the same dimension.
-    */
+   * @param src    images to validate
+   * @param length expected number of images
+   * @tparam T image processor type
+   * @throws java.lang.IllegalArgumentException if the images in the array are not of the same dimension.
+   */
   @inline
   def validateSameDimensions[T <: ImageProcessor](src: Array[T], length: Int): Unit = {
     require(src != null, "Input cannot be null.")
     require(src.length == length, "Input array has to have " + length + " elements.")
     require(!src.contains(null.asInstanceOf[T]), "Input array cannot have null entries.")
-    val width = src(0).getWidth
+    val width  = src(0).getWidth
     val height = src(0).getHeight
-    require(src.forall(width == _.getWidth), "All input images have to have the same width: " + src.map(_.getWidth).mkString(","))
-    require(src.forall(height == _.getHeight), "All input images have to have the same height: " + src.map(_.getHeight).mkString(","))
+    require(
+      src.forall(width == _.getWidth),
+      "All input images have to have the same width: " + src.map(_.getWidth).mkString(",")
+    )
+    require(
+      src.forall(height == _.getHeight),
+      "All input images have to have the same height: " + src.map(_.getHeight).mkString(",")
+    )
   }
 
   /**
-    *
-    * @param src    images to validate
-    * @param length expected number of images
-    * @tparam T image processor type
-    * @throws java.lang.IllegalArgumentException if the images in the array are not of the same dimension.
-    */
+   * @param src    images to validate
+   * @param length expected number of images
+   * @tparam T image processor type
+   * @throws java.lang.IllegalArgumentException if the images in the array are not of the same dimension.
+   */
   @inline
   def validateSameTypeAndDimensions[T <: ImageProcessor](src: Array[T], length: Int): Unit = {
     validateSameDimensions(src, length)
@@ -183,10 +192,10 @@ object IJTools {
   }
 
   /**
-    * Get the singleton instance of ImageJ `RoiManager`
-    *
-    * @return RoiManager instance
-    */
+   * Get the singleton instance of ImageJ `RoiManager`
+   *
+   * @return RoiManager instance
+   */
   def roiManagerInstance: RoiManager = { // Workaround for ImageJ bug.
     // RoiManger is a singleton in function, but it has constructors.
     // If a second instance of RoiManager is created it should not be used.
@@ -197,11 +206,11 @@ object IJTools {
   }
 
   /**
-    * Add result ROIs to ROI Manager, replacing current content. If ROI Manager is not visible it will be opened.
-    *
-    * @param rois         ROI's to be added.
-    * @param clearContent if `true` ROI Manager content will be cleared before new rois will be added
-    */
+   * Add result ROIs to ROI Manager, replacing current content. If ROI Manager is not visible it will be opened.
+   *
+   * @param rois         ROI's to be added.
+   * @param clearContent if `true` ROI Manager content will be cleared before new rois will be added
+   */
   def addToROIManager(rois: IterableOnce[Roi], clearContent: Boolean = false): Unit = {
     val roiManager = roiManagerInstance
     if (clearContent) roiManager.runCommand("Reset")

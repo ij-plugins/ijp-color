@@ -23,7 +23,7 @@
 package ij_plugins.color.ui
 
 import ij.IJ
-import ij_plugins.color.util.ImageConverter.toBufferImage
+import ij_plugins.color.util.AWTtoFXImageConverter.toBufferImage
 import javafx.embed.{swing => jfxes}
 import org.scalafx.extras._
 import scalafx.Includes._
@@ -31,22 +31,22 @@ import scalafx.geometry.Point2D
 import scalafx.scene.image.Image
 
 /**
-  * JavaFX/ScalaFX utilities.
-  */
+ * JavaFX/ScalaFX utilities.
+ */
 package object fx {
 
   /**
-    * Convert AWT Point2D to ScalaFX Point2D
-    */
+   * Convert AWT Point2D to ScalaFX Point2D
+   */
   def toFX(point: java.awt.geom.Point2D): Point2D = new Point2D(point.getX, point.getY)
 
   def toAWT(point: Point2D): java.awt.geom.Point2D = new java.awt.geom.Point2D.Double(point.x, point.y)
 
-
-  /** Returns icon used by ImageJ main frame. Returns `null` if main frame is not instantiated or has no icon.
-    *
-    * @return ImageJ icon or `null`.
-    */
+  /**
+   * Returns icon used by ImageJ main frame. Returns `null` if main frame is not instantiated or has no icon.
+   *
+   * @return ImageJ icon or `null`.
+   */
   def imageJIconAsFXImage: Option[Image] = {
     Option(IJ.getInstance).flatMap { i =>
       Option(i.getIconImage).map { icon =>
@@ -55,19 +55,19 @@ package object fx {
     }
   }
 
-  /** Convert AWT image to JavaFX Image.
-    *
-    * @param image AWT image.
-    */
+  /**
+   * Convert AWT image to JavaFX Image.
+   *
+   * @param image AWT image.
+   */
   def toFXImage(image: java.awt.Image): Image = {
     val bi = toBufferImage(image)
     jfxes.SwingFXUtils.toFXImage(bi, null)
   }
 
-
   /**
-    * Ensure that JavaFX thread is initialized and unhandled exceptions are caught.
-    */
+   * Ensure that JavaFX thread is initialized and unhandled exceptions are caught.
+   */
   def initializeFX(): Unit = {
 
     initFX()

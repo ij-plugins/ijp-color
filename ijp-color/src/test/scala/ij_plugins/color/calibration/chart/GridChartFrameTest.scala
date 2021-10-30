@@ -29,8 +29,8 @@ class GridChartFrameTest extends AnyFlatSpec {
 
   it should "have 4 point outline" in {
     val nbColumns = 3
-    val nbRows = 2
-    val chart = new GridChartFrame(nbColumns, nbRows, 0.1)
+    val nbRows    = 2
+    val chart     = new GridChartFrame(nbColumns, nbRows, 0.1)
 
     val ot = chart.referenceOutline
 
@@ -49,8 +49,8 @@ class GridChartFrameTest extends AnyFlatSpec {
 
   it should "have default chips at unit locations" in {
     val nbColumns = 3
-    val nbRows = 2
-    val chart = new GridChartFrame(nbColumns, nbRows, 0.1)
+    val nbRows    = 2
+    val chart     = new GridChartFrame(nbColumns, nbRows, 0.1)
 
     val rois = chart.alignedChipROIs
     rois.length should be(nbColumns * nbRows)
@@ -59,7 +59,7 @@ class GridChartFrameTest extends AnyFlatSpec {
     for (r <- 0 until nbRows) {
       for (c <- 0 until nbColumns) {
         val indx = c + r * nbColumns
-        val roi = rois(indx)
+        val roi  = rois(indx)
         val cent = roi.getContourCentroid
         cent(0) should be(c + 0.5 +- tol)
         cent(1) should be(r + 0.5 +- tol)

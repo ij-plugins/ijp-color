@@ -4,9 +4,8 @@ ijp-color
 Operations on color spaces and color images. Can be used as a stand-alone library or a plugin for [ImageJ](http://rsb.info.nih.gov/ij)
 
 [![Actions Status](https://github.com/ij-plugins/ijp-color/workflows/Scala%20CI/badge.svg)](https://github.com/ij-plugins/ijp-color/actions) 
-[![Build Status](https://travis-ci.org/ij-plugins/ijp-color.svg?branch=develop)](https://travis-ci.org/ij-plugins/ijp-color) 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/net.sf.ij-plugins/ijp-color_2.13/badge.svg)](https://maven-badges.herokuapp.com/maven-central/net.sf.ij-plugins/ijp-color_2.13) 
-[![Scaladoc](http://javadoc-badge.appspot.com/net.sf.ij-plugins/ijp-color_2.13.svg?label=scaladoc)](http://javadoc-badge.appspot.com/net.sf.ij-plugins/ijp-color_2.13)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/net.sf.ij-plugins/ijp-color_2.13/badge.svg)](https://maven-badges.herokuapp.com/maven-central/net.sf.ij-plugins/ijp-color_2.13)
+[![Scaladoc](https://javadoc.io/badge2/net.sf.ij-plugins/ijp-color_2.13/scaladoc.svg)](https://javadoc.io/doc/net.sf.ij-plugins/ijp-color_2.13)
 
 
 ImageJ Plugins
@@ -20,10 +19,11 @@ Color calibrates images using a color chart. Supported charts:
 * GretagMacbeth ColorChecker
 * X-Rite Passport
 * Image Science Associates ColorGauge
+* Custom charts - provide your own layout and CIE L\*a\*b\* color values
 
 Supports 8, 16, 32 bit per channel color images, including raw.
 
-![Image Calibrator](https://github.com/ij-plugins/ijp-color/wiki/assets/Color_Calibrator_0.6_01.png)
+![Image Calibrator](https://github.com/ij-plugins/ijp-color/wiki/assets/Color_Calibrator_quick_usage.png)
 
 More details in [project Wiki]
 
@@ -47,12 +47,36 @@ Test Images
 
 You can test the calibrator plugin using images in [test/data](test/data).
 
+Installing Plugins in ImageJ
+----------------------------
+
+### ImageJ
+
+#### Option 1
+
+Prebuild binaries are published with each [Release](https://github.com/ij-plugins/ijp-color/releases).
+
+1. Look for in the asset section for an "ijp-color_plugins_*_win.zip" file,
+2. download and unzip into ImageJ's `plugins` directory. It should create subdirectory "ij-plugins".
+3. Restart ImageJ
+
+#### Option 2
+
+IJP Color is also a part of the ij-plugins-bundle. You can download from
+its [Release](https://github.com/ij-plugins/ij-plugins-bundle/releases) page.
+
+### ImageJ2/FIJI
+
+IJP Color is a part of the ij-plugins-bundle that is also distributed for FIJI/ImageJ2
+as [IJ-Plugins Update Site](https://sites.imagej.net/IJ-Plugins/): "https://sites.imagej.net/IJ-Plugins/"
+
+
 
 Stand-alone Library
 -------------------
 
-`ijp-color` was designed to be easily used as a stand-alone library. 
-Examples of use are provided in the [ijp-color/test](ijp-color/src/main/test/scala/net/ij/ij_plugins/color) directory.
+`ijp-color` was designed to be easily used as a stand-alone library. Examples of use are provided in
+the [ijp-color/test](ijp-color/src/main/test/scala/net/ij/ij_plugins/color) directory.
 
 
 Development Setup

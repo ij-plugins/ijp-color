@@ -25,17 +25,30 @@ package ij_plugins.color.calibration.regression
 import ij_plugins.color.calibration.regression.MappingMethod._
 import org.apache.commons.math3.linear.MatrixUtils
 
-/** Factory creating mapping between a reference and observed values using various
-  * polynomial mappings and linear regression.
-  */
+/**
+ * Factory creating mapping between a reference and observed values using various
+ * polynomial mappings and linear regression.
+ */
 object MappingFactory {
-  def createCubicPolynomialTriple(standard: Array[Array[Double]],
-                                  observed: Array[Array[Double]],
-                                  method: MappingMethod): CubicPolynomialTriple = {
+  def createCubicPolynomialTriple(
+    standard: Array[Array[Double]],
+    observed: Array[Array[Double]],
+    method: MappingMethod
+  ): CubicPolynomialTriple = {
     validateStandardAndObserved(standard, observed)
     val standardM = MatrixUtils.createRealMatrix(standard)
     val observedM = MatrixUtils.createRealMatrix(observed)
     val (redBandCoefficients, greenBandCoefficients, blueBandCoefficients) = method match {
+      case LinearNoIntercept => (
+        createLinearNoIntercept(standardM.getColumn(0), observedM.getColumn(0), 0),
+        createLinearNoIntercept(standardM.getColumn(1), observedM.getColumn(1), 1),
+        createLinearNoIntercept(standardM.getColumn(2), observedM.getColumn(2), 2)
+      )
+      case LinearNoInterceptCrossBand => (
+        createLinearNoInterceptXBand(standardM.getColumn(0), observed),
+        createLinearNoInterceptXBand(standardM.getColumn(1), observed),
+        createLinearNoInterceptXBand(standardM.getColumn(2), observed)
+      )
       case Linear => (
         createLinear(standardM.getColumn(0), observedM.getColumn(0), 0),
         createLinear(standardM.getColumn(1), observedM.getColumn(1), 1),
@@ -47,20 +60,20 @@ object MappingFactory {
         createLinearXBand(standardM.getColumn(2), observed)
       )
       case Quadratic => (
-        createQuadratic(standardM.getColumn(0), observedM.getColumn(0), 0),
-        createQuadratic(standardM.getColumn(1), observedM.getColumn(1), 1),
-        createQuadratic(standardM.getColumn(2), observedM.getColumn(2), 2)
-      )
+          createQuadratic(standardM.getColumn(0), observedM.getColumn(0), 0),
+          createQuadratic(standardM.getColumn(1), observedM.getColumn(1), 1),
+          createQuadratic(standardM.getColumn(2), observedM.getColumn(2), 2)
+        )
       case QuadraticCrossBand => (
-        createQuadraticXBand(standardM.getColumn(0), observed),
-        createQuadraticXBand(standardM.getColumn(1), observed),
-        createQuadraticXBand(standardM.getColumn(2), observed)
-      )
+          createQuadraticXBand(standardM.getColumn(0), observed),
+          createQuadraticXBand(standardM.getColumn(1), observed),
+          createQuadraticXBand(standardM.getColumn(2), observed)
+        )
       case Cubic => (
-        createCubic(standardM.getColumn(0), observedM.getColumn(0), 0),
-        createCubic(standardM.getColumn(1), observedM.getColumn(1), 1),
-        createCubic(standardM.getColumn(2), observedM.getColumn(2), 2)
-      )
+          createCubic(standardM.getColumn(0), observedM.getColumn(0), 0),
+          createCubic(standardM.getColumn(1), observedM.getColumn(1), 1),
+          createCubic(standardM.getColumn(2), observedM.getColumn(2), 2)
+        )
       case CubicCrossBand => (
         createCubicXBand(standardM.getColumn(0), observed),
         createCubicXBand(standardM.getColumn(1), observed),
@@ -72,7 +85,60 @@ object MappingFactory {
     CubicPolynomialTriple(redBandCoefficients, greenBandCoefficients, blueBandCoefficients)
   }
 
-  def createLinear(standard: Array[Double], observed: Array[Double], band: Int): CubicPolynomial = {
+  private[regression] def createLinearNoIntercept(standard: Array[Double], observed: Array[Double], band: Int): CubicPolynomial = {
+    validateStandardAndObserved(standard, observed)
+    val regressionResult = createLinearNoIntercept(standard, observed)
+    band match {
+      case 0 => CubicPolynomial(
+        intercept = 0,
+        a = regressionResult.beta(0),
+        regressionResult = Some(regressionResult)
+      )
+      case 1 => CubicPolynomial(
+        intercept = 0,
+        b = regressionResult.beta(0),
+        regressionResult = Some(regressionResult)
+      )
+      case 2 => CubicPolynomial(
+        intercept = 0,
+        c = regressionResult.beta(0),
+        regressionResult = Some(regressionResult)
+      )
+      case _ =>
+        throw new IllegalArgumentException("Unknown band '" + band + "'")
+    }
+  }
+
+  private[regression] def createLinearNoIntercept(standard: Array[Double], observed: Array[Double]): Regression.Result = {
+    validateStandardAndObserved(standard, observed)
+    require(observed.length >= 1, "Linear No-intercept fit needs at least 1 observation, got " + observed.length)
+
+    val data = Array.ofDim[Double](observed.length, 1)
+    for (i <- observed.indices) {
+      data(i)(0) = observed(i)
+    }
+    Regression.regression(standard, data, noIntercept = true)
+  }
+
+  private[regression] def createLinearNoInterceptXBand(
+                                                        standard: Array[Double],
+                                                        observation: Array[Array[Double]]
+                                                      ): CubicPolynomial = {
+    validateStandardAndObserved(standard, observation)
+    require(observation.length >= 4, "Linear cross-band fit needs at least 4 observations, got " + observation.length)
+    val rr = Regression.regression(standard, observation, noIntercept = true)
+
+    require(rr != null)
+    require(rr.beta != null)
+    require(rr.beta.length == 3, "Size of beta must be equal 3, got " + rr.beta.length)
+
+    val alpha14 = new Array[Double](14)
+    alpha14(1) = rr.beta(0)
+
+    new CubicPolynomial(alpha14, Option(rr))
+  }
+
+  private[regression] def createLinear(standard: Array[Double], observed: Array[Double], band: Int): CubicPolynomial = {
     validateStandardAndObserved(standard, observed)
     val regressionResult = createLinear(standard, observed)
     val intercept = regressionResult.beta(0)
@@ -83,21 +149,21 @@ object MappingFactory {
         regressionResult = Some(regressionResult)
       )
       case 1 => CubicPolynomial(
-        intercept = intercept,
-        b = regressionResult.beta(1),
-        regressionResult = Some(regressionResult)
-      )
+          intercept = intercept,
+          b = regressionResult.beta(1),
+          regressionResult = Some(regressionResult)
+        )
       case 2 => CubicPolynomial(
-        intercept = intercept,
-        c = regressionResult.beta(1),
-        regressionResult = Some(regressionResult)
-      )
+          intercept = intercept,
+          c = regressionResult.beta(1),
+          regressionResult = Some(regressionResult)
+        )
       case _ =>
         throw new IllegalArgumentException("Unknown band '" + band + "'")
     }
   }
 
-  def createLinear(standard: Array[Double], observed: Array[Double]): Regression.Result = {
+  private[regression] def createLinear(standard: Array[Double], observed: Array[Double]): Regression.Result = {
     validateStandardAndObserved(standard, observed)
     require(observed.length >= 2, "Linear fit needs at least 2 observations, got " + observed.length)
 
@@ -108,17 +174,59 @@ object MappingFactory {
     Regression.regression(standard, data, noIntercept = false)
   }
 
-  private def createLinearXBand(standard: Array[Double],
-                                observation: Array[Array[Double]]): CubicPolynomial = {
+  private[regression] def createLinearXBand(standard: Array[Double], observation: Array[Array[Double]]): CubicPolynomial = {
     validateStandardAndObserved(standard, observation)
     require(observation.length >= 4, "Linear cross-band fit needs at least 4 observations, got " + observation.length)
     val rr = Regression.regression(standard, observation, noIntercept = false)
     toCubicPolynomial(rr)
   }
 
-  private def createQuadraticXBand(standard: Array[Double], observation: Array[Array[Double]]): CubicPolynomial = {
+  private[regression] def createQuadratic(standard: Array[Double], observed: Array[Double], band: Int): CubicPolynomial = {
+    validateStandardAndObserved(standard, observed)
+    val regressionResult = createQuadratic(standard, observed)
+    val intercept = regressionResult.beta(0)
+    band match {
+      case 0 => CubicPolynomial(
+        intercept = intercept,
+        a = regressionResult.beta(1),
+        aa = regressionResult.beta(2),
+        regressionResult = Some(regressionResult)
+      )
+      case 1 => CubicPolynomial(
+          intercept = intercept,
+          b = regressionResult.beta(1),
+          bb = regressionResult.beta(2),
+          regressionResult = Some(regressionResult)
+        )
+      case 2 => CubicPolynomial(
+          intercept = intercept,
+          c = regressionResult.beta(1),
+          cc = regressionResult.beta(2),
+          regressionResult = Some(regressionResult)
+        )
+      case _ =>
+        throw new IllegalArgumentException("Unknown band '" + band + "'")
+    }
+  }
+
+  private[regression] def createQuadratic(standard: Array[Double], observed: Array[Double]): Regression.Result = {
+    validateStandardAndObserved(standard, observed)
+    require(observed.length >= 3, "Quadratic fit needs at least 3 observations, got " + observed.length)
+    val data: Array[Array[Double]] = Array.ofDim[Double](observed.length, 2)
+    for (i <- observed.indices) {
+      val o: Double = observed(i)
+      data(i)(0) = o
+      data(i)(1) = o * o
+    }
+    Regression.regression(standard, data, noIntercept = false)
+  }
+
+  private[regression] def createQuadraticXBand(standard: Array[Double], observation: Array[Array[Double]]): CubicPolynomial = {
     validateStandardAndObserved(standard, observation)
-    require(observation.length >= 10, "Quadratic cross-band fit needs at least 10 observations, got " + observation.length)
+    require(
+      observation.length >= 10,
+      "Quadratic cross-band fit needs at least 10 observations, got " + observation.length
+    )
     val data = Array.ofDim[Double](observation.length, 9)
 
     for (i <- observation.indices) {
@@ -141,47 +249,52 @@ object MappingFactory {
     toCubicPolynomial(rr)
   }
 
-  def createQuadratic(standard: Array[Double], observed: Array[Double], band: Int): CubicPolynomial = {
+  private[regression] def createCubic(standard: Array[Double], observed: Array[Double], band: Int): CubicPolynomial = {
     validateStandardAndObserved(standard, observed)
-    val regressionResult = createQuadratic(standard, observed)
+    val regressionResult = createCubic(standard, observed)
     val intercept = regressionResult.beta(0)
     band match {
       case 0 => CubicPolynomial(
         intercept = intercept,
         a = regressionResult.beta(1),
         aa = regressionResult.beta(2),
+        aaa = regressionResult.beta(3),
         regressionResult = Some(regressionResult)
-      )
+        )
       case 1 => CubicPolynomial(
-        intercept = intercept,
-        b = regressionResult.beta(1),
-        bb = regressionResult.beta(2),
-        regressionResult = Some(regressionResult)
-      )
+          intercept = intercept,
+          b = regressionResult.beta(1),
+          bb = regressionResult.beta(2),
+          bbb = regressionResult.beta(3),
+          regressionResult = Some(regressionResult)
+        )
       case 2 => CubicPolynomial(
-        intercept = intercept,
-        c = regressionResult.beta(1),
-        cc = regressionResult.beta(2),
-        regressionResult = Some(regressionResult)
-      )
+          intercept = intercept,
+          c = regressionResult.beta(1),
+          cc = regressionResult.beta(2),
+          ccc = regressionResult.beta(3),
+          regressionResult = Some(regressionResult)
+        )
       case _ =>
         throw new IllegalArgumentException("Unknown band '" + band + "'")
     }
   }
 
-  def createQuadratic(standard: Array[Double], observed: Array[Double]): Regression.Result = {
+  private[regression] def createCubic(standard: Array[Double], observed: Array[Double]): Regression.Result = {
     validateStandardAndObserved(standard, observed)
-    require(observed.length >= 3, "Quadratic fit needs at least 3 observations, got " + observed.length)
-    val data: Array[Array[Double]] = Array.ofDim[Double](observed.length, 2)
+    require(observed.length >= 4, "Cubic fit needs at least 4 observations, got " + observed.length)
+    val data: Array[Array[Double]] = Array.ofDim[Double](observed.length, 3)
+
     for (i <- observed.indices) {
       val o: Double = observed(i)
       data(i)(0) = o
       data(i)(1) = o * o
+      data(i)(2) = o * o * o
     }
     Regression.regression(standard, data, noIntercept = false)
   }
 
-  private def createCubicXBand(standard: Array[Double], observed: Array[Array[Double]]): CubicPolynomial = {
+  private[regression] def createCubicXBand(standard: Array[Double], observed: Array[Array[Double]]): CubicPolynomial = {
     validateStandardAndObserved(standard, observed)
     require(observed.length >= 14, "Cubic cross-band fit needs at least 14 observations, got " + observed.length)
     val data: Array[Array[Double]] = Array.ofDim[Double](observed.length, 13)
@@ -210,55 +323,10 @@ object MappingFactory {
     toCubicPolynomial(rr)
   }
 
-  def createCubic(standard: Array[Double], observed: Array[Double], band: Int): CubicPolynomial = {
-    validateStandardAndObserved(standard, observed)
-    val regressionResult = createCubic(standard, observed)
-    val intercept = regressionResult.beta(0)
-    band match {
-      case 0 => CubicPolynomial(
-        intercept = intercept,
-        a = regressionResult.beta(1),
-        aa = regressionResult.beta(2),
-        aaa = regressionResult.beta(3),
-        regressionResult = Some(regressionResult)
-      )
-      case 1 => CubicPolynomial(
-        intercept = intercept,
-        b = regressionResult.beta(1),
-        bb = regressionResult.beta(2),
-        bbb = regressionResult.beta(3),
-        regressionResult = Some(regressionResult)
-      )
-      case 2 => CubicPolynomial(
-        intercept = intercept,
-        c = regressionResult.beta(1),
-        cc = regressionResult.beta(2),
-        ccc = regressionResult.beta(3),
-        regressionResult = Some(regressionResult)
-      )
-      case _ =>
-        throw new IllegalArgumentException("Unknown band '" + band + "'")
-    }
-  }
-
-  private def createCubic(standard: Array[Double], observed: Array[Double]): Regression.Result = {
-    validateStandardAndObserved(standard, observed)
-    require(observed.length >= 4, "Cubic fit needs at least 4 observations, got " + observed.length)
-    val data: Array[Array[Double]] = Array.ofDim[Double](observed.length, 3)
-
-    for (i <- observed.indices) {
-      val o: Double = observed(i)
-      data(i)(0) = o
-      data(i)(1) = o * o
-      data(i)(2) = o * o * o
-    }
-    Regression.regression(standard, data, noIntercept = false)
-  }
-
-  private def toCubicPolynomial(rr: Regression.Result): CubicPolynomial = {
+  private[regression] def toCubicPolynomial(rr: Regression.Result): CubicPolynomial = {
     require(rr != null)
     require(rr.beta != null)
-    require(rr.beta.length <= 14, "Size of alpha must be less or equal 14, got" + rr.beta.length)
+    require(rr.beta.length <= 14, "Size of beta must be less or equal 14, got" + rr.beta.length)
 
     val alpha14 = new Array[Double](14)
     rr.beta.copyToArray(alpha14)
@@ -266,29 +334,40 @@ object MappingFactory {
     new CubicPolynomial(alpha14, Option(rr))
   }
 
-  private def validateStandardAndObserved(standard: Array[Double], observed: Array[Double]): Unit = {
+  private[regression] def validateStandardAndObserved(standard: Array[Double], observed: Array[Double]): Unit = {
     require(observed != null)
     require(standard != null)
-    require(observed.length == standard.length, "Number of Standard and Observed values are not equal reference.length='" + standard.length + "' observed.length='" + observed.length + "'")
+    require(
+      observed.length == standard.length,
+      "Number of Standard and Observed values are not equal reference.length='" + standard.length + "' observed.length='" + observed.length + "'"
+    )
   }
 
-  private def validateStandardAndObserved(standard: Array[Double], observation: Array[Array[Double]]): Unit = {
+  private[regression] def validateStandardAndObserved(standard: Array[Double], observation: Array[Array[Double]]): Unit = {
     require(standard != null)
     require(observation != null)
     require(observation.length == standard.length)
   }
 
-  private def validateStandardAndObserved(standard: Array[Array[Double]], observed: Array[Array[Double]]): Unit = {
+  private[regression] def validateStandardAndObserved(standard: Array[Array[Double]], observed: Array[Array[Double]]): Unit = {
     require(observed != null)
     require(standard != null)
-    require(observed.length == standard.length,
-      "Number of Standard and Observed values are not equal reference.length='" + standard.length + "' observed.length='" + observed.length + "'")
+    require(
+      observed.length == standard.length,
+      "Number of Standard and Observed values are not equal reference.length='" + standard.length + "' observed.length='" + observed.length + "'"
+    )
 
     standard.foreach(s =>
-      require(s.length == 3, "Number of Standard Color values should be equal to 3 (RED,GREEN and BLUE), got " + s.length)
+      require(
+        s.length == 3,
+        "Number of Standard Color values should be equal to 3 (RED,GREEN and BLUE), got " + s.length
+      )
     )
     observed.foreach(o =>
-      require(o.length == 3, "Number of Observed Color values should be equal to 3 (RED,GREEN and BLUE), got " + o.length)
+      require(
+        o.length == 3,
+        "Number of Observed Color values should be equal to 3 (RED,GREEN and BLUE), got " + o.length
+      )
     )
   }
 }

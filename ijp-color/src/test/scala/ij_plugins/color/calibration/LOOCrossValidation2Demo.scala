@@ -28,7 +28,7 @@ import ij_plugins.color.calibration.regression.MappingMethod
 
 import java.io.File
 
-object LOOCrossValidationDemo extends App {
+object LOOCrossValidation2Demo extends App {
 
   main()
 
@@ -50,21 +50,27 @@ object LOOCrossValidationDemo extends App {
     val chart = ColorCharts.XRitePassportColorChecker
 
     // Do LOO validation
-    val crossValidations = LOOCrossValidation.crossValidationStatsAll(chart, observed, ReferenceColorSpace.values, MappingMethod.values)
+    val crossValidations =
+      LOOCrossValidation.crossValidationStatsAll(chart, observed, ReferenceColorSpace.values, MappingMethod.values)
 
     val bestByMean = crossValidations.minBy(v => v.statsDeltaE.getMean)
-    println(s"Best by mean: ${bestByMean.method} - ${bestByMean.referenceColorSpace}: ${bestByMean.statsDeltaE.getMean} ")
+    println(
+      s"Best by mean  : ${bestByMean.referenceColorSpace} - ${bestByMean.method}: ${bestByMean.statsDeltaE.getMean} "
+    )
 
     val bestByMedian = crossValidations.minBy(v => v.statsDeltaE.getPercentile(50))
-    println(s"Best by median: ${bestByMedian.method} - ${bestByMedian.referenceColorSpace}: ${bestByMedian.statsDeltaE.getPercentile(50)} ")
+    println(
+      s"Best by median: ${bestByMedian.referenceColorSpace} - ${bestByMedian.method}: ${bestByMedian.statsDeltaE.getPercentile(50)} "
+    )
 
     val bestBy95 = crossValidations.minBy(v => v.statsDeltaE.getPercentile(95))
-    println(s"Best by 95%: ${bestBy95.method} - ${bestBy95.referenceColorSpace}: ${bestBy95.statsDeltaE.getPercentile(95)} ")
-
+    println(
+      s"Best by 95%   : ${bestBy95.referenceColorSpace} - ${bestBy95.method}: ${bestBy95.statsDeltaE.getPercentile(95)} "
+    )
 
     // Convert to a table for saving
     val hSorted = crossValidations.toArray.sortBy(-_.statsDeltaE.getMean)
-    val dstRT = new ResultsTable()
+    val dstRT   = new ResultsTable()
     for ((v, i) <- hSorted.reverse.zipWithIndex) {
       dstRT.setValue("Reference", i, v.referenceColorSpace.toString)
       dstRT.setValue("Method", i, v.method.toString)

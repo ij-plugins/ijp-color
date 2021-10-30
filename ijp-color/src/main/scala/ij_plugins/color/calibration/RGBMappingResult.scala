@@ -24,12 +24,11 @@ package ij_plugins.color.calibration
 
 import ij.process.ColorProcessor
 
-/** Represents color mapping results:
-  * <ul>
-  * <li>corrected image</li>
-  * <li>number of values in result images that have to be clipped to be in 0 to 255 range.</li>
-  * </ul>
-  */
-case class RGBMappingResult(image: ColorProcessor,
-                            clippingLow: Array[Long],
-                            clippingHigh: Array[Long])
+/**
+ * Represents color mapping results:
+ * <ul>
+ * <li>corrected image</li>
+ * <li>number of values in result images that have to be clipped to be in 0 to 255 range.</li>
+ * </ul>
+ */
+case class RGBMappingResult(image: ColorProcessor, clippingLow: Array[Long], clippingHigh: Array[Long])

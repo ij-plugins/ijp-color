@@ -24,7 +24,6 @@ package ij_plugins.color.ui.converter
 
 import ij.plugin.BrowserLauncher
 import ij_plugins.color.converter._
-import ij_plugins.color.ui.ColorValueUI
 import ij_plugins.color.ui.converter.ColorConverterModel.Update
 import ij_plugins.color.ui.util.IJPUtils
 import javafx.beans.{binding => jfxbb}
@@ -53,9 +52,9 @@ class ColorConverterView(val model: ColorConverterModel) {
   import ColorConverterView._
 
   private val nbColumns = 5
-  private val xyzUI = new ColorValueUI()
-  private val labUI = new ColorValueUI()
-  private val rgbUI = new ColorValueUI()
+  private val xyzUI     = new ColorValueUI()
+  private val labUI     = new ColorValueUI()
+  private val rgbUI     = new ColorValueUI()
 
   lazy val pane: GridPane = createGidPane()
 
@@ -103,15 +102,26 @@ class ColorConverterView(val model: ColorConverterModel) {
         gp.add(n2, 1, row, nbColumns - 1, 1)
       } else {
         gp.add(n2, 1, row, nbColumns - 2, 1)
-        gp.add(new Label {
-          id = "ijp-label"
-          text = xLabel.get
-        }, nbColumns - 1, row, 1, 1)
+        gp.add(
+          new Label {
+            id = "ijp-label"
+            text = xLabel.get
+          },
+          nbColumns - 1,
+          row,
+          1,
+          1
+        )
       }
     }
 
-    def addChoiceBox[T <: AnyRef](row: Int, label: String, property: ObjectProperty[T], values: Seq[T],
-                                  converter: Option[StringConverter[T]] = None): Unit = {
+    def addChoiceBox[T <: AnyRef](
+      row: Int,
+      label: String,
+      property: ObjectProperty[T],
+      values: Seq[T],
+      converter: Option[StringConverter[T]] = None
+    ): Unit = {
       val v = ObservableBuffer.from(values)
       val cb = new ChoiceBox[T] {
         value = property()
@@ -125,7 +135,8 @@ class ColorConverterView(val model: ColorConverterModel) {
           alignment = Pos.CenterRight
           alignmentInParent = Pos.CenterRight
         },
-        0, row
+        0,
+        row
       )
       gp.add(cb, 1, row)
 
@@ -150,11 +161,15 @@ class ColorConverterView(val model: ColorConverterModel) {
     row += 1
 
     addChoiceBox(row, "RGB Model", model.rgbWorkingSpace, RGBWorkingSpace.values)
-    gp.add(new Label {
-      id = "ijp-label"
-      text = "Gamma"
-      alignment = Pos.CenterRight
-    }, 2, row)
+    gp.add(
+      new Label {
+        id = "ijp-label"
+        text = "Gamma"
+        alignment = Pos.CenterRight
+      },
+      2,
+      row
+    )
     gp.add(
       new Label {
         id = "ijp-label"
@@ -164,21 +179,25 @@ class ColorConverterView(val model: ColorConverterModel) {
           protected def computeValue(): String = model.rgbWorkingSpace().gamma match {
             case g if g > 0 => model.rgbWorkingSpace().gamma.toString
             case g if g < 0 => "sRGB"
-            case _ => "L*"
+            case _          => "L*"
           }
         }
         alignment = Pos.CenterLeft
       },
-      3, row
+      3,
+      row
     )
     row += 1
 
-    addChoiceBox(row, "Adaptation", model.chromaticAdaptation,
+    addChoiceBox(
+      row,
+      "Adaptation",
+      model.chromaticAdaptation,
       None :: ChromaticAdaptation.values.map(Some(_)).toList,
       Some(
         StringConverter.toStringConverter[Option[ChromaticAdaptation]] {
           case Some(o) => o.toString
-          case None => "None"
+          case None    => "None"
         }
       )
     )

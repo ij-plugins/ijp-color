@@ -32,7 +32,7 @@ object PolynomialCorrectorDemo extends App {
   // Read chart values
   //  val tableFile = "../test/data/Passport-linear-25_color_values.csv"
   val tableFile = "../test/data/ColorGauge-01_color_values.csv"
-  val srcRT = ResultsTable.open(tableFile)
+  val srcRT     = ResultsTable.open(tableFile)
 
   // Extract chart values as an array
   val observed = new Array[Array[Double]](srcRT.getCounter)
@@ -48,9 +48,9 @@ object PolynomialCorrectorDemo extends App {
   val chart = ColorCharts.ImageScienceColorGaugeMatte
 
   val referenceColorSpace = XYZ
-  val clipReferenceRGB = false
+  val clipReferenceRGB    = false
   val mappingMethod = MappingMethod.QuadraticCrossBand
-  val colorCalibrator = ColorCalibrator(chart, referenceColorSpace, mappingMethod, clipReferenceRGB)
+  val colorCalibrator = new ColorCalibrator(chart, referenceColorSpace, mappingMethod, clipReferenceRGB)
   val fit = colorCalibrator.computeCalibrationMapping(observed)
 
   println("Deltas")
@@ -63,6 +63,5 @@ object PolynomialCorrectorDemo extends App {
   println(mappingMethod)
   println(referenceColorSpace)
   println("LOO CV mean deltaE: " + stats.statsDeltaE.getMean)
-
 
 }

@@ -56,28 +56,27 @@ object PlotUtils {
   //    ColorFXUI.showInNewWindow(chart, title)
   //  }
 
-
   case class ValueEntry(row: String, column: String, value: Double)
 
   case class ValueErrorEntry(row: String, column: String, value: Double, error: Double)
 
-
-  def createBarPlot(title: String,
-                    data: Seq[ValueEntry],
-                    categoryAxisLabel: String = "Type",
-                    valueAxisLabel: String = "Value",
-                    barColors: Seq[Color] = Seq.empty[Color]
-                   ): Unit = {
-
+  def createBarPlot(
+    title: String,
+    data: Seq[ValueEntry],
+    categoryAxisLabel: String = "Type",
+    valueAxisLabel: String = "Value",
+    barColors: Seq[Color] = Seq.empty[Color]
+  ): Unit = {
 
     val dataset = new DefaultCategoryDataset()
     for (d <- data) {
       dataset.addValue(d.value, d.row, d.column)
     }
 
-    val chart = ChartFactory.createBarChart(null, // chart title
+    val chart = ChartFactory.createBarChart(
+      null,              // chart title
       categoryAxisLabel, // domain axis label
-      valueAxisLabel, // range axis label
+      valueAxisLabel,    // range axis label
       dataset,
       PlotOrientation.HORIZONTAL,
       true, // include legend
@@ -99,7 +98,10 @@ object PlotUtils {
     renderer.setDefaultItemLabelGenerator(new StandardCategoryItemLabelGenerator())
     renderer.setDefaultItemLabelsVisible(true)
     renderer.setDefaultItemLabelPaint(java.awt.Color.WHITE)
-    renderer.setDefaultPositiveItemLabelPosition(new ItemLabelPosition(ItemLabelAnchor.INSIDE6, TextAnchor.BOTTOM_CENTER))
+    renderer.setDefaultPositiveItemLabelPosition(new ItemLabelPosition(
+      ItemLabelAnchor.INSIDE6,
+      TextAnchor.BOTTOM_CENTER
+    ))
 
     for ((c, i) <- barColors.zipWithIndex) {
       renderer.setSeriesPaint(i, new java.awt.Color(c.red.toFloat, c.green.toFloat, c.blue.toFloat))
@@ -109,20 +111,22 @@ object PlotUtils {
     ColorFXUI.showInNewWindow(new ChartViewer(chart), title)
   }
 
-  def createBarErrorPlot(title: String,
-                         data: Seq[ValueErrorEntry],
-                         categoryAxisLabel: String = "Type",
-                         valueAxisLabel: String = "Value"
-                        ): Unit = {
+  def createBarErrorPlot(
+    title: String,
+    data: Seq[ValueErrorEntry],
+    categoryAxisLabel: String = "Type",
+    valueAxisLabel: String = "Value"
+  ): Unit = {
 
     val dataset: DefaultStatisticalCategoryDataset = new DefaultStatisticalCategoryDataset
     for (d <- data) {
       dataset.add(d.value, d.error, d.row, d.column)
     }
 
-    val chart = ChartFactory.createLineChart(null, // chart title
+    val chart = ChartFactory.createLineChart(
+      null,              // chart title
       categoryAxisLabel, // domain axis label
-      valueAxisLabel, // range axis label
+      valueAxisLabel,    // range axis label
       dataset,
       PlotOrientation.HORIZONTAL,
       true, // include legend
@@ -150,10 +154,12 @@ object PlotUtils {
     renderer.setDefaultItemLabelGenerator(new StandardCategoryItemLabelGenerator())
     renderer.setDefaultItemLabelsVisible(true)
     renderer.setDefaultItemLabelPaint(java.awt.Color.WHITE)
-    renderer.setDefaultPositiveItemLabelPosition(new ItemLabelPosition(ItemLabelAnchor.INSIDE6, TextAnchor.BOTTOM_CENTER))
+    renderer.setDefaultPositiveItemLabelPosition(new ItemLabelPosition(
+      ItemLabelAnchor.INSIDE6,
+      TextAnchor.BOTTOM_CENTER
+    ))
 
     ColorFXUI.showInNewWindow(new ChartViewer(chart), title)
   }
-
 
 }

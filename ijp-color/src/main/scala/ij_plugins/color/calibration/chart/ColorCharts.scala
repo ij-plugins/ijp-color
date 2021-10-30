@@ -22,20 +22,25 @@
 
 package ij_plugins.color.calibration.chart
 
+import ij.measure.ResultsTable
 import ij_plugins.color.converter.ColorTriple.Lab
-import ij_plugins.color.converter.ReferenceWhite
+import ij_plugins.color.converter.{ColorTriple, ReferenceWhite}
 
+import java.io.File
 
 /** Enumeration of some common color charts. */
 object ColorCharts {
 
-  /** GretagMacbeth ColorChecker with values measured by Robin D. Myers, average of two charts manufactured 2002-10.
+  /**
+    * GretagMacbeth ColorChecker with values measured by Robin D. Myers, average of two charts manufactured 2002-10.
     *
     * Illuminant D65.
     * [[http://www.rmimaging.com/spectral_library/Reflective/Charts-Calibration/ColorChecker_2002-10_averaged.ss3.zip]]
     */
   val GretagMacbethColorChecker = new GridColorChart(
-    "GretagMacbeth ColorChecker", 6, 4,
+    ColorChartType.GretagMacbethColorChecker.name,
+    6,
+    4,
     List(
       ("Dark skin", Lab(40.59, 14.68, 16.83)),
       ("Light skin", Lab(68.22, 22.21, 20.33)),
@@ -66,12 +71,18 @@ object ColorCharts {
     refWhite = ReferenceWhite.D65
   )
 
-  /** X-Rite Passport ColorChecker chart, based on the values from "ColorChecker Passport Technical Review"
-    *
-    * Illuminant D65.
-    * [[http://www.rmimaging.com/information/ColorChecker_Passport_Technical_Report.pdf]]
-    */
-  val XRitePassportColorChecker = new GridColorChart("X-Rite Passport", 6, 4,
+  /**
+   * X-Rite Passport ColorChecker chart, based on the values from "ColorChecker Passport Technical Review"
+   *
+   * Illuminant D65.
+   * [[http://www.rmimaging.com/information/ColorChecker_Passport_Technical_Report.pdf]]
+   * alternate link location
+   * [[https://chromaxion.com/information/ColorChecker_Passport_Technical_Report.pdf]]
+   */
+  val XRitePassportColorChecker = new GridColorChart(
+    ColorChartType.XRitePassportColorChecker.name,
+    6,
+    4,
     List(
       ("Dark Skin", Lab(38.96, 12.13, 13.84)),
       ("Light Skin", Lab(65.50, 15.59, 16.81)),
@@ -102,13 +113,17 @@ object ColorCharts {
     refWhite = ReferenceWhite.D65
   )
 
-  /** Image Science ColorGauge Matte Neutral Patch Versions
-    * Data retrieved on 2019/01/08.
-    *
-    * Illuminant D50
-    * [[http://www.imagescienceassociates.com/mm5/pubs/Micro_Nano_Pico_Rez_TargetData.xls]]
-    */
-  val ImageScienceColorGaugeMatte = new GridColorChart("Image Science ColorGauge Matte", 6, 5,
+  /**
+   * Image Science ColorGauge Matte Neutral Patch Versions
+   * Data retrieved on 2019/01/08.
+   *
+   * Illuminant D50
+   * [[http://www.imagescienceassociates.com/mm5/pubs/Micro_Nano_Pico_Rez_TargetData.xls]]
+   */
+  val ImageScienceColorGaugeMatte = new GridColorChart(
+    ColorChartType.ImageScienceColorGaugeMatte.name,
+    6,
+    5,
     List(
       ("1", Lab(38.76, 13.81, 14.69)),
       ("2", Lab(65.15, 19.21, 17.92)),
@@ -139,13 +154,65 @@ object ColorCharts {
       ("27", Lab(29.51, 13.42, -47.69)),
       ("28", Lab(72.10, 19.51, 67.85)),
       ("29", Lab(72.50, -22.92, 56.08)),
-      ("30", Lab(30.32, 22.13, -19.02)),
+      ("30", Lab(30.32, 22.13, -19.02))
     ),
     chipMargin = 0,
     refWhite = ReferenceWhite.D50
   )
 
-
   /** All pre-defined color charts */
   val values = List(GretagMacbethColorChecker, XRitePassportColorChecker, ImageScienceColorGaugeMatte)
+
+  def withColorChartType(colorChartType: ColorChartType): Option[GridColorChart] = {
+    require(colorChartType != null, "'colorChartType' cannot be null.")
+    values.find(_.name == colorChartType.name)
+  }
+
+  /**
+    * Load chart reference values from a CSV file represented in CIE L*a*b* color space.
+    *
+    * The file is expected to have at least 4 columns: "SAMPLE_NAME", "LAB_L", "LAB_A", "LAB_B".
+    * Any additional columns will be ignored.
+    *
+    * Example of a file with 4 chips:
+    *
+    * {{{
+    * SAMPLE_NAME,LAB_L,LAB_A,LAB_B
+    * 1,38.675,12.907,14.358,19.306
+    * 2,65.750,19.811,17.790,26.626
+    * 3,50.373,-3.646,-22.360,22.656
+    * 4,43.697,-13.342,22.858,26.466
+    * }}}
+    *
+    * @return list of tuples representing chip name and reference value in CIE L*a*b*
+    */
+  def loadReferenceValues(file: File): List[(String, ColorTriple.Lab)] = {
+
+    require(file.exists(), "File must exist: " + file.getCanonicalPath)
+    val rt = ResultsTable.open(file.getCanonicalPath)
+
+    def checkForColumn(name: String): Unit = {
+      require(rt.columnExists(name), s"Input file must contain column '$name'.")
+    }
+
+    val headingName = "SAMPLE_NAME"
+    val headingL = "LAB_L"
+    val headingA = "LAB_A"
+    val headingB = "LAB_B"
+    Seq(headingName, headingL, headingA, headingB).foreach(checkForColumn)
+
+    val chips =
+      (0 until rt.size())
+        .map { r =>
+          val name = rt.getStringValue(headingName, r)
+          val l = rt.getValue(headingL, r)
+          val a = rt.getValue(headingA, r)
+          val b = rt.getValue(headingB, r)
+
+          (name, ColorTriple.Lab(l, a, b))
+        }
+        .toList
+
+    chips
+  }
 }

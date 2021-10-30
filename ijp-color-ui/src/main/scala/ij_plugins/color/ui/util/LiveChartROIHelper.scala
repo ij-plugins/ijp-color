@@ -25,14 +25,14 @@ package ij_plugins.color.ui.util
 import ij.gui.Roi
 
 /**
-  * Helps using LiveChartROI. Handles adding and removing ROI Listener
-  */
+ * Helps using LiveChartROI. Handles adding and removing ROI Listener
+ */
 trait LiveChartROIHelper {
   private var _liveChartROIOption: Option[LiveChartROI] = None
 
   protected def liveChartROIOption: Option[LiveChartROI] = _liveChartROIOption
 
-  final protected def setupROIListener(liveChartROI: LiveChartROI): Unit = {
+  final protected def setupLiveChartROI(liveChartROI: LiveChartROI): Unit = {
 
     if (liveChartROIOption.nonEmpty) {
       throw new IllegalStateException("RoiListener already created")

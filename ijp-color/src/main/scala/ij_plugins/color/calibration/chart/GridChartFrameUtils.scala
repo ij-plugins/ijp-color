@@ -25,7 +25,9 @@ package ij_plugins.color.calibration.chart
 import ij.ImagePlus
 import ij.gui.Roi
 import ij.process.{ColorProcessor, ImageProcessor, ImageStatistics}
+import ij_plugins.color.util.PerspectiveTransform
 
+import java.awt.geom.Point2D
 import scala.collection.immutable.ListMap
 
 object GridChartFrameUtils {
@@ -35,21 +37,21 @@ object GridChartFrameUtils {
   }
 
   /**
-    * Measure ROIs in the source image. The images is assumed to consts of bands (slices).
-    * For `COLOR_RGB` (`ColorProcessor`) images there can be only one slice - it is interpreted as 3 bands:
-    * "Red", "Green", and "Blue".
-    * For images with "GRAY*" slices, each slice is interpreted as a "band".
-    *
-    * Measurements for each "ROI" are grouped together.
-    * Measurements are reported as `ImageStatistics`, so you have flexibility extracting desired measurement, like
-    * mean, area, min, max, and so on.
-    *
-    * @param imp  input image
-    * @param rois rois to measure
-    * @return ordered map of measurements: key are rois, values are measurement for each band.
-    *         Order corresponds to the order of input `rois`.
-    *         Values are ordered maps as well, where key is band name, and value is `ImageStatistics` for the roi.
-    */
+   * Measure ROIs in the source image. The images is assumed to consts of bands (slices).
+   * For `COLOR_RGB` (`ColorProcessor`) images there can be only one slice - it is interpreted as 3 bands:
+   * "Red", "Green", and "Blue".
+   * For images with "GRAY*" slices, each slice is interpreted as a "band".
+   *
+   * Measurements for each "ROI" are grouped together.
+   * Measurements are reported as `ImageStatistics`, so you have flexibility extracting desired measurement, like
+   * mean, area, min, max, and so on.
+   *
+   * @param imp  input image
+   * @param rois rois to measure
+   * @return ordered map of measurements: key are rois, values are measurement for each band.
+   *         Order corresponds to the order of input `rois`.
+   *         Values are ordered maps as well, where key is band name, and value is `ImageStatistics` for the roi.
+   */
   def measureRois(imp: ImagePlus, rois: IndexedSeq[Roi]): ListMap[Roi, ListMap[String, ImageStatistics]] = {
 
     // So safety remember original ROI in the source image
@@ -60,15 +62,15 @@ object GridChartFrameUtils {
       case ImagePlus.COLOR_RGB =>
         val cp = imp.getProcessor.asInstanceOf[ColorProcessor]
         ListMap(
-          "Red" -> cp.getChannel(1, null),
+          "Red"   -> cp.getChannel(1, null),
           "Green" -> cp.getChannel(2, null),
-          "Blue" -> cp.getChannel(3, null),
+          "Blue"  -> cp.getChannel(3, null)
         )
       case _ =>
         val stack = imp.getStack
         val slices = for (i <- 1 to stack.getSize) yield {
           val ip = stack.getProcessor(i)
-          val label = stack.getSliceLabel(i)
+          val label = Option(stack.getSliceLabel(i)).getOrElse(s"$i")
           (label, ip)
         }
         ListMap(slices: _*)
@@ -86,10 +88,33 @@ object GridChartFrameUtils {
         (roi, bandStats)
       }
 
-
     // Restore ROI
     imp.setRoi(impRoi)
 
     ListMap(roiMeasurementMaps: _*)
+  }
+
+  def computeAlignmentTransform(chartROI: Roi, refChartFrame: GridChartFrame): PerspectiveTransform = {
+    require(chartROI != null, "'chartROI' cannot be null.")
+    require(
+      chartROI.getType == Roi.POLYGON,
+      s"'chartROI's type must be a 'Roi.POLYGON', got ${chartROI.getTypeAsString}."
+    )
+    require(chartROI.getPolygon.npoints == 4, s"'chartROI's must have 4 vertices, got ${chartROI.getPolygon.npoints}.")
+    require(refChartFrame != null)
+
+    val polygon = chartROI.getFloatPolygon
+    // Get location of the chart corners from the selected poly-line
+    val p0 = new Point2D.Float(polygon.xpoints(0), polygon.ypoints(0))
+    val p1 = new Point2D.Float(polygon.xpoints(1), polygon.ypoints(1))
+    val p2 = new Point2D.Float(polygon.xpoints(2), polygon.ypoints(2))
+    val p3 = new Point2D.Float(polygon.xpoints(3), polygon.ypoints(3))
+    val points = Array[Point2D](p0, p1, p2, p3)
+
+    // Create alignment transform
+    PerspectiveTransform.quadToQuad(
+      refChartFrame.referenceOutline.toArray,
+      points
+    )
   }
 }

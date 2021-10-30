@@ -20,27 +20,23 @@
  * Latest release available at https://github.com/ij-plugins/ijp-color/
  */
 
-package ij_plugins.color.ui
+package ij_plugins.color.ui.calibration
 
 import enumeratum.{Enum, EnumEntry}
 
 import scala.collection.immutable
 
-sealed abstract class Gamma(override val entryName: String, val value: Double) extends EnumEntry {
+sealed abstract class ChipsEnabledType(override val entryName: String) extends EnumEntry {
   override def toString: String = entryName
 }
 
-case object Gamma extends Enum[Gamma] {
+case object ChipsEnabledType extends Enum[ChipsEnabledType] {
 
-  case object v10 extends Gamma("1.0", 1.0)
+  case object All extends ChipsEnabledType("All")
 
-  case object v18 extends Gamma("1.8", 1.8)
+  case object Auto extends ChipsEnabledType("Auto")
 
-  case object v22 extends Gamma("2.2", 2.2)
+  case object Custom extends ChipsEnabledType("Custom")
 
-  case object sRGB extends Gamma("sRGB", -2.2)
-
-  case object L extends Gamma("L*", 0.0)
-
-  val values: immutable.IndexedSeq[Gamma] = findValues
+  override val values: immutable.IndexedSeq[ChipsEnabledType] = findValues
 }

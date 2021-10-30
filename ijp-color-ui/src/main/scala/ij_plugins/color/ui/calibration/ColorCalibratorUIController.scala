@@ -22,9 +22,9 @@
 
 package ij_plugins.color.ui.calibration
 
-import ij_plugins.color.calibration.chart.{ColorCharts, GridColorChart, ReferenceColorSpace}
+import ij_plugins.color.calibration.chart.{ColorChartType, ReferenceColorSpace}
 import ij_plugins.color.calibration.regression.MappingMethod
-import ij_plugins.color.ui.util.IJPUtils
+import ij_plugins.color.ui.util.{IJPUtils, ImageJUIColors}
 import org.scalafx.extras.mvcfx.ControllerFX
 import scalafx.Includes._
 import scalafx.collections.ObservableBuffer
@@ -34,39 +34,64 @@ import scalafx.scene.control._
 import scalafx.scene.layout.GridPane
 import scalafxml.core.macros.sfxml
 
+import java.util.concurrent.atomic.AtomicBoolean
+
 /**
   * Binds ColorCalibrator FXML to UI model.
   */
 @sfxml
-class ColorCalibratorUIController(private val imageTitleLabel: Label,
-                                  private val chartTypeChoiceBox: ChoiceBox[GridColorChart],
-                                  private val renderReferenceChartSplitButton: SplitMenuButton,
-                                  private val marginsSpinner: Spinner[java.lang.Integer],
-                                  private val referenceColorSpaceChoiceBox: ChoiceBox[ReferenceColorSpace],
-                                  private val enableExtraInfoCB: CheckBox,
-                                  private val mappingMethodChoiceBox: ChoiceBox[MappingMethod],
-                                  private val suggestCalibrationOptionsButton: Button,
-                                  private val calibrateButton: Button,
-                                  private val applyToCurrentImageButton: Button,
-                                  private val helpButton: Button,
-                                  private val rootGridPane: GridPane,
-                                  private val model: ColorCalibratorUIModel) extends ControllerFX {
+class ColorCalibratorUIController(
+                                   private val imageTitleLabel: Label,
+                                   private val chartTypeChoiceBox: ChoiceBox[ColorChartType],
+                                   private val renderReferenceChartSplitButton: SplitMenuButton,
+                                   private val chartInfoLabel: Label,
+                                   private val editChartButton: Button,
+                                   private val marginsSpinner: Spinner[java.lang.Integer],
+                                   private val chipOverlayColorChoiceBox: ChoiceBox[String],
+                                   private val enabledChipsChoiceBox: ChoiceBox[ChipsEnabledType],
+                                   private val selectChipsButton: Button,
+                                   private val referenceColorSpaceChoiceBox: ChoiceBox[ReferenceColorSpace],
+                                   private val mappingMethodChoiceBox: ChoiceBox[MappingMethod],
+                                   private val suggestCalibrationOptionsButton: Button,
+                                   private val selectOutputsButton: Button,
+                                   private val calibrateButton: Button,
+                                   private val applyToCurrentImageButton: Button,
+                                   private val applyInBatchButton: Button,
+                                   private val helpButton: Button,
+                                   private val rootGridPane: GridPane,
+                                   private val model: ColorCalibratorUIModel
+                                 ) extends ControllerFX {
 
   // Dialog header
   private val headerNode = IJPUtils.createHeaderNode(
     "Color Calibrator",
-    "Performs color calibration of an image using a color chart.")
+    "Performs color calibration of an image using a color chart."
+  )
   rootGridPane.add(headerNode, 0, 0, GridPane.Remaining, 1)
 
   // Image title
   imageTitleLabel.text <== model.imageTitle
 
   // Reference chart
-  chartTypeChoiceBox.items = ObservableBuffer.from(ColorCharts.values)
-  chartTypeChoiceBox.value.onChange { (_, oldValue, newValue) =>
-    model.selectReferenceChart(newValue)
+  chartTypeChoiceBox.items = ObservableBuffer.from(ColorChartType.values)
+
+  private val chartIsChanging = new AtomicBoolean(false)
+  chartTypeChoiceBox.selectionModel().selectedItem.onChange { (_, _, newValue) =>
+    chartIsChanging.synchronized {
+      if (!chartIsChanging.getAndSet(true)) {
+        model.selectReferenceChartType(newValue)
+      }
+      chartIsChanging.set(false)
+    }
   }
   chartTypeChoiceBox.selectionModel().selectFirst()
+
+  model.referenceChartType.onChange { (_, _, newValue) =>
+    chartTypeChoiceBox.selectionModel().select(newValue)
+  }
+
+  editChartButton.onAction = _ => model.onEditChart()
+  editChartButton.disable <== model.referenceChartType =!= ColorChartType.Custom
 
   renderReferenceChartSplitButton.onAction = _ => model.onRenderReferenceChart()
   renderReferenceChartSplitButton.items = List(
@@ -75,17 +100,51 @@ class ColorCalibratorUIController(private val imageTitleLabel: Label,
     }
   )
 
+  renderReferenceChartSplitButton.disable <== !model.referenceChartDefined
+
+  chartInfoLabel.text <== model.chartInfoText
+
   // Actual chart
   marginsSpinner.valueFactory = new IntegerSpinnerValueFactory(0, 49) {
     value = model.chipMarginPercent()
     value <==> model.chipMarginPercent
   }
-  //  importROIButton.onAction = _ => model.onLoadLocationFromROI()
+
+  chipOverlayColorChoiceBox.items = ObservableBuffer.from(ImageJUIColors.listColorNames)
+  chipOverlayColorChoiceBox.selectionModel.value.select(model.chipOverlayColorName.value)
+  chipOverlayColorChoiceBox.selectionModel.value.selectedItem.onChange { (_, _, newValue) =>
+    model.chipOverlayColorName.value = newValue
+  }
+  model.chipOverlayColorName.onChange { (_, _, newValue) =>
+    chipOverlayColorChoiceBox.selectionModel.value.select(newValue)
+  }
+
+  // Enabled chips type choice
+  enabledChipsChoiceBox.items = ObservableBuffer.from(ChipsEnabledType.values)
+  // Update model when UI changed
+  private val enabledChipsIsChanging = new AtomicBoolean(false)
+  enabledChipsChoiceBox.selectionModel().selectedItem.onChange { (_, _, newValue) =>
+    enabledChipsIsChanging.synchronized {
+      if (!enabledChipsIsChanging.getAndSet(true)) {
+        model.enabledChipsType.value = newValue
+      }
+      enabledChipsIsChanging.set(false)
+    }
+  }
+  enabledChipsChoiceBox.selectionModel().selectFirst()
+  // Update UI when enabledChipsType changed
+  model.enabledChipsType.onChange { (_, _, newValue) =>
+    enabledChipsChoiceBox.selectionModel().select(newValue)
+  }
+
+  selectChipsButton.onAction = _ => model.onSelectEnabledChips()
+  selectChipsButton.disable <== (model.enabledChipsType =!= ChipsEnabledType.Custom) or !model.referenceChartDefined
+
+  selectOutputsButton.onAction = _ => model.onSelectOutputs()
 
   // Calibration
   referenceColorSpaceChoiceBox.items = ObservableBuffer.from(ReferenceColorSpace.values)
   referenceColorSpaceChoiceBox.value <==> model.referenceColorSpace
-  model.showExtraInfo <==> enableExtraInfoCB.selected
 
   mappingMethodChoiceBox.items = ObservableBuffer.from(MappingMethod.values)
   mappingMethodChoiceBox.value <==> model.mappingMethod
@@ -98,6 +157,9 @@ class ColorCalibratorUIController(private val imageTitleLabel: Label,
 
   applyToCurrentImageButton.onAction = _ => model.onApplyToCurrentImage()
   applyToCurrentImageButton.disable <== !model.correctionRecipeAvailable
+
+  applyInBatchButton.onAction = _ => model.onApplyInBatch()
+  applyInBatchButton.disable <== !model.correctionRecipeAvailable
 
   helpButton.onAction = _ => model.onHelp()
 }
