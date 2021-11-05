@@ -11,7 +11,7 @@ name := "ijp-color-project"
 val Scala2_12 = "2.12.15"
 val Scala2_13 = "2.13.6"
 
-val _version       = "0.11.0.1-SNAPSHOT"
+val _version       = "0.11.1"
 val _scalaVersions = Seq(Scala2_13, Scala2_12)
 val _scalaVersion  = _scalaVersions.head
 
