@@ -3,23 +3,25 @@ name: Scala CI
 on: [push]
 
 jobs:
-  build:
-
-    runs-on: ubuntu-latest
-    
+  test:
     strategy:
+      fail-fast: false
       matrix:
-        java: [ '8', '11', '17' ]
-    name: Java ${{ matrix.Java }} sample
-
+        include:
+          - os: ubuntu-latest
+            java: 8
+          - os: ubuntu-latest
+            java: 11
+          - os: ubuntu-latest
+            java: 17
+    runs-on: ${{ matrix.os }}
     steps:
-    - uses: actions/checkout@v2
-    - name: Set Java
-      uses: actions/setup-java@v2.3.1
+    - name: Checkout
+      uses: actions/checkout@v1
+    - name: Setup
+      uses: olafurpg/setup-scala@v13
       with:
-        distribution: '<distribution>'
-        java-version: ${{ matrix.java }}
-    - name: Run tests
-      uses: GabrielBB/xvfb-action@v1
-      with:
-        run: sbt +test
+        java-version: "adopt@1.${{ matrix.java }}"
+    - name: Build and test
+      run: sbt +test
+      shell: bash
