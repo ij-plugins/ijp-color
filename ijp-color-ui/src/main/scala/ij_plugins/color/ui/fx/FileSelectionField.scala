@@ -66,7 +66,7 @@ class FileSelectionField(val title: String, val ownerWindow: Option[Window]) {
     val button = new Button("Browse") {
       onAction = _ => {
         val initialPath = path.value
-        if (!initialPath.isBlank) {
+        if (initialPath.trim.nonEmpty) {
           val file = new File(initialPath)
           fileChooser.initialFileName = file.getName
           if (file.getParentFile.exists()) {
