@@ -86,7 +86,7 @@ class DirectorySelectionField(val title: String, val ownerWindow: Option[Window]
     val button = new Button("Browse") {
       onAction = _ => {
         val initialPath = path.value
-        if (!initialPath.isBlank) {
+        if (initialPath.trim.nonEmpty) {
           chooser.initialDirectory = existingOrParent(new File(initialPath))
         } else {
           val file = new File(OpenDialog.getDefaultDirectory)
