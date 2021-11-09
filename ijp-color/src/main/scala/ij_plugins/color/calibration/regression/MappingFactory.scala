@@ -133,7 +133,7 @@ object MappingFactory {
     require(rr.beta.length == 3, "Size of beta must be equal 3, got " + rr.beta.length)
 
     val alpha14 = new Array[Double](14)
-    alpha14(1) = rr.beta(0)
+    rr.beta.copyToArray(alpha14, 1)
 
     new CubicPolynomial(alpha14, Option(rr))
   }
