@@ -97,7 +97,7 @@
                 <ChoiceBox fx:id="mappingMethodChoiceBox" maxWidth="1.7976931348623157E308" prefWidth="150.0"
                            GridPane.columnIndex="1" GridPane.rowIndex="11"/>
                 <Button fx:id="suggestCalibrationOptionsButton" maxWidth="1.7976931348623157E308"
-                        mnemonicParsing="false" text="Sugget Options" GridPane.columnIndex="2" GridPane.rowIndex="10"/>
+                        mnemonicParsing="false" text="Suggest Options" GridPane.columnIndex="2" GridPane.rowIndex="10"/>
                 <Button id="ijp-button" fx:id="calibrateButton" contentDisplay="CENTER"
                         maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Calibrate"
                         GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="13">

@@ -136,6 +136,8 @@ class BatchProcessing(override val parentWindow: Option[Window]) extends ShowMes
         }
       if (abort.get()) {
         IJ.showStatus(title + " - batch processing aborted by user.")
+      } else {
+        IJ.showStatus(title + " - competed.")
       }
 
       //      onFX {progressStatus.close()}
