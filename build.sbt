@@ -9,9 +9,9 @@ import scala.xml.{Node => XmlNode, NodeSeq => XmlNodeSeq, _}
 name := "ijp-color-project"
 
 val Scala2_12 = "2.12.15"
-val Scala2_13 = "2.13.6"
+val Scala2_13 = "2.13.7"
 
-val _version       = "0.11.2"
+val _version       = "0.11.2.1-SNAPSHOT"
 val _scalaVersions = Seq(Scala2_13, Scala2_12)
 val _scalaVersion  = _scalaVersions.head
 
@@ -114,7 +114,7 @@ lazy val ijp_color = (project in file("ijp-color"))
       "com.beachape"           %% "enumeratum"              % "1.7.0",
       "net.imagej"              % "ij"                      % "1.53j",
       "org.apache.commons"      % "commons-math3"           % "3.6.1",
-      "org.scala-lang.modules" %% "scala-collection-compat" % "2.5.0",
+      "org.scala-lang.modules" %% "scala-collection-compat" % "2.6.0",
       // Test
       "org.scalatest"          %% "scalatest"               % "3.2.10" % "test"
     ),

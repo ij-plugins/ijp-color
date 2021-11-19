@@ -29,19 +29,34 @@ import scala.collection.immutable
 sealed abstract class ImagePlusType(val value: Int, val name: String) extends IntEnumEntry
 
 /**
-  * ImagePlus types
+  * Make ImagePlus image types integer IDs to be type-safe.
   */
 object ImagePlusType extends IntEnum[ImagePlusType] {
 
-  case object Gray8 extends ImagePlusType(0, "Gray 8")
+  /**
+    * ImagePlus.GRAY8
+    */
+  case object Gray8 extends ImagePlusType(0, "8-bit gray")
 
-  case object Gray16 extends ImagePlusType(1, "Gray 16")
+  /**
+    * ImagePlus.GRAY16
+    */
+  case object Gray16 extends ImagePlusType(1, "16-bit gray")
 
-  case object Gray32 extends ImagePlusType(2, "Gray 32")
+  /**
+    * ImagePlus.GRAY32
+    */
+  case object Gray32 extends ImagePlusType(2, "32-bit gray")
 
-  case object Color256 extends ImagePlusType(3, "Color 256")
+  /**
+    * ImagePlus.COLOR_256
+    */
+  case object Color256 extends ImagePlusType(3, "Indexed color 256")
 
-  case object ColorRGB extends ImagePlusType(4, "Color RGB")
+  /**
+    * ImagePlus.COLOR_RGB
+    */
+  case object ColorRGB extends ImagePlusType(4, "24-bit color")
 
   override def values: immutable.IndexedSeq[ImagePlusType] = findValues
 }
