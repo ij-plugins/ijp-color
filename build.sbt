@@ -10,31 +10,69 @@ name := "ijp-color-project"
 
 val Scala2_12 = "2.12.15"
 val Scala2_13 = "2.13.7"
+val Scala3_0  = "3.0.2"
 
-val _version       = "0.11.3"
-val _scalaVersions = Seq(Scala2_13, Scala2_12)
-val _scalaVersion  = _scalaVersions.head
+val _version       = "0.11.3.2-SNAPSHOT"
+val _scalaVersions = Seq(Scala2_13, Scala2_12, Scala3_0)
+//val _scalaVersion  = _scalaVersions.head
+val _scalaVersion  = Scala3_0
 
-version             := _version
-scalaVersion        := _scalaVersion
+ThisBuild / version             := _version
+ThisBuild / scalaVersion        := _scalaVersion
+ThisBuild / organization        := "net.sf.ij-plugins"
+ThisBuild / sonatypeProfileName := "net.sf.ij-plugins"
+ThisBuild / homepage            := Some(new URL("https://github.com/ij-plugins/ijp-color"))
+ThisBuild / startYear           := Some(2002)
+ThisBuild / licenses            := Seq(("LGPL-2.1", new URL("http://opensource.org/licenses/LGPL-2.1")))
+
+
 publishArtifact     := false
 publish / skip      := true
-sonatypeProfileName := "net.sf.ij-plugins"
+
+def isScala2(scalaVersion: String): Boolean = {
+  CrossVersion.partialVersion(scalaVersion) match {
+    case Some((2, _)) => true
+    case _            => false
+  }
+}
 
 // Helper to determine Scala version-dependent settings
-def isScala2_13plus(scalaVersion: String): Boolean =
+def isScala2_12(scalaVersion: String): Boolean =
   CrossVersion.partialVersion(scalaVersion) match {
-    case Some((2, n)) if n >= 13 => true
-    case _ => false
+    case Some((2, 12)) => true
+    case _             => false
   }
+
+def isScala2_13(scalaVersion: String): Boolean =
+  CrossVersion.partialVersion(scalaVersion) match {
+    case Some((2, 13)) => true
+    case _             => false
+  }
+
+def isScala3(scalaVersion: String): Boolean =
+  CrossVersion.partialVersion(scalaVersion) match {
+    case Some((3, _)) => true
+    case _            => false
+  }
+
 
 // Add src/main/scala-2.13+ for Scala 2.13 and newer
 //   and src/main/scala-2.12- for Scala versions older than 2.13
 def versionSubDir(scalaVersion: String): String =
   CrossVersion.partialVersion(scalaVersion) match {
-    case Some((2, n)) if n < 13 => "scala-2.12-"
-    case Some((_, _)) => "scala-2.13+"
+    case Some((2, n)) if n < 13  => "scala-2.12-"
+    case Some((2, n)) if n >= 13 => "scala-2.13+"
+    case Some((3, _))            => "scala-3"
+    case _ => throw new Exception(s"Unsupported Scala version $scalaVersion")
   }
+
+def versionSubDir2v3(scalaVersion: String): String =
+  CrossVersion.partialVersion(scalaVersion) match {
+    case Some((2, _)) => "scala-2"
+    case Some((3, _)) => "scala-3"
+    case _            => throw new Exception(s"Unsupported Scala version $scalaVersion")
+  }
+
 
 // Determine OS version of JavaFX binaries
 lazy val osName = System.getProperty("os.name") match {
@@ -47,25 +85,25 @@ lazy val javaFXModules = Seq("base", "controls", "fxml", "graphics", "media", "s
 lazy val javaFXVersion = "16"
 
 val commonSettings = Seq(
-  version      := _version,
-  organization := "net.sf.ij-plugins",
-  homepage     := Some(new URL("https://github.com/ij-plugins/ijp-color")),
-  startYear    := Some(2002),
-  licenses     := Seq(("LGPL-2.1", new URL("http://opensource.org/licenses/LGPL-2.1"))),
   //
   crossScalaVersions := _scalaVersions,
   scalaVersion       := _scalaVersion,
-  // Use different directories for code that is not source compatible between Scala versions
-  Compile / unmanagedSourceDirectories += (Compile / sourceDirectory).value / versionSubDir(scalaVersion.value),
-  Test / unmanagedSourceDirectories += (Test / sourceDirectory).value / versionSubDir(scalaVersion.value),
   //
   scalacOptions ++= Seq(
     "-encoding", "UTF-8",
     "-unchecked",
     "-deprecation",
-    "-Xlint",
     "-feature",
-    "-explaintypes", 
+  ) ++ (
+    if(isScala2(scalaVersion.value))
+      Seq(
+        "-Xlint",
+        "-explaintypes",
+      )
+    else
+      Seq(
+        "-explain"
+      )
   ),
   Compile / doc / scalacOptions ++= Opts.doc.title("IJP Color API"),
   Compile / doc / scalacOptions ++= Opts.doc.version(_version),
@@ -80,7 +118,10 @@ val commonSettings = Seq(
     }),
   javacOptions  ++= Seq("-deprecation", "-Xlint"),
   //
-  resolvers += Resolver.sonatypeRepo("snapshots"),
+  resolvers ++= Seq(
+    Resolver.sonatypeRepo("snapshots"),
+    Resolver.mavenLocal
+  ),
   //
   exportJars := true,
   //
@@ -110,8 +151,11 @@ lazy val ijp_color = (project in file("ijp-color"))
     name        := "ijp-color",
     description := "IJP Color Core",
     commonSettings,
+    // Use different directories for code that is not source compatible between Scala versions
+    Compile / unmanagedSourceDirectories += (Compile / sourceDirectory).value / versionSubDir2v3(scalaVersion.value),
+    Test / unmanagedSourceDirectories += (Test / sourceDirectory).value / versionSubDir2v3(scalaVersion.value),
+    //
     libraryDependencies ++= Seq(
-      "com.beachape"           %% "enumeratum"              % "1.7.0",
       "net.imagej"              % "ij"                      % "1.53j",
       "org.apache.commons"      % "commons-math3"           % "3.6.1",
       "org.scala-lang.modules" %% "scala-collection-compat" % "2.6.0",
@@ -119,9 +163,18 @@ lazy val ijp_color = (project in file("ijp-color"))
       "org.scalatest"          %% "scalatest"               % "3.2.10" % "test"
     ),
     libraryDependencies ++= (
-      if (isScala2_13plus(scalaVersion.value)) {
+      if (isScala2_13(scalaVersion.value) || isScala3(scalaVersion.value)) {
         Seq("org.scala-lang.modules" %% "scala-parallel-collections" % "1.0.4")
-      } else {
+      }
+      else {
+        Seq.empty[ModuleID]
+      }
+    ),
+    libraryDependencies ++= (
+      if(isScala2(scalaVersion.value)) {
+        Seq("com.beachape" %% "enumeratum" % "1.7.0")
+      }
+      else {
         Seq.empty[ModuleID]
       }
     ),
@@ -133,15 +186,17 @@ lazy val ijp_color_ui = (project in file("ijp-color-ui"))
     name        := "ijp-color-ui",
     description := "IJP Color UI and ImageJ plugins",
     commonSettings,
+    // Use different directories for code that is not source compatible between Scala versions
+    Compile / unmanagedSourceDirectories += (Compile / sourceDirectory).value / versionSubDir(scalaVersion.value),
+    Test / unmanagedSourceDirectories += (Test / sourceDirectory).value / versionSubDir(scalaVersion.value),
     // Enable macro annotation processing for ScalaFXML
-    scalacOptions += (if(isScala2_13plus(scalaVersion.value)) "-Ymacro-annotations" else ""),
+    scalacOptions += (if(isScala2_13(scalaVersion.value)) "-Ymacro-annotations" else ""),
     libraryDependencies ++= (
-      if (isScala2_13plus(scalaVersion.value)) {
-        Seq.empty[ModuleID]
-      } else {
+      if (isScala2_12(scalaVersion.value)) {
         Seq(compilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full))
-      }
-    ),
+      } else {
+        Seq.empty[ModuleID]
+      }),
     // JavaFX dependencies marked as "provided"
     libraryDependencies ++= javaFXModules.map( m =>
       "org.openjfx" % s"javafx-$m" % javaFXVersion % "provided" classifier osName
@@ -166,8 +221,8 @@ lazy val ijp_color_ui = (project in file("ijp-color-ui"))
       "org.jfree"           % "jfreechart-fx"       % "1.0.1",
       "org.jfree"           % "fxgraphics2d"        % "1.8",
       "org.scalafx"        %% "scalafx"             % "16.0.0-R25",
-      "org.scalafx"        %% "scalafx-extras"      % "0.3.6",
-      "org.scalafx"        %% "scalafxml-core-sfx8" % "0.5",
+      "org.scalafx"        %% "scalafx-extras"      % "0.4.0",
+//      "org.scalafx"        %% "scalafxml-core-sfx8" % "0.5",
       // Test
       "org.scalatest"      %% "scalatest"           % "3.2.10"  % "test"
     )

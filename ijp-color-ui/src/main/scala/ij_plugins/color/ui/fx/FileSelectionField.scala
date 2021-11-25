@@ -34,7 +34,7 @@ import java.io.File
 
 class FileSelectionField(val title: String, val ownerWindow: Option[Window]) {
   private lazy val fileChooser: FileChooser = new FileChooser() {
-    title = FileSelectionField.this.title
+    this.title = FileSelectionField.this.title
   }
 
   private var _view: Option[Node] = None

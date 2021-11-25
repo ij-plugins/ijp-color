@@ -20,36 +20,24 @@
  * Latest release available at https://github.com/ij-plugins/ijp-color/
  */
 
-package ij_plugins.color.util
+package ij_plugins.color.ui.calibration
 
 import ij.ImagePlus
-import org.scalatest.flatspec.AnyFlatSpec
-import org.scalatest.matchers.should.Matchers._
+import org.scalafx.extras.mvcfx.MVCfx
+import scalafx.stage.Window
 
-class ImagePlusTypeTest extends AnyFlatSpec {
-  it should "match ImagePlus constants" in {
-    ImagePlusType.Gray8.value should be(ImagePlus.GRAY8)
-    ImagePlusType.Gray16.value should be(ImagePlus.GRAY16)
-    ImagePlusType.Gray32.value should be(ImagePlus.GRAY32)
-    ImagePlusType.Color256.value should be(ImagePlus.COLOR_256)
-    ImagePlusType.ColorRGB.value should be(ImagePlus.COLOR_RGB)
-  }
+/**
+ * Creates Color Calibrator UI.
+ *
+ * @author Jarek Sacha
+ */
+class ColorCalibratorUI(val image: ImagePlus, private var _parentWindow: Window) extends MVCfx("ColorCalibrator.fxml") {
 
-  it should "have unique names" in {
-    val names = ImagePlusType.values.map(_.name)
+  lazy val model = new ColorCalibratorUIModel(image, _parentWindow)
 
-    names.toSet.size should be(ImagePlusType.values.size)
-  }
+  def parentWindow: Window = _parentWindow
 
-//  it should "lookup by name" in {
-//    for (v <- ImagePlusType.values) {
-//      ImagePlusType.withName(v.name) should be(v)
-//    }
-//  }
-
-  it should "lookup by value" in {
-    for (v <- ImagePlusType.values) {
-      ImagePlusType.withValue(v.value) should be(v)
-    }
+  def parentWindow_=(newParent: Window): Unit = {
+    _parentWindow = newParent
   }
 }

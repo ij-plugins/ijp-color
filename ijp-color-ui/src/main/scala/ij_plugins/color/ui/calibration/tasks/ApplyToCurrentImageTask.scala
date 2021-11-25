@@ -89,7 +89,7 @@ class ApplyToCurrentImageTask(
             recipe.referenceColorSpace,
             refWhite,
             correctionOutput.correctedBands,
-            imp.getShortTitle + s" - CIE L*a*b* ${refWhite.entryName}"
+            imp.getShortTitle + s" - CIE L*a*b* ${refWhite.name}"
           )
         }
 

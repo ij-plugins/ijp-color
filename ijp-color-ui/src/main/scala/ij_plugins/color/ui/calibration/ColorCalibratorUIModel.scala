@@ -86,9 +86,9 @@ object ColorCalibratorUIModel {
     import Config._
 
     def saveToIJPref(): Unit = {
-      IJPrefs.set(ReferencePrefix + ".referenceColorSpace", referenceColorSpace.entryName)
-      IJPrefs.set(ReferencePrefix + ".mappingMethod", mappingMethod.entryName)
-      IJPrefs.set(ReferencePrefix + ".colorChartType", colorChartType.entryName)
+      IJPrefs.set(ReferencePrefix + ".referenceColorSpace", referenceColorSpace.name)
+      IJPrefs.set(ReferencePrefix + ".mappingMethod", mappingMethod.name)
+      IJPrefs.set(ReferencePrefix + ".colorChartType", colorChartType.name)
       IJPrefs.set(ReferencePrefix + ".chipMargin", s"$chipMargin")
       IJPrefs.set(ReferencePrefix + ".chipOverlayColorName", chipOverlayColorName)
       outputConfig.saveToIJPref()

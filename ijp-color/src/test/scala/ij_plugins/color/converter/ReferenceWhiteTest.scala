@@ -20,23 +20,21 @@
  * Latest release available at https://github.com/ij-plugins/ijp-color/
  */
 
-package ij_plugins.color.ui.calibration
+package ij_plugins.color.converter
 
-import enumeratum.{Enum, EnumEntry}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers._
 
-import scala.collection.immutable
+class ReferenceWhiteTest extends AnyFlatSpec {
+  it should "have unique names" in {
+    val names = ReferenceWhite.values.map(_.name)
 
-sealed abstract class ChipsEnabledType(override val entryName: String) extends EnumEntry {
-  override def toString: String = entryName
-}
+    names.toSet.size should be(ReferenceWhite.values.size)
+  }
 
-case object ChipsEnabledType extends Enum[ChipsEnabledType] {
-
-  case object All extends ChipsEnabledType("All")
-
-  case object Auto extends ChipsEnabledType("Auto")
-
-  case object Custom extends ChipsEnabledType("Custom")
-
-  override val values: immutable.IndexedSeq[ChipsEnabledType] = findValues
+  it should "lookup by name" in {
+    for (v <- ReferenceWhite.values) {
+      ReferenceWhite.withName(v.name) should be(v)
+    }
+  }
 }

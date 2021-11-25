@@ -54,7 +54,7 @@ class DirectorySelectionField(val title: String, val ownerWindow: Option[Window]
   import DirectorySelectionField._
 
   private lazy val chooser: DirectoryChooser = new DirectoryChooser() {
-    title = DirectorySelectionField.this.title
+    this.title = DirectorySelectionField.this.title
   }
 
   private var _view: Option[Node] = None
