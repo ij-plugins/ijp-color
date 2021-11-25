@@ -57,6 +57,8 @@ sealed abstract class RGBWorkingSpace(
   val gamma: Double
 ) extends EnumEntry {
 
+  def name: String = entryName
+
   private val m = new Matrix3x3(
     m00 = xR / yR,
     m01 = xG / yG,

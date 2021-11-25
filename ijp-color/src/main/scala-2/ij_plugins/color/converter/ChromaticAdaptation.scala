@@ -29,14 +29,17 @@ import scala.collection.immutable
 /**
  * Represents chromatic adaptation when converting between color spaces using difference reference whites.
  *
- * @param entryName adaptation name
- * @param ma        adaptation matrix
+ * @param entryName
+ *   adaptation name
+ * @param ma
+ *   adaptation matrix
  */
 sealed abstract class ChromaticAdaptation(override val entryName: String, val ma: Matrix3x3) extends EnumEntry {
 
   /** Inverse of the adaptation matrix */
   val maI: Matrix3x3 = ma.inverse
 
+  def name: String              = entryName
   override def toString: String = entryName
 }
 

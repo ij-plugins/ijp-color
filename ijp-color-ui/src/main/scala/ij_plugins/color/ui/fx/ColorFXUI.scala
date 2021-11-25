@@ -55,7 +55,7 @@ object ColorFXUI {
         scene = new Scene {
           root = new StackPane {
             children = node
-            stylesheets ++= ColorFXUI.stylesheets
+            this.stylesheets ++= ColorFXUI.stylesheets
           }
         }
       }

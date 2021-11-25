@@ -193,7 +193,7 @@ class CalibrateTask(
       }
 
     // Prepare calibration outputs
-    val recipeLR = fitLR.map { fit: ColorCalibrator.CalibrationFit =>
+    val recipeLR = fitLR.map { (fit: ColorCalibrator.CalibrationFit) =>
       val recipe = CorrectionRecipe(
         corrector = fit.corrector,
         colorConverter = colorCalibrator.chart.colorConverter,
@@ -232,7 +232,7 @@ class CalibrateTask(
             recipe.referenceColorSpace,
             refWhite,
             co.correctedBands,
-            s"$titlePrefix - CIE L*a*b* ${refWhite.entryName}"
+            s"$titlePrefix - CIE L*a*b* ${refWhite.name}"
           )
         }
 

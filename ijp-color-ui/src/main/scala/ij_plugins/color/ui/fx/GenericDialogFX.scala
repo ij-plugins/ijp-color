@@ -223,7 +223,7 @@ class GenericDialogFX(
     *
     * @deprecated this is only for compatibility with ImageJ GenericDialog API, it delegates to addNode()
     */
-  @deprecated("This is only for compatibility with ImageJ GenericDialog API, it delegates to addNode()", "0.11")
+  @deprecated("This is only for compatibility with ImageJ GenericDialog API, it delegates to addNode()", since="0.11")
   def addPanel(node: Node): Unit = {
     addNode(node)
   }
@@ -346,7 +346,7 @@ class GenericDialogFX(
       // Create the custom dialog.
       val dialog = new Dialog[Result]() {
         parentWindowOption.foreach(initOwner)
-        title = GenericDialogFX.this.title
+        this.title = GenericDialogFX.this.title
         header.foreach(headerText = _)
         resizable = true
       }

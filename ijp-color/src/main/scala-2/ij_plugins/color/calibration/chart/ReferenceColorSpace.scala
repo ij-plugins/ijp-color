@@ -35,6 +35,9 @@ import scala.collection.immutable
   * the reference white (illuminant) of the reference color values.
   */
 sealed abstract class ReferenceColorSpace(override val entryName: String, bands: Array[String]) extends EnumEntry {
+
+  val name: String = entryName
+
   override def toString: String = entryName
 
   private val _bands: Array[String] = bands.clone()

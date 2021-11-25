@@ -28,6 +28,8 @@ import scala.collection.immutable
 
 /** Reference white. */
 sealed abstract class ReferenceWhite(override val entryName: String, val x: Double, val z: Double) extends EnumEntry {
+  val name: String = entryName
+
   final val y: Double = 1
 
   override def toString: String = entryName

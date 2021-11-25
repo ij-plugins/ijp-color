@@ -161,7 +161,7 @@ class LOOCrossValidationSpec extends AnyFlatSpec {
     val sortedByMean = crossValidations.sortBy(v => v.statsDeltaE.getMean)
 
     println("Space -                Method:      Mean,    Median,       95%")
-    sortedByMean.foreach { cvd: CrossValidationData =>
+    sortedByMean.foreach { (cvd: CrossValidationData) =>
       println(
         f"${cvd.referenceColorSpace}%5s - ${cvd.method}%21s:  " +
           f"${cvd.statsDeltaE.getMean}%8.3f,  ${cvd.statsDeltaE.getPercentile(50)}%8.3f,  ${cvd.statsDeltaE.getPercentile(95)}%8.3f"

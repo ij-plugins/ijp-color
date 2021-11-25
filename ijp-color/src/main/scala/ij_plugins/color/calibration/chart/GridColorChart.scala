@@ -119,7 +119,7 @@ final class GridColorChart(
    *
    * Chip linear size is reduced by a margin expressed as a fraction of width/length.
    */
-  @deprecated("Unused method, will be removed", "0.8")
+  @deprecated("Unused method, will be removed", since="0.8")
   def outlineChipAt(column: Int, row: Int, margin: Double): Array[Point2D] = {
     val ref = referenceGrid.chipAt(column, row, margin)
     ref.map(p => alignmentTransform.transform(p))
@@ -144,7 +144,7 @@ final class GridColorChart(
   /**
    * Actual outline of the of the chart (reference outline with alignment transform applied).
    */
-  @deprecated("Unused method, will be removed", "0.8")
+  @deprecated("Unused method, will be removed", since="0.8")
   def alignedOutline: immutable.IndexedSeq[Point2D] =
     alignmentTransform.transform(referenceOutline).toIndexedSeq
 

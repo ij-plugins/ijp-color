@@ -22,25 +22,38 @@
 
 package ij_plugins.color.ui.util
 
-import enumeratum.{Enum, EnumEntry}
+enum Gamma(val name: String, val value: Double) {
 
-import scala.collection.immutable
+  case v10 extends Gamma("1.0", 1.0)
 
-sealed abstract class Gamma(override val entryName: String, val value: Double) extends EnumEntry {
-  override def toString: String = entryName
+  case v18 extends Gamma("1.8", 1.8)
+
+  case v22 extends Gamma("2.2", 2.2)
+
+  case sRGB extends Gamma("sRGB", -2.2)
+
+  case L extends Gamma("L*", 0.0)
+
+  override def toString: String = name
 }
 
-case object Gamma extends Enum[Gamma] {
+object Gamma {
 
-  case object v10 extends Gamma("1.0", 1.0)
+  /**
+    * Tries to get an item by the supplied name.
+    * @param name
+    *   name of the item
+    * @throws NoSuchElementException
+    *   if enum has no item with given name
+    */
+  def withName(name: String): Gamma =
+    withNameOption(name).getOrElse(throw new NoSuchElementException(s"No Gamma with name: $name"))
 
-  case object v18 extends Gamma("1.8", 1.8)
-
-  case object v22 extends Gamma("2.2", 2.2)
-
-  case object sRGB extends Gamma("sRGB", -2.2)
-
-  case object L extends Gamma("L*", 0.0)
-
-  val values: immutable.IndexedSeq[Gamma] = findValues
+  /**
+    * Optionally returns an item for a given name.
+    * @param name
+    *   name of the item
+    */
+  def withNameOption(name: String): Option[Gamma] =
+    Gamma.values.find(_.name == name)
 }
