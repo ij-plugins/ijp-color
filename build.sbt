@@ -12,7 +12,7 @@ val Scala2_12 = "2.12.15"
 val Scala2_13 = "2.13.7"
 val Scala3_0  = "3.0.2"
 
-val _version       = "0.11.4"
+val _version       = "0.11.4.1-SNAPSHOT"
 val _scalaVersions = Seq(Scala2_13, Scala2_12, Scala3_0)
 //val _scalaVersion  = _scalaVersions.head
 val _scalaVersion  = Scala3_0
