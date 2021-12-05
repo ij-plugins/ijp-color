@@ -23,13 +23,13 @@
 package ij_plugins.color.calibration.regression
 
 /**
- * Cubic polynomial function of 3 variables, with some 3-order cross-terms dropped (aab, aac, abb, acc, bbc, bcc)
- * to reduce requirements on size of data needed to fit the polynomial.
+ * Cubic polynomial function of 3 variables, with some 3-order cross-terms dropped (aab, aac, abb, acc, bbc, bcc) to
+ * reduce requirements on size of data needed to fit the polynomial.
  * {{{
  *   f(A,B,C) = intercept +
- *              a*A + b*B + c*C +
- *              aa*A*A + ab*A*B + ac*A*C + bb*B*B + bc*B*C + cc*C*C +
- *              aaa*A*A*A + bbb*B*B*B + ccc*C*C*C + abc*A*B*C
+ *               a*A + b*B + c*C +
+ *               aa*A*A + ab*A*B + ac*A*C + bb*B*B + bc*B*C + cc*C*C +
+ *               aaa*A*A*A + bbb*B*B*B + ccc*C*C*C + abc*A*B*C
  * }}}
  */
 case class CubicPolynomial(
@@ -53,7 +53,8 @@ case class CubicPolynomial(
   /**
    * Initialize coefficients from an `Array(intercept, a, b, c, aa, ab, ac, bb, bc, cc, aaa, abc, bbb, ccc)`
    *
-   * @param coeff coefficient array.
+   * @param coeff
+   *   coefficient array.
    */
   def this(coeff: Array[Double], regressionResult: Option[Regression.Result]) = {
     this(
@@ -78,7 +79,8 @@ case class CubicPolynomial(
   /**
    * Evaluate polynomial for the given argument.
    *
-   * @param v array of length 3.
+   * @param v
+   *   array of length 3.
    */
   def evaluate(v: Array[Double]): Double = {
     assert(v.length == 3)

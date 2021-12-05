@@ -29,20 +29,20 @@ import ij_plugins.color.calibration.CalibrationUtils.renderReferenceChart
 import ij_plugins.color.calibration.CorrectionRecipe
 import ij_plugins.color.calibration.chart.{ColorChartType, ColorCharts, GridColorChart, ReferenceColorSpace}
 import ij_plugins.color.calibration.regression.MappingMethod
+import ij_plugins.color.ui.calibration.tasks.*
 import ij_plugins.color.ui.calibration.tasks.CalibrateTask.OutputConfig
-import ij_plugins.color.ui.calibration.tasks._
 import ij_plugins.color.ui.util.{IJPrefs, ImageJUIColors, LiveChartROI}
 import javafx.beans.property.ReadOnlyBooleanProperty
 import org.scalafx.extras.mvcfx.ModelFX
 import org.scalafx.extras.{BusyWorker, ShowMessage, onFX}
-import scalafx.beans.property._
+import scalafx.beans.property.*
 import scalafx.stage.Window
 
 import java.util.concurrent.Future
 
 object ColorCalibratorUIModel {
   val HelpURL = "https://github.com/ij-plugins/ijp-color/wiki/Color-Calibrator"
-  val Title = "IJP Color Calibrator"
+  val Title   = "IJP Color Calibrator"
 
   object Config {
 
@@ -55,14 +55,14 @@ object ColorCalibratorUIModel {
 
       for {
         referenceColorSpaceName <- IJPrefs.getStringOption(ReferencePrefix + ".referenceColorSpace")
-        referenceColorSpace <- ReferenceColorSpace.withNameOption(referenceColorSpaceName)
-        mappingMethodName <- IJPrefs.getStringOption(ReferencePrefix + ".mappingMethod")
-        mappingMethod <- MappingMethod.withNameOption(mappingMethodName)
-        colorChartTypeName <- IJPrefs.getStringOption(ReferencePrefix + ".colorChartType")
-        colorChartType <- ColorChartType.withNameOption(colorChartTypeName)
-        chipMargin <- IJPrefs.getDoubleOption(ReferencePrefix + ".chipMargin")
-        chipOverlayColorName <- IJPrefs.getStringOption(ReferencePrefix + ".chipOverlayColorName")
-        outputConfig <- OutputConfig.loadFromIJPref()
+        referenceColorSpace     <- ReferenceColorSpace.withNameOption(referenceColorSpaceName)
+        mappingMethodName       <- IJPrefs.getStringOption(ReferencePrefix + ".mappingMethod")
+        mappingMethod           <- MappingMethod.withNameOption(mappingMethodName)
+        colorChartTypeName      <- IJPrefs.getStringOption(ReferencePrefix + ".colorChartType")
+        colorChartType          <- ColorChartType.withNameOption(colorChartTypeName)
+        chipMargin              <- IJPrefs.getDoubleOption(ReferencePrefix + ".chipMargin")
+        chipOverlayColorName    <- IJPrefs.getStringOption(ReferencePrefix + ".chipOverlayColorName")
+        outputConfig            <- OutputConfig.loadFromIJPref()
       } yield Config(
         referenceColorSpace,
         mappingMethod,
@@ -75,15 +75,15 @@ object ColorCalibratorUIModel {
   }
 
   case class Config(
-                     referenceColorSpace: ReferenceColorSpace,
-                     mappingMethod: MappingMethod,
-                     colorChartType: ColorChartType,
-                     chipMargin: Double,
-                     chipOverlayColorName: String,
-                     outputConfig: OutputConfig
-                   ) {
+    referenceColorSpace: ReferenceColorSpace,
+    mappingMethod: MappingMethod,
+    colorChartType: ColorChartType,
+    chipMargin: Double,
+    chipOverlayColorName: String,
+    outputConfig: OutputConfig
+  ) {
 
-    import Config._
+    import Config.*
 
     def saveToIJPref(): Unit = {
       IJPrefs.set(ReferencePrefix + ".referenceColorSpace", referenceColorSpace.name)
@@ -102,7 +102,7 @@ object ColorCalibratorUIModel {
  */
 class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends ModelFX with ShowMessage {
 
-  import ColorCalibratorUIModel._
+  import ColorCalibratorUIModel.*
 
   require(parentWindow != null, "Argument `parentStage` cannot be null.")
 
@@ -125,7 +125,7 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
   val referenceChartOption: ReadOnlyObjectProperty[Option[GridColorChart]] =
     referenceChartOptionWrapper.readOnlyProperty
 
-  private val referenceChartDefinedWrapper = new ReadOnlyBooleanWrapper()
+  private val referenceChartDefinedWrapper           = new ReadOnlyBooleanWrapper()
   val referenceChartDefined: ReadOnlyBooleanProperty = referenceChartDefinedWrapper.readOnlyProperty
 
   private var customChartOption: Option[GridColorChart] = None
@@ -153,7 +153,7 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
 
   def outputConfig: OutputConfig = outputConfigWrapper.value
 
-  val mappingMethod = new ObjectProperty[MappingMethod](this, "mappingMethod", MappingMethod.LinearCrossBand)
+  val mappingMethod    = new ObjectProperty[MappingMethod](this, "mappingMethod", MappingMethod.LinearCrossBand)
   val clipReferenceRGB = new BooleanProperty(this, "clipReferenceRGB", true)
   val correctionRecipe = new ObjectProperty[Option[CorrectionRecipe]](this, "correctionRecipe", None)
 
@@ -200,7 +200,7 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
             } yield {
               newChart2.copyWithEnabled(currentChart.enabled.toArray)
             }
-            ).getOrElse(newChart2)
+          ).getOrElse(newChart2)
         }
       } else {
         newChartOpt2.map(_.copyWithEnabledAll)
@@ -258,7 +258,7 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
   def onShowReferenceColors(): Unit = busyWorker.doTask("onShowReferenceColors") { () =>
     referenceChartOption.value match {
       case Some(referenceChart) =>
-        val rt = new ResultsTable()
+        val rt    = new ResultsTable()
         val chips = referenceChart.referenceChips
         for (i <- chips.indices) {
           rt.incrementCounter()

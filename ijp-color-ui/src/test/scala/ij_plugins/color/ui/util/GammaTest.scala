@@ -23,7 +23,7 @@
 package ij_plugins.color.ui.util
 
 import org.scalatest.flatspec.AnyFlatSpec
-import org.scalatest.matchers.should.Matchers._
+import org.scalatest.matchers.should.Matchers.*
 
 class GammaTest extends AnyFlatSpec {
   it should "have unique names" in {

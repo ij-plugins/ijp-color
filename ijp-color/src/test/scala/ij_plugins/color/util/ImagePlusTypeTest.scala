@@ -24,7 +24,7 @@ package ij_plugins.color.util
 
 import ij.ImagePlus
 import org.scalatest.flatspec.AnyFlatSpec
-import org.scalatest.matchers.should.Matchers._
+import org.scalatest.matchers.should.Matchers.*
 
 class ImagePlusTypeTest extends AnyFlatSpec {
   it should "match ImagePlus constants" in {

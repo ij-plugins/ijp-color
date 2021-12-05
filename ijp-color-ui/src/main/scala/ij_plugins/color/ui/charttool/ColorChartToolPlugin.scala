@@ -22,13 +22,13 @@
 
 package ij_plugins.color.ui.charttool
 
-import ij.gui._
+import ij.gui.*
 import ij.measure.ResultsTable
 import ij.plugin.PlugIn
 import ij.process.ImageStatistics
 import ij.{IJ, ImagePlus}
 import ij_plugins.color.calibration.chart.{GridChartFrame, GridChartFrameUtils}
-import ij_plugins.color.ui.util._
+import ij_plugins.color.ui.util.*
 import ij_plugins.color.util.{ImageJUtils, PerspectiveTransform}
 import scalafx.beans.property.ObjectProperty
 
@@ -43,13 +43,13 @@ object ColorChartToolPlugin {
   object Config {
     def loadFromIJPref(): Option[Config] = {
       for {
-        nbColumns <- IJPrefs.getIntOption(ReferencePrefix + ".nbColumns")
-        nbRows <- IJPrefs.getIntOption(ReferencePrefix + ".nbRows")
-        chipMargin <- IJPrefs.getDoubleOption(ReferencePrefix + ".chipMargin")
+        nbColumns            <- IJPrefs.getIntOption(ReferencePrefix + ".nbColumns")
+        nbRows               <- IJPrefs.getIntOption(ReferencePrefix + ".nbRows")
+        chipMargin           <- IJPrefs.getDoubleOption(ReferencePrefix + ".chipMargin")
         chipOverlayColorName <- IJPrefs.getStringOption(ReferencePrefix + ".chipOverlayColorName")
-        sendToROIManager <- IJPrefs.getBooleanOption(ReferencePrefix + ".sendToROIManager")
-        measureChips <- IJPrefs.getBooleanOption(ReferencePrefix + ".measureChips")
-        listChipVertices <- IJPrefs.getBooleanOption(ReferencePrefix + ".listChipVertices")
+        sendToROIManager     <- IJPrefs.getBooleanOption(ReferencePrefix + ".sendToROIManager")
+        measureChips         <- IJPrefs.getBooleanOption(ReferencePrefix + ".measureChips")
+        listChipVertices     <- IJPrefs.getBooleanOption(ReferencePrefix + ".listChipVertices")
       } yield Config(
         nbColumns = nbColumns,
         nbRows = nbRows,
@@ -63,14 +63,14 @@ object ColorChartToolPlugin {
   }
 
   case class Config(
-                     nbColumns: Int = 6,
-                     nbRows: Int = 4,
-                     chipMargin: Double = 0.2,
-                     chipOverlayColorName: String = "magenta",
-                     sendToROIManager: Boolean = true,
-                     measureChips: Boolean = true,
-                     listChipVertices: Boolean = false
-                   ) {
+    nbColumns: Int = 6,
+    nbRows: Int = 4,
+    chipMargin: Double = 0.2,
+    chipOverlayColorName: String = "magenta",
+    sendToROIManager: Boolean = true,
+    measureChips: Boolean = true,
+    listChipVertices: Boolean = false
+  ) {
     require(ImageJUIColors.listColorNames.contains(chipOverlayColorName))
 
     def saveToIJPref(): Unit = {
@@ -88,8 +88,7 @@ object ColorChartToolPlugin {
 }
 
 /**
- * Send tiles of the chart to ROI Manager
- * User indicates chart location by pointing to chart corners.
+ * Send tiles of the chart to ROI Manager User indicates chart location by pointing to chart corners.
  */
 class ColorChartToolPlugin extends PlugIn with DialogListener with ImageListenerHelper with LiveChartROIHelper {
 
@@ -101,7 +100,7 @@ class ColorChartToolPlugin extends PlugIn with DialogListener with ImageListener
     "Measures color of each chip."
 
   private var dialog: Option[NonBlockingGenericDialog] = None
-  private var config: Config = Config.loadFromIJPref().getOrElse(Config())
+  private var config: Config                           = Config.loadFromIJPref().getOrElse(Config())
 
   private val referenceChartOption = {
     val chart =
@@ -203,7 +202,7 @@ class ColorChartToolPlugin extends PlugIn with DialogListener with ImageListener
     val colorName = gd.getNextChoice
 
     val sendToROIManager = gd.getNextBoolean
-    val measureChips = gd.getNextBoolean
+    val measureChips     = gd.getNextBoolean
     val listChipVertices = gd.getNextBoolean
 
     config = Config(
@@ -289,12 +288,12 @@ class ColorChartToolPlugin extends PlugIn with DialogListener with ImageListener
 
   private def statsToMap(stats: ImageStatistics): ListMap[String, Double] = {
     ListMap(
-      "Area" -> stats.area,
-      "Mean" -> stats.mean,
-      "Median" -> stats.median,
-      "Min" -> stats.min,
-      "Max" -> stats.max,
-      "StdDev" -> stats.stdDev,
+      "Area"     -> stats.area,
+      "Mean"     -> stats.mean,
+      "Median"   -> stats.median,
+      "Min"      -> stats.min,
+      "Max"      -> stats.max,
+      "StdDev"   -> stats.stdDev,
       "Kurtosis" -> stats.kurtosis,
       "Skewness" -> stats.skewness
     )

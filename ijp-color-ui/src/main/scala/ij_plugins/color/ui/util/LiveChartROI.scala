@@ -27,7 +27,7 @@ import ij.gui.{Overlay, Roi, RoiListener}
 import ij_plugins.color.calibration.chart.GridChartFrame
 import ij_plugins.color.ui.fx.toAWT
 import ij_plugins.color.util.PerspectiveTransform
-import scalafx.beans.property._
+import scalafx.beans.property.*
 import scalafx.geometry.Point2D
 
 import java.awt.Color
@@ -44,13 +44,14 @@ object LiveChartROI {
 }
 
 /**
-  * @param imp Image which ROI is observed
-  */
+ * @param imp
+ *   Image which ROI is observed
+ */
 class LiveChartROI(imp: ImagePlus, referenceChart: ReadOnlyObjectProperty[Option[GridChartFrame]]) extends RoiListener {
 
   private val overlyColorProperty = new ObjectProperty(this, "overlyColorProperty", new Color(255, 0, 255, 128))
 
-  private val _status = new ReadOnlyStringWrapper()
+  private val _status                = new ReadOnlyStringWrapper()
   val status: ReadOnlyStringProperty = _status.readOnlyProperty
 
   private val _locatedChart = new ReadOnlyObjectWrapper[Option[GridChartFrame]](this, "locatedChart", None)
@@ -74,8 +75,8 @@ class LiveChartROI(imp: ImagePlus, referenceChart: ReadOnlyObjectProperty[Option
   }
 
   /**
-    * Check ROI in the current image and if valid update locatedChart. If invalid remove located chart.
-    */
+   * Check ROI in the current image and if valid update locatedChart. If invalid remove located chart.
+   */
   private def updateChartLocation(): Unit = {
 
     val roi = imp.getRoi

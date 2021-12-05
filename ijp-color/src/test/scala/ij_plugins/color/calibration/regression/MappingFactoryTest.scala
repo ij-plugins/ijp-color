@@ -23,7 +23,7 @@
 package ij_plugins.color.calibration.regression
 
 import org.scalatest.flatspec.AnyFlatSpec
-import org.scalatest.matchers.should.Matchers._
+import org.scalatest.matchers.should.Matchers.*
 
 class MappingFactoryTest extends AnyFlatSpec {
 
@@ -105,7 +105,7 @@ class MappingFactoryTest extends AnyFlatSpec {
     val expectedResult = Array(0.0, 1.9724784162678572, -0.426914583530878, -0.1296547005685931, 0.0, 0.0, 0.0, 0.0,
       0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
 
-    val cp = MappingFactory.createLinearNoInterceptXBand(standard, observed)
+    val cp      = MappingFactory.createLinearNoInterceptXBand(standard, observed)
     val cpArray = cp.toArray
 
     cpArray should be(expectedResult)

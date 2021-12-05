@@ -38,7 +38,7 @@ object ColorCorrectionBatchItem {
     def loadFromIJPrefOption(): Option[Config] = {
       for {
         enableSaveSRGB <- IJPrefs.getBooleanOption(ReferencePrefix + ".enableSaveSRGB")
-        enableSaveLab <- IJPrefs.getBooleanOption(ReferencePrefix + ".enableSaveLab")
+        enableSaveLab  <- IJPrefs.getBooleanOption(ReferencePrefix + ".enableSaveLab")
       } yield Config(
         enableSaveSRGB = enableSaveSRGB,
         enableSaveLab = enableSaveLab
@@ -49,9 +49,9 @@ object ColorCorrectionBatchItem {
   }
 
   case class Config(
-                     enableSaveSRGB: Boolean = true,
-                     enableSaveLab: Boolean = false
-                   ) {
+    enableSaveSRGB: Boolean = true,
+    enableSaveLab: Boolean = false
+  ) {
 
     def saveToIJPref(): Unit = {
       IJPrefs.set(ReferencePrefix + ".enableSaveSRGB", enableSaveSRGB)
@@ -61,12 +61,12 @@ object ColorCorrectionBatchItem {
 
   /** List files in the `inputDir`, select ones that match the `inputExt`-ension, for create a batch item */
   def createBatchItems(
-                        recipe: CorrectionRecipe,
-                        itemConfig: ColorCorrectionBatchItem.Config,
-                        inputDir: File,
-                        inputExt: String,
-                        outputDir: File
-                      ): Seq[ColorCorrectionBatchItem] = {
+    recipe: CorrectionRecipe,
+    itemConfig: ColorCorrectionBatchItem.Config,
+    inputDir: File,
+    inputExt: String,
+    outputDir: File
+  ): Seq[ColorCorrectionBatchItem] = {
     if (!inputDir.exists()) throw new IOException(s"Input directory must exist: ${inputDir.getAbsolutePath}")
 
     val files = inputDir.listFiles().filter(_.getName.endsWith(inputExt))
@@ -76,7 +76,7 @@ object ColorCorrectionBatchItem {
 
   def nameWithoutExtension(file: File): String = {
     val fullName = file.getName
-    val index = fullName.lastIndexOf('.')
+    val index    = fullName.lastIndexOf('.')
     if (index > -1) {
       fullName.substring(0, index)
     } else {
@@ -92,7 +92,7 @@ object ColorCorrectionBatchItem {
 
     Option(IJ.openImage(path)) match {
       case Some(img) => img
-      case None => throw new IOException(s"Cannot open file as image: $path")
+      case None      => throw new IOException(s"Cannot open file as image: $path")
     }
   }
 
@@ -106,19 +106,19 @@ object ColorCorrectionBatchItem {
 }
 
 /**
-  * Color correction of a single image using the `recipe`. Loads image from `srcFile` and saves result to `dstDir`.
-  */
+ * Color correction of a single image using the `recipe`. Loads image from `srcFile` and saves result to `dstDir`.
+ */
 class ColorCorrectionBatchItem(recipe: CorrectionRecipe, srcFile: File, dstDir: File, config: Config)
-  extends BatchProcessing.BatchItem[String] {
+    extends BatchProcessing.BatchItem[String] {
 
   private val sRGBExt = "png"
-  private val LabExt = "tif"
+  private val LabExt  = "tif"
 
   override val name: String = nameWithoutExtension(srcFile)
 
   override def run(): String = {
     val srcImp = openImage(srcFile)
-    val name = nameWithoutExtension(srcFile)
+    val name   = nameWithoutExtension(srcFile)
 
     val correctedBands = recipe.corrector.map(srcImp)
 

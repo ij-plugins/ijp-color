@@ -38,6 +38,6 @@ class NumberTextField(decimalPlaces: Int = 6) extends TextField {
     new DecimalFormat(pattern)
   }
   private val converter = new FormatStringConverter[Number](format)
-  val model = new TextFormatter(converter)
+  val model             = new TextFormatter(converter)
   textFormatter = model
 }

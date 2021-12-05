@@ -1,16 +1,16 @@
 ijp-color
 =========
 
-Operations on color spaces and color images. Can be used as a stand-alone library or a plugin for [ImageJ](http://rsb.info.nih.gov/ij)
+Operations on color spaces and color images. Can be used as a stand-alone library or a plugin
+for [ImageJ](http://rsb.info.nih.gov/ij)
 
-[![Actions Status](https://github.com/ij-plugins/ijp-color/workflows/Scala%20CI/badge.svg)](https://github.com/ij-plugins/ijp-color/actions) 
+[![Actions Status](https://github.com/ij-plugins/ijp-color/workflows/Scala%20CI/badge.svg)](https://github.com/ij-plugins/ijp-color/actions)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/net.sf.ij-plugins/ijp-color_2.13/badge.svg)](https://maven-badges.herokuapp.com/maven-central/net.sf.ij-plugins/ijp-color_2.13)
 [![Scaladoc](https://javadoc.io/badge2/net.sf.ij-plugins/ijp-color_2.13/scaladoc.svg)](https://javadoc.io/doc/net.sf.ij-plugins/ijp-color_2.13)
 
 
 ImageJ Plugins
 --------------
-
 
 ### IJP Color Calibrator
 
@@ -27,13 +27,12 @@ Supports 8, 16, 32 bit per channel color images, including raw.
 
 More details in [project Wiki]
 
-
 ### IJP Color Calculator
 
-Tool for converting individual color values between different color spaces. Inspired by Bruce Lindbloom [CIE Color Calculator](http://www.brucelindbloom.com/index.html?ColorCalculator.html)
+Tool for converting individual color values between different color spaces. Inspired by Bruce
+Lindbloom [CIE Color Calculator](http://www.brucelindbloom.com/index.html?ColorCalculator.html)
 
 ![Image Calibrator](https://github.com/ij-plugins/ijp-color/wiki/assets/Color_Converter_0.6_01.png)
-
 
 ### IJP Color Chart ROI Tool
 
@@ -82,21 +81,21 @@ the [ijp-color/test](ijp-color/src/main/test/scala/net/ij/ij_plugins/color) dire
 Development Setup
 -----------------
 
-The minimum requirement to build an run the plugin in development environment is [Java](java.oracle.com) and [SBT](http://www.scala-sbt.org/). 
-SBT will download all needed dependencies. Key libraries: 
+The minimum requirement to build an run the plugin in development environment is [Java](java.oracle.com)
+and [SBT](http://www.scala-sbt.org/). SBT will download all needed dependencies. Key libraries:
 [ImageJ](https://imagej.nih.gov/ij/), [Scala](https://www.scala-lang.org/), and [ScalaFX](http://www.scalafx.org/).
 
 ### Command line
 
 You can build the `ij-color` plugins and run it within ImageJ using SBT task `ijRun` from the `experimental` module:
- 
+
 ```
 sbt ijRun
 ```
 
-
 ### IntelliJ
 
-You will need to install Scala plugin then import the project from `build.sbt` file. To run the `ij-color` plugins in ImageJ, setup "Run Configuration" for "SBT Task" and add task `experimental/ijRun`.  
+You will need to install Scala plugin then import the project from `build.sbt` file. To run the `ij-color` plugins in
+ImageJ, setup "Run Configuration" for "SBT Task" and add task `experimental/ijRun`.
 
 [project Wiki]: https://github.com/ij-plugins/ijp-color/wiki

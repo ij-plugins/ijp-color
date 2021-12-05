@@ -27,18 +27,21 @@ import ij.process.ColorProcessor
 import ij_plugins.color.image.VectorImage
 
 object ConverterUtils {
+
   /**
-    * Convert between RGB and CIE L*a*b* color image representation.
-    *
-    * @param cp RGB image to be converted
-    * @return CIE L*a*b* image represented by { @link VectorProcessor}.
-    */
+   * Convert between RGB and CIE L*a*b* color image representation.
+   *
+   * @param cp
+   *   RGB image to be converted
+   * @return
+   *   CIE L*a*b* image represented by { @link VectorProcessor}.
+   */
   def sRGBToLabVector(cp: ColorProcessor): VectorImage = {
-    val width = cp.getWidth
+    val width  = cp.getWidth
     val height = cp.getHeight
-    val size = width * height
-    val src = new VectorImage(cp)
-    val dest = new VectorImage(width, height, 3)
+    val size   = width * height
+    val src    = new VectorImage(cp)
+    val dest   = new VectorImage(width, height, 3)
 
     val progressStep: Int = Math.max(size / 10, 1)
     val converter = new ColorConverter(

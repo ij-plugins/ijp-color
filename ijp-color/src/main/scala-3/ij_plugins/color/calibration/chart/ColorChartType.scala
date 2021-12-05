@@ -22,8 +22,6 @@
 
 package ij_plugins.color.calibration.chart
 
-import ij_plugins.color.util.ImagePlusType
-
 enum ColorChartType(val name: String) {
   case GretagMacbethColorChecker extends ColorChartType("GretagMacbeth ColorChecker")
 

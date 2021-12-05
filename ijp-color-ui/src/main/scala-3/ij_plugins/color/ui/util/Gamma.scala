@@ -40,20 +40,20 @@ enum Gamma(val name: String, val value: Double) {
 object Gamma {
 
   /**
-    * Tries to get an item by the supplied name.
-    * @param name
-    *   name of the item
-    * @throws NoSuchElementException
-    *   if enum has no item with given name
-    */
+   * Tries to get an item by the supplied name.
+   * @param name
+   *   name of the item
+   * @throws NoSuchElementException
+   *   if enum has no item with given name
+   */
   def withName(name: String): Gamma =
     withNameOption(name).getOrElse(throw new NoSuchElementException(s"No Gamma with name: $name"))
 
   /**
-    * Optionally returns an item for a given name.
-    * @param name
-    *   name of the item
-    */
+   * Optionally returns an item for a given name.
+   * @param name
+   *   name of the item
+   */
   def withNameOption(name: String): Option[Gamma] =
     Gamma.values.find(_.name == name)
 }

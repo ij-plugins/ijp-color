@@ -34,11 +34,11 @@ object CreateCustomChartDemo {
   }
 
   def createCustomChart(): GridColorChart = {
-    val chartName = "Custom Color Gauge"
-    val nbColumns = 6
-    val nbRows = 5
-    val chipsList = ColorCharts.loadReferenceValues(new File("../test/data/Color_Gauge_Chart_3.csv"))
-    val chipMargin = 0
+    val chartName      = "Custom Color Gauge"
+    val nbColumns      = 6
+    val nbRows         = 5
+    val chipsList      = ColorCharts.loadReferenceValues(new File("../test/data/Color_Gauge_Chart_3.csv"))
+    val chipMargin     = 0
     val referenceWhite = ReferenceWhite.D50
 
     new GridColorChart(chartName, nbColumns, nbRows, chipsList, chipMargin, referenceWhite)

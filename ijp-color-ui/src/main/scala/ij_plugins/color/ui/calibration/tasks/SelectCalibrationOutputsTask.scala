@@ -29,7 +29,7 @@ import scalafx.scene.text.{Font, FontWeight}
 import scalafx.stage.Window
 
 class SelectCalibrationOutputsTask(src: OutputConfig, parentWindowOption: Option[Window])
-  extends SimpleTask[Option[OutputConfig]] {
+    extends SimpleTask[Option[OutputConfig]] {
 
   override def call(): Option[OutputConfig] = {
 

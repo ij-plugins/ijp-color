@@ -29,29 +29,33 @@ import ij_plugins.color.util.ImagePlusType
 
 object CorrectionRecipe {
   def apply(
-             corrector: CubicPolynomialTriple,
-             colorConverter: ColorConverter,
-             referenceColorSpace: ReferenceColorSpace,
-             imageTypeInt: Int
-           ): CorrectionRecipe = {
+    corrector: CubicPolynomialTriple,
+    colorConverter: ColorConverter,
+    referenceColorSpace: ReferenceColorSpace,
+    imageTypeInt: Int
+  ): CorrectionRecipe = {
     val imageType = ImagePlusType.withValue(imageTypeInt)
     CorrectionRecipe(corrector, colorConverter, referenceColorSpace, imageType)
   }
 }
 
 /**
-  * Parameters needed to perform color correction of an image and convert it to sRGB.
-  *
-  * @param corrector           color correction mapping. Correction is done in the provided `referenceColorSpace`
-  * @param colorConverter      use to convert to color space other than the provided `referenceColorSpace`
-  * @param referenceColorSpace indicates color space in which `corrector` operates
-  * @param imageType           ImagePlus image type supported by this correction. Used to enforce matching image type.
-  *                            For instance, is `imageType` indicates `GRAY32`, it will result in when input is `GRAY16`,
-  *                            due to uncertainty in scaling of image values
+ * Parameters needed to perform color correction of an image and convert it to sRGB.
+ *
+ * @param corrector
+ *   color correction mapping. Correction is done in the provided `referenceColorSpace`
+ * @param colorConverter
+ *   use to convert to color space other than the provided `referenceColorSpace`
+ * @param referenceColorSpace
+ *   indicates color space in which `corrector` operates
+ * @param imageType
+ *   ImagePlus image type supported by this correction. Used to enforce matching image type. For instance, is
+ *   `imageType` indicates `GRAY32`, it will result in when input is `GRAY16`, due to uncertainty in scaling of image
+ *   values
  */
 case class CorrectionRecipe(
-                             corrector: CubicPolynomialTriple,
-                             colorConverter: ColorConverter,
-                             referenceColorSpace: ReferenceColorSpace,
-                             imageType: ImagePlusType
-                           )
+  corrector: CubicPolynomialTriple,
+  colorConverter: ColorConverter,
+  referenceColorSpace: ReferenceColorSpace,
+  imageType: ImagePlusType
+)

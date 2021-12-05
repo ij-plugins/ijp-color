@@ -42,9 +42,9 @@ object ApplyInBatchTask {
     def loadFromIJPrefOption(): Option[Config] = {
       for {
         itemConfig <- ColorCorrectionBatchItem.Config.loadFromIJPrefOption()
-        inputDir <- IJPrefs.getStringOption(ReferencePrefix + ".inputDir")
-        inputExt <- IJPrefs.getStringOption(ReferencePrefix + ".inputExt")
-        outputDir <- IJPrefs.getStringOption(ReferencePrefix + ".outputDir")
+        inputDir   <- IJPrefs.getStringOption(ReferencePrefix + ".inputDir")
+        inputExt   <- IJPrefs.getStringOption(ReferencePrefix + ".inputExt")
+        outputDir  <- IJPrefs.getStringOption(ReferencePrefix + ".outputDir")
         //        enableParallelProcessing <- IJPrefs.getBooleanOption(ReferencePrefix + ".enableParallelProcessing")
       } yield Config(
         itemConfig = itemConfig,
@@ -67,12 +67,12 @@ object ApplyInBatchTask {
   )
 
   case class Config(
-                     itemConfig: ColorCorrectionBatchItem.Config,
-                     inputDir: File,
-                     inputExt: String,
-                     outputDir: File
-                     //                     enableParallelProcessing: Boolean
-                   ) {
+    itemConfig: ColorCorrectionBatchItem.Config,
+    inputDir: File,
+    inputExt: String,
+    outputDir: File
+    //                     enableParallelProcessing: Boolean
+  ) {
 
     def saveToIJPref(): Unit = {
       itemConfig.saveToIJPref()
@@ -86,16 +86,18 @@ object ApplyInBatchTask {
 }
 
 /**
-  * Task performed by Calibrator's "Batch Apply ..." button
-  *
-  * @param correctionRecipe recipe to be applied
-  * @param parentWindow     parent window for dialogs
-  */
+ * Task performed by Calibrator's "Batch Apply ..." button
+ *
+ * @param correctionRecipe
+ *   recipe to be applied
+ * @param parentWindow
+ *   parent window for dialogs
+ */
 class ApplyInBatchTask(
-                        correctionRecipe: ObjectProperty[Option[CorrectionRecipe]],
-                        val parentWindow: Option[Window]
-                      ) extends SimpleTask[Unit]
-  with ShowMessage {
+  correctionRecipe: ObjectProperty[Option[CorrectionRecipe]],
+  val parentWindow: Option[Window]
+) extends SimpleTask[Unit]
+    with ShowMessage {
 
   import ApplyInBatchTask.Config
 
@@ -135,8 +137,8 @@ class ApplyInBatchTask(
 
     val configOpt = {
       if (gd.wasOKed) {
-        val inputDir = new File(gd.getNextString())
-        val inputExt = gd.getNextString()
+        val inputDir  = new File(gd.getNextString())
+        val inputExt  = gd.getNextString()
         val outputDir = new File(gd.getNextString())
         val itemConfig = ColorCorrectionBatchItem.Config(
           enableSaveSRGB = gd.getNextBoolean(),

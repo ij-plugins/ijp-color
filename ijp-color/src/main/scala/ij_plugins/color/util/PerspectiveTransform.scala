@@ -41,8 +41,10 @@ object PerspectiveTransform {
    * [   0    0    1   ]
    * }}}
    *
-   * @param tx The distance by which coordinates are translated in the X axis direction
-   * @param ty The distance by which coordinates are translated in the Y axis direction
+   * @param tx
+   *   The distance by which coordinates are translated in the X axis direction
+   * @param ty
+   *   The distance by which coordinates are translated in the Y axis direction
    */
   def translation(tx: Double, ty: Double) = new PerspectiveTransform(
     m00 = 1.0,
@@ -67,7 +69,8 @@ object PerspectiveTransform {
    * }}}
    * Rotating with a positive angle theta rotates points on the positive X axis toward the positive Y axis.
    *
-   * @param theta The angle of rotation in radians.
+   * @param theta
+   *   The angle of rotation in radians.
    */
   def rotation(theta: Double): PerspectiveTransform = {
     val m00 = math.cos(theta)
@@ -90,9 +93,12 @@ object PerspectiveTransform {
    *
    * Rotating with a positive angle theta rotates points on the positive X axis toward the positive Y axis.
    *
-   * @param theta The angle of rotation in radians.
-   * @param x     The X coordinate of the origin of the rotation
-   * @param y     The Y coordinate of the origin of the rotation
+   * @param theta
+   *   The angle of rotation in radians.
+   * @param x
+   *   The X coordinate of the origin of the rotation
+   * @param y
+   *   The Y coordinate of the origin of the rotation
    */
   def rotation(theta: Double, x: Double, y: Double): PerspectiveTransform = {
     val cos         = math.cos(theta)
@@ -123,8 +129,10 @@ object PerspectiveTransform {
    * [   0    0    1   ]
    * }}}
    *
-   * @param sx The X axis scale factor.
-   * @param sy The Y axis scale factor.
+   * @param sx
+   *   The X axis scale factor.
+   * @param sy
+   *   The Y axis scale factor.
    */
   def scaling(sx: Double, sy: Double) = new PerspectiveTransform(
     m00 = sx,
@@ -148,10 +156,12 @@ object PerspectiveTransform {
    * [   0    0    1   ]
    * }}}
    *
-   * @param shx The factor by which coordinates are shifted towards the positive X axis direction according to their Y
-   *            coordinate.
-   * @param shy The factor by which coordinates are shifted towards the positive Y axis direction according to their X
-   *            coordinate.
+   * @param shx
+   *   The factor by which coordinates are shifted towards the positive X axis direction according to their Y
+   *   coordinate.
+   * @param shy
+   *   The factor by which coordinates are shifted towards the positive Y axis direction according to their X
+   *   coordinate.
    */
   def shearing(shx: Double, shy: Double) = new PerspectiveTransform(
     m00 = 1.0,
@@ -314,12 +324,12 @@ object PerspectiveTransform {
  * A 2D perspective (or projective) transform.
  *
  * A perspective transformation is capable of mapping an arbitrary quadrilateral into another arbitrary quadrilateral,
- * while preserving the straightness of lines.  Unlike an affine transformation, the parallelism of lines in the
- * source is not necessarily preserved in the output.
+ * while preserving the straightness of lines. Unlike an affine transformation, the parallelism of lines in the source
+ * is not necessarily preserved in the output.
  *
  * Such a coordinate transformation can be represented by a 3x3 matrix which transforms homogeneous source coordinates
- * `(x, y, 1)` into destination coordinates `(x', y', w)`.
- * To convert back into non-homogeneous coordinates (X, Y), `x'` and `y'` are divided by `w`.
+ * `(x, y, 1)` into destination coordinates `(x', y', w)`. To convert back into non-homogeneous coordinates (X, Y), `x'`
+ * and `y'` are divided by `w`.
  *
  * {{{
  * [ x']   [  m00  m01  m02  ] [ x ]   [ m00x + m01y + m02 ]
@@ -349,13 +359,15 @@ final class PerspectiveTransform(
   val m22: Double = 1
 ) {
 
-  import PerspectiveTransform._
+  import PerspectiveTransform.*
 
   /**
    * Constructs a new PerspectiveTransform from a two-dimensional array of doubles.
    *
-   * @throws java.lang.IllegalArgumentException       if matrix is null
-   * @throws java.lang.ArrayIndexOutOfBoundsException if matrix is too small
+   * @throws java.lang.IllegalArgumentException
+   *   if matrix is null
+   * @throws java.lang.ArrayIndexOutOfBoundsException
+   *   if matrix is too small
    */
   def this(matrix: Array[Array[Double]]) = {
     this(
@@ -374,7 +386,8 @@ final class PerspectiveTransform(
   /**
    * Constructs a new PerspectiveTransform with the same effect as an existing AffineTransform.
    *
-   * @throws java.lang.IllegalArgumentException if transform is null
+   * @throws java.lang.IllegalArgumentException
+   *   if transform is null
    */
   def this(transform: AffineTransform) = {
     this(
@@ -393,7 +406,8 @@ final class PerspectiveTransform(
   /**
    * Sets this transform to a given PerspectiveTransform.
    *
-   * @throws java.lang.IllegalArgumentException if tx is null
+   * @throws java.lang.IllegalArgumentException
+   *   if tx is null
    */
   def this(tx: PerspectiveTransform) = {
     this(
@@ -459,13 +473,15 @@ final class PerspectiveTransform(
    * Retrieves the 9 specifiable values in the 3x3 affine transformation matrix into a 2-dimensional array of double
    * precision values.
    *
-   * The values are stored into the 2-dimensional array using the row index as the first subscript and the column
-   * index as the second.
+   * The values are stored into the 2-dimensional array using the row index as the first subscript and the column index
+   * as the second.
    *
-   * @param matrix The 2-dimensional double array to store the
-   *               returned values.  The array is assumed to be at least 3x3.
-   * @throws java.lang.ArrayIndexOutOfBoundsException if matrix is too small
-   * @throws java.lang.IllegalArgumentException       if matrix is null
+   * @param matrix
+   *   The 2-dimensional double array to store the returned values. The array is assumed to be at least 3x3.
+   * @throws java.lang.ArrayIndexOutOfBoundsException
+   *   if matrix is too small
+   * @throws java.lang.IllegalArgumentException
+   *   if matrix is null
    */
   def toMatrix(matrix: Array[Array[Double]] = Array.ofDim[Double](3, 3)): Array[Array[Double]] = {
     require(matrix != null, "The input argument 'matrix' may not be null.")
@@ -484,8 +500,8 @@ final class PerspectiveTransform(
   /**
    * Creates new transform that concatenates this transform with a translation transformation.
    *
-   * This is equivalent to calling concatenate(T), where T is an
-   * PerspectiveTransform represented by the following matrix:
+   * This is equivalent to calling concatenate(T), where T is an PerspectiveTransform represented by the following
+   * matrix:
    * {{{
    * [   1    0    tx  ]
    * [   0    1    ty  ]
@@ -497,8 +513,8 @@ final class PerspectiveTransform(
   /**
    * Creates new transform that concatenates this transform with a rotation transformation.
    *
-   * This is equivalent to calling concatenate(R), where R is an
-   * PerspectiveTransform represented by the following matrix:
+   * This is equivalent to calling concatenate(R), where R is an PerspectiveTransform represented by the following
+   * matrix:
    * {{{
    * [   cos(theta)    -sin(theta)    0   ]
    * [   sin(theta)     cos(theta)    0   ]
@@ -506,7 +522,8 @@ final class PerspectiveTransform(
    * }}}
    * Rotating with a positive angle theta rotates points on the positive X axis toward the positive Y axis.
    *
-   * @param theta The angle of rotation in radians.
+   * @param theta
+   *   The angle of rotation in radians.
    */
   def rotate(theta: Double): PerspectiveTransform = concatenate(rotation(theta))
 
@@ -521,49 +538,58 @@ final class PerspectiveTransform(
    * }}}
    * Rotating with a positive angle theta rotates points on the positive X axis toward the positive Y axis.
    *
-   * @param theta The angle of rotation in radians.
-   * @param x     The X coordinate of the origin of the rotation
-   * @param y     The Y coordinate of the origin of the rotation
+   * @param theta
+   *   The angle of rotation in radians.
+   * @param x
+   *   The X coordinate of the origin of the rotation
+   * @param y
+   *   The Y coordinate of the origin of the rotation
    */
   def rotate(theta: Double, x: Double, y: Double): PerspectiveTransform = concatenate(rotation(theta, x, y))
 
   /**
    * Creates new transform that concatenates this transform with a scaling transformation.
    *
-   * This is equivalent to calling concatenate(S), where S is an PerspectiveTransform represented by the following matrix:
+   * This is equivalent to calling concatenate(S), where S is an PerspectiveTransform represented by the following
+   * matrix:
    * {{{
    * [   sx   0    0   ]
    * [   0    sy   0   ]
    * [   0    0    1   ]
    * }}}
    *
-   * @param sx The X axis scale factor.
-   * @param sy The Y axis scale factor.
+   * @param sx
+   *   The X axis scale factor.
+   * @param sy
+   *   The Y axis scale factor.
    */
   def scale(sx: Double, sy: Double): PerspectiveTransform = concatenate(scaling(sx, sy))
 
   /**
    * Creates new transform that cConcatenates this transform with a shearing transformation.
    *
-   * This is equivalent to calling concatenate(SH), where SH is an
-   * PerspectiveTransform represented by the following matrix:
+   * This is equivalent to calling concatenate(SH), where SH is an PerspectiveTransform represented by the following
+   * matrix:
    * {{{
    * [   1   shx   0   ]
    * [  shy   1    0   ]
    * [   0    0    1   ]
    * }}}
    *
-   * @param shx The factor by which coordinates are shifted towards the positive X axis direction according to their Y
-   *            coordinate.
-   * @param shy The factor by which coordinates are shifted towards the positive Y axis direction according to their X
-   *            coordinate.
+   * @param shx
+   *   The factor by which coordinates are shifted towards the positive X axis direction according to their Y
+   *   coordinate.
+   * @param shy
+   *   The factor by which coordinates are shifted towards the positive Y axis direction according to their X
+   *   coordinate.
    */
   def shear(shx: Double, shy: Double): PerspectiveTransform = concatenate(shearing(shx, shy))
 
   /**
    * Creates new transform that post-concatenates a given AffineTransform to this transform.
    *
-   * @throws java.lang.IllegalArgumentException if tx is null
+   * @throws java.lang.IllegalArgumentException
+   *   if tx is null
    */
   def concatenate(tx: AffineTransform): PerspectiveTransform = {
     require(tx != null, "The input argument 'tx' may not be null.")
@@ -598,7 +624,8 @@ final class PerspectiveTransform(
   /**
    * Creates new transform that post-concatenates a given PerspectiveTransform to this transform.
    *
-   * @throws java.lang.IllegalArgumentException if tx is null
+   * @throws java.lang.IllegalArgumentException
+   *   if tx is null
    */
   def concatenate(tx: PerspectiveTransform): PerspectiveTransform = {
     require(tx != null, "The input argument 'tx' may not be null.")
@@ -627,7 +654,8 @@ final class PerspectiveTransform(
   /**
    * Creates new transform that pre-concatenates a given AffineTransform to this transform.
    *
-   * @throws java.lang.IllegalArgumentException if tx is null
+   * @throws java.lang.IllegalArgumentException
+   *   if tx is null
    */
   def preConcatenate(tx: AffineTransform): PerspectiveTransform = {
     require(tx != null, "The input argument 'tx' may not be null.")
@@ -662,7 +690,8 @@ final class PerspectiveTransform(
   /**
    * Creates new transform that pre-concatenates a given PerspectiveTransform to this transform.
    *
-   * @throws java.lang.IllegalArgumentException if tx is null
+   * @throws java.lang.IllegalArgumentException
+   *   if tx is null
    */
   def preConcatenate(tx: PerspectiveTransform): PerspectiveTransform = {
     require(tx != null, "The input argument 'tx' may not be null.")
@@ -691,7 +720,8 @@ final class PerspectiveTransform(
   /**
    * Returns a new PerspectiveTransform that is the inverse of the current transform.
    *
-   * @throws java.awt.geom.NoninvertibleTransformException if transform cannot be inverted
+   * @throws java.awt.geom.NoninvertibleTransformException
+   *   if transform cannot be inverted
    */
   def createInverse: PerspectiveTransform = {
     val tx = makeAdjoint()
@@ -705,16 +735,13 @@ final class PerspectiveTransform(
   /**
    * * Returns a new PerspectiveTransform that is the adjoint, of the current transform.
    *
-   * The adjoint is defined as the matrix of co-factors, which in turn are the determinants
-   * of the sub-matrices defined by removing the row and column
-   * of each element from the original matrix in turn.
+   * The adjoint is defined as the matrix of co-factors, which in turn are the determinants of the sub-matrices defined
+   * by removing the row and column of each element from the original matrix in turn.
    *
-   * The adjoint is a scalar multiple of the inverse matrix.
-   * Because points to be transformed are converted into homogeneous
-   * coordinates, where scalar factors are irrelevant, the adjoint
-   * may be used in place of the true inverse. Since it is unnecessary
-   * to normalize the adjoint, it is both faster to compute and more
-   * numerically stable than the true inverse.
+   * The adjoint is a scalar multiple of the inverse matrix. Because points to be transformed are converted into
+   * homogeneous coordinates, where scalar factors are irrelevant, the adjoint may be used in place of the true inverse.
+   * Since it is unnecessary to normalize the adjoint, it is both faster to compute and more numerically stable than the
+   * true inverse.
    */
   def createAdjoint: PerspectiveTransform = {
     val tx = clone.asInstanceOf[PerspectiveTransform]
@@ -724,15 +751,16 @@ final class PerspectiveTransform(
   /**
    * Transforms the specified ptSrc and stores the result in ptDst.
    *
-   * If ptDst is null, a new Point2D object will be allocated before
-   * storing. In either case, ptDst containing the transformed point
-   * is returned for convenience.
-   * Note that ptSrc and ptDst can the same. In this case, the input
+   * If ptDst is null, a new Point2D object will be allocated before storing. In either case, ptDst containing the
+   * transformed point is returned for convenience. Note that ptSrc and ptDst can the same. In this case, the input
    * point will be overwritten with the transformed point.
    *
-   * @param ptSrc The array containing the source point objects.
-   * @param ptDst The array where the transform point objects are returned.
-   * @throws java.lang.IllegalArgumentException if ptSrc is null
+   * @param ptSrc
+   *   The array containing the source point objects.
+   * @param ptDst
+   *   The array where the transform point objects are returned.
+   * @throws java.lang.IllegalArgumentException
+   *   if ptSrc is null
    */
   def transform(ptSrc: Point2D, ptDst: Point2D = null): Point2D = {
     require(ptSrc != null, "The input argument 'ptSrc' may not be null.")
@@ -769,14 +797,14 @@ final class PerspectiveTransform(
   /**
    * Transforms the specified ptSrc and stores the result in ptDst.
    *
-   * If ptDst is null, a new Point2D object will be allocated before
-   * storing. In either case, ptDst containing the transformed point
-   * is returned for convenience.
-   * Note that ptSrc and ptDst can the same. In this case, the input
+   * If ptDst is null, a new Point2D object will be allocated before storing. In either case, ptDst containing the
+   * transformed point is returned for convenience. Note that ptSrc and ptDst can the same. In this case, the input
    * point will be overwritten with the transformed point.
    *
-   * @param points The array containing the source point objects.
-   * @throws java.lang.IllegalArgumentException if ptSrc is null
+   * @param points
+   *   The array containing the source point objects.
+   * @throws java.lang.IllegalArgumentException
+   *   if ptSrc is null
    */
   def transform(points: Seq[Point2D]): immutable.Seq[Point2D] = {
     require(points != null, "The input argument 'points' may not be null.")
@@ -787,18 +815,19 @@ final class PerspectiveTransform(
   }
 
   /**
-   * Inverse transforms the specified ptSrc and stores the result in ptDst.
-   * If ptDst is null, a new Point2D object will be allocated before
-   * storing. In either case, ptDst containing the transformed point
-   * is returned for convenience.
-   * Note that ptSrc and ptDst can the same. In this case, the input
-   * point will be overwritten with the transformed point.
+   * Inverse transforms the specified ptSrc and stores the result in ptDst. If ptDst is null, a new Point2D object will
+   * be allocated before storing. In either case, ptDst containing the transformed point is returned for convenience.
+   * Note that ptSrc and ptDst can the same. In this case, the input point will be overwritten with the transformed
+   * point.
    *
-   * @param ptSrc The point to be inverse transformed.
-   * @param ptDst The resulting transformed point.
-   * @throws java.awt.geom.NoninvertibleTransformException if the matrix cannot be
-   *                                                       inverted.
-   * @throws java.lang.IllegalArgumentException            if ptSrc is null
+   * @param ptSrc
+   *   The point to be inverse transformed.
+   * @param ptDst
+   *   The resulting transformed point.
+   * @throws java.awt.geom.NoninvertibleTransformException
+   *   if the matrix cannot be inverted.
+   * @throws java.lang.IllegalArgumentException
+   *   if ptSrc is null
    */
   def inverseTransform(ptSrc: Point2D, ptDst: Point2D = null): Point2D = {
     require(ptSrc != null, "The input argument 'ptSrc' may not be null.")

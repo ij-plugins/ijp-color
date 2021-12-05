@@ -99,10 +99,12 @@ val commonSettings = Seq(
       Seq(
         "-Xlint",
         "-explaintypes",
+        "-Xsource:3"
       )
     else
       Seq(
-        "-explain"
+        "-explain",
+        "-explain-types"
       )
   ),
   Compile / doc / scalacOptions ++= Opts.doc.title("IJP Color API"),

@@ -22,8 +22,6 @@
 
 package ij_plugins.color.converter
 
-import scala.collection.immutable
-
 /**
  * Represents chromatic adaptation type when converting between color spaces using difference reference whites.
  *
@@ -99,20 +97,20 @@ enum ChromaticAdaptation(val name: String, val ma: Matrix3x3) {
 object ChromaticAdaptation {
 
   /**
-    * Tries to get an item by the supplied name.
-    * @param name
-    *   name of the item
-    * @throws NoSuchElementException
-    *   if enum has no item with given name
-    */
+   * Tries to get an item by the supplied name.
+   * @param name
+   *   name of the item
+   * @throws NoSuchElementException
+   *   if enum has no item with given name
+   */
   def withName(name: String): ChromaticAdaptation =
     withNameOption(name).getOrElse(throw new NoSuchElementException(s"No ChromaticAdaptation with name: $name"))
 
   /**
-    * Optionally returns an item for a given name.
-    * @param name
-    *   name of the item
-    */
+   * Optionally returns an item for a given name.
+   * @param name
+   *   name of the item
+   */
   def withNameOption(name: String): Option[ChromaticAdaptation] =
     ChromaticAdaptation.values.find(_.name == name)
-} 
+}

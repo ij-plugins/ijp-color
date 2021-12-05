@@ -24,9 +24,9 @@ package ij_plugins.color.ui
 
 import ij.IJ
 import ij_plugins.color.util.AWTtoFXImageConverter.toBufferImage
-import javafx.embed.{swing => jfxes}
-import org.scalafx.extras._
-import scalafx.Includes._
+import javafx.embed.swing as jfxes
+import org.scalafx.extras.*
+import scalafx.Includes.*
 import scalafx.geometry.Point2D
 import scalafx.scene.image.Image
 
@@ -45,7 +45,8 @@ package object fx {
   /**
    * Returns icon used by ImageJ main frame. Returns `null` if main frame is not instantiated or has no icon.
    *
-   * @return ImageJ icon or `null`.
+   * @return
+   *   ImageJ icon or `null`.
    */
   def imageJIconAsFXImage: Option[Image] = {
     Option(IJ.getInstance).flatMap { i =>
@@ -58,7 +59,8 @@ package object fx {
   /**
    * Convert AWT image to JavaFX Image.
    *
-   * @param image AWT image.
+   * @param image
+   *   AWT image.
    */
   def toFXImage(image: java.awt.Image): Image = {
     val bi = toBufferImage(image)

@@ -28,7 +28,7 @@ import scalafx.stage.Window
 
 import java.util.concurrent.atomic.{AtomicBoolean, AtomicInteger}
 //import scala.collection.parallel.CollectionConverters._
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 import scala.util.control.NonFatal
 
 object BatchProcessing {
@@ -47,15 +47,18 @@ object BatchProcessing {
 /** Helper for running a set of tasks in a batch mode */
 class BatchProcessing(override val parentWindow: Option[Window]) extends ShowMessage {
 
-  import BatchProcessing._
+  import BatchProcessing.*
 
   /**
-    * Helper method for implementing ImageJ plugins that do batch processing
-    *
-    * @param title     title used for messages and dialogs
-    * @param itemTasks items to process
-    * @tparam T type of items return value
-    */
+   * Helper method for implementing ImageJ plugins that do batch processing
+   *
+   * @param title
+   *   title used for messages and dialogs
+   * @param itemTasks
+   *   items to process
+   * @tparam T
+   *   type of items return value
+   */
   def processItems[T](title: String, itemTasks: Seq[BatchItem[T]]): Unit = {
     IJ.getInstance().getProgressBar.setBatchMode(true)
     IJ.resetEscape()
@@ -67,11 +70,11 @@ class BatchProcessing(override val parentWindow: Option[Window]) extends ShowMes
 
     try {
 
-      val numberOfItems = itemTasks.size
-      val progressCount = new AtomicInteger(0)
+      val numberOfItems   = itemTasks.size
+      val progressCount   = new AtomicInteger(0)
       val successfulCount = new AtomicInteger(0)
-      val abort = new AtomicBoolean(false)
-      val errors = new java.util.concurrent.ConcurrentHashMap[String, Throwable]()
+      val abort           = new AtomicBoolean(false)
+      val errors          = new java.util.concurrent.ConcurrentHashMap[String, Throwable]()
       val abortingMessage = title + " - processing aborted by user. Waiting to complete..."
 
       val runningItems = new AtomicInteger(0)

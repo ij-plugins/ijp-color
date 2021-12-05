@@ -35,12 +35,19 @@ object ColorChip {
    *
    * Chip size is 1x1, less the margin.
    *
-   * @param name   name
-   * @param color  chip color in CIE L*a*b* color space
-   * @param column column in a grid chart
-   * @param row    row in a grid chart
-   * @param margin size of the chip is reduced ny the margin from its 1x1 size. Margin must be greater or equal 0, and less than 0.5.
-   * @see [[ij_plugins.color.calibration.chart.ChartGrid]]
+   * @param name
+   *   name
+   * @param color
+   *   chip color in CIE L*a*b* color space
+   * @param column
+   *   column in a grid chart
+   * @param row
+   *   row in a grid chart
+   * @param margin
+   *   size of the chip is reduced ny the margin from its 1x1 size. Margin must be greater or equal 0, and less than
+   *   0.5.
+   * @see
+   *   [[ij_plugins.color.calibration.chart.ChartGrid]]
    */
   def apply(name: String, color: Lab, column: Int, row: Int, margin: Double = 0): ColorChip = {
     require(margin >= 0 && margin < 0.5, "Margin value must at least 0 but less than 0.5, got " + margin)
@@ -60,8 +67,11 @@ object ColorChip {
 /**
  * Color chips, its name, color, and shape (location).
  *
- * @param name    chip's name.
- * @param color   chip's color in CIE L*a*b*.
- * @param outline outline describing the chip and its location.
+ * @param name
+ *   chip's name.
+ * @param color
+ *   chip's color in CIE L*a*b*.
+ * @param outline
+ *   outline describing the chip and its location.
  */
 class ColorChip(val name: String, val color: Lab, val outline: Seq[Point2D])

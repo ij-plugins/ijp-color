@@ -34,24 +34,30 @@ import scala.collection.immutable
 /**
  * Chart consisting of a regular grid of square chips, arranged in rows and columns.
  *
- * @param name       chart's name
- * @param nbColumns  number of columns
- * @param nbRows     number of rows
- * @param chips      chip names and CIE L*a*b* / D65 color values, row by row, starting at (0,0) or top left corner.
- * @param chipMargin reduction of chip from their maximum size on the grid (as fraction of its width or height).
- *                   Value of the margin must be between 0 and 0.5.
- * @param enabled    which chips are active. If value is 'true' chip is active' if 'false' not used in computations.
+ * @param name
+ *   chart's name
+ * @param nbColumns
+ *   number of columns
+ * @param nbRows
+ *   number of rows
+ * @param chips
+ *   chip names and CIE L*a*b* / D65 color values, row by row, starting at (0,0) or top left corner.
+ * @param chipMargin
+ *   reduction of chip from their maximum size on the grid (as fraction of its width or height). Value of the margin
+ *   must be between 0 and 0.5.
+ * @param enabled
+ *   which chips are active. If value is 'true' chip is active' if 'false' not used in computations.
  */
 final class GridColorChart(
-                            val name: String,
-                            nbColumns: Int,
-                            nbRows: Int,
-                            val chips: Seq[(String, Lab)],
-                            chipMargin: Double,
-                            override val enabled: Seq[Boolean],
-                            override val refWhite: ReferenceWhite,
-                            alignmentTransform: PerspectiveTransform
-                          ) extends GridChartFrame(nbColumns, nbRows, chipMargin, alignmentTransform)
+  val name: String,
+  nbColumns: Int,
+  nbRows: Int,
+  val chips: Seq[(String, Lab)],
+  chipMargin: Double,
+  override val enabled: Seq[Boolean],
+  override val refWhite: ReferenceWhite,
+  alignmentTransform: PerspectiveTransform
+) extends GridChartFrame(nbColumns, nbRows, chipMargin, alignmentTransform)
     with ColorChart {
 
   require(chipMargin >= 0 && chipMargin < 0.5, s"Margin value must at least 0 but less than 0.5, got $chipMargin.")
@@ -70,22 +76,26 @@ final class GridColorChart(
   require(alignmentTransform != null, "'alignmentTransform', cannot be null.")
 
   /**
-    * Construct chart with all chips enabled.
-    *
-    * @param name      chart's name
-    * @param nbColumns number of columns
-    * @param nbRows    number of rows
-    * @param chips     chip names and CIE L*a*b* / D65 color values, row by row, starting at (0,0) or top left corner.
-    */
+   * Construct chart with all chips enabled.
+   *
+   * @param name
+   *   chart's name
+   * @param nbColumns
+   *   number of columns
+   * @param nbRows
+   *   number of rows
+   * @param chips
+   *   chip names and CIE L*a*b* / D65 color values, row by row, starting at (0,0) or top left corner.
+   */
   def this(
-            name: String,
-            nbColumns: Int,
-            nbRows: Int,
-            chips: Seq[(String, Lab)],
-            chipMargin: Double = 0,
-            refWhite: ReferenceWhite,
-            alignmentTransform: PerspectiveTransform = new PerspectiveTransform()
-          ) = {
+    name: String,
+    nbColumns: Int,
+    nbRows: Int,
+    chips: Seq[(String, Lab)],
+    chipMargin: Double = 0,
+    refWhite: ReferenceWhite,
+    alignmentTransform: PerspectiveTransform = new PerspectiveTransform()
+  ) = {
     this(name, nbColumns, nbRows, chips, chipMargin, List.fill(nbColumns * nbRows)(true), refWhite, alignmentTransform)
   }
 
@@ -104,7 +114,7 @@ final class GridColorChart(
   def referenceChips: immutable.IndexedSeq[ColorChip] = {
     val a = chips.toArray
     for {
-      row <- 0 until nbRows
+      row    <- 0 until nbRows
       column <- 0 until nbColumns
       i = row * nbColumns + column
     } yield ColorChip(a(i)._1, a(i)._2, column, row, chipMargin)
@@ -119,7 +129,7 @@ final class GridColorChart(
    *
    * Chip linear size is reduced by a margin expressed as a fraction of width/length.
    */
-  @deprecated("Unused method, will be removed", since="0.8")
+  @deprecated("Unused method, will be removed", since = "0.8")
   def outlineChipAt(column: Int, row: Int, margin: Double): Array[Point2D] = {
     val ref = referenceGrid.chipAt(column, row, margin)
     ref.map(p => alignmentTransform.transform(p))
@@ -144,7 +154,7 @@ final class GridColorChart(
   /**
    * Actual outline of the of the chart (reference outline with alignment transform applied).
    */
-  @deprecated("Unused method, will be removed", since="0.8")
+  @deprecated("Unused method, will be removed", since = "0.8")
   def alignedOutline: immutable.IndexedSeq[Point2D] =
     alignmentTransform.transform(referenceOutline).toIndexedSeq
 
@@ -152,27 +162,29 @@ final class GridColorChart(
 
   override def averageChipColor[T <: ImageProcessor](src: Array[T]): Array[Array[Double]] = {
     val chips = alignedChips
-    val r = for (chip <- chips) yield ImageJUtils.measureColor(src, chip.outline.toArray)
+    val r     = for (chip <- chips) yield ImageJUtils.measureColor(src, chip.outline.toArray)
     r.toArray
   }
 
   /**
-    * Creates a copy of this chart that has its chip outline aligned gto given ROI.
-    *
-    * @param roi desired chip outline ROI.
-    */
+   * Creates a copy of this chart that has its chip outline aligned gto given ROI.
+   *
+   * @param roi
+   *   desired chip outline ROI.
+   */
   override def copyAlignedTo(roi: Roi): GridColorChart = {
     val t = GridChartFrameUtils.computeAlignmentTransform(roi, this)
     this.copyWith(t)
   }
 
   /**
-    * Creates a copy of this chart in which some chips cn be enabled/disabled.
-    *
-    * @param enabled array with indexes corresponding to ones returned by `referenceColor` methods.
-    *                If value is `true` chip with corresponding index is enabled, if `false` it is disabled.
-    * @return
-    */
+   * Creates a copy of this chart in which some chips cn be enabled/disabled.
+   *
+   * @param enabled
+   *   array with indexes corresponding to ones returned by `referenceColor` methods. If value is `true` chip with
+   *   corresponding index is enabled, if `false` it is disabled.
+   * @return
+   */
   override def copyWithEnabled(enabled: Array[Boolean]): GridColorChart = {
     require(
       chips.length == enabled.length,
@@ -183,7 +195,6 @@ final class GridColorChart(
   }
 
   override def copyWithEnabledAll: GridColorChart = copyWithEnabled(Array.fill(enabled.length)(true))
-
 
   /** Creates a copy of this chart with different `chipMargin`. Value of the margin must be between 0 and 0.5. */
   override def copyWithChipMargin(newChipMargin: Double): GridColorChart =

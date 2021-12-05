@@ -30,7 +30,7 @@ import ij_plugins.color.calibration.chart.{ColorCharts, GridColorChart, Referenc
 import ij_plugins.color.calibration.regression.MappingMethod
 import ij_plugins.color.converter.ReferenceWhite
 import org.scalatest.flatspec.AnyFlatSpec
-import org.scalatest.matchers.should.Matchers._
+import org.scalatest.matchers.should.Matchers.*
 
 import java.io.File
 
@@ -58,7 +58,7 @@ class LOOCrossValidationSpec extends AnyFlatSpec {
 
     // Do LOO validation
     val referenceColorSpaces = ReferenceColorSpace.values
-    val mappingMethods = MappingMethod.values
+    val mappingMethods       = MappingMethod.values
     val crossValidations =
       LOOCrossValidation.crossValidationStatsAll(chart, observed, referenceColorSpaces, mappingMethods)
 
@@ -123,13 +123,13 @@ class LOOCrossValidationSpec extends AnyFlatSpec {
 
     // Image to calibrate
     val imageFile = new File(dataDir, "Color_Gauge_Sample_3.png")
-    val roiFile = new File(dataDir, "Color_Gauge_Sample_3.roi")
+    val roiFile   = new File(dataDir, "Color_Gauge_Sample_3.roi")
 
     // Custom chart params
-    val nbRows = 5
-    val nbColumns = 6
-    val chipMargin = 0.2
-    val refWhite = ReferenceWhite.D50
+    val nbRows        = 5
+    val nbColumns     = 6
+    val chipMargin    = 0.2
+    val refWhite      = ReferenceWhite.D50
     val refValuesFile = new File(dataDir, "Color_Gauge_Chart_3.csv")
 
     // Load image

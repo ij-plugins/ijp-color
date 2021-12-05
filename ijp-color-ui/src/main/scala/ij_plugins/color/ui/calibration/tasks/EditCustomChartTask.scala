@@ -34,17 +34,17 @@ import java.io.File
 import scala.util.control.NonFatal
 
 class EditCustomChartTask(customChartOption: Option[GridColorChart], parentWindow: Option[Window])
-  extends SimpleTask[Option[GridColorChart]] {
+    extends SimpleTask[Option[GridColorChart]] {
 
-  private val Title = "Edit Custom Reference Chart"
-  private val ReferencePrefix = classOf[EditCustomChartTask].getName
+  private val Title               = "Edit Custom Reference Chart"
+  private val ReferencePrefix     = classOf[EditCustomChartTask].getName
   private val defaultPathPrefName = ReferencePrefix + ".defaultPath"
 
   override def call(): Option[GridColorChart] = {
 
-    val _nbRows = customChartOption.map(_.nbRows).getOrElse(5)
+    val _nbRows    = customChartOption.map(_.nbRows).getOrElse(5)
     val _nbColumns = customChartOption.map(_.nbColumns).getOrElse(6)
-    val _refWhite = customChartOption.map(_.refWhite).getOrElse(ReferenceWhite.D50)
+    val _refWhite  = customChartOption.map(_.refWhite).getOrElse(ReferenceWhite.D50)
     // Load last path from ImageJ preferences
     val _defaultPath = IJPrefs.getStringOption(defaultPathPrefName).getOrElse("")
 
@@ -82,7 +82,7 @@ class EditCustomChartTask(customChartOption: Option[GridColorChart], parentWindo
         }
 
         val filePath = gd.getNextString()
-        val file = new File(filePath)
+        val file     = new File(filePath)
 
         val chipsOpt =
           try {

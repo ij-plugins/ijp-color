@@ -23,14 +23,14 @@
 package ij_plugins.color.ui.fx
 
 import org.scalafx.extras.{initFX, onFXAndWait}
-import scalafx.Includes._
+import scalafx.Includes.*
 import scalafx.application.Platform
 import scalafx.beans.property.StringProperty
 import scalafx.collections.ObservableBuffer
 import scalafx.geometry.Insets
 import scalafx.scene.Node
+import scalafx.scene.control.*
 import scalafx.scene.control.ButtonBar.ButtonData
-import scalafx.scene.control._
 import scalafx.scene.layout.{ColumnConstraints, GridPane, Priority}
 import scalafx.scene.text.Font
 import scalafx.stage.Window
@@ -44,54 +44,55 @@ object GenericDialogFX {
   //  case class Result(checkboxes: Seq[Boolean])
 
   /**
-    * @param buttonPressed button used to close the dialog
-    */
+   * @param buttonPressed
+   *   button used to close the dialog
+   */
   case class Result(buttonPressed: Option[ButtonType])
 }
 
 /**
-  * A helper for crating input dialogs. It emulates basic behaviour of ImageJ's GenericDialog.
-  *
-  * {{{
-  *    val dialog =
-  *      new GenericDialogFX(
-  *        title = "GenericDialogFX Demo",
-  *        header = Option("An attempt to emulate ImageJ's GenericDialog.")
-  *      ) {
-  *        addCheckbox("Check me out!", defaultValue = false)
-  *        addCheckbox("Check me too!", defaultValue = true)
-  *      }
-  *
-  *    dialog.showDialog()
-  *
-  *    if (dialog.wasOKed) {
-  *      val select1 = dialog.getNextBoolean()
-  *      val select2 = dialog.getNextBoolean()
-  *
-  *      IJ.log(s"Selection 1: $select1")
-  *      IJ.log(s"Selection 2: $select2")
-  *    }
-  * }}}
-  */
+ * A helper for crating input dialogs. It emulates basic behaviour of ImageJ's GenericDialog.
+ *
+ * {{{
+ *     val dialog =
+ *       new GenericDialogFX(
+ *         title = "GenericDialogFX Demo",
+ *         header = Option("An attempt to emulate ImageJ's GenericDialog.")
+ *       ) {
+ *         addCheckbox("Check me out!", defaultValue = false)
+ *         addCheckbox("Check me too!", defaultValue = true)
+ *       }
+ *
+ *     dialog.showDialog()
+ *
+ *     if (dialog.wasOKed) {
+ *       val select1 = dialog.getNextBoolean()
+ *       val select2 = dialog.getNextBoolean()
+ *
+ *       IJ.log(s"Selection 1: $select1")
+ *       IJ.log(s"Selection 2: $select2")
+ *     }
+ * }}}
+ */
 class GenericDialogFX(
-                       val title: String,
-                       val header: Option[String] = None,
-                       val parentWindowOption: Option[Window] = None
-                     ) {
+  val title: String,
+  val header: Option[String] = None,
+  val parentWindowOption: Option[Window] = None
+) {
 
-  import GenericDialogFX._
+  import GenericDialogFX.*
 
-  private var _wasOKed = false
-  private var _rowIndex = 0
-  private val _labeledControls = ListBuffer.empty[(String, Node)]
-  private val _checkBoxes = ListBuffer.empty[CheckBox]
-  private var _checkBoxNextIndex = 0
-  private val _choiceBoxes = ListBuffer.empty[ChoiceBox[String]]
-  private var _choiceBoxNextIndex = 0
-  private val _numberTextFields = ListBuffer.empty[NumberTextField]
-  private var _numberTextFieldNextIndex = 0
-  private val _stringProperties = ListBuffer.empty[StringProperty]
-  private var _stringPropertyNextIndex = 0
+  private var _wasOKed                       = false
+  private var _rowIndex                      = 0
+  private val _labeledControls               = ListBuffer.empty[(String, Node)]
+  private val _checkBoxes                    = ListBuffer.empty[CheckBox]
+  private var _checkBoxNextIndex             = 0
+  private val _choiceBoxes                   = ListBuffer.empty[ChoiceBox[String]]
+  private var _choiceBoxNextIndex            = 0
+  private val _numberTextFields              = ListBuffer.empty[NumberTextField]
+  private var _numberTextFieldNextIndex      = 0
+  private val _stringProperties              = ListBuffer.empty[StringProperty]
+  private var _stringPropertyNextIndex       = 0
   private var _helpURLOption: Option[String] = None
 
   private val _helpLabel: String = "Help"
@@ -112,15 +113,17 @@ class GenericDialogFX(
         hgrow = Priority.Always
       }
     )
-    columnConstraints.addAll(constrains.map(_.delegate): _*)
+    columnConstraints.addAll(constrains.map(_.delegate)*)
   }
 
   /**
-    * Adds a checkbox.
-    *
-    * @param label        the label
-    * @param defaultValue the initial state
-    */
+   * Adds a checkbox.
+   *
+   * @param label
+   *   the label
+   * @param defaultValue
+   *   the initial state
+   */
   def addCheckbox(label: String, defaultValue: Boolean): Unit = {
     val label2 = label.replace('_', ' ')
 
@@ -154,11 +157,9 @@ class GenericDialogFX(
   }
 
   /**
-    * Adds a directory text field and "Browse" button, where the
-    * field width is determined by the length of 'defaultPath', with
-    * a minimum of 25 columns. Use getNextString to retrieve the
-    * directory path.
-    */
+   * Adds a directory text field and "Browse" button, where the field width is determined by the length of
+   * 'defaultPath', with a minimum of 25 columns. Use getNextString to retrieve the directory path.
+   */
   def addDirectoryField(label: String, defaultPath: String): Unit = {
     val columns =
       if (defaultPath != null) Math.max(defaultPath.length, 25)
@@ -195,17 +196,16 @@ class GenericDialogFX(
   }
 
   /**
-    * Adds a "Help" button that opens the specified URL in the default browser.
-    * Displays an HTML formatted message if 'url' starts with "<html>". There is an example at
-    * http://imagej.nih.gov/ij/macros/js/DialogWithHelp.js
-    */
+   * Adds a "Help" button that opens the specified URL in the default browser. Displays an HTML formatted message if
+   * 'url' starts with "<html>". There is an example at http://imagej.nih.gov/ij/macros/js/DialogWithHelp.js
+   */
   def addHelp(url: String): Unit = {
     _helpURLOption = Option(url)
   }
 
   /**
-    * Adds a message consisting of one or more lines of text.
-    */
+   * Adds a message consisting of one or more lines of text.
+   */
   def addMessage(message: String, font: Option[Font] = None): Unit = {
     val label = Label(message)
     font.foreach(label.font = _)
@@ -219,11 +219,12 @@ class GenericDialogFX(
   }
 
   /**
-    * Adds a Panel to the dialog.
-    *
-    * @deprecated this is only for compatibility with ImageJ GenericDialog API, it delegates to addNode()
-    */
-  @deprecated("This is only for compatibility with ImageJ GenericDialog API, it delegates to addNode()", since="0.11")
+   * Adds a Panel to the dialog.
+   *
+   * @deprecated
+   *   this is only for compatibility with ImageJ GenericDialog API, it delegates to addNode()
+   */
+  @deprecated("This is only for compatibility with ImageJ GenericDialog API, it delegates to addNode()", since = "0.11")
   def addPanel(node: Node): Unit = {
     addNode(node)
   }
@@ -236,17 +237,17 @@ class GenericDialogFX(
 
   def addNumericField(label: String, defaultValue: Double): Unit = {
     val decimalPlaces = if (defaultValue.toInt == defaultValue) 0 else 3
-    val columnWidth = if (decimalPlaces == 3) 8 else 6
+    val columnWidth   = if (decimalPlaces == 3) 8 else 6
     addNumericField(label, defaultValue, decimalPlaces, columnWidth, "")
   }
 
   def addNumericField(
-                       label: String,
-                       defaultValue: Double,
-                       decimalPlaces: Int,
-                       columnWidth: Int,
-                       units: String
-                     ): Unit = {
+    label: String,
+    defaultValue: Double,
+    decimalPlaces: Int,
+    columnWidth: Int,
+    units: String
+  ): Unit = {
     require(columnWidth > 0)
 
     val label2 = label.replace('_', ' ')
@@ -265,9 +266,9 @@ class GenericDialogFX(
   }
 
   /**
-    * Returns the state of the next checkbox.
-    */
-  //noinspection AccessorLikeMethodIsEmptyParen
+   * Returns the state of the next checkbox.
+   */
+  // noinspection AccessorLikeMethodIsEmptyParen
   def getNextBoolean(): Boolean = {
     require(_checkBoxNextIndex < _checkBoxes.size)
 
@@ -277,7 +278,7 @@ class GenericDialogFX(
     next
   }
 
-  //noinspection AccessorLikeMethodIsEmptyParen
+  // noinspection AccessorLikeMethodIsEmptyParen
   def getNextChoice(): String = {
     require(_choiceBoxNextIndex < _choiceBoxes.size)
 
@@ -287,7 +288,7 @@ class GenericDialogFX(
     next
   }
 
-  //noinspection AccessorLikeMethodIsEmptyParen
+  // noinspection AccessorLikeMethodIsEmptyParen
   def getNextNumber(): Double = {
     require(_numberTextFieldNextIndex < _numberTextFields.size)
 
@@ -297,7 +298,7 @@ class GenericDialogFX(
     next.doubleValue()
   }
 
-  //noinspection AccessorLikeMethodIsEmptyParen
+  // noinspection AccessorLikeMethodIsEmptyParen
   def getNextString(): String = {
     require(_stringPropertyNextIndex < _stringProperties.size)
 
@@ -308,22 +309,27 @@ class GenericDialogFX(
   }
 
   /**
-    * Adds an 8 column text field.
-    *
-    * @param label       the label
-    * @param defaultText the text initially displayed
-    */
+   * Adds an 8 column text field.
+   *
+   * @param label
+   *   the label
+   * @param defaultText
+   *   the text initially displayed
+   */
   def addStringField(label: String, defaultText: String): Unit = {
     addStringField(label, defaultText, 8)
   }
 
   /**
-    * Adds a text field.
-    *
-    * @param label       the label
-    * @param defaultText text initially displayed
-    * @param columns     width of the text field. If columns is 8 or more, additional items may be added to this line with addToSameRow()
-    */
+   * Adds a text field.
+   *
+   * @param label
+   *   the label
+   * @param defaultText
+   *   text initially displayed
+   * @param columns
+   *   width of the text field. If columns is 8 or more, additional items may be added to this line with addToSameRow()
+   */
   def addStringField(label: String, defaultText: String, columns: Int): Unit = {
     val label2 = label.replace('_', ' ')
     val textField = new TextField() {

@@ -35,7 +35,7 @@ object LOOCrossValidation2Demo extends App {
   def main(): Unit = {
     // Read chart values
     val tableFile = "../test/data/Passport-linear-25_color_values.csv"
-    val srcRT = ResultsTable.open(tableFile)
+    val srcRT     = ResultsTable.open(tableFile)
 
     // Extract chart values as an array
     val observed = new Array[Array[Double]](srcRT.getCounter)

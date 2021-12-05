@@ -43,10 +43,14 @@ object Regression {
    *   s = A*o.
    * }}}
    *
-   * @param standard    array of expected output values.
-   * @param observation array of input values
-   * @return linear fit coefficients
-   * @see #regression(double[], double[][], boolean)
+   * @param standard
+   *   array of expected output values.
+   * @param observation
+   *   array of input values
+   * @return
+   *   linear fit coefficients
+   * @see
+   *   #regression(double[], double[][], boolean)
    */
   def regression(standard: Array[Double], observation: Array[Array[Double]]): Regression.Result = {
     regression(standard, observation, noIntercept = true)
@@ -55,10 +59,14 @@ object Regression {
   /**
    * Compute linear fit coefficient `s = A*o` if `noIntercept` is true or `s = A*o + b` if `noIntercept` is `false`.
    *
-   * @param standard    array of expected output values.
-   * @param observation array of input values
-   * @param noIntercept true means the model is to be estimated without an intercept term
-   * @return linear fit coefficients
+   * @param standard
+   *   array of expected output values.
+   * @param observation
+   *   array of input values
+   * @param noIntercept
+   *   true means the model is to be estimated without an intercept term
+   * @return
+   *   linear fit coefficients
    */
   def regression(
     standard: Array[Double],
@@ -93,9 +101,12 @@ object Regression {
   /**
    * Compute linear fit coefficients that map observations to a reference: `s = A*[o, 1]`.
    *
-   * @param standard    reference values.
-   * @param observation observed values.
-   * @return linear fit coefficients.
+   * @param standard
+   *   reference values.
+   * @param observation
+   *   observed values.
+   * @return
+   *   linear fit coefficients.
    */
   def createLinear(standard: Array[Double], observation: Array[Array[Double]]): Regression.Result = {
     regression(standard, observation, noIntercept = false)

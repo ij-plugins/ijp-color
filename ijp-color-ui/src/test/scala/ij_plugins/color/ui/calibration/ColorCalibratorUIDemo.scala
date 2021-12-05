@@ -24,7 +24,7 @@ package ij_plugins.color.ui.calibration
 
 import ij.ImagePlus
 import ij_plugins.color.ui.fx.ColorFXUI
-import scalafx.Includes._
+import scalafx.Includes.*
 import scalafx.application.JFXApp3
 import scalafx.scene.Scene
 

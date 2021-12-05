@@ -33,17 +33,19 @@ import scalafx.beans.property.ObjectProperty
 import scalafx.stage.Window
 
 /**
-  * Apply color correction to the current selected image in ImageJ UI
-  *
-  * @param correctionRecipe correction recipe
-  * @param parentWindow     parent window for dialogs
-  */
+ * Apply color correction to the current selected image in ImageJ UI
+ *
+ * @param correctionRecipe
+ *   correction recipe
+ * @param parentWindow
+ *   parent window for dialogs
+ */
 class ApplyToCurrentImageTask(
-                               correctionRecipe: ObjectProperty[Option[CorrectionRecipe]],
-                               outputConfig: OutputConfig,
-                               val parentWindow: Option[Window]
-                             ) extends SimpleTask[Unit]
-  with ShowMessage {
+  correctionRecipe: ObjectProperty[Option[CorrectionRecipe]],
+  outputConfig: OutputConfig,
+  val parentWindow: Option[Window]
+) extends SimpleTask[Unit]
+    with ShowMessage {
 
   def call(): Unit = {
     val errorTitle = "Cannot Apply Correction"

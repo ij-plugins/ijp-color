@@ -30,7 +30,8 @@ import ij_plugins.color.converter.ColorTriple.Lab
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
 
 /**
- * @author Jarek Sacha
+ * @author
+ *   Jarek Sacha
  */
 object LOOCrossValidation {
 
@@ -48,13 +49,13 @@ object LOOCrossValidation {
   /**
    * Compute leave-one-out error for each of the chips in the chart.
    *
-   * The error for a given chip is computed by excluding that chip from a chart.
-   * Color corrector is computed using all but that selected chip, then a delta between value of that chip and
-   * color computed for that chip by the corrector is determined (square root of sum of squares of
-   * color components differences).
+   * The error for a given chip is computed by excluding that chip from a chart. Color corrector is computed using all
+   * but that selected chip, then a delta between value of that chip and color computed for that chip by the corrector
+   * is determined (square root of sum of squares of color components differences).
    *
-   * @return deltas when each of the chips, in turn, is excluded.
-   *         Index of the delta is the same as of the excluded (test) chip.
+   * @return
+   *   deltas when each of the chips, in turn, is excluded. Index of the delta is the same as of the excluded (test)
+   *   chip.
    */
   def crossValidation(
     chart: ColorChart,
@@ -70,13 +71,13 @@ object LOOCrossValidation {
   /**
    * Compute leave-one-out error for each of the chips in the chart.
    *
-   * The error for a given chip is computed by excluding that chip from a chart.
-   * Color corrector is computed using all but that selected chip, then a delta between value of that chip and
-   * color computed for that chip by the corrector is determined (square root of sum of squares of
-   * color components differences).
+   * The error for a given chip is computed by excluding that chip from a chart. Color corrector is computed using all
+   * but that selected chip, then a delta between value of that chip and color computed for that chip by the corrector
+   * is determined (square root of sum of squares of color components differences).
    *
-   * @return deltas when each of the chips, in turn, is excluded. Each element in the sequence is
-   *         a tuple: (deltaE, deltaL, deltaA, deltaB)
+   * @return
+   *   deltas when each of the chips, in turn, is excluded. Each element in the sequence is a tuple: (deltaE, deltaL,
+   *   deltaA, deltaB)
    */
   def crossValidation(
     chart: ColorChart,
@@ -106,7 +107,7 @@ object LOOCrossValidation {
     }
 
     val excludeInvalidRGBRef = false
-    val clipReferenceRGB = false
+    val clipReferenceRGB     = false
 
     val expectedColors = chart.referenceColor(referenceColorSpace)
     val enabledChips = expectedColors.zipWithIndex.map { case (c, i) =>
@@ -127,16 +128,16 @@ object LOOCrossValidation {
 
       // Separate training and testing samples
       val observedTrain = observedSamples2.zipWithIndex.filter(v => enabled(v._2)).map(_._1)
-      val observedTest = observedSamples2(i)
+      val observedTest  = observedSamples2(i)
 
-      val fit = colorCalibrator.computeCalibrationMapping(observedTrain)
+      val fit       = colorCalibrator.computeCalibrationMapping(observedTrain)
       val corrector = fit.corrector
 
       // Measure correction quality on the disabled chip
       // Computation of the mean is be done in L*a*b*
 
-      val correctedTest = corrector.map(observedTest)
-      val correctedTestLab = referenceColorSpace.toLab(correctedTest, chart.refWhite)
+      val correctedTest         = corrector.map(observedTest)
+      val correctedTestLab      = referenceColorSpace.toLab(correctedTest, chart.refWhite)
       val expectedColorLab: Lab = referenceColorSpace.toLab(expectedColors(i), chart.refWhite)
 
       val deltaL = math.abs(expectedColorLab.l - correctedTestLab.l)
@@ -214,7 +215,7 @@ object LOOCrossValidation {
       method <- mappingMethods
     ) yield (rcs, method)
 
-    for (((rcs, _method), i) <- refSpaceMethods.zipWithIndex) yield {
+    for (((rcs, _method), _) <- refSpaceMethods.zipWithIndex) yield {
       LOOCrossValidation.crossValidationStats(chart, rcs, _method, observedSamples)
     }
   }

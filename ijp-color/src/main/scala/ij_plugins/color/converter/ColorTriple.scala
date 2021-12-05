@@ -38,7 +38,8 @@ object ColorTriple {
   /**
    * Generic color coordinates in an arbitrary color space.
    *
-   * @author Jarek Sacha
+   * @author
+   *   Jarek Sacha
    */
   case class Color123(_1: Double = 0, _2: Double = 0, _3: Double = 0) extends ColorTriple {
 

@@ -24,10 +24,11 @@ package ij_plugins.color.calibration
 
 import ij_plugins.color.calibration.regression.{CubicPolynomial, CubicPolynomialTriple}
 import org.scalatest.flatspec.AnyFlatSpec
-import org.scalatest.matchers.should.Matchers._
+import org.scalatest.matchers.should.Matchers.*
 
 /**
- * @author Jarek Sacha
+ * @author
+ *   Jarek Sacha
  */
 class CorrectorSpec extends AnyFlatSpec {
 

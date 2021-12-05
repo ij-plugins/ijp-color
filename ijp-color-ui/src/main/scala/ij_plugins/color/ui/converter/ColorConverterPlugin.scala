@@ -26,7 +26,7 @@ import ij.IJ
 import ij.plugin.PlugIn
 import ij_plugins.color.ui.fx.{ColorFXUI, imageJIconAsFXImage, initializeFX}
 import org.scalafx.extras.onFX
-import scalafx.Includes._
+import scalafx.Includes.*
 import scalafx.scene.Scene
 import scalafx.stage.Stage
 

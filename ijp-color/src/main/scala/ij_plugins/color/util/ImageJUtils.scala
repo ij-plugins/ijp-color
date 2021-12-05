@@ -28,16 +28,17 @@ import ij.process.{ByteProcessor, ColorProcessor, FloatProcessor, ImageProcessor
 import ij.{IJ, ImageJ}
 
 import java.awt.geom.Point2D
-import scala.collection.compat._
+import scala.collection.compat.*
 
 /** Helper methods for working with ImageJ. */
 object ImageJUtils {
 
   /**
-    * Returns icon used by ImageJ main frame. Returns `null` if main frame is not instantiated or has no icon.
-    *
-    * @return ImageJ icon or `null`.
-    */
+   * Returns icon used by ImageJ main frame. Returns `null` if main frame is not instantiated or has no icon.
+   *
+   * @return
+   *   ImageJ icon or `null`.
+   */
   def imageJIconAsAWTImage: java.awt.Image = {
     val imageJ: ImageJ = IJ.getInstance
     if (imageJ != null) imageJ.getIconImage else null
@@ -46,8 +47,10 @@ object ImageJUtils {
   /**
    * Splits ColorProcessor into ByteProcessors representing each of three bands (red, green, and blue).
    *
-   * @param cp input color processor
-   * @return ByteProcessor for each band.
+   * @param cp
+   *   input color processor
+   * @return
+   *   ByteProcessor for each band.
    */
   def splitRGB(cp: ColorProcessor): Array[ByteProcessor] = {
     val width       = cp.getWidth
@@ -65,9 +68,12 @@ object ImageJUtils {
   /**
    * Merges RGB bands into a ColorProcessor.
    *
-   * @param src ByteProcessor for red, green, and blue band.
-   * @return merged bands
-   * @see #splitRGB
+   * @param src
+   *   ByteProcessor for red, green, and blue band.
+   * @return
+   *   merged bands
+   * @see
+   *   #splitRGB
    */
   def mergeRGB(src: Array[ByteProcessor]): ColorProcessor = {
     validateSameTypeAndDimensions(src, 3)
@@ -88,9 +94,12 @@ object ImageJUtils {
    *
    * Floating point values are assumed in the range 0 to 255.
    *
-   * @param src ByteProcessor for red, green, and blue band.
-   * @return merged bands
-   * @see #splitRGB
+   * @param src
+   *   ByteProcessor for red, green, and blue band.
+   * @return
+   *   merged bands
+   * @see
+   *   #splitRGB
    */
   def mergeRGB(src: Array[FloatProcessor]): ColorProcessor = {
     validateSameTypeAndDimensions(src, 3)
@@ -127,10 +136,14 @@ object ImageJUtils {
   /**
    * Measure color within ROI.
    *
-   * @param tri     three bands of an image, may represent only color space.
-   * @param outline outline of the region of interest.
-   * @return average color in the ROI.
-   * @see #measureColorXY(ij.process.ImageProcessor[], ij.gui.Roi)
+   * @param tri
+   *   three bands of an image, may represent only color space.
+   * @param outline
+   *   outline of the region of interest.
+   * @return
+   *   average color in the ROI.
+   * @see
+   *   #measureColorXY(ij.process.ImageProcessor[], ij.gui.Roi)
    */
   def measureColor[T <: ImageProcessor](tri: Array[T], outline: Array[Point2D]): Array[Double] = {
     measureColor(tri, toRoi(outline.toSeq))
@@ -139,10 +152,14 @@ object ImageJUtils {
   /**
    * Measure color within ROI.
    *
-   * @param tri three bands of an image, may represent only color space.
-   * @param roi region of interest.
-   * @return average color in the ROI.
-   * @see #measureColorXY(ij.process.ImageProcessor[], ij.gui.Roi)
+   * @param tri
+   *   three bands of an image, may represent only color space.
+   * @param roi
+   *   region of interest.
+   * @return
+   *   average color in the ROI.
+   * @see
+   *   #measureColorXY(ij.process.ImageProcessor[], ij.gui.Roi)
    */
   def measureColor[T <: ImageProcessor](tri: Array[T], roi: Roi): Array[Double] = {
     val color: Array[Double] = new Array[Double](tri.length)
@@ -154,10 +171,14 @@ object ImageJUtils {
   }
 
   /**
-   * @param src    images to validate
-   * @param length expected number of images
-   * @tparam T image processor type
-   * @throws java.lang.IllegalArgumentException if the images in the array are not of the same dimension.
+   * @param src
+   *   images to validate
+   * @param length
+   *   expected number of images
+   * @tparam T
+   *   image processor type
+   * @throws java.lang.IllegalArgumentException
+   *   if the images in the array are not of the same dimension.
    */
   @inline
   def validateSameDimensions[T <: ImageProcessor](src: Array[T], length: Int): Unit = {
@@ -177,10 +198,14 @@ object ImageJUtils {
   }
 
   /**
-   * @param src    images to validate
-   * @param length expected number of images
-   * @tparam T image processor type
-   * @throws java.lang.IllegalArgumentException if the images in the array are not of the same dimension.
+   * @param src
+   *   images to validate
+   * @param length
+   *   expected number of images
+   * @tparam T
+   *   image processor type
+   * @throws java.lang.IllegalArgumentException
+   *   if the images in the array are not of the same dimension.
    */
   @inline
   def validateSameTypeAndDimensions[T <: ImageProcessor](src: Array[T], length: Int): Unit = {
@@ -194,7 +219,8 @@ object ImageJUtils {
   /**
    * Get the singleton instance of ImageJ `RoiManager`
    *
-   * @return RoiManager instance
+   * @return
+   *   RoiManager instance
    */
   def roiManagerInstance: RoiManager = { // Workaround for ImageJ bug.
     // RoiManger is a singleton in function, but it has constructors.
@@ -208,8 +234,10 @@ object ImageJUtils {
   /**
    * Add result ROIs to ROI Manager, replacing current content. If ROI Manager is not visible it will be opened.
    *
-   * @param rois         ROI's to be added.
-   * @param clearContent if `true` ROI Manager content will be cleared before new rois will be added
+   * @param rois
+   *   ROI's to be added.
+   * @param clearContent
+   *   if `true` ROI Manager content will be cleared before new rois will be added
    */
   def addToROIManager(rois: IterableOnce[Roi], clearContent: Boolean = false): Unit = {
     val roiManager = roiManagerInstance

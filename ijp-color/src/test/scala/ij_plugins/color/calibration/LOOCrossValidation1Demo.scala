@@ -25,7 +25,7 @@ package ij_plugins.color.calibration
 import ij.IJ
 import ij.io.RoiDecoder
 import ij_plugins.color.calibration.LOOCrossValidation.CrossValidationData
-import ij_plugins.color.calibration.chart._
+import ij_plugins.color.calibration.chart.*
 import ij_plugins.color.calibration.regression.MappingMethod
 import ij_plugins.color.converter.ReferenceWhite
 
@@ -40,13 +40,13 @@ object LOOCrossValidation1Demo {
 
     // Image to calibrate
     val imageFile = new File(dataDir, "Color_Gauge_Sample_3.png")
-    val roiFile = new File(dataDir, "Color_Gauge_Sample_3.roi")
+    val roiFile   = new File(dataDir, "Color_Gauge_Sample_3.roi")
 
     // Custom chart params
-    val nbRows = 5
-    val nbColumns = 6
-    val chipMargin = 0.2
-    val refWhite = ReferenceWhite.D50
+    val nbRows        = 5
+    val nbColumns     = 6
+    val chipMargin    = 0.2
+    val refWhite      = ReferenceWhite.D50
     val refValuesFile = new File(dataDir, "Color_Gauge_Chart_3.csv")
 
     // Load image

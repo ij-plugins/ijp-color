@@ -23,6 +23,6 @@
 package ij_plugins.color.calibration
 
 /**
-  * Color correction mappings based on polynomial regression.
-  */
+ * Color correction mappings based on polynomial regression.
+ */
 package object regression

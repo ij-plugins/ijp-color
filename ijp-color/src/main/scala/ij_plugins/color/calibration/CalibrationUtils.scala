@@ -59,15 +59,15 @@ object CalibrationUtils {
   }
 
   def renderReferenceChart(referenceChart: GridColorChart): ImagePlus = {
-    val scale = 80
+    val scale  = 80
     val margin = referenceChart.chipMargin * scale
 
-    val chart = referenceChart.copyWith(new PerspectiveTransform())
-    val maxX = chart.referenceOutline.map(_.getX).max * scale
-    val maxY = chart.referenceOutline.map(_.getY).max * scale
-    val width: Int = (maxX + 2 * margin).toInt
+    val chart       = referenceChart.copyWith(new PerspectiveTransform())
+    val maxX        = chart.referenceOutline.map(_.getX).max * scale
+    val maxY        = chart.referenceOutline.map(_.getY).max * scale
+    val width: Int  = (maxX + 2 * margin).toInt
     val height: Int = (maxY + 2 * margin).toInt
-    val cp = new ColorProcessor(width, height)
+    val cp          = new ColorProcessor(width, height)
     cp.setColor(Color.BLACK)
     cp.fill()
     val converter = chart.colorConverter
@@ -76,7 +76,7 @@ object CalibrationUtils {
       val outline = chip.outline
       val xPoints = outline.map(p => (margin + p.getX * scale).toInt).toArray
       val yPoints = outline.map(p => (margin + p.getY * scale).toInt).toArray
-      val roi = new PolygonRoi(new Polygon(xPoints, yPoints, xPoints.length), Roi.POLYGON)
+      val roi     = new PolygonRoi(new Polygon(xPoints, yPoints, xPoints.length), Roi.POLYGON)
       cp.setRoi(roi)
       // Color
       val color = {
@@ -102,29 +102,33 @@ object CalibrationUtils {
   }
 
   /**
-    * Convert floating point color bands to an RGB image (24-bit ColorProcessor)
-    *
-    * @param bands      color bands
-    * @param colorSpace color space of the `bands`
-    * @param converter  color converter, used if color space is XYZ
-    * @return RGB color image
-    */
+   * Convert floating point color bands to an RGB image (24-bit ColorProcessor)
+   *
+   * @param bands
+   *   color bands
+   * @param colorSpace
+   *   color space of the `bands`
+   * @param converter
+   *   color converter, used if color space is XYZ
+   * @return
+   *   RGB color image
+   */
   def convertToSRGB(
-                     bands: Array[FloatProcessor],
-                     colorSpace: ReferenceColorSpace,
-                     converter: ColorConverter
-                   ): ImagePlus = {
+    bands: Array[FloatProcessor],
+    colorSpace: ReferenceColorSpace,
+    converter: ColorConverter
+  ): ImagePlus = {
     colorSpace match {
       case ReferenceColorSpace.sRGB => new ImagePlus("", ImageJUtils.mergeRGB(bands))
-      case ReferenceColorSpace.XYZ =>
+      case ReferenceColorSpace.XYZ  =>
         // Convert XYZ to sRGB
         val cp = new ColorProcessor(bands(0).getWidth, bands(0).getHeight)
-        val n = bands(0).getWidth * bands(0).getHeight
+        val n  = bands(0).getWidth * bands(0).getHeight
         for (i <- new ParRange(0 until n)) {
-          val rgb = converter.xyzToRGB(bands(0).getf(i), bands(1).getf(i), bands(2).getf(i))
-          val r = clipUInt8(rgb.r)
-          val g = clipUInt8(rgb.g)
-          val b = clipUInt8(rgb.b)
+          val rgb   = converter.xyzToRGB(bands(0).getf(i), bands(1).getf(i), bands(2).getf(i))
+          val r     = clipUInt8(rgb.r)
+          val g     = clipUInt8(rgb.g)
+          val b     = clipUInt8(rgb.b)
           val color = ((r & 0xff) << 16) | ((g & 0xff) << 8) | ((b & 0xff) << 0)
           cp.set(i, color)
         }
@@ -134,20 +138,24 @@ object CalibrationUtils {
   }
 
   /**
-    * Convert floating point color bands to an CIE L*a*b* image (floating point bands)
-    *
-    * @param bands      input color bands
-    * @param colorSpace color space of the input `bands`
-    * @param refWhite   assumed reference while
-    * @return CIE L*a*b* color image
-    */
+   * Convert floating point color bands to an CIE L*a*b* image (floating point bands)
+   *
+   * @param bands
+   *   input color bands
+   * @param colorSpace
+   *   color space of the input `bands`
+   * @param refWhite
+   *   assumed reference while
+   * @return
+   *   CIE L*a*b* color image
+   */
   def convertToLab(
-                    bands: Array[FloatProcessor],
-                    colorSpace: ReferenceColorSpace,
-                    refWhite: ReferenceWhite
-                  ): ImagePlus = {
+    bands: Array[FloatProcessor],
+    colorSpace: ReferenceColorSpace,
+    refWhite: ReferenceWhite
+  ): ImagePlus = {
     val labFPs = colorSpace.toLab(bands, refWhite)
-    val stack = new ImageStack(labFPs(0).getWidth, labFPs(0).getHeight)
+    val stack  = new ImageStack(labFPs(0).getWidth, labFPs(0).getHeight)
     stack.addSlice("L*", labFPs(0))
     stack.addSlice("a*", labFPs(1))
     stack.addSlice("b*", labFPs(2))

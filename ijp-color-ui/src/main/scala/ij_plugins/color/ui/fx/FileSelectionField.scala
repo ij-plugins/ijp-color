@@ -38,7 +38,7 @@ class FileSelectionField(val title: String, val ownerWindow: Option[Window]) {
   }
 
   private var _view: Option[Node] = None
-  val path: StringProperty = new StringProperty("")
+  val path: StringProperty        = new StringProperty("")
 
   def view: Node = {
     if (_view.isEmpty) {

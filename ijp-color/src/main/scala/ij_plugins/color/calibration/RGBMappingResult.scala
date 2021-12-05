@@ -26,9 +26,7 @@ import ij.process.ColorProcessor
 
 /**
  * Represents color mapping results:
- * <ul>
- * <li>corrected image</li>
- * <li>number of values in result images that have to be clipped to be in 0 to 255 range.</li>
- * </ul>
+  * * corrected image
+  * * number of values in result images that have to be clipped to be in 0 to 255 range.
  */
 case class RGBMappingResult(image: ColorProcessor, clippingLow: Array[Long], clippingHigh: Array[Long])

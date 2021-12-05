@@ -28,7 +28,8 @@ import org.scalatest.flatspec.AnyFlatSpec
 import java.awt.geom.Point2D
 
 /**
- * @author Jarek Sacha
+ * @author
+ *   Jarek Sacha
  */
 class ChartGridSpec extends AnyFlatSpec {
 

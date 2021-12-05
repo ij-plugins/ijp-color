@@ -36,9 +36,9 @@ import scala.annotation.tailrec
 object DirectorySelectionField {
 
   /**
-    * Find existing part of the input file path.
-    * If the input file exists return that file otherwise look for first existing parent
-    */
+   * Find existing part of the input file path. If the input file exists return that file otherwise look for first
+   * existing parent
+   */
   @tailrec
   def existingOrParent(file: File): File =
     if (file.exists()) file
@@ -46,19 +46,19 @@ object DirectorySelectionField {
 }
 
 /**
-  * Directory selection control, accessible through `view`.
-  * The text field shows the path, the button allow browsing to select the directory.
-  */
+ * Directory selection control, accessible through `view`. The text field shows the path, the button allow browsing to
+ * select the directory.
+ */
 class DirectorySelectionField(val title: String, val ownerWindow: Option[Window]) {
 
-  import DirectorySelectionField._
+  import DirectorySelectionField.*
 
   private lazy val chooser: DirectoryChooser = new DirectoryChooser() {
     this.title = DirectorySelectionField.this.title
   }
 
   private var _view: Option[Node] = None
-  val path: StringProperty = new StringProperty("")
+  val path: StringProperty        = new StringProperty("")
 
   def view: Node = {
     if (_view.isEmpty) {

@@ -23,7 +23,7 @@
 package ij_plugins.color.converter
 
 import org.scalatest.flatspec.AnyFlatSpec
-import org.scalatest.matchers.should.Matchers._
+import org.scalatest.matchers.should.Matchers.*
 
 class ReferenceWhiteTest extends AnyFlatSpec {
   it should "have unique names" in {

@@ -49,9 +49,9 @@ object PolynomialCorrectorDemo extends App {
 
   val referenceColorSpace = XYZ
   val clipReferenceRGB    = false
-  val mappingMethod = MappingMethod.QuadraticCrossBand
-  val colorCalibrator = new ColorCalibrator(chart, referenceColorSpace, mappingMethod, clipReferenceRGB)
-  val fit = colorCalibrator.computeCalibrationMapping(observed)
+  val mappingMethod       = MappingMethod.QuadraticCrossBand
+  val colorCalibrator     = new ColorCalibrator(chart, referenceColorSpace, mappingMethod, clipReferenceRGB)
+  val fit                 = colorCalibrator.computeCalibrationMapping(observed)
 
   println("Deltas")
   println(fit.correctedDeltas.mkString("\n"))

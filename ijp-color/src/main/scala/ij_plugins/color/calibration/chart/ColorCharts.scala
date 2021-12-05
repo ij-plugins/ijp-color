@@ -32,11 +32,11 @@ import java.io.File
 object ColorCharts {
 
   /**
-    * GretagMacbeth ColorChecker with values measured by Robin D. Myers, average of two charts manufactured 2002-10.
-    *
-    * Illuminant D65.
-    * [[http://www.rmimaging.com/spectral_library/Reflective/Charts-Calibration/ColorChecker_2002-10_averaged.ss3.zip]]
-    */
+   * GretagMacbeth ColorChecker with values measured by Robin D. Myers, average of two charts manufactured 2002-10.
+   *
+   * Illuminant D65.
+   * [[http://www.rmimaging.com/spectral_library/Reflective/Charts-Calibration/ColorChecker_2002-10_averaged.ss3.zip]]
+   */
   val GretagMacbethColorChecker = new GridColorChart(
     ColorChartType.GretagMacbethColorChecker.name,
     6,
@@ -74,10 +74,8 @@ object ColorCharts {
   /**
    * X-Rite Passport ColorChecker chart, based on the values from "ColorChecker Passport Technical Review"
    *
-   * Illuminant D65.
-   * [[http://www.rmimaging.com/information/ColorChecker_Passport_Technical_Report.pdf]]
-   * alternate link location
-   * [[https://chromaxion.com/information/ColorChecker_Passport_Technical_Report.pdf]]
+   * Illuminant D65. [[http://www.rmimaging.com/information/ColorChecker_Passport_Technical_Report.pdf]] alternate link
+   * location [[https://chromaxion.com/information/ColorChecker_Passport_Technical_Report.pdf]]
    */
   val XRitePassportColorChecker = new GridColorChart(
     ColorChartType.XRitePassportColorChecker.name,
@@ -114,11 +112,9 @@ object ColorCharts {
   )
 
   /**
-   * Image Science ColorGauge Matte Neutral Patch Versions
-   * Data retrieved on 2019/01/08.
+   * Image Science ColorGauge Matte Neutral Patch Versions Data retrieved on 2019/01/08.
    *
-   * Illuminant D50
-   * [[http://www.imagescienceassociates.com/mm5/pubs/Micro_Nano_Pico_Rez_TargetData.xls]]
+   * Illuminant D50 [[http://www.imagescienceassociates.com/mm5/pubs/Micro_Nano_Pico_Rez_TargetData.xls]]
    */
   val ImageScienceColorGaugeMatte = new GridColorChart(
     ColorChartType.ImageScienceColorGaugeMatte.name,
@@ -169,23 +165,24 @@ object ColorCharts {
   }
 
   /**
-    * Load chart reference values from a CSV file represented in CIE L*a*b* color space.
-    *
-    * The file is expected to have at least 4 columns: "SAMPLE_NAME", "LAB_L", "LAB_A", "LAB_B".
-    * Any additional columns will be ignored.
-    *
-    * Example of a file with 4 chips:
-    *
-    * {{{
-    * SAMPLE_NAME,LAB_L,LAB_A,LAB_B
-    * 1,38.675,12.907,14.358,19.306
-    * 2,65.750,19.811,17.790,26.626
-    * 3,50.373,-3.646,-22.360,22.656
-    * 4,43.697,-13.342,22.858,26.466
-    * }}}
-    *
-    * @return list of tuples representing chip name and reference value in CIE L*a*b*
-    */
+   * Load chart reference values from a CSV file represented in CIE L*a*b* color space.
+   *
+   * The file is expected to have at least 4 columns: "SAMPLE_NAME", "LAB_L", "LAB_A", "LAB_B". Any additional columns
+   * will be ignored.
+   *
+   * Example of a file with 4 chips:
+   *
+   * {{{
+   * SAMPLE_NAME,LAB_L,LAB_A,LAB_B
+   * 1,38.675,12.907,14.358,19.306
+   * 2,65.750,19.811,17.790,26.626
+   * 3,50.373,-3.646,-22.360,22.656
+   * 4,43.697,-13.342,22.858,26.466
+   * }}}
+   *
+   * @return
+   *   list of tuples representing chip name and reference value in CIE L*a*b*
+   */
   def loadReferenceValues(file: File): List[(String, ColorTriple.Lab)] = {
 
     require(file.exists(), "File must exist: " + file.getCanonicalPath)
@@ -196,18 +193,18 @@ object ColorCharts {
     }
 
     val headingName = "SAMPLE_NAME"
-    val headingL = "LAB_L"
-    val headingA = "LAB_A"
-    val headingB = "LAB_B"
+    val headingL    = "LAB_L"
+    val headingA    = "LAB_A"
+    val headingB    = "LAB_B"
     Seq(headingName, headingL, headingA, headingB).foreach(checkForColumn)
 
     val chips =
       (0 until rt.size())
         .map { r =>
           val name = rt.getStringValue(headingName, r)
-          val l = rt.getValue(headingL, r)
-          val a = rt.getValue(headingA, r)
-          val b = rt.getValue(headingB, r)
+          val l    = rt.getValue(headingL, r)
+          val a    = rt.getValue(headingA, r)
+          val b    = rt.getValue(headingB, r)
 
           (name, ColorTriple.Lab(l, a, b))
         }

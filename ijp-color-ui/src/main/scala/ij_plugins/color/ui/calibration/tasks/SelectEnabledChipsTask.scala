@@ -42,25 +42,25 @@ import scalafx.stage.Window
 object SelectEnabledChipsTask {
 
   class ColorChipData(
-                       val index: Int,
-                       val name: String,
-                       val colorLab: Lab,
-                       val enabled0: Boolean,
-                       colorConverter: ColorConverter
-                     ) {
-    val enabled = new BooleanProperty(this, "selected", enabled0)
+    val index: Int,
+    val name: String,
+    val colorLab: Lab,
+    val enabled0: Boolean,
+    colorConverter: ColorConverter
+  ) {
+    val enabled       = new BooleanProperty(this, "selected", enabled0)
     val colorRGB: RGB = colorConverter.copyWith(rgbScale = 1).toRGB(colorLab)
     val colorXYZ: XYZ = colorConverter.copyWith(xyzScale = 100).toXYZ(colorLab)
   }
 
   def createTableView(
-                       data: ObservableBuffer[ColorChipData]
-                     ): TableView[ColorChipData] = {
+    data: ObservableBuffer[ColorChipData]
+  ): TableView[ColorChipData] = {
 
     def bandColumn(
-                    header: String,
-                    f: ColorChipData => Double
-                  ): TableColumn[ColorChipData, Number] =
+      header: String,
+      f: ColorChipData => Double
+    ): TableColumn[ColorChipData, Number] =
       new TableColumn[ColorChipData, Number] {
         text = header
         cellValueFactory =
@@ -125,9 +125,9 @@ object SelectEnabledChipsTask {
 }
 
 class SelectEnabledChipsTask(chart: GridColorChart, parentWindow: Option[Window])
-  extends SimpleTask[Option[GridColorChart]] {
+    extends SimpleTask[Option[GridColorChart]] {
 
-  import SelectEnabledChipsTask._
+  import SelectEnabledChipsTask.*
 
   private val Title = "Select Enabled Chips"
 
@@ -160,7 +160,7 @@ class SelectEnabledChipsTask(chart: GridColorChart, parentWindow: Option[Window]
 
       if (dialog.wasOKed) {
         val enabled: Array[Boolean] = data.sortBy(_.index).map(_.enabled.value).toArray
-        val c = chart.copyWithEnabled(enabled)
+        val c                       = chart.copyWithEnabled(enabled)
         Option(c)
       } else {
         None

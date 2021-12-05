@@ -25,11 +25,13 @@ package ij_plugins.color.converter
 import ij_plugins.color.converter.ColorTriple.{Lab, RGB, XYZ}
 import ij_plugins.color.converter.RGBWorkingSpace.AdobeRGB1998
 import org.scalatest.flatspec.AnyFlatSpec
-import org.scalatest.matchers.should.Matchers._
+import org.scalatest.matchers.should.Matchers.*
 
 /**
- * @author Jarek Sacha
- * @since 10/16/12 8:14 PM
+ * @author
+ *   Jarek Sacha
+ * @since 10/16/12
+ *   8:14 PM
  */
 class ColorConverterTest extends AnyFlatSpec {
 
@@ -63,8 +65,7 @@ class ColorConverterTest extends AnyFlatSpec {
   )
 
   /**
-   * Converted to XYZ from using http://www.brucelindbloom.com/iPhone/ColorConv.html
-   * D65, no adaptation, x100.
+   * Converted to XYZ from using http://www.brucelindbloom.com/iPhone/ColorConv.html D65, no adaptation, x100.
    */
   private val xyzColorChecker: Array[XYZ] = Array(
     XYZ(0.108176, 0.096773, 0.062064),

@@ -23,11 +23,11 @@
 package ij_plugins.color.ui.converter
 
 import ij.plugin.BrowserLauncher
-import ij_plugins.color.converter._
+import ij_plugins.color.converter.*
 import ij_plugins.color.ui.converter.ColorConverterModel.Update
 import ij_plugins.color.ui.util.IJPUtils
-import javafx.beans.{binding => jfxbb}
-import scalafx.Includes._
+import javafx.beans.binding as jfxbb
+import scalafx.Includes.*
 import scalafx.beans.property.ObjectProperty
 import scalafx.collections.ObservableBuffer
 import scalafx.event.ActionEvent
@@ -49,7 +49,7 @@ object ColorConverterView {
 
 class ColorConverterView(val model: ColorConverterModel) {
 
-  import ColorConverterView._
+  import ColorConverterView.*
 
   private val nbColumns = 5
   private val xyzUI     = new ColorValueUI()

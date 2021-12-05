@@ -23,6 +23,6 @@
 package ij_plugins.color.calibration
 
 /**
-  * Creation of color charts used for color calibration.
-  */
+ * Creation of color charts used for color calibration.
+ */
 package object chart
