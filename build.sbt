@@ -29,12 +29,11 @@ ThisBuild / licenses            := Seq(("LGPL-2.1", new URL("http://opensource.o
 publishArtifact     := false
 publish / skip      := true
 
-def isScala2(scalaVersion: String): Boolean = {
-  CrossVersion.partialVersion(scalaVersion) match {
+def isScala2(scalaVersion: String): Boolean =
+      CrossVersion.partialVersion(scalaVersion) match {
     case Some((2, _)) => true
     case _            => false
   }
-}
 
 // Helper to determine Scala version-dependent settings
 def isScala2_12(scalaVersion: String): Boolean =
@@ -82,7 +81,7 @@ lazy val osName = System.getProperty("os.name") match {
   case _ => throw new Exception("Unknown platform!")
 }
 lazy val javaFXModules = Seq("base", "controls", "fxml", "graphics", "media", "swing", "web")
-lazy val javaFXVersion = "16"
+lazy val javaFXVersion = "17.0.1"
 
 val commonSettings = Seq(
   //
@@ -94,12 +93,19 @@ val commonSettings = Seq(
     "-unchecked",
     "-deprecation",
     "-feature",
+    // Java 8 for compatibility with ImageJ/FIJI
+    "-release",
+    "8"
   ) ++ (
     if(isScala2(scalaVersion.value))
       Seq(
-        "-Xlint",
         "-explaintypes",
-        "-Xsource:3"
+        "-Xsource:3",
+        "-Xlint",
+        "-Xcheckinit",
+        "-Xlint:missing-interpolator",
+        "-Ywarn-dead-code",
+        "-Ywarn-unused:-patvars,_",
       )
     else
       Seq(
@@ -222,7 +228,7 @@ lazy val ijp_color_ui = (project in file("ijp-color-ui"))
     libraryDependencies ++= Seq(
       "org.jfree"           % "jfreechart-fx"       % "1.0.1",
       "org.jfree"           % "fxgraphics2d"        % "1.8",
-      "org.scalafx"        %% "scalafx"             % "16.0.0-R25",
+      "org.scalafx"        %% "scalafx"             % "17.0.1-R26",
       "org.scalafx"        %% "scalafx-extras"      % "0.4.0",
 //      "org.scalafx"        %% "scalafxml-core-sfx8" % "0.5",
       // Test
