@@ -9,8 +9,6 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            java: 8
-          - os: ubuntu-latest
             java: 11
           - os: ubuntu-latest
             java: "17.0-custom=tgz+https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17%2B35/OpenJDK17-jdk_x64_linux_hotspot_17_35.tar.gz"
