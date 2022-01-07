@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2021 Jarek Sacha
+ * Copyright (C) 2002-2022 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -79,8 +79,6 @@ object MappingFactory {
           createCubicXBand(standardM.getColumn(1), observed),
           createCubicXBand(standardM.getColumn(2), observed)
         )
-      case _ =>
-        throw new IllegalArgumentException("Invalid Mapping method '" + method + "'")
     }
     CubicPolynomialTriple(redBandCoefficients, greenBandCoefficients, blueBandCoefficients)
   }

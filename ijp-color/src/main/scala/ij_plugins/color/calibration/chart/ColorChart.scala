@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2021 Jarek Sacha
+ * Copyright (C) 2002-2022 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -109,7 +109,6 @@ trait ColorChart {
   def referenceColor(colorSpace: ReferenceColorSpace): Array[Array[Double]] = colorSpace match {
     case ReferenceColorSpace.XYZ  => referenceColorXYZ
     case ReferenceColorSpace.sRGB => referenceColorSRGB
-    case _ => throw new IllegalArgumentException("Unsupported reference color space: '" + colorSpace + "'.")
   }
 
   /** Return reference colors represented in given color space. Only enabled chips are returned. */
