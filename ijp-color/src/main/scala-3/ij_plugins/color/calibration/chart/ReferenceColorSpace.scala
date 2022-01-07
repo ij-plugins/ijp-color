@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2021 Jarek Sacha
+ * Copyright (C) 2002-2022 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -24,20 +24,11 @@ package ij_plugins.color.calibration.chart
 
 import ij.process.FloatProcessor
 import ij_plugins.color.converter.{ColorConverter, ColorTriple, ReferenceWhite}
+import ij_plugins.color.util.EnumCompanion.{WithName, WithNameCompanion}
 
 import scala.collection.immutable
 
-object ReferenceColorSpace {
-
-  /**
-   * Returns enum with given name, equivalent to `valueOf`. Only for compatibility with "enumeratum"
-   * @param name
-   *   name of the enum to retrieve
-   */
-  def withName(name: String): ReferenceColorSpace = ReferenceColorSpace.valueOf(name)
-
-  def withNameOption(name: String): Option[ReferenceColorSpace] = Option(ReferenceColorSpace.valueOf(name))
-}
+object ReferenceColorSpace extends WithNameCompanion[ReferenceColorSpace]
 
 /**
  * Color spaces used for creation of reference color values.
@@ -45,15 +36,13 @@ object ReferenceColorSpace {
  * Note that for proper correction to L*a*b* you need to keep track of the reference white (illuminant) of the reference
  * color values.
  */
-enum ReferenceColorSpace(val name: String, bands: Array[String]) {
+enum ReferenceColorSpace(val name: String, bands: Array[String]) extends WithName {
 
   /** CIE XYZ color space */
   case XYZ extends ReferenceColorSpace("XYZ", Array("X", "Y", "Z"))
 
   /** sRGB color space */
   case sRGB extends ReferenceColorSpace("sRGB", Array("Red", "Green", "Blue"))
-
-  override def toString: String = name
 
   private val _bands: Array[String] = bands.clone()
 

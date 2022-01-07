@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2021 Jarek Sacha
+ * Copyright (C) 2002-2022 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -59,4 +59,29 @@ object ImagePlusType extends IntEnum[ImagePlusType] {
   case object ColorRGB extends ImagePlusType(4, "24-bit color")
 
   override def values: immutable.IndexedSeq[ImagePlusType] = findValues
+
+
+  /**
+    * Tries to get an item by the supplied name.
+    * @param name
+    *   name of the item
+    * @throws NoSuchElementException
+    *   if enum has no item with given name
+    */
+  def withName(name: String): ImagePlusType =
+    withNameOption(name).getOrElse(throw new NoSuchElementException(s"No ImagePlusType with name: $name"))
+
+  /**
+    * Optionally returns [[ImagePlusType]] for a given name.
+    * @param name
+    *   name of the item
+    */
+  def withNameOption(name: String): Option[ImagePlusType] =
+    values.find(_.name == name)
+
+
+  /**
+    * Optionally returns an [[ImagePlusType]] for a given value.
+    */
+  def withValueOption(v:Int) : Option[ImagePlusType] = ImagePlusType.withValueOpt(v)
 }

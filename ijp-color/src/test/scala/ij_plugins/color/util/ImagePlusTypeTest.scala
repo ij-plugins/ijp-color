@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2021 Jarek Sacha
+ * Copyright (C) 2002-2022 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -38,14 +38,14 @@ class ImagePlusTypeTest extends AnyFlatSpec {
   it should "have unique names" in {
     val names = ImagePlusType.values.map(_.name)
 
-    names.toSet.size should be(ImagePlusType.values.size)
+    names.toSet.size should be(ImagePlusType.values.length)
   }
 
-//  it should "lookup by name" in {
-//    for (v <- ImagePlusType.values) {
-//      ImagePlusType.withName(v.name) should be(v)
-//    }
-//  }
+  it should "lookup by name" in {
+    for (v <- ImagePlusType.values) {
+      ImagePlusType.withName(v.name) should be(v)
+    }
+  }
 
   it should "lookup by value" in {
     for (v <- ImagePlusType.values) {

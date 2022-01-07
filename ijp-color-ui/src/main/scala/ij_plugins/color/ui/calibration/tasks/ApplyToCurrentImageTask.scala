@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2021 Jarek Sacha
+ * Copyright (C) 2002-2022 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -70,7 +70,7 @@ class ApplyToCurrentImageTask(
       showError(
         errorTitle,
         s"Image type does not match expected: ${recipe.imageType} [${recipe.imageType.value}],  " +
-          s"got ${ImagePlusType.withValueOpt(imp.getType).getOrElse("???")} [${imp.getType}]",
+          s"got ${ImagePlusType.withValueOption(imp.getType).getOrElse("???")} [${imp.getType}]",
         ""
       )
       return

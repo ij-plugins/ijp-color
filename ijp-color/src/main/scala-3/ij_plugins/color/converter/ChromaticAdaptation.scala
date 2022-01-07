@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2021 Jarek Sacha
+ * Copyright (C) 2002-2022 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -22,6 +22,8 @@
 
 package ij_plugins.color.converter
 
+import ij_plugins.color.util.EnumCompanion.{WithName, WithNameCompanion}
+
 /**
  * Represents chromatic adaptation type when converting between color spaces using difference reference whites.
  *
@@ -35,7 +37,7 @@ package ij_plugins.color.converter
  * @param ma
  *   adaptation matrix
  */
-enum ChromaticAdaptation(val name: String, val ma: Matrix3x3) {
+enum ChromaticAdaptation(val name: String, val ma: Matrix3x3) extends WithName {
 
   /** Bradford Adaptation */
   case Bradford
@@ -90,27 +92,6 @@ enum ChromaticAdaptation(val name: String, val ma: Matrix3x3) {
 
   /** Inverse of the adaptation matrix */
   val maI: Matrix3x3 = ma.inverse
-
-  override def toString: String = name
 }
 
-object ChromaticAdaptation {
-
-  /**
-   * Tries to get an item by the supplied name.
-   * @param name
-   *   name of the item
-   * @throws NoSuchElementException
-   *   if enum has no item with given name
-   */
-  def withName(name: String): ChromaticAdaptation =
-    withNameOption(name).getOrElse(throw new NoSuchElementException(s"No ChromaticAdaptation with name: $name"))
-
-  /**
-   * Optionally returns an item for a given name.
-   * @param name
-   *   name of the item
-   */
-  def withNameOption(name: String): Option[ChromaticAdaptation] =
-    ChromaticAdaptation.values.find(_.name == name)
-}
+object ChromaticAdaptation extends WithNameCompanion[ChromaticAdaptation]
