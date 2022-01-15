@@ -47,6 +47,4 @@ enum ImagePlusType(val name: String, val value: Int) extends WithName with WithV
   /** ImagePlus.COLOR_RGB */
   case ColorRGB extends ImagePlusType("24-bit color", ImagePlus.COLOR_RGB)
 
-  override def toString: String = name
-
 object ImagePlusType extends WithNameCompanion[ImagePlusType] with WithValueCompanion[Int, ImagePlusType]
