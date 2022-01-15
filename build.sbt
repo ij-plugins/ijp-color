@@ -229,8 +229,7 @@ lazy val ijp_color_ui = (project in file("ijp-color-ui"))
       "org.jfree"           % "jfreechart-fx"       % "1.0.1",
       "org.jfree"           % "fxgraphics2d"        % "1.8",
       "org.scalafx"        %% "scalafx"             % "17.0.1-R26",
-      "org.scalafx"        %% "scalafx-extras"      % "0.4.0",
-//      "org.scalafx"        %% "scalafxml-core-sfx8" % "0.5",
+      "org.scalafx"        %% "scalafx-extras"      % "0.5.0",
       // Test
       "org.scalatest"      %% "scalatest"           % "3.2.10"  % "test"
     )
