@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2021 Jarek Sacha
+ * Copyright (C) 2002-2022 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -90,7 +90,8 @@ object ColorChartToolPlugin {
 /**
  * Send tiles of the chart to ROI Manager User indicates chart location by pointing to chart corners.
  */
-class ColorChartToolPlugin extends PlugIn with DialogListener with ImageListenerHelper with LiveChartROIHelper[GridChartFrame] {
+class ColorChartToolPlugin extends PlugIn with DialogListener with ImageListenerHelper
+    with LiveChartROIHelper[GridChartFrame] {
 
   import ColorChartToolPlugin.Config
 
@@ -228,8 +229,8 @@ class ColorChartToolPlugin extends PlugIn with DialogListener with ImageListener
   }
 
   override protected def handleImageUpdated(): Unit = {
-    // TODO: Review correctness, this code seems to do nothing
-    liveChartROIOption.foreach(v => v.locatedChart)
+    // Update ROI in the new image
+    liveChartROIOption.foreach(_.updateOverlay())
   }
 
   override protected def handleImageClosed(): Unit = {
