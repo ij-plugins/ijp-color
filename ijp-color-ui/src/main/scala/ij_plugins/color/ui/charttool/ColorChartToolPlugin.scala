@@ -27,7 +27,7 @@ import ij.measure.ResultsTable
 import ij.plugin.PlugIn
 import ij.process.ImageStatistics
 import ij.{IJ, ImagePlus}
-import ij_plugins.color.calibration.chart.{GridChartFrame, GridChartFrameUtils}
+import ij_plugins.color.calibration.chart.{ChartFrameUtils, GridChartFrame}
 import ij_plugins.color.ui.util.*
 import ij_plugins.color.util.{ImageJUtils, PerspectiveTransform}
 import scalafx.beans.property.ObjectProperty
@@ -90,7 +90,7 @@ object ColorChartToolPlugin {
 /**
  * Send tiles of the chart to ROI Manager User indicates chart location by pointing to chart corners.
  */
-class ColorChartToolPlugin extends PlugIn with DialogListener with ImageListenerHelper with LiveChartROIHelper {
+class ColorChartToolPlugin extends PlugIn with DialogListener with ImageListenerHelper with LiveChartROIHelper[GridChartFrame] {
 
   import ColorChartToolPlugin.Config
 
@@ -124,7 +124,7 @@ class ColorChartToolPlugin extends PlugIn with DialogListener with ImageListener
     dialog = Option(gd)
 
     setupImageListener()
-    setupLiveChartROI(new LiveChartROI(image.get, referenceChartOption))
+    setupLiveChartROI(new LiveChartROI[GridChartFrame](image.get, referenceChartOption))
 
     liveChartROIOption.foreach { l =>
       l.overlyColor = config.chipOverlayColor
@@ -251,7 +251,7 @@ class ColorChartToolPlugin extends PlugIn with DialogListener with ImageListener
 
   private def doMeasureChips(imp: ImagePlus, chart: GridChartFrame): Unit = {
 
-    val roiBandStats = GridChartFrameUtils.measureRois(imp, chart)
+    val roiBandStats = ChartFrameUtils.measureRois(imp, chart)
 
     val rt = new ResultsTable()
 

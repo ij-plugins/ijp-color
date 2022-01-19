@@ -24,15 +24,26 @@ package ij_plugins.color.calibration.chart
 
 import ij.ImagePlus
 import ij.gui.Roi
-import ij.process.{ColorProcessor, ImageProcessor, ImageStatistics}
+import ij.process.{ColorProcessor, FloatPolygon, ImageProcessor, ImageStatistics}
 import ij_plugins.color.util.PerspectiveTransform
 
 import java.awt.geom.Point2D
 import scala.collection.immutable.ListMap
 
-object GridChartFrameUtils {
+object ChartFrameUtils {
 
-  def measureRois(imp: ImagePlus, chart: GridChartFrame): ListMap[Roi, ListMap[String, ImageStatistics]] = {
+  /**
+   * Measure ROIs defined in the chart frame.
+   *
+   * Note that alignment transform is applied to chip outlines.
+   *
+   * @param imp input image
+   * @param chart chart fefining locations of measurements
+   * @return  ordered map of measurements: key are rois, values are measurement for each band.
+   *          Order corresponds to the order of input `rois`.
+   *          Values are ordered maps as well, where key is band name, and value is `ImageStatistics` for the roi.
+   */
+  def measureRois(imp: ImagePlus, chart: ChartFrame): ListMap[Roi, ListMap[String, ImageStatistics]] = {
     measureRois(imp, chart.alignedChipROIs)
   }
 
@@ -44,14 +55,11 @@ object GridChartFrameUtils {
    * Measurements for each "ROI" are grouped together. Measurements are reported as `ImageStatistics`, so you have
    * flexibility extracting desired measurement, like mean, area, min, max, and so on.
    *
-   * @param imp
-   *   input image
-   * @param rois
-   *   rois to measure
-   * @return
-   *   ordered map of measurements: key are rois, values are measurement for each band. Order corresponds to the order
-   *   of input `rois`. Values are ordered maps as well, where key is band name, and value is `ImageStatistics` for the
-   *   roi.
+   * @param imp   input image
+   * @param rois   rois to measure
+   * @return ordered map of measurements: key are rois, values are measurement for each band.
+   *         Order corresponds to the order of input `rois`.
+   *         Values are ordered maps as well, where key is band name, and value is `ImageStatistics` for the roi.
    */
   def measureRois(imp: ImagePlus, rois: IndexedSeq[Roi]): ListMap[Roi, ListMap[String, ImageStatistics]] = {
 
@@ -95,7 +103,13 @@ object GridChartFrameUtils {
     ListMap(roiMeasurementMaps*)
   }
 
-  def computeAlignmentTransform(chartROI: Roi, refChartFrame: GridChartFrame): PerspectiveTransform = {
+  /**
+   * Compute an a perspective transform, such that when applied to the outline of the reference chart will produce outline of the `chartROI`
+   * @param chartROI target ROI (polygon with 4 vertices)
+   * @param refChartFrame source ROI
+   * @return perspective transform
+   */
+  def computeAlignmentTransform(chartROI: Roi, refChartFrame: ChartFrame): PerspectiveTransform = {
     require(chartROI != null, "'chartROI' cannot be null.")
     require(
       chartROI.getType == Roi.POLYGON,
@@ -104,18 +118,25 @@ object GridChartFrameUtils {
     require(chartROI.getPolygon.npoints == 4, s"'chartROI's must have 4 vertices, got ${chartROI.getPolygon.npoints}.")
     require(refChartFrame != null)
 
-    val polygon = chartROI.getFloatPolygon
-    // Get location of the chart corners from the selected poly-line
-    val p0     = new Point2D.Float(polygon.xpoints(0), polygon.ypoints(0))
-    val p1     = new Point2D.Float(polygon.xpoints(1), polygon.ypoints(1))
-    val p2     = new Point2D.Float(polygon.xpoints(2), polygon.ypoints(2))
-    val p3     = new Point2D.Float(polygon.xpoints(3), polygon.ypoints(3))
-    val points = Array[Point2D](p0, p1, p2, p3)
+    val points = toOutline(chartROI.getFloatPolygon)
 
     // Create alignment transform
     PerspectiveTransform.quadToQuad(
       refChartFrame.referenceOutline.toArray,
       points
     )
+  }
+
+  /**
+   * Convert polygon to an array of points from its vertices
+   * @param poly source polygon
+   * @return an array of vertices
+   */
+  def toOutline(poly: FloatPolygon): Array[Point2D] = {
+    val r = new Array[Point2D](poly.npoints)
+    for (i <- r.indices) {
+      r(i) = new Point2D.Float(poly.xpoints(i), poly.ypoints(i))
+    }
+    r
   }
 }

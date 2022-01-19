@@ -24,10 +24,29 @@ package ij_plugins.color.calibration.chart
 
 import ij.gui.Roi
 import ij_plugins.color.calibration.CalibrationUtils.point2D
-import ij_plugins.color.util.{ImageJUtils, PerspectiveTransform}
+import ij_plugins.color.util.PerspectiveTransform
 
 import java.awt.geom.Point2D
 import scala.collection.compat.immutable.ArraySeq
+
+object GridChartFrame {
+  private def createChipOutlines(nbColumns: Int, nbRows: Int, chipMargin: Double): IndexedSeq[Seq[Point2D]] = {
+    require(nbColumns > 0)
+    require(nbRows > 0)
+
+    for {
+      row    <- 0 until nbRows
+      column <- 0 until nbColumns
+    } yield {
+      Seq(
+        point2D(column + chipMargin, row + chipMargin),
+        point2D(column + 1 - chipMargin, row + chipMargin),
+        point2D(column + 1 - chipMargin, row + 1 - chipMargin),
+        point2D(column + chipMargin, row + 1 - chipMargin)
+      )
+    }.toIndexedSeq
+  }
+}
 
 /**
  * Represents only layout of chips similar to `GridColorChart`: a regular grid of square chips, arranged in rows and
@@ -47,38 +66,21 @@ class GridChartFrame(
   val nbColumns: Int,
   val nbRows: Int,
   val chipMargin: Double,
-  val alignmentTransform: PerspectiveTransform = new PerspectiveTransform()
-) {
-
-  private val chipOutlines: IndexedSeq[Seq[Point2D]] = {
-    for {
-      row    <- 0 until nbRows
-      column <- 0 until nbColumns
-    } yield {
-      Seq(
-        point2D(column + chipMargin, row + chipMargin),
-        point2D(column + 1 - chipMargin, row + chipMargin),
-        point2D(column + 1 - chipMargin, row + 1 - chipMargin),
-        point2D(column + chipMargin, row + 1 - chipMargin)
-      )
-    }.toIndexedSeq
-  }
+  alignmentTransform: PerspectiveTransform = new PerspectiveTransform()
+) extends ChartFrame(
+      refOutline =
+        ArraySeq(point2D(0, 0), point2D(nbColumns, 0), point2D(nbColumns, nbRows), point2D(0, nbRows)),
+      refChipOutlines = GridChartFrame.createChipOutlines(nbColumns, nbRows, chipMargin),
+      alignmentTransform = alignmentTransform
+    ) {
 
   /**
-   * Outline of the reference chart as a sequence of 4 corner points: top-left, top-right, bottom-right, bottom-left.
-   */
-  def referenceOutline: IndexedSeq[Point2D] = {
-    ArraySeq(point2D(0, 0), point2D(nbColumns, 0), point2D(nbColumns, nbRows), point2D(0, nbRows))
-  }
-
-  /**
-   * Creates a copy of this chart that has its chip outline aligned gto given ROI.
+   * Creates a copy of this chart that has its chip outline aligned to a given ROI.
    *
-   * @param roi
-   *   desired chip outline ROI.
+   * @param roi desired chip outline ROI.
    */
-  def copyAlignedTo(roi: Roi): GridChartFrame = {
-    val t = GridChartFrameUtils.computeAlignmentTransform(roi, this)
+  override def copyAlignedTo(roi: Roi): GridChartFrame = {
+    val t = ChartFrameUtils.computeAlignmentTransform(roi, this)
     this.copyWith(t)
   }
 
@@ -91,18 +93,6 @@ class GridChartFrame(
   /**
    * Creates a copy of this chart with different `alignmentTransform`.
    */
-  def copyWith(newAlignmentTransform: PerspectiveTransform): GridChartFrame =
+  override def copyWith(newAlignmentTransform: PerspectiveTransform): GridChartFrame =
     new GridChartFrame(nbColumns, nbRows, chipMargin, newAlignmentTransform)
-
-  /**
-   * Chips ROIs with alignment transform applied to their outline.
-   */
-  def alignedChipROIs: IndexedSeq[Roi] = {
-    for ((oSrc, i) <- chipOutlines.zipWithIndex) yield {
-      val oDst = alignmentTransform.transform(oSrc)
-      val roi  = ImageJUtils.toRoi(oDst)
-      roi.setName(s"${i + 1}")
-      roi
-    }
-  }
 }

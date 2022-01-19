@@ -157,7 +157,7 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
   val clipReferenceRGB = new BooleanProperty(this, "clipReferenceRGB", true)
   val correctionRecipe = new ObjectProperty[Option[CorrectionRecipe]](this, "correctionRecipe", None)
 
-  val liveChartROI: LiveChartROI = LiveChartROI(image, referenceChartOption)
+  val liveChartROI: LiveChartROI[GridColorChart] = new LiveChartROI[GridColorChart](image, referenceChartOption)
   liveChartROI.overlyColor = ImageJUIColors.colorWithNameAWT(chipOverlayColorName.value)
 
   val chipValuesObserved: ReadOnlyBooleanProperty = {

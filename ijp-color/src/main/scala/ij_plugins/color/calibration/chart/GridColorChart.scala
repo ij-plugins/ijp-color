@@ -112,12 +112,11 @@ final class GridColorChart(
    * Value of the margin must be between 0 and 0.5.
    */
   def referenceChips: immutable.IndexedSeq[ColorChip] = {
-    val a = chips.toArray
-    for {
-      row    <- 0 until nbRows
-      column <- 0 until nbColumns
-      i = row * nbColumns + column
-    } yield ColorChip(a(i)._1, a(i)._2, column, row, chipMargin)
+    require(chips.length == referenceChipOutlines.length)
+
+    for (case (chip, outline) <- chips.toIndexedSeq.zip(referenceChipOutlines)) yield {
+      new ColorChip(chip._1, chip._2, outline)
+    }
   } ensuring (_.length == chips.size)
 
   override def referenceColorXYZ: Array[Array[Double]] = {
@@ -142,22 +141,6 @@ final class GridColorChart(
     c => new ColorChip(c.name, c.color, alignmentTransform.transform(c.outline))
   }
 
-  /**
-   * Color chips with alignment transform applied to their outline.
-   */
-  override def alignedChipROIs: immutable.IndexedSeq[Roi] = alignedChips.map { chip =>
-    val roi = ImageJUtils.toRoi(chip.outline)
-    roi.setName(chip.name)
-    roi
-  }
-
-  /**
-   * Actual outline of the of the chart (reference outline with alignment transform applied).
-   */
-  @deprecated("Unused method, will be removed", since = "0.8")
-  def alignedOutline: immutable.IndexedSeq[Point2D] =
-    alignmentTransform.transform(referenceOutline).toIndexedSeq
-
   override def toString: String = name
 
   override def averageChipColor[T <: ImageProcessor](src: Array[T]): Array[Array[Double]] = {
@@ -173,7 +156,7 @@ final class GridColorChart(
    *   desired chip outline ROI.
    */
   override def copyAlignedTo(roi: Roi): GridColorChart = {
-    val t = GridChartFrameUtils.computeAlignmentTransform(roi, this)
+    val t = ChartFrameUtils.computeAlignmentTransform(roi, this)
     this.copyWith(t)
   }
 
