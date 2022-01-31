@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2021 Jarek Sacha
+ * Copyright (C) 2002-2022 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -23,12 +23,16 @@
 package ij_plugins.color.util
 
 import ij.gui.{PolygonRoi, Roi}
+import ij.io.RoiEncoder
 import ij.plugin.frame.RoiManager
 import ij.process.{ByteProcessor, ColorProcessor, FloatProcessor, ImageProcessor}
 import ij.{IJ, ImageJ}
 
 import java.awt.geom.Point2D
+import java.io.{BufferedOutputStream, DataOutputStream, File, FileOutputStream}
+import java.util.zip.{ZipEntry, ZipOutputStream}
 import scala.collection.compat.*
+import scala.util.Using
 
 /** Helper methods for working with ImageJ. */
 object ImageJUtils {
@@ -243,5 +247,28 @@ object ImageJUtils {
     val roiManager = roiManagerInstance
     if (clearContent) roiManager.runCommand("Reset")
     rois.iterator.foreach(roiManager.addRoi)
+  }
+
+  /** Save ROI to a file */
+  def saveROI(roi: Roi, file: File): Unit = {
+    val encoder = new RoiEncoder(file.getPath)
+    encoder.write(roi)
+  }
+
+  /** Save collection of ROIs to a file as a set in a format that ImageJ can read back - ZIP of individual ROI files. */
+  def saveRoiZip(rois: Seq[(String, Roi)], file: File): Unit = {
+    Using.resource(new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(file)))) { zos =>
+      Using.resource(new DataOutputStream(new BufferedOutputStream(zos))) { out =>
+        val encoder = new RoiEncoder(out)
+        for (case (_name, roi) <- rois) {
+          val name: String = if (_name.endsWith(".roi")) _name else _name + ".roi"
+          zos.putNextEntry(new ZipEntry(name))
+          encoder.write(roi)
+          out.flush()
+        }
+
+        out.close()
+      }
+    }
   }
 }
