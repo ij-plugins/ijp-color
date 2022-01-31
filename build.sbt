@@ -168,7 +168,7 @@ lazy val ijp_color = (project in file("ijp-color"))
       "org.apache.commons"      % "commons-math3"           % "3.6.1",
       "org.scala-lang.modules" %% "scala-collection-compat" % "2.6.0",
       // Test
-      "org.scalatest"          %% "scalatest"               % "3.2.10" % "test"
+      "org.scalatest"          %% "scalatest"               % "3.2.11" % "test"
     ),
     libraryDependencies ++= (
       if (isScala2_13(scalaVersion.value) || isScala3(scalaVersion.value)) {
@@ -231,7 +231,7 @@ lazy val ijp_color_ui = (project in file("ijp-color-ui"))
       "org.scalafx"        %% "scalafx"             % "17.0.1-R26",
       "org.scalafx"        %% "scalafx-extras"      % "0.5.0",
       // Test
-      "org.scalatest"      %% "scalatest"           % "3.2.10"  % "test"
+      "org.scalatest"      %% "scalatest"           % "3.2.11"  % "test"
     )
   )
   .dependsOn(ijp_color)
