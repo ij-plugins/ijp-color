@@ -80,6 +80,13 @@ class ChartFrame(
   def copyWith(newAlignmentTransform: PerspectiveTransform): ChartFrame =
     new ChartFrame(_referenceOutline, _chipOutlines, newAlignmentTransform)
 
+  final def alignedOutlineROI: Roi = {
+    val oDst = alignmentTransform.transform(_referenceOutline)
+    val roi  = ImageJUtils.toRoi(oDst)
+    roi.setName("Chart Outline")
+    roi
+  }
+
   /**
    * Chips ROIs with alignment transform applied to their outline.
    */
