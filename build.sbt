@@ -164,7 +164,7 @@ lazy val ijp_color = (project in file("ijp-color"))
     Test / unmanagedSourceDirectories += (Test / sourceDirectory).value / versionSubDir2v3(scalaVersion.value),
     //
     libraryDependencies ++= Seq(
-      "net.imagej"              % "ij"                      % "1.53j",
+      "net.imagej"              % "ij"                      % "1.53p",
       "org.apache.commons"      % "commons-math3"           % "3.6.1",
       "org.scala-lang.modules" %% "scala-collection-compat" % "2.7.0",
       // Test
