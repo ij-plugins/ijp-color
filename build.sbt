@@ -81,7 +81,7 @@ lazy val osName = System.getProperty("os.name") match {
   case _ => throw new Exception("Unknown platform!")
 }
 lazy val javaFXModules = Seq("base", "controls", "fxml", "graphics", "media", "swing", "web")
-lazy val javaFXVersion = "17.0.2"
+lazy val javaFXVersion = "18.0.1"
 
 val commonSettings = Seq(
   //
@@ -228,7 +228,7 @@ lazy val ijp_color_ui = (project in file("ijp-color-ui"))
     libraryDependencies ++= Seq(
       "org.jfree"           % "jfreechart-fx"       % "1.0.1",
       "org.jfree"           % "fxgraphics2d"        % "1.8",
-      "org.scalafx"        %% "scalafx"             % "17.0.1-R26",
+      "org.scalafx"        %% "scalafx"             % "18.0.1-R27",
       "org.scalafx"        %% "scalafx-extras"      % "0.5.0",
       // Test
       "org.scalatest"      %% "scalatest"           % "3.2.11"  % "test"
