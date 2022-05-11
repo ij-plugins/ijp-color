@@ -23,17 +23,21 @@
 package ij_plugins.color.ui.charttool
 
 import ij.gui.*
+import ij.io.{RoiEncoder, SaveDialog}
 import ij.measure.ResultsTable
 import ij.plugin.PlugIn
 import ij.process.ImageStatistics
 import ij.{IJ, ImagePlus}
 import ij_plugins.color.calibration.chart.{ChartFrameUtils, GridChartFrame}
 import ij_plugins.color.ui.util.*
+import ij_plugins.color.util.ImageJUtils.{saveROI, saveRoiZip}
 import ij_plugins.color.util.{ImageJUtils, PerspectiveTransform}
 import scalafx.beans.property.ObjectProperty
 
+import java.awt.*
 import java.awt.event.{WindowAdapter, WindowEvent}
-import java.awt.{AWTEvent, Color}
+import java.io.*
+import java.util.zip.{ZipEntry, ZipOutputStream}
 import scala.collection.immutable.ListMap
 import scala.util.Using
 
@@ -185,9 +189,13 @@ class ColorChartToolPlugin extends PlugIn with DialogListener with ImageListener
       addNumericField("Overlay_stroke_width", config.chipOverlayStrokeWidth, 0, 3, "")
 
       addMessage("")
+      addMessage(makeHeader("Closing Options"))
       addCheckbox("Send chip ROI to ROI Manager", config.sendToROIManager)
       addCheckbox("Measure chips", config.measureChips)
       addCheckbox("List_chip_vertices", config.listChipVertices)
+
+      addMessage("")
+      addButton("Save Chart ROIs...", (_) => saveROIs())
 
       addHelp("https://github.com/ij-plugins/ijp-color/wiki/Color-Chart-ROI-Tool")
     }
@@ -320,5 +328,34 @@ class ColorChartToolPlugin extends PlugIn with DialogListener with ImageListener
       "Kurtosis" -> stats.kurtosis,
       "Skewness" -> stats.skewness
     )
+  }
+
+  def saveROIs(): Unit = {
+    var saved = false
+    image.foreach { imp =>
+      chartOption.foreach { chart =>
+        val name       = imp.getTitle
+        val roiName    = SaveDialog.setExtension(name, ".roi")
+        val saveDialog = new SaveDialog(Title + " - Save Chart ROIs", roiName, ".roi")
+        Option(saveDialog.getFileName).foreach { selectedName =>
+          Option(saveDialog.getDirectory).foreach { directoryName =>
+            try {
+              // Save chart outline
+              saveROI(chart.alignedOutlineROI, new File(directoryName, selectedName))
+
+              // Save chip ROIs
+              val dst = chart.alignedChipROIs.map(roi => (roi.getName, roi))
+              saveRoiZip(dst, new File(directoryName, SaveDialog.setExtension(name, ".RoiSet.zip")))
+              saved = true
+            } catch {
+              case e: IOException =>
+                IJ.error(Title, s"Error saving ROIs.\n${e.getMessage}")
+            }
+          }
+        }
+      }
+    }
+
+    IJ.showMessage(Title, "ROIs " + (if (saved) "" else "not ") + "saved")
   }
 }
