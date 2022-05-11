@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2021 Jarek Sacha
+ * Copyright (C) 2002-2022 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -62,6 +62,7 @@ object ColorCalibratorUIModel {
         colorChartType          <- ColorChartType.withNameOption(colorChartTypeName)
         chipMargin              <- IJPrefs.getDoubleOption(ReferencePrefix + ".chipMargin")
         chipOverlayColorName    <- IJPrefs.getStringOption(ReferencePrefix + ".chipOverlayColorName")
+        chipOverlayStrokeWidth <- IJPrefs.getIntOption(ReferencePrefix + ".chipOverlayStrokeWidth")
         outputConfig            <- OutputConfig.loadFromIJPref()
       } yield Config(
         referenceColorSpace,
@@ -69,6 +70,7 @@ object ColorCalibratorUIModel {
         colorChartType,
         chipMargin,
         chipOverlayColorName = chipOverlayColorName,
+        chipOverlayStrokeWidth = chipOverlayStrokeWidth,
         outputConfig
       )
     }
@@ -80,6 +82,7 @@ object ColorCalibratorUIModel {
     colorChartType: ColorChartType,
     chipMargin: Double,
     chipOverlayColorName: String,
+    chipOverlayStrokeWidth: Int = 1,
     outputConfig: OutputConfig
   ) {
 
@@ -91,6 +94,7 @@ object ColorCalibratorUIModel {
       IJPrefs.set(ReferencePrefix + ".colorChartType", colorChartType.name)
       IJPrefs.set(ReferencePrefix + ".chipMargin", s"$chipMargin")
       IJPrefs.set(ReferencePrefix + ".chipOverlayColorName", chipOverlayColorName)
+      IJPrefs.set(ReferencePrefix + ".chipOverlayStrokeWidth", chipOverlayStrokeWidth)
       outputConfig.saveToIJPref()
     }
 
@@ -142,6 +146,10 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
   chipOverlayColorName.onChange((_, _, newValue) =>
     liveChartROI.overlyColor = ImageJUIColors.colorWithNameAWT(newValue)
   )
+  val chipOverlayStrokeWidth = new ObjectProperty[Integer](this, "chipOverlayStrokeWidth", 1)
+  chipOverlayStrokeWidth.onChange((_, _, newValue) =>
+    liveChartROI.overlayStrokeWidth = newValue
+  )
 
   // Parameters defining chart, beside ROI that will be handled by `liveChartROI`
   val enabledChipsType = new ObjectProperty[ChipsEnabledType](this, "chipsEnabledType", ChipsEnabledType.All)
@@ -159,6 +167,7 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
 
   val liveChartROI: LiveChartROI[GridColorChart] = new LiveChartROI[GridColorChart](image, referenceChartOption)
   liveChartROI.overlyColor = ImageJUIColors.colorWithNameAWT(chipOverlayColorName.value)
+  liveChartROI.overlayStrokeWidth = chipOverlayStrokeWidth.value
 
   val chipValuesObserved: ReadOnlyBooleanProperty = {
     val p = new ReadOnlyBooleanWrapper(this, "chipValuesObserved", false)
@@ -369,6 +378,7 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
       referenceChartType.value,
       chipMarginPercent.value / 100d,
       chipOverlayColorName = chipOverlayColorName.value,
+      chipOverlayStrokeWidth = chipOverlayStrokeWidth.value,
       outputConfig
     )
   }
@@ -381,6 +391,7 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
       referenceChartType.value = config.colorChartType
       chipMarginPercent.value = math.round(config.chipMargin * 100).toInt
       chipOverlayColorName.value = config.chipOverlayColorName
+      chipOverlayStrokeWidth.value = config.chipOverlayStrokeWidth
     }
   }
 }

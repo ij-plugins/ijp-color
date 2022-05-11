@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2021 Jarek Sacha
+ * Copyright (C) 2002-2022 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -59,6 +59,8 @@ class ColorCalibratorUIController(
   private var marginsSpinner: jfxsc.Spinner[java.lang.Integer] = _
   @jfxf.FXML
   private var chipOverlayColorChoiceBox: jfxsc.ChoiceBox[String] = _
+  @jfxf.FXML
+  private var overlayStrokeWidthSpinner: jfxsc.Spinner[java.lang.Integer] = _
   @jfxf.FXML
   private var enabledChipsChoiceBox: jfxsc.ChoiceBox[ChipsEnabledType] = _
   @jfxf.FXML
@@ -140,6 +142,11 @@ class ColorCalibratorUIController(
     }
     model.chipOverlayColorName.onChange { (_, _, newValue) =>
       chipOverlayColorChoiceBox.selectionModel.value.select(newValue)
+    }
+
+    overlayStrokeWidthSpinner.valueFactory = new IntegerSpinnerValueFactory(0, 100) {
+      value = model.chipOverlayStrokeWidth()
+      value <==> model.chipOverlayStrokeWidth
     }
 
     // Enabled chips type choice

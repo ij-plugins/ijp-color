@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2021 Jarek Sacha
+ * Copyright (C) 2002-2022 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -48,6 +48,7 @@ class ColorCalibratorUIController(
   private val editChartButton: Button,
   private val marginsSpinner: Spinner[java.lang.Integer],
   private val chipOverlayColorChoiceBox: ChoiceBox[String],
+  private var overlayStrokeWidthSpinner: Spinner[java.lang.Integer],
   private val enabledChipsChoiceBox: ChoiceBox[ChipsEnabledType],
   private val selectChipsButton: Button,
   private val referenceColorSpaceChoiceBox: ChoiceBox[ReferenceColorSpace],
@@ -115,8 +116,14 @@ class ColorCalibratorUIController(
   chipOverlayColorChoiceBox.selectionModel.value.selectedItem.onChange { (_, _, newValue) =>
     model.chipOverlayColorName.value = newValue
   }
+
   model.chipOverlayColorName.onChange { (_, _, newValue) =>
     chipOverlayColorChoiceBox.selectionModel.value.select(newValue)
+  }
+
+  overlayStrokeWidthSpinner.valueFactory = new IntegerSpinnerValueFactory(0, 100) {
+    value = model.chipOverlayStrokeWidth()
+    value <==> model.chipOverlayStrokeWidth
   }
 
   // Enabled chips type choice
