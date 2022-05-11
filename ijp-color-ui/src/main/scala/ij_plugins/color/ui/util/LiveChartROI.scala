@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2021 Jarek Sacha
+ * Copyright (C) 2002-2022 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -35,10 +35,13 @@ import java.awt.Color
  * @param imp
  *   Image which ROI is observed
  */
-class LiveChartROI[T <: ChartFrame](imp: ImagePlus, referenceChart: ReadOnlyObjectProperty[Option[T]])
-    extends RoiListener {
+class LiveChartROI[T <: ChartFrame](
+  imp: ImagePlus,
+  referenceChart: ReadOnlyObjectProperty[Option[T]]
+) extends RoiListener {
 
-  private val overlyColorProperty = new ObjectProperty(this, "overlyColorProperty", new Color(255, 0, 255, 128))
+  private val overlyColorProperty        = new ObjectProperty(this, "overlyColorProperty", new Color(255, 0, 255, 128))
+  private val overlayStrokeWidthProperty = new ObjectProperty(this, "overlayStrokeWidthProperty", 1)
 
   private val _status                = new ReadOnlyStringWrapper()
   val status: ReadOnlyStringProperty = _status.readOnlyProperty
@@ -48,6 +51,7 @@ class LiveChartROI[T <: ChartFrame](imp: ImagePlus, referenceChart: ReadOnlyObje
 
   referenceChart.onChange((_, _, _) => updateChartLocation())
   overlyColorProperty.onChange((_, _, _) => updateOverlay())
+  overlayStrokeWidthProperty.onChange((_, _, _) => updateOverlay())
 
   updateChartLocation()
 
@@ -58,9 +62,13 @@ class LiveChartROI[T <: ChartFrame](imp: ImagePlus, referenceChart: ReadOnlyObje
   }
 
   def overlyColor: Color = overlyColorProperty.value
-
   def overlyColor_=(v: Color): Unit = {
     overlyColorProperty.value = v
+  }
+
+  def overlayStrokeWidth: Int = overlayStrokeWidthProperty.value
+  def overlayStrokeWidth_=(v: Int): Unit = {
+    overlayStrokeWidthProperty.value = v
   }
 
   /**
@@ -97,7 +105,7 @@ class LiveChartROI[T <: ChartFrame](imp: ImagePlus, referenceChart: ReadOnlyObje
         val o = new Overlay()
         chart.alignedChipROIs.foreach(o.add)
         o.setStrokeColor(overlyColor)
-        o.setStrokeWidth(1d)
+        o.setStrokeWidth(overlayStrokeWidth.toDouble)
         imp.setOverlay(o)
       case None =>
         imp.setOverlay(null)
