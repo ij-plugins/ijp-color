@@ -8,7 +8,7 @@ import scala.xml.{Node => XmlNode, NodeSeq => XmlNodeSeq, _}
 
 name := "ijp-color-project"
 
-val Scala2_12 = "2.12.15"
+val Scala2_12 = "2.12.16"
 val Scala2_13 = "2.13.8"
 val Scala3_0  = "3.0.2"
 
