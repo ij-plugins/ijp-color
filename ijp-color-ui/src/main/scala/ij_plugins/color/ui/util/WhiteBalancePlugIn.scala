@@ -27,13 +27,12 @@ import ij.measure.ResultsTable
 import ij.plugin.PlugIn
 import ij.process.ColorProcessor
 import ij.{CompositeImage, IJ, ImagePlus}
-import ij_plugins.color.util.WhiteBalance
-import ij_plugins.color.util.WhiteBalance.AveragingMode
+import ij_plugins.color.util.{AveragingMode, WhiteBalance}
 
 import scala.util.control.NonFatal
 
 object WhiteBalancePlugIn {
-  private var averagingMode        = AveragingMode.Median
+  private var averagingMode: AveragingMode = AveragingMode.Median
   private var showCorrectionFactor = false
 }
 
@@ -109,7 +108,7 @@ class WhiteBalancePlugIn extends PlugIn {
   def showOptionsDialog(): Boolean = {
     val gd = new GenericDialog(TITLE, IJ.getInstance)
     gd.addPanel(IJPUtils.createInfoPanel(TITLE, ABOUT))
-    gd.addChoice("Averaging method", AveragingMode.values.map(_.name), averagingMode.name)
+    gd.addChoice("Averaging method", AveragingMode.values.map(_.name).toArray, averagingMode.name)
     gd.addCheckbox("Show correction factor", showCorrectionFactor)
 
     gd.addHelp("https://github.com/ij-plugins/ijp-color/wiki/White-Balance")

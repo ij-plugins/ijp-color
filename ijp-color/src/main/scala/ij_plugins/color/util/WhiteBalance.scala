@@ -25,7 +25,6 @@ package ij_plugins.color.util
 import ij.gui.Roi
 import ij.process.{ByteProcessor, ColorProcessor, ImageProcessor, ImageStatistics}
 import ij.{CompositeImage, IJ, ImagePlus, ImageStack}
-import ij_plugins.color.util.EnumCompanion.{WithName, WithValue}
 import ij_plugins.color.util.ImageJUtils.{mergeRGB, splitRGB}
 
 import scala.collection.immutable
@@ -33,11 +32,6 @@ import scala.collection.immutable.ListMap
 
 /** Methods for performing white balancing of RGB color images. */
 object WhiteBalance {
-
-  enum AveragingMode(val name: String) extends WithName {
-    case Mean extends AveragingMode("Mean")
-    case Median extends AveragingMode("Median")
-  }
 
   /**
     * White balance an image using provided ROI. Median color value within ROI is used.
@@ -206,7 +200,8 @@ object WhiteBalance {
     new ImagePlus("", stack)
   }
 
-  def slices(imp: ImagePlus): Seq[ImageProcessor] =
+  def slices(imp: ImagePlus): Seq[ImageProcessor] = {
     val stack = imp.getStack
     (1 to stack.getSize).map(stack.getProcessor)
+  }
 }
