@@ -126,10 +126,8 @@ val commonSettings = Seq(
     }),
   javacOptions  ++= Seq("-deprecation", "-Xlint"),
   //
-  resolvers ++= Seq(
-    Resolver.sonatypeRepo("snapshots"),
-    Resolver.mavenLocal
-  ),
+  resolvers  += Resolver.mavenLocal,
+  resolvers ++= Resolver.sonatypeOssRepos("snapshots"),
   //
   exportJars := true,
   //
