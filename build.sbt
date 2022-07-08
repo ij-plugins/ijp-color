@@ -73,16 +73,6 @@ def versionSubDir2v3(scalaVersion: String): String =
   }
 
 
-// Determine OS version of JavaFX binaries
-lazy val osName = System.getProperty("os.name") match {
-  case n if n.startsWith("Linux")   => "linux"
-  case n if n.startsWith("Mac")     => "mac"
-  case n if n.startsWith("Windows") => "win"
-  case _ => throw new Exception("Unknown platform!")
-}
-lazy val javaFXModules = Seq("base", "controls", "fxml", "graphics", "media", "swing", "web")
-lazy val javaFXVersion = "18.0.1"
-
 val commonSettings = Seq(
   //
   crossScalaVersions := _scalaVersions,
@@ -203,10 +193,9 @@ lazy val ijp_color_ui = (project in file("ijp-color-ui"))
       } else {
         Seq.empty[ModuleID]
       }),
-    // JavaFX dependencies marked as "provided"
-    libraryDependencies ++= javaFXModules.map( m =>
-      "org.openjfx" % s"javafx-$m" % javaFXVersion % "provided" classifier osName
-    ),
+    libraryDependencies ++=
+      Seq("base", "controls", "fxml", "graphics", "media", "swing", "web")
+        .map(m => "org.openjfx" % s"javafx-$m" % "18.0.1"),
     // Use `pomPostProcess` to remove dependencies marked as "provided" from publishing in POM
     // This is to avoid dependency on wrong OS version JavaFX libraries
     // See also [https://stackoverflow.com/questions/27835740/sbt-exclude-certain-dependency-only-during-publish]
@@ -240,10 +229,6 @@ lazy val experimental = (project in file("experimental"))
   .settings(
     name := "experimental",
     commonSettings,
-    // Add JavaFX dependencies
-    libraryDependencies ++= javaFXModules.map( m =>
-      "org.openjfx" % s"javafx-$m" % javaFXVersion classifier osName
-    ),
     // Do not publish this artifact
     publishArtifact := false,
     publish / skip  := true,
