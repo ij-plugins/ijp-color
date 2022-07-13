@@ -22,6 +22,8 @@
 
 package ij_plugins.color.util
 
+import enumeratum.{Enum, EnumEntry}
+
 import scala.collection.immutable
 
 sealed abstract class AveragingMode(override val entryName: String) extends EnumEntry {
