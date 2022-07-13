@@ -24,7 +24,7 @@ package ij_plugins.color.ui.calibration.tasks
 
 import ij.IJ
 import ij_plugins.color.calibration.CorrectionRecipe
-import ij_plugins.color.ui.fx.GenericDialogFX
+import ij_plugins.color.ui.fx.GenericDialogFXIJ
 import ij_plugins.color.ui.util.IJPrefs
 import ij_plugins.color.ui.util.batch.BatchProcessing
 import org.scalafx.extras.BusyWorker.SimpleTask
@@ -117,11 +117,11 @@ class ApplyInBatchTask(
     }
 
     val gd =
-      new GenericDialogFX(
+      new GenericDialogFXIJ(
         Title,
-        Option("" +
+        "" +
           "Color correction will be applied to images in the 'Input directory' with the 'Input extension'.\n" +
-          "Corrected files will be saved in the 'Output directory'."),
+          "Corrected files will be saved in the 'Output directory'.",
         parentWindow
       ) {
         addDirectoryField("Input_directory", config.inputDir.getPath)
@@ -137,13 +137,13 @@ class ApplyInBatchTask(
 
     val configOpt = {
       if (gd.wasOKed) {
-        val inputDir  = new File(gd.getNextString())
-        val inputExt  = gd.getNextString()
-        val outputDir = new File(gd.getNextString())
+        val inputDir = new File(gd.nextString())
+        val inputExt = gd.nextString()
+        val outputDir = new File(gd.nextString())
         val itemConfig = ColorCorrectionBatchItem.Config(
-          enableSaveSRGB = gd.getNextBoolean(),
+          enableSaveSRGB = gd.nextBoolean(),
           //      enableSaveXYZ = gd.getNextBoolean(),
-          enableSaveLab = gd.getNextBoolean()
+          enableSaveLab = gd.nextBoolean()
         )
         //        val enableParallelProcessing = gd.getNextBoolean()
 

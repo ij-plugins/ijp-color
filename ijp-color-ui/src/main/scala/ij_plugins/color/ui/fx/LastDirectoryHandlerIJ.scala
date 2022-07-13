@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2021 Jarek Sacha
+ * Copyright (C) 2002-2022 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -22,22 +22,31 @@
 
 package ij_plugins.color.ui.fx
 
-import scalafx.scene.control.{TextField, TextFormatter}
-import scalafx.util.converter.FormatStringConverter
+import ij.io.OpenDialog
+import org.scalafx.extras.generic_dialog.LastDirectoryHandler
+import scalafx.stage.Window
 
-import java.text.DecimalFormat
+import java.io.File
 
-class NumberTextField(decimalPlaces: Int = 6) extends TextField {
-  private val format = {
-    val pattern =
-      if (decimalPlaces > 0) {
-        "0." + ("0" * decimalPlaces)
-      } else
-        "0"
+/**
+  * Integrates last directory handling with ImageJ
+  */
+object LastDirectoryHandlerIJ extends LastDirectoryHandler {
 
-    new DecimalFormat(pattern)
+  def lastDirectory: java.io.File = {
+    Option(OpenDialog.getDefaultDirectory) match {
+      case Some(dir) =>
+        val f = new File(dir)
+        if (f.exists() & f.isFile) f.getParentFile else f
+      case None => new File(".")
+    }
   }
-  private val converter = new FormatStringConverter[Number](format)
-  val model             = new TextFormatter(converter)
-  textFormatter = model
+
+  def lastDirectory_=(newDir: java.io.File): Unit = {
+    Option(newDir).foreach { f =>
+      val dir = if (f.exists() & f.isFile) f.getParentFile else f
+      OpenDialog.setLastDirectory(dir.getAbsolutePath)
+      OpenDialog.setDefaultDirectory(dir.getAbsolutePath)
+    }
+  }
 }

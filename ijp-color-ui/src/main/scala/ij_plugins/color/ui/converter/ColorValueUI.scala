@@ -24,7 +24,7 @@ package ij_plugins.color.ui.converter
 
 import ij_plugins.color.converter.ColorTriple
 import ij_plugins.color.converter.ColorTriple.Color123
-import ij_plugins.color.ui.fx.NumberTextField
+import org.scalafx.extras.generic_dialog.NumberTextField
 import scalafx.Includes.*
 import scalafx.beans.property.ObjectProperty
 import scalafx.geometry.Pos

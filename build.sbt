@@ -12,7 +12,7 @@ val Scala2_12 = "2.12.16"
 val Scala2_13 = "2.13.8"
 val Scala3_0  = "3.0.2"
 
-val _version       = "0.11.4.2-SNAPSHOT"
+val _version       = "0.11.4.3-SNAPSHOT"
 val _scalaVersions = Seq(Scala2_13, Scala2_12, Scala3_0)
 //val _scalaVersion  = _scalaVersions.head
 val _scalaVersion  = Scala3_0
@@ -216,7 +216,7 @@ lazy val ijp_color_ui = (project in file("ijp-color-ui"))
       "org.jfree"           % "jfreechart-fx"       % "1.0.1",
       "org.jfree"           % "fxgraphics2d"        % "1.8",
       "org.scalafx"        %% "scalafx"             % "18.0.1-R27",
-      "org.scalafx"        %% "scalafx-extras"      % "0.5.0",
+      "org.scalafx"        %% "scalafx-extras"      % "0.5.0.2-SNAPSHOT",
       // Test
       "org.scalatest"      %% "scalatest"           % "3.2.11"  % "test"
     )

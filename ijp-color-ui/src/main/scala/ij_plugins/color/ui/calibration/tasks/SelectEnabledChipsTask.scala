@@ -25,7 +25,7 @@ package ij_plugins.color.ui.calibration.tasks
 import ij_plugins.color.calibration.chart.GridColorChart
 import ij_plugins.color.converter.ColorConverter
 import ij_plugins.color.converter.ColorTriple.{Lab, RGB, XYZ}
-import ij_plugins.color.ui.fx.GenericDialogFX
+import ij_plugins.color.ui.fx.GenericDialogFXIJ
 import org.scalafx.extras.BusyWorker.SimpleTask
 import org.scalafx.extras.onFXAndWait
 import scalafx.beans.property.{BooleanProperty, ObjectProperty, StringProperty}
@@ -147,10 +147,10 @@ class SelectEnabledChipsTask(chart: GridColorChart, parentWindow: Option[Window]
     onFXAndWait {
 
       val dialog =
-        new GenericDialogFX(
+        new GenericDialogFXIJ(
           title = Title,
-          header = Option("An attempt to emulate ImageJ's GenericDialog."),
-          parentWindowOption = parentWindow
+          header = "An attempt to emulate ImageJ's GenericDialog.",
+          parentWindow = parentWindow
         ) {
           addNode(createTableView(data))
           addHelp("https://github.com/ij-plugins/ijp-color/wiki/Select-Enabled-Chips")
