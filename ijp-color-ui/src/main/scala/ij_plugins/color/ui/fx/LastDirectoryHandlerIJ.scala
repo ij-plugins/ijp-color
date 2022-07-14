@@ -24,7 +24,6 @@ package ij_plugins.color.ui.fx
 
 import ij.io.OpenDialog
 import org.scalafx.extras.generic_dialog.LastDirectoryHandler
-import scalafx.stage.Window
 
 import java.io.File
 

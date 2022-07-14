@@ -25,8 +25,7 @@ package ij_plugins.color.ui.util
 import ij.gui.GenericDialog
 import ij.measure.ResultsTable
 import ij.plugin.PlugIn
-import ij.process.ColorProcessor
-import ij.{CompositeImage, IJ, ImagePlus}
+import ij.{IJ, ImagePlus}
 import ij_plugins.color.util.{AveragingMode, WhiteBalance}
 
 import scala.util.control.NonFatal

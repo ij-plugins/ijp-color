@@ -23,7 +23,7 @@
 package ij_plugins.color.ui.charttool
 
 import ij.gui.*
-import ij.io.{RoiEncoder, SaveDialog}
+import ij.io.SaveDialog
 import ij.measure.ResultsTable
 import ij.plugin.PlugIn
 import ij.process.ImageStatistics
@@ -37,9 +37,7 @@ import scalafx.beans.property.ObjectProperty
 import java.awt.*
 import java.awt.event.{WindowAdapter, WindowEvent}
 import java.io.*
-import java.util.zip.{ZipEntry, ZipOutputStream}
 import scala.collection.immutable.ListMap
-import scala.util.Using
 
 object ColorChartToolPlugin {
 

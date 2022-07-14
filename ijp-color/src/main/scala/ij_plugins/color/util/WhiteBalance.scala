@@ -27,9 +27,6 @@ import ij.process.{ByteProcessor, ColorProcessor, ImageProcessor, ImageStatistic
 import ij.{CompositeImage, IJ, ImagePlus, ImageStack}
 import ij_plugins.color.util.ImageJUtils.{mergeRGB, splitRGB}
 
-import scala.collection.immutable
-import scala.collection.immutable.ListMap
-
 /** Methods for performing white balancing of RGB color images. */
 object WhiteBalance {
 
