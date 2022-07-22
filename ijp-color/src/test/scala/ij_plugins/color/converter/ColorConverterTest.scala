@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2021 Jarek Sacha
+ * Copyright (C) 2002-2022 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -136,7 +136,7 @@ class ColorConverterTest extends AnyFlatSpec {
   it should "convert RGB to XYZ with scaled RGB" in {
     val converter = new ColorConverter(ReferenceWhite.D50, AdobeRGB1998, None, rgbScale = 255, xyzScale = 1)
 
-    val rgb = RGB(178, 217, 18)
+    val rgb = RGB(Array[Double](178, 217, 18))
     val xyz = converter.rgbToXYZ(rgb.r, rgb.g, rgb.b)
     xyz.x should be(0.392179 +- 0.00001)
     xyz.y should be(0.574946 +- 0.00001)

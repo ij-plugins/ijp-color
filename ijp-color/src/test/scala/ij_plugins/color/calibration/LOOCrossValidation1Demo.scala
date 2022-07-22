@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2021 Jarek Sacha
+ * Copyright (C) 2002-2022 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -79,8 +79,7 @@ object LOOCrossValidation1Demo {
     printBestInfo(crossValidations)
 
     // LOO-CV with invalid-reference-chips disabled
-    val enabled2 = chart.enabled.toArray
-    enabled2(6) = false
+    val enabled2 = chart.enabled.updated(6, false)
     val chart2 = chart.copyWithEnabled(enabled2)
     val crossValidations2 =
       LOOCrossValidation.crossValidationStatsAll(chart2, imp, ReferenceColorSpace.values, MappingMethod.values)

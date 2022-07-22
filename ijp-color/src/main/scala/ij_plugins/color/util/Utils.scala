@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2021 Jarek Sacha
+ * Copyright (C) 2002-2022 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -46,12 +46,15 @@ object Utils {
     math.sqrt(sum)
   }
 
+  def delta(a: IndexedSeq[Double], b: IndexedSeq[Double]): Double = delta(a.toArray, b.toArray)
+
+
   /**
-   * Clip all elements of the input array to range suitable for an 8-bit unsigned integer: 0 to 255.
-   *
-   * Values in the range will be rounded to the closest integer. Values less than 0 will be set to 0. Values greater
-   * than 255 will be set to 255.
-   */
+    * Clip all elements of the input array to range suitable for an 8-bit unsigned integer: 0 to 255.
+    *
+    * Values in the range will be rounded to the closest integer. Values less than 0 will be set to 0. Values greater
+    * than 255 will be set to 255.
+    */
   def clipUInt8(a: Array[Double]): Array[Int] = {
     assert(a != null)
     val r = new Array[Int](a.length)

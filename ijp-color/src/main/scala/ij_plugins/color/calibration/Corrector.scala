@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2021 Jarek Sacha
+ * Copyright (C) 2002-2022 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -42,13 +42,13 @@ trait Corrector {
   protected def evaluate(src: Array[Double], dest: Array[Double]): Unit
 
   /**
-   * Map color triplet.
-   *
-   * @param src
-   *   input color values. The array must be of size 3.
-   * @return
-   *   new color triplet.
-   */
+    * Map color triplet.
+    *
+    * @param src
+    * input color values. The array must be of size 3.
+    * @return
+    * new color triplet.
+    */
   def map(src: Array[Double]): Array[Double] = {
     require(src.length == 3, "Color space mapping can only be done when input image has 3 color bands")
 
@@ -57,25 +57,27 @@ trait Corrector {
     dest
   }
 
+  def map(src: IndexedSeq[Double]): IndexedSeq[Double] = map(src.toArray).toIndexedSeq
+
   def map(a: Array[Array[Double]]): Array[Array[Double]] = {
     a.map(map)
   }
 
   /**
-   * Color calibrate input image `src`, convert result to sRGB color space.
-   *
-   * Calibration mapping must be set before calling this method. It is critical to only use this method on the same type
-   * of an image as it was used for computing the calibration mapping.
-   *
-   * @param src
-   *   image to be calibrated.
-   * @return
-   *   converted image in sRGB color space.
-   * @throws java.lang.IllegalArgumentException
-   *   if the mapping was not set.
-   * @see
-   *   #map[T <: ImageProcessor](src: Array[T])
-   */
+    * Color calibrate input image `src`, convert result to sRGB color space.
+    *
+    * Calibration mapping must be set before calling this method. It is critical to only use this method on the same type
+    * of an image as it was used for computing the calibration mapping.
+    *
+    * @param src
+    * image to be calibrated.
+    * @return
+    * converted image in sRGB color space.
+    * @throws java.lang.IllegalArgumentException
+    * if the mapping was not set.
+    * @see
+    * #map[T <: ImageProcessor](src: Array[T])
+    */
   def mapToFloat(src: ColorProcessor): Array[FloatProcessor] = {
     map(ImageJUtils.splitRGB(src))
   }

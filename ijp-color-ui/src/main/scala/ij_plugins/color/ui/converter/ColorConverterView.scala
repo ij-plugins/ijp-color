@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2021 Jarek Sacha
+ * Copyright (C) 2002-2022 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -157,10 +157,10 @@ class ColorConverterView(val model: ColorConverterModel) {
     addColorUI(row, buttonRGB, rgbUI.control, Some("[0-255]"))
     row += 1
 
-    addChoiceBox(row, "Ref. White", model.referenceWhite, ReferenceWhite.values)
+    addChoiceBox(row, "Ref. White", model.referenceWhite, ReferenceWhite.values.toSeq)
     row += 1
 
-    addChoiceBox(row, "RGB Model", model.rgbWorkingSpace, RGBWorkingSpace.values)
+    addChoiceBox(row, "RGB Model", model.rgbWorkingSpace, RGBWorkingSpace.values.toSeq)
     gp.add(
       new Label {
         id = "ijp-label"

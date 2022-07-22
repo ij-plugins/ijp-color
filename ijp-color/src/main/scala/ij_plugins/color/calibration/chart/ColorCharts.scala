@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2021 Jarek Sacha
+ * Copyright (C) 2002-2022 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -41,7 +41,7 @@ object ColorCharts {
     ColorChartType.GretagMacbethColorChecker.name,
     6,
     4,
-    List(
+    IndexedSeq(
       ("Dark skin", Lab(40.59, 14.68, 16.83)),
       ("Light skin", Lab(68.22, 22.21, 20.33)),
       ("Blue sky", Lab(49.31, -9.20, -23.05)),
@@ -81,7 +81,7 @@ object ColorCharts {
     ColorChartType.XRitePassportColorChecker.name,
     6,
     4,
-    List(
+    IndexedSeq(
       ("Dark Skin", Lab(38.96, 12.13, 13.84)),
       ("Light Skin", Lab(65.50, 15.59, 16.81)),
       ("Blue Sky", Lab(50.69, -2.09, -21.75)),
@@ -120,7 +120,7 @@ object ColorCharts {
     ColorChartType.ImageScienceColorGaugeMatte.name,
     6,
     5,
-    List(
+    IndexedSeq(
       ("1", Lab(38.76, 13.81, 14.69)),
       ("2", Lab(65.15, 19.21, 17.92)),
       ("3", Lab(49.61, -4.20, -21.33)),
@@ -157,7 +157,7 @@ object ColorCharts {
   )
 
   /** All pre-defined color charts */
-  val values = List(GretagMacbethColorChecker, XRitePassportColorChecker, ImageScienceColorGaugeMatte)
+  val values: Seq[GridColorChart] = Seq(GretagMacbethColorChecker, XRitePassportColorChecker, ImageScienceColorGaugeMatte)
 
   def withColorChartType(colorChartType: ColorChartType): Option[GridColorChart] = {
     require(colorChartType != null, "'colorChartType' cannot be null.")
@@ -165,25 +165,25 @@ object ColorCharts {
   }
 
   /**
-   * Load chart reference values from a CSV file represented in CIE L*a*b* color space.
-   *
-   * The file is expected to have at least 4 columns: "SAMPLE_NAME", "LAB_L", "LAB_A", "LAB_B". Any additional columns
-   * will be ignored.
-   *
-   * Example of a file with 4 chips:
-   *
-   * {{{
-   * SAMPLE_NAME,LAB_L,LAB_A,LAB_B
-   * 1,38.675,12.907,14.358,19.306
-   * 2,65.750,19.811,17.790,26.626
-   * 3,50.373,-3.646,-22.360,22.656
-   * 4,43.697,-13.342,22.858,26.466
-   * }}}
-   *
-   * @return
-   *   list of tuples representing chip name and reference value in CIE L*a*b*
-   */
-  def loadReferenceValues(file: File): List[(String, ColorTriple.Lab)] = {
+    * Load chart reference values from a CSV file represented in CIE L*a*b* color space.
+    *
+    * The file is expected to have at least 4 columns: "SAMPLE_NAME", "LAB_L", "LAB_A", "LAB_B". Any additional columns
+    * will be ignored.
+    *
+    * Example of a file with 4 chips:
+    *
+    * {{{
+    * SAMPLE_NAME,LAB_L,LAB_A,LAB_B
+    * 1,38.675,12.907,14.358,19.306
+    * 2,65.750,19.811,17.790,26.626
+    * 3,50.373,-3.646,-22.360,22.656
+    * 4,43.697,-13.342,22.858,26.466
+    * }}}
+    *
+    * @return
+    * list of tuples representing chip name and reference value in CIE L*a*b*
+    */
+  def loadReferenceValues(file: File): IndexedSeq[(String, ColorTriple.Lab)] = {
 
     require(file.exists(), "File must exist: " + file.getCanonicalPath)
     val rt = ResultsTable.open(file.getCanonicalPath)
@@ -193,22 +193,21 @@ object ColorCharts {
     }
 
     val headingName = "SAMPLE_NAME"
-    val headingL    = "LAB_L"
-    val headingA    = "LAB_A"
-    val headingB    = "LAB_B"
+    val headingL = "LAB_L"
+    val headingA = "LAB_A"
+    val headingB = "LAB_B"
     Seq(headingName, headingL, headingA, headingB).foreach(checkForColumn)
 
     val chips =
       (0 until rt.size())
         .map { r =>
           val name = rt.getStringValue(headingName, r)
-          val l    = rt.getValue(headingL, r)
-          val a    = rt.getValue(headingA, r)
-          val b    = rt.getValue(headingB, r)
+          val l = rt.getValue(headingL, r)
+          val a = rt.getValue(headingA, r)
+          val b = rt.getValue(headingB, r)
 
           (name, ColorTriple.Lab(l, a, b))
         }
-        .toList
 
     chips
   }

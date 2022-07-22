@@ -207,7 +207,7 @@ class ColorCalibratorUIModel(val image: ImagePlus, parentWindow: Window) extends
             for {
               currentChart <- referenceChartOptionWrapper.value
             } yield {
-              newChart2.copyWithEnabled(currentChart.enabled.toArray)
+              newChart2.copyWithEnabled(currentChart.enabled)
             }
           ).getOrElse(newChart2)
         }

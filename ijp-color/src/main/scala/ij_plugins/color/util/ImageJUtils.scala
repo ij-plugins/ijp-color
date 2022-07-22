@@ -138,33 +138,36 @@ object ImageJUtils {
   }
 
   /**
-   * Measure color within ROI.
-   *
-   * @param tri
-   *   three bands of an image, may represent only color space.
-   * @param outline
-   *   outline of the region of interest.
-   * @return
-   *   average color in the ROI.
-   * @see
-   *   #measureColorXY(ij.process.ImageProcessor[], ij.gui.Roi)
-   */
+    * Measure color within ROI.
+    *
+    * @param tri
+    * three bands of an image, may represent only color space.
+    * @param outline
+    * outline of the region of interest.
+    * @return
+    * average color in the ROI.
+    * @see
+    * #measureColorXY(ij.process.ImageProcessor[], ij.gui.Roi)
+    */
   def measureColor[T <: ImageProcessor](tri: Array[T], outline: Array[Point2D]): Array[Double] = {
     measureColor(tri, toRoi(outline.toSeq))
   }
 
+  def measureColor[T <: ImageProcessor](tri: IndexedSeq[T], outline: IndexedSeq[Point2D]): IndexedSeq[Double] =
+    measureColor(tri, toRoi(outline))
+
   /**
-   * Measure color within ROI.
-   *
-   * @param tri
-   *   three bands of an image, may represent only color space.
-   * @param roi
-   *   region of interest.
-   * @return
-   *   average color in the ROI.
-   * @see
-   *   #measureColorXY(ij.process.ImageProcessor[], ij.gui.Roi)
-   */
+    * Measure color within ROI.
+    *
+    * @param tri
+    * three bands of an image, may represent only color space.
+    * @param roi
+    * region of interest.
+    * @return
+    * average color in the ROI.
+    * @see
+    * #measureColorXY(ij.process.ImageProcessor[], ij.gui.Roi)
+    */
   def measureColor[T <: ImageProcessor](tri: Array[T], roi: Roi): Array[Double] = {
     val color: Array[Double] = new Array[Double](tri.length)
     for (i <- tri.indices) {
@@ -174,16 +177,23 @@ object ImageJUtils {
     color
   }
 
+  def measureColor[T <: ImageProcessor](tri: IndexedSeq[T], roi: Roi): IndexedSeq[Double] = {
+    tri.map { ip =>
+      ip.setRoi(roi)
+      ip.getStatistics.mean
+    }
+  }
+
   /**
-   * @param src
-   *   images to validate
-   * @param length
-   *   expected number of images
-   * @tparam T
-   *   image processor type
-   * @throws java.lang.IllegalArgumentException
-   *   if the images in the array are not of the same dimension.
-   */
+    * @param src
+    * images to validate
+    * @param length
+    * expected number of images
+    * @tparam T
+    * image processor type
+    * @throws java.lang.IllegalArgumentException
+    * if the images in the array are not of the same dimension.
+    */
   @inline
   def validateSameDimensions[T <: ImageProcessor](src: Array[T], length: Int): Unit = {
     require(src != null, "Input cannot be null.")

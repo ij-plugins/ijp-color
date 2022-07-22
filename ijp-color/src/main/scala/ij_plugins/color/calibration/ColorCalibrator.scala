@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2021 Jarek Sacha
+ * Copyright (C) 2002-2022 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -29,29 +29,29 @@ import ij_plugins.color.calibration.chart.{ColorChart, ReferenceColorSpace}
 import ij_plugins.color.calibration.regression.{CubicPolynomialTriple, MappingFactory, MappingMethod}
 import ij_plugins.color.util.Utils.{clipUInt8D, delta}
 
+import scala.reflect.ClassTag
+
 /** Color calibration helper methods */
 object ColorCalibrator {
 
   /**
-   * Results of computing color calibration.
-   *
-   * @param reference
-   *   reference color values
-   * @param observed
-   *   observed color values
-   * @param corrected
-   *   color values after calibration
-   * @param corrector
-   *   coefficients of the polynomial mapping functions.
-   */
-  case class CalibrationFit(
-    reference: Array[Array[Double]],
-    observed: Array[Array[Double]],
-    corrected: Array[Array[Double]],
-    corrector: CubicPolynomialTriple
-  ) {
+    * Results of computing color calibration.
+    *
+    * @param reference
+    * reference color values
+    * @param observed
+    * observed color values
+    * @param corrected
+    * color values after calibration
+    * @param corrector
+    * coefficients of the polynomial mapping functions.
+    */
+  case class CalibrationFit(reference: IndexedSeq[IndexedSeq[Double]],
+                            observed: IndexedSeq[IndexedSeq[Double]],
+                            corrected: IndexedSeq[IndexedSeq[Double]],
+                            corrector: CubicPolynomialTriple) {
     // Validate inputs
-    require(reference.length > 0)
+    require(reference.nonEmpty)
     require(reference.forall(_.length == 3))
     require(observed.length == reference.length)
     require(observed.forall(_.length == 3))
@@ -59,8 +59,8 @@ object ColorCalibrator {
     require(corrected.forall(_.length == 3))
 
     /**
-     */
-    def correctedDeltas: Array[Double] = reference zip corrected map (p => delta(p._1, p._2))
+      */
+    def correctedDeltas: IndexedSeq[Double] = reference zip corrected map (p => delta(p._1, p._2))
   }
 
   /** Create instance of ColorCalibrator */
@@ -115,50 +115,52 @@ class ColorCalibrator(
   import ColorCalibrator.*
 
   /**
-   * Compute coefficients of a polynomial color mapping between the reference and observed colors.
-   *
-   * @param observed
-   *   Actually observed color values.
-   * @return
-   *   color mapping coefficients.
-   * @throws java.lang.IllegalArgumentException
-   *   when the reference and observed values are not sufficient to compute mapping polynomial coefficients, for
-   *   instance, if the desired polynomial order is too high given the number of reference colors.
-   */
-  def computeCalibrationMapping(observed: Array[Array[Double]]): CalibrationFit = {
+    * Compute coefficients of a polynomial color mapping between the reference and observed colors.
+    *
+    * @param observed
+    * Actually observed color values.
+    * @return
+    * color mapping coefficients.
+    * @throws java.lang.IllegalArgumentException
+    * when the reference and observed values are not sufficient to compute mapping polynomial coefficients, for
+    * instance, if the desired polynomial order is too high given the number of reference colors.
+    */
+  def computeCalibrationMapping(observed: IndexedSeq[IndexedSeq[Double]]): CalibrationFit = {
     require(
       observed.length == chart.referenceChipsEnabled.length,
       s"Expecting ${chart.referenceChipsEnabled.length} observations, got ${observed.length}."
     )
     require(observed.forall(_.length == 3))
 
-    val reference = chart.referenceColorEnabled(referenceColorSpace).clone()
-    if (clipReferenceRGB && ReferenceColorSpace.sRGB == referenceColorSpace) {
-      reference.foreach(r => {
+
+    val referenceClipped = {
+      val reference1 = chart.referenceColorEnabled(referenceColorSpace)
+
+      if (clipReferenceRGB && ReferenceColorSpace.sRGB == referenceColorSpace) {
         // Values should be clipped, but decimal precision should net be truncated
-        r(0) = clipUInt8D(r(0))
-        r(1) = clipUInt8D(r(1))
-        r(2) = clipUInt8D(r(2))
-      })
+        reference1.map(r => r.map(clipUInt8D))
+      } else {
+        reference1
+      }
     }
 
-    require(reference.length == observed.length)
+    require(referenceClipped.length == observed.length)
 
-    val corrector = MappingFactory.createCubicPolynomialTriple(reference, observed, mappingMethod)
+    val corrector = MappingFactory.createCubicPolynomialTriple(referenceClipped, observed, mappingMethod)
     val corrected = observed.map(corrector.map)
 
-    CalibrationFit(reference = reference, observed = observed, corrected = corrected, corrector)
+    CalibrationFit(reference = referenceClipped, observed = observed, corrected = corrected, corrector)
   }
 
   /**
-   * Estimate calibration coefficient. This method does not clip reference color values.
-   *
-   * @param bands
-   *   input image bands to measure observed color value of chart's chips.
-   * @throws java.lang.IllegalArgumentException
-   *   if one of the calibration mapping functions cannot be computed.
-   */
-  def computeCalibrationMapping[T <: ImageProcessor](bands: Array[T]): CalibrationFit = {
+    * Estimate calibration coefficient. This method does not clip reference color values.
+    *
+    * @param bands
+    * input image bands to measure observed color value of chart's chips.
+    * @throws java.lang.IllegalArgumentException
+    * if one of the calibration mapping functions cannot be computed.
+    */
+  def computeCalibrationMapping[T <: ImageProcessor : ClassTag](bands: IndexedSeq[T]): CalibrationFit = {
     require(
       (bands.forall(_.isInstanceOf[ByteProcessor]) |
         bands.forall(_.isInstanceOf[ShortProcessor]) |
@@ -200,7 +202,7 @@ class ColorCalibrator(
         val src = image.getProcessor.asInstanceOf[ColorProcessor]
         computeCalibrationMapping(src)
       case (GRAY8, 3) | (GRAY16, 3) | (GRAY32, 3) =>
-        val src = (1 to 3).map(image.getStack.getProcessor).toArray
+        val src = (1 to 3).map(image.getStack.getProcessor)
         computeCalibrationMapping(src)
       case _ =>
         throw new IllegalArgumentException(

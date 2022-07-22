@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2021 Jarek Sacha
+ * Copyright (C) 2002-2022 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -38,41 +38,40 @@ object Regression {
   )
 
   /**
-   * Compute linear fit coefficient
-   * {{{
-   *   s = A*o.
-   * }}}
-   *
-   * @param standard
-   *   array of expected output values.
-   * @param observation
-   *   array of input values
-   * @return
-   *   linear fit coefficients
-   * @see
-   *   #regression(double[], double[][], boolean)
-   */
-  def regression(standard: Array[Double], observation: Array[Array[Double]]): Regression.Result = {
+    * Compute linear fit coefficient
+    * {{{
+    *   s = A*o.
+    * }}}
+    *
+    * @param standard
+    * array of expected output values.
+    * @param observation
+    * array of input values
+    * @return
+    * linear fit coefficients
+    * @see
+    * #regression(double[], double[][], boolean)
+    */
+  def regression(standard: Array[Double], observation: IndexedSeq[IndexedSeq[Double]]): Regression.Result = {
     regression(standard, observation, noIntercept = true)
   }
 
   /**
-   * Compute linear fit coefficient `s = A*o` if `noIntercept` is true or `s = A*o + b` if `noIntercept` is `false`.
-   *
-   * @param standard
-   *   array of expected output values.
-   * @param observation
-   *   array of input values
-   * @param noIntercept
-   *   true means the model is to be estimated without an intercept term
-   * @return
-   *   linear fit coefficients
-   */
-  def regression(
-    standard: Array[Double],
-    observation: Array[Array[Double]],
-    noIntercept: Boolean
-  ): Regression.Result = {
+    * Compute linear fit coefficient `s = A*o` if `noIntercept` is true or `s = A*o + b` if `noIntercept` is `false`.
+    *
+    * @param standard
+    * array of expected output values.
+    * @param observation
+    * array of input values
+    * @param noIntercept
+    * true means the model is to be estimated without an intercept term
+    * @return
+    * linear fit coefficients
+    */
+  def regression(standard: Array[Double],
+                 observation: IndexedSeq[IndexedSeq[Double]],
+                 noIntercept: Boolean
+                ): Regression.Result = {
     require(standard != null, "Argument `standard` cannot be null.")
     require(observation != null, "Argument `observation` cannot be null.")
     require(observation.length == standard.length)
@@ -87,7 +86,7 @@ object Regression {
 
     val regression = new OLSMultipleLinearRegression()
     regression.setNoIntercept(noIntercept)
-    regression.newSampleData(standard, observation)
+    regression.newSampleData(standard, toArrayArray(observation))
     Regression.Result(
       numberOfSamples = standard.length,
       beta = regression.estimateRegressionParameters,
@@ -99,16 +98,16 @@ object Regression {
   }
 
   /**
-   * Compute linear fit coefficients that map observations to a reference: `s = A*[o, 1]`.
-   *
-   * @param standard
-   *   reference values.
-   * @param observation
-   *   observed values.
-   * @return
-   *   linear fit coefficients.
-   */
-  def createLinear(standard: Array[Double], observation: Array[Array[Double]]): Regression.Result = {
+    * Compute linear fit coefficients that map observations to a reference: `s = A*[o, 1]`.
+    *
+    * @param standard
+    * reference values.
+    * @param observation
+    * observed values.
+    * @return
+    * linear fit coefficients.
+    */
+  def createLinear(standard: Array[Double], observation: IndexedSeq[IndexedSeq[Double]]): Regression.Result = {
     regression(standard, observation, noIntercept = false)
   }
 }

@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2021 Jarek Sacha
+ * Copyright (C) 2002-2022 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -63,7 +63,7 @@ object LOOCrossValidation {
     mappingMethod: MappingMethod,
     image: ImagePlus
   ): IndexedSeq[Deltas] = {
-    val observed: Array[Array[Double]] = chart.averageChipColor(image)
+    val observed: IndexedSeq[IndexedSeq[Double]] = chart.averageChipColor(image)
 
     crossValidation(chart, referenceColorSpace, mappingMethod, observed)
   }
@@ -80,19 +80,19 @@ object LOOCrossValidation {
    *   deltaA, deltaB)
    */
   def crossValidation(
-    chart: ColorChart,
-    referenceColorSpace: ReferenceColorSpace,
-    mappingMethod: MappingMethod,
-    observedSamples: Array[Array[Double]]
-  ): IndexedSeq[Deltas] = {
+                       chart: ColorChart,
+                       referenceColorSpace: ReferenceColorSpace,
+                       mappingMethod: MappingMethod,
+                       observedSamples: IndexedSeq[IndexedSeq[Double]]
+                     ): IndexedSeq[Deltas] = {
 
     require(chart.referenceChipsEnabled.length == observedSamples.length)
 
     val n = chart.referenceChips.size
 
     // A hack to match indices in a full chart with indices in observations - inset null observations
-    val observedSamples2: Array[Array[Double]] = {
-      val a2 = new Array[Array[Double]](n)
+    val observedSamples2: IndexedSeq[IndexedSeq[Double]] = {
+      val a2 = new Array[IndexedSeq[Double]](n)
       var ii = 0
       for (i <- 0 until n) {
         if (chart.enabled(i)) {
@@ -103,7 +103,7 @@ object LOOCrossValidation {
           a2(i) = null
         }
       }
-      a2
+      a2.toIndexedSeq
     }
 
     val excludeInvalidRGBRef = false
@@ -119,8 +119,7 @@ object LOOCrossValidation {
 
     for (i <- 0 until n if enabledChips(i)) yield {
       // Disable i-th chip when computing calibration coefficients
-      val enabled = enabledChips.clone()
-      enabled(i) = false
+      val enabled = enabledChips.updated(i, false)
       val leaveOneOutChart = chart.copyWithEnabled(enabled)
 
       // Compute color mapping coefficients
@@ -159,17 +158,17 @@ object LOOCrossValidation {
     image: ImagePlus
   ): CrossValidationData = {
 
-    val observedSamples: Array[Array[Double]] = chart.averageChipColor(image)
+    val observedSamples: IndexedSeq[IndexedSeq[Double]] = chart.averageChipColor(image)
 
     crossValidationStats(chart, referenceColorSpace, mappingMethod, observedSamples)
   }
 
   def crossValidationStats(
-    chart: ColorChart,
-    referenceColorSpace: ReferenceColorSpace,
-    mappingMethod: MappingMethod,
-    observedSamples: Array[Array[Double]]
-  ): CrossValidationData = {
+                            chart: ColorChart,
+                            referenceColorSpace: ReferenceColorSpace,
+                            mappingMethod: MappingMethod,
+                            observedSamples: IndexedSeq[IndexedSeq[Double]]
+                          ): CrossValidationData = {
     val _statsDeltaE = new DescriptiveStatistics()
     val _statsDeltaL = new DescriptiveStatistics()
     val _statsDeltaA = new DescriptiveStatistics()
@@ -198,20 +197,21 @@ object LOOCrossValidation {
     mappingMethods: Seq[MappingMethod]
   ): Seq[CrossValidationData] = {
 
-    val observedSamples: Array[Array[Double]] = chart.averageChipColorEnabled(image)
+    val observedSamples: IndexedSeq[IndexedSeq[Double]] = chart.averageChipColorEnabled(image)
 
     crossValidationStatsAll(chart, observedSamples, referenceColorSpaces, mappingMethods)
   }
 
   def crossValidationStatsAll(
-    chart: ColorChart,
-    observedSamples: Array[Array[Double]],
-    referenceColorSpaces: Seq[ReferenceColorSpace],
-    mappingMethods: Seq[MappingMethod]
-  ): Seq[CrossValidationData] = {
+                               chart: ColorChart,
+                               observedSamples: IndexedSeq[IndexedSeq[Double]],
+                               referenceColorSpaces: Seq[ReferenceColorSpace],
+                               mappingMethods: Seq[MappingMethod]
+                             ): Seq[CrossValidationData] = {
+
 
     val refSpaceMethods = for (
-      rcs    <- referenceColorSpaces;
+      rcs <- referenceColorSpaces;
       method <- mappingMethods
     ) yield (rcs, method)
 

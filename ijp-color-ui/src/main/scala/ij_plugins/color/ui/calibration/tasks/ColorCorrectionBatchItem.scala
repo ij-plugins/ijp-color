@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2021 Jarek Sacha
+ * Copyright (C) 2002-2022 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -71,7 +71,9 @@ object ColorCorrectionBatchItem {
 
     val files = inputDir.listFiles().filter(_.getName.endsWith(inputExt))
 
-    files.map(file => new ColorCorrectionBatchItem(recipe, file, dstDir = outputDir, config = itemConfig))
+    files
+      .map(file => new ColorCorrectionBatchItem(recipe, file, dstDir = outputDir, config = itemConfig))
+      .toSeq
   }
 
   def nameWithoutExtension(file: File): String = {

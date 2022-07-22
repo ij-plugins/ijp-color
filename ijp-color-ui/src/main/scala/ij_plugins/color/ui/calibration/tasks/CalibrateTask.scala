@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2021 Jarek Sacha
+ * Copyright (C) 2002-2022 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -114,12 +114,11 @@ object CalibrateTask {
 
   }
 
-  private def showScatterChart(
-    x: Array[Array[Double]],
-    y: Array[Array[Double]],
-    seriesLabels: Array[String],
-    chartTitle: String
-  ): Unit = {
+  private def showScatterChart(x: IndexedSeq[IndexedSeq[Double]],
+                               y: IndexedSeq[IndexedSeq[Double]],
+                               seriesLabels: Array[String],
+                               chartTitle: String
+                              ): Unit = {
 
     require(x.length == y.length)
     require(seriesLabels.length == 3)
@@ -431,13 +430,12 @@ class CalibrateTask(
       "\n")
   }
 
-  private def showColorErrorChart(
-    x: Array[Array[Double]],
-    y: Array[Array[Double]],
-    columnNames: Array[String],
-    seriesLabels: Array[String],
-    titlePrefix: String
-  ): Unit = {
+  private def showColorErrorChart(x: IndexedSeq[IndexedSeq[Double]],
+                                  y: IndexedSeq[IndexedSeq[Double]],
+                                  columnNames: Array[String],
+                                  seriesLabels: Array[String],
+                                  titlePrefix: String
+                                 ): Unit = {
 
     assert(x.length == y.length)
     assert(x.length == columnNames.length)
@@ -454,18 +452,15 @@ class CalibrateTask(
     PlotUtils.createBarPlot(titlePrefix + " - Individual Chip Error", data, "Chip", "Error", barColors)
   }
 
-  private def showResidualScatterChart(x: Array[Array[Double]], y: Array[Array[Double]], chartTitle: String): Unit = {
+  private def showResidualScatterChart(x: IndexedSeq[IndexedSeq[Double]], y: IndexedSeq[IndexedSeq[Double]], chartTitle: String): Unit = {
 
-    val dy = new Array[Array[Double]](x.length)
-    for (i <- x.indices) {
-      val xi = x(i)
-      val yi = y(i)
-      val dd = new Array[Double](xi.length)
-      for (j <- xi.indices) {
-        dd(j) = math.abs(yi(j) - xi(j))
-      }
-      dy(i) = dd
-    }
+    val dy =
+      x.zipWithIndex
+        .map { case (xi, i) =>
+          val yi = y(i)
+          xi.zipWithIndex
+            .map { case (xij, j) => math.abs(yi(j) - xij) }
+        }
     showScatterChart(x, dy, referenceColorSpace().bandsNames, chartTitle)
   }
 

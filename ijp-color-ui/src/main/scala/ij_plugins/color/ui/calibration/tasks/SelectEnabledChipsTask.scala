@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2021 Jarek Sacha
+ * Copyright (C) 2002-2022 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -159,8 +159,8 @@ class SelectEnabledChipsTask(chart: GridColorChart, parentWindow: Option[Window]
       dialog.showDialog()
 
       if (dialog.wasOKed) {
-        val enabled: Array[Boolean] = data.sortBy(_.index).map(_.enabled.value).toArray
-        val c                       = chart.copyWithEnabled(enabled)
+        val enabled = data.sortBy(_.index).map(_.enabled.value).toIndexedSeq
+        val c = chart.copyWithEnabled(enabled)
         Option(c)
       } else {
         None
