@@ -22,7 +22,7 @@
 
 package ij_plugins.color.ui.fx
 
-import org.scalafx.extras.generic_dialog.{GenericDialogFX, LastDirectoryHandler}
+import org.scalafx.extras.generic_dialog.GenericDialogFX
 import scalafx.stage.Window
 
 /**
@@ -35,4 +35,4 @@ import scalafx.stage.Window
 class GenericDialogFXIJ(title: String,
                         header: String,
                         parentWindow: Option[Window] = None)
-  extends GenericDialogFX(title, Option(header), parentWindow, LastDirectoryHandlerIJ)
+  extends GenericDialogFX(title, header, parentWindow, LastDirectoryHandlerIJ)
