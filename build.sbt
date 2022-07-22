@@ -22,7 +22,7 @@ ThisBuild / organization        := "net.sf.ij-plugins"
 ThisBuild / sonatypeProfileName := "net.sf.ij-plugins"
 ThisBuild / homepage            := Some(new URL("https://github.com/ij-plugins/ijp-color"))
 ThisBuild / startYear           := Some(2002)
-ThisBuild / licenses            := Seq(("LGPL-2.1", new URL("http://opensource.org/licenses/LGPL-2.1")))
+ThisBuild / licenses            := Seq(("LGPL-2.1", new URL("https://opensource.org/licenses/LGPL-2.1")))
 
 
 publishArtifact     := false
