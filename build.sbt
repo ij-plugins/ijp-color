@@ -192,30 +192,12 @@ lazy val ijp_color_ui = (project in file("ijp-color-ui"))
       } else {
         Seq.empty[ModuleID]
       }),
-    libraryDependencies ++=
-      Seq("base", "controls", "fxml", "graphics", "media", "swing", "web")
-        .map(m => "org.openjfx" % s"javafx-$m" % "18.0.1"),
-    // Use `pomPostProcess` to remove dependencies marked as "provided" from publishing in POM
-    // This is to avoid dependency on wrong OS version JavaFX libraries
-    // See also [https://stackoverflow.com/questions/27835740/sbt-exclude-certain-dependency-only-during-publish]
-    pomPostProcess := { node: XmlNode =>
-      new RuleTransformer(new RewriteRule {
-        override def transform(node: XmlNode): XmlNodeSeq = node match {
-          case e: Elem if e.label == "dependency" && e.child.exists(c => c.label == "scope" && c.text == "provided") =>
-            val organization = e.child.filter(_.label == "groupId").flatMap(_.text).mkString
-            val artifact = e.child.filter(_.label == "artifactId").flatMap(_.text).mkString
-            val version = e.child.filter(_.label == "version").flatMap(_.text).mkString
-            Comment(s"provided dependency $organization#$artifact;$version has been omitted")
-          case _ => node
-        }
-      }).transform(node).head
-    },
     // Other dependencies
     libraryDependencies ++= Seq(
       "org.jfree"           % "jfreechart-fx"       % "1.0.1",
       "org.jfree"           % "fxgraphics2d"        % "1.8",
-      "org.scalafx"        %% "scalafx"             % "18.0.1-R27",
-      "org.scalafx"        %% "scalafx-extras"      % "0.5.0.3-SNAPSHOT",
+      "org.scalafx"        %% "scalafx"             % "18.0.2-R29",
+      "org.scalafx"        %% "scalafx-extras"      % "0.7.0",
       // Test
       "org.scalatest"      %% "scalatest"           % "3.2.11"  % "test"
     )
