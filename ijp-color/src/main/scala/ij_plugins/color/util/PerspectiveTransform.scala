@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2021 Jarek Sacha
+ * Copyright (C) 2002-2022 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -297,6 +297,27 @@ object PerspectiveTransform {
    * }}}
    */
   def quadToQuad(points1: Array[Point2D], points2: Array[Point2D]): PerspectiveTransform = {
+    quadToQuad(
+      points1(0).getX,
+      points1(0).getY,
+      points1(1).getX,
+      points1(1).getY,
+      points1(2).getX,
+      points1(2).getY,
+      points1(3).getX,
+      points1(3).getY,
+      points2(0).getX,
+      points2(0).getY,
+      points2(1).getX,
+      points2(1).getY,
+      points2(2).getX,
+      points2(2).getY,
+      points2(3).getX,
+      points2(3).getY
+    )
+  }
+
+  def quadToQuad(points1: IndexedSeq[Point2D], points2: IndexedSeq[Point2D]): PerspectiveTransform = {
     quadToQuad(
       points1(0).getX,
       points1(0).getY,
@@ -806,12 +827,11 @@ final class PerspectiveTransform(
    * @throws java.lang.IllegalArgumentException
    *   if ptSrc is null
    */
-  def transform(points: Seq[Point2D]): immutable.Seq[Point2D] = {
+  def transform(points: IndexedSeq[Point2D]): immutable.IndexedSeq[Point2D] = {
     require(points != null, "The input argument 'points' may not be null.")
     // Conversion `toList` to achieve Scala 2.12 compatibility
     points
       .map(p => transform(p))
-      .toList
   }
 
   /**

@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2021 Jarek Sacha
+ * Copyright (C) 2002-2022 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -54,7 +54,7 @@ object ColorChip {
     new ColorChip(
       name,
       color,
-      List(
+      IndexedSeq(
         point2D(column + margin, row + margin),
         point2D(column + 1 - margin, row + margin),
         point2D(column + 1 - margin, row + 1 - margin),
@@ -74,4 +74,4 @@ object ColorChip {
  * @param outline
  *   outline describing the chip and its location.
  */
-class ColorChip(val name: String, val color: Lab, val outline: Seq[Point2D])
+class ColorChip(val name: String, val color: Lab, val outline: IndexedSeq[Point2D])

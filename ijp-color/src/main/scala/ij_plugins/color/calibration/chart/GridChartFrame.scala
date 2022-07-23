@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2021 Jarek Sacha
+ * Copyright (C) 2002-2022 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -30,12 +30,12 @@ import java.awt.geom.Point2D
 import scala.collection.compat.immutable.ArraySeq
 
 object GridChartFrame {
-  private def createChipOutlines(nbColumns: Int, nbRows: Int, chipMargin: Double): IndexedSeq[Seq[Point2D]] = {
+  private def createChipOutlines(nbColumns: Int, nbRows: Int, chipMargin: Double): IndexedSeq[IndexedSeq[Point2D]] = {
     require(nbColumns > 0)
     require(nbRows > 0)
 
     for {
-      row    <- 0 until nbRows
+      row <- 0 until nbRows
       column <- 0 until nbColumns
     } yield {
       Seq(

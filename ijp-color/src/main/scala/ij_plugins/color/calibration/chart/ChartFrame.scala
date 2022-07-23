@@ -44,14 +44,14 @@ object ChartFrame {
  */
 class ChartFrame(
   refOutline: IndexedSeq[Point2D],
-  refChipOutlines: IndexedSeq[Seq[Point2D]],
+  refChipOutlines: IndexedSeq[IndexedSeq[Point2D]],
   final val alignmentTransform: PerspectiveTransform /*= new PerspectiveTransform()*/
 ) {
 
   require(refOutline.length == 4, s"The reference outline must have 4 points, got ${refOutline.length}.")
 
   private val _referenceOutline: IndexedSeq[Point2D]  = deepCopy(refOutline)
-  private val _chipOutlines: IndexedSeq[Seq[Point2D]] = refChipOutlines.map(deepCopy)
+  private val _chipOutlines: IndexedSeq[IndexedSeq[Point2D]] = refChipOutlines.map(deepCopy)
 
   /**
    * Outline of the reference chart as a sequence of 4 corner points: top-left, top-right, bottom-right, bottom-left.
@@ -61,7 +61,7 @@ class ChartFrame(
   /**
    * Outlines of the reference chips. OOutlines are polygons, may have 3 or more vertices.
    */
-  final def referenceChipOutlines: IndexedSeq[Seq[Point2D]] = _chipOutlines.map(deepCopy)
+  final def referenceChipOutlines: IndexedSeq[IndexedSeq[Point2D]] = _chipOutlines.map(deepCopy)
 
   /**
    * Creates a copy of this chart that has its chip outline aligned to given ROI.

@@ -59,17 +59,13 @@ object Regression {
   /**
     * Compute linear fit coefficient `s = A*o` if `noIntercept` is true or `s = A*o + b` if `noIntercept` is `false`.
     *
-    * @param standard
-    * array of expected output values.
-    * @param observation
-    * array of input values
-    * @param noIntercept
-    * true means the model is to be estimated without an intercept term
-    * @return
-    * linear fit coefficients
+    * @param standard    array of expected output values.
+    * @param observation array of input values
+    * @param noIntercept true means the model is to be estimated without an intercept term
+    * @return linear fit coefficients
     */
   def regression(standard: Array[Double],
-                 observation: IndexedSeq[IndexedSeq[Double]],
+                 observation: Array[Array[Double]],
                  noIntercept: Boolean
                 ): Regression.Result = {
     require(standard != null, "Argument `standard` cannot be null.")
@@ -86,7 +82,7 @@ object Regression {
 
     val regression = new OLSMultipleLinearRegression()
     regression.setNoIntercept(noIntercept)
-    regression.newSampleData(standard, toArrayArray(observation))
+    regression.newSampleData(standard, observation)
     Regression.Result(
       numberOfSamples = standard.length,
       beta = regression.estimateRegressionParameters,
@@ -95,6 +91,21 @@ object Regression {
       regressandVariance = regression.estimateRegressandVariance,
       regressionStandardError = regression.estimateRegressionStandardError
     )
+  }
+
+  /**
+    * Compute linear fit coefficient `s = A*o` if `noIntercept` is true or `s = A*o + b` if `noIntercept` is `false`.
+    *
+    * @param standard    array of expected output values.
+    * @param observation array of input values
+    * @param noIntercept true means the model is to be estimated without an intercept term
+    * @return linear fit coefficients
+    */
+  def regression(standard: Array[Double],
+                 observation: IndexedSeq[IndexedSeq[Double]],
+                 noIntercept: Boolean
+                ): Regression.Result = {
+    regression(standard, toArrayArray(observation), noIntercept)
   }
 
   /**
@@ -108,6 +119,10 @@ object Regression {
     * linear fit coefficients.
     */
   def createLinear(standard: Array[Double], observation: IndexedSeq[IndexedSeq[Double]]): Regression.Result = {
+    regression(standard, observation, noIntercept = false)
+  }
+
+  def createLinear(standard: Array[Double], observation: Array[Array[Double]]): Regression.Result = {
     regression(standard, observation, noIntercept = false)
   }
 }
