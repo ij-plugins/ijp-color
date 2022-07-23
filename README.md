@@ -9,6 +9,27 @@ for [ImageJ](http://rsb.info.nih.gov/ij)
 [![Scaladoc](https://javadoc.io/badge2/net.sf.ij-plugins/ijp-color_2.13/scaladoc.svg)](https://javadoc.io/doc/net.sf.ij-plugins/ijp-color_2.13)
 
 
+<!-- TOC -->
+
+* [ImageJ Plugins](#imagej-plugins)
+    * [IJP Color Calibrator](#ijp-color-calibrator)
+    * [IJP Color Calculator](#ijp-color-calculator)
+    * [IJP Color Chart ROI Tool](#ijp-color-chart-roi-tool)
+    * [IJP White Balance](#ijp-white-balance)
+* [Test Images](#test-images)
+* [Installing Plugins in ImageJ](#installing-plugins-in-imagej)
+    * [ImageJ](#imagej)
+        * [Option 1](#option-1)
+        * [Option 2](#option-2)
+    * [ImageJ2/FIJI](#imagej2fiji)
+    * [Troubleshooting](#troubleshooting)
+* [Stand-alone Library](#stand-alone-library)
+* [Development Setup](#development-setup)
+    * [Command line](#command-line)
+    * [IntelliJ](#intellij)
+
+<!-- TOC -->
+
 ImageJ Plugins
 --------------
 
@@ -25,7 +46,7 @@ Supports 8, 16, 32 bit per channel color images, including raw.
 
 ![Image Calibrator](https://github.com/ij-plugins/ijp-color/wiki/assets/Color_Calibrator_quick_usage.png)
 
-More details in [project Wiki]
+More details in [project Wiki] under [Color Calibrator]
 
 ### IJP Color Calculator
 
@@ -34,12 +55,23 @@ Lindbloom [CIE Color Calculator](http://www.brucelindbloom.com/index.html?ColorC
 
 ![Image Calibrator](https://github.com/ij-plugins/ijp-color/wiki/assets/Color_Converter_0.6_01.png)
 
+More details in [project Wiki] under [Color Calculator]
+
 ### IJP Color Chart ROI Tool
 
 Converts color chart ROI to individual chip ROIs. Measures color of each chip.
 
 ![Chart Tool](https://github.com/ij-plugins/ijp-color/wiki/assets/Chart_Tool_0.9_01.png)
 
+More details in [project Wiki] under [Color Chart ROI Tool]
+
+### IJP White Balance
+
+Performs White Balance of an RGB image.
+
+![Chart Tool](https://github.com/ij-plugins/ijp-color/wiki/assets/White_Balance_0.12_01.png)
+
+More details in [project Wiki] under [White Balance]
 
 Test Images
 -----------
@@ -56,7 +88,7 @@ Installing Plugins in ImageJ
 Prebuild binaries are published with each [Release](https://github.com/ij-plugins/ijp-color/releases).
 
 1. Look for in the asset section for an "ijp-color_plugins_*_win.zip" file,
-2. download and unzip into ImageJ's `plugins` directory. It should create subdirectory "ij-plugins".
+2. Download and unzip into ImageJ's `plugins` directory. It should create subdirectory "ij-plugins".
 3. Restart ImageJ
 
 #### Option 2
@@ -69,6 +101,11 @@ its [Release](https://github.com/ij-plugins/ij-plugins-bundle/releases) page.
 IJP Color is a part of the ij-plugins-bundle that is also distributed for FIJI/ImageJ2
 as [IJ-Plugins Update Site](https://sites.imagej.net/IJ-Plugins/): "https://sites.imagej.net/IJ-Plugins/"
 
+### Troubleshooting
+
+Depending on your ImageJ installation there may be issues properly loading the ijp-color plugin components,
+see [Troubleshooting Wiki] for some hints. Please post your experience or ask questions in
+the [Troubleshooting Discussions].
 
 
 Stand-alone Library
@@ -99,3 +136,17 @@ You will need to install Scala plugin then import the project from `build.sbt` f
 ImageJ, setup "Run Configuration" for "SBT Task" and add task `experimental/ijRun`.
 
 [project Wiki]: https://github.com/ij-plugins/ijp-color/wiki
+
+[Discussions]: https://github.com/ij-plugins/ijp-color/discussions
+
+[Color Calculator]: https://github.com/ij-plugins/ijp-color/wiki/Color-Calculator.md
+
+[Color Calibrator]: https://github.com/ij-plugins/ijp-color/wiki/Color-Calibrator.md
+
+[Color Chart ROI Tool]: https://github.com/ij-plugins/ijp-color/wiki/Color-Chart-ROI-Tool.md
+
+[White Balance]: https://github.com/ij-plugins/ijp-color/wiki/White-Balance.md
+
+[Troubleshooting Wiki]: https://github.com/ij-plugins/ijp-color/wiki/ImageJ-Launcher-Troubleshooting
+
+[Troubleshooting Discussions]: https://github.com/ij-plugins/ijp-color/issues/71
