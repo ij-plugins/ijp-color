@@ -9,7 +9,7 @@ name := "ijp-color-project"
 val Scala2_13 = "2.13.8"
 val Scala3_0  = "3.0.2"
 
-val _version       = "0.11.4.7-SNAPSHOT"
+val _version       = "0.12.0"
 val _scalaVersions = Seq(Scala2_13, Scala3_0)
 //val _scalaVersion  = _scalaVersions.head
 val _scalaVersion  = Scala3_0
@@ -148,7 +148,12 @@ lazy val ijp_color_ui = (project in file("ijp-color-ui"))
       "org.scalafx"        %% "scalafx-extras"      % "0.7.0",
       // Test
       "org.scalatest"      %% "scalatest"           % "3.2.11"  % "test"
-    )
+    ),
+    // Customize `sbt-imagej` plugin
+    ijRuntimeSubDir         := "sandbox",
+    ijPluginsSubDir         := "ij-plugins",
+    ijCleanBeforePrepareRun := true,
+    cleanFiles += ijPluginsDir.value,
   )
   .dependsOn(ijp_color)
 
