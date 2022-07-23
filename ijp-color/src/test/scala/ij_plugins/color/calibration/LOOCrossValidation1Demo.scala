@@ -73,7 +73,7 @@ object LOOCrossValidation1Demo {
 
     // LOO-CV with all chips enabled
     val crossValidations =
-      LOOCrossValidation.crossValidationStatsAll(chart, imp, ReferenceColorSpace.values, MappingMethod.values)
+      LOOCrossValidation.crossValidationStatsAll(chart, imp, ReferenceColorSpace.values.toSeq, MappingMethod.values.toSeq)
 
     println("All chips enables")
     printBestInfo(crossValidations)
@@ -82,7 +82,7 @@ object LOOCrossValidation1Demo {
     val enabled2 = chart.enabled.updated(6, false)
     val chart2 = chart.copyWithEnabled(enabled2)
     val crossValidations2 =
-      LOOCrossValidation.crossValidationStatsAll(chart2, imp, ReferenceColorSpace.values, MappingMethod.values)
+      LOOCrossValidation.crossValidationStatsAll(chart2, imp, ReferenceColorSpace.values.toSeq, MappingMethod.values.toSeq)
     println("\nWith invalid reference disabled")
     printBestInfo(crossValidations2)
   }

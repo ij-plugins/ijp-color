@@ -52,7 +52,7 @@ object LOOCrossValidation2Demo extends App {
 
     // Do LOO validation
     val crossValidations =
-      LOOCrossValidation.crossValidationStatsAll(chart, observed, ReferenceColorSpace.values, MappingMethod.values)
+      LOOCrossValidation.crossValidationStatsAll(chart, observed, ReferenceColorSpace.values.toSeq, MappingMethod.values.toSeq)
 
     val bestByMean = crossValidations.minBy(v => v.statsDeltaE.getMean)
     println(

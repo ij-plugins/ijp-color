@@ -58,8 +58,8 @@ class LOOCrossValidationSpec extends AnyFlatSpec {
     val chart = ColorCharts.XRitePassportColorChecker
 
     // Do LOO validation
-    val referenceColorSpaces = ReferenceColorSpace.values
-    val mappingMethods = MappingMethod.values
+    val referenceColorSpaces = ReferenceColorSpace.values.toSeq
+    val mappingMethods = MappingMethod.values.toSeq
     val crossValidations =
       LOOCrossValidation.crossValidationStatsAll(chart, observed, referenceColorSpaces, mappingMethods)
 
@@ -83,7 +83,7 @@ class LOOCrossValidationSpec extends AnyFlatSpec {
 
     // LOO-CV with all chips enabled
     val crossValidations =
-      LOOCrossValidation.crossValidationStatsAll(chart, imp, ReferenceColorSpace.values, MappingMethod.values)
+      LOOCrossValidation.crossValidationStatsAll(chart, imp, ReferenceColorSpace.values.toSeq, MappingMethod.values.toSeq)
 
     //    println("\nLOO Cross-Validation - all chips")
     //    printInfo(crossValidations)
@@ -104,7 +104,7 @@ class LOOCrossValidationSpec extends AnyFlatSpec {
     val enabled = chart.enabled.updated(6, false)
     val chart2 = chart.copyWithEnabled(enabled)
     val crossValidations =
-      LOOCrossValidation.crossValidationStatsAll(chart2, imp, ReferenceColorSpace.values, MappingMethod.values)
+      LOOCrossValidation.crossValidationStatsAll(chart2, imp, ReferenceColorSpace.values.toSeq, MappingMethod.values.toSeq)
 
     //    println("\nLOO Cross-Validation - invalid reference disabled")
     //    printInfo(crossValidations)
