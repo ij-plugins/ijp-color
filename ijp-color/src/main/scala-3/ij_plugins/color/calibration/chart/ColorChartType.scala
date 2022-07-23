@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2021 Jarek Sacha
+ * Copyright (C) 2002-2022 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -22,37 +22,12 @@
 
 package ij_plugins.color.calibration.chart
 
-import ij_plugins.color.util.ImagePlusType
+import ij_plugins.color.util.EnumCompanion.*
 
-enum ColorChartType(val name: String) {
+enum ColorChartType(val name: String) extends WithName:
   case GretagMacbethColorChecker extends ColorChartType("GretagMacbeth ColorChecker")
-
   case XRitePassportColorChecker extends ColorChartType("X-Rite Passport")
-
   case ImageScienceColorGaugeMatte extends ColorChartType("Image Science ColorGauge Matte")
-
   case Custom extends ColorChartType("Custom")
 
-  override def toString: String = name
-}
-
-object ColorChartType {
-
-  /**
-   * Tries to get an item by the supplied name.
-   * @param name
-   *   name of the item
-   * @throws NoSuchElementException
-   *   if enum has no item with given name
-   */
-  def withName(name: String): ColorChartType =
-    withNameOption(name).getOrElse(throw new NoSuchElementException(s"No ImagePlusType with name: $name"))
-
-  /**
-   * Optionally returns an item for a given name.
-   * @param name
-   *   name of the item
-   */
-  def withNameOption(name: String): Option[ColorChartType] =
-    ColorChartType.values.find(_.name == name)
-}
+object ColorChartType extends WithNameCompanion[ColorChartType]

@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2021 Jarek Sacha
+ * Copyright (C) 2002-2022 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -20,24 +20,24 @@
  * Latest release available at https://github.com/ij-plugins/ijp-color/
  */
 
-package ij_plugins.color.ui.calibration
+package ij_plugins.color.util
 
-import ij.ImagePlus
-import org.scalafx.extras.mvcfx.MVCfx
-import scalafx.stage.Window
+import enumeratum.{Enum, EnumEntry}
 
-/**
- * Creates Color Calibrator UI.
- *
- * @author Jarek Sacha
- */
-class ColorCalibratorUI(val image: ImagePlus, private var _parentWindow: Window) extends MVCfx("ColorCalibrator.fxml") {
+import scala.collection.immutable
 
-  lazy val model = new ColorCalibratorUIModel(image, _parentWindow)
+sealed abstract class AveragingMode(override val entryName: String) extends EnumEntry {
+  override def toString: String = entryName
 
-  def parentWindow: Window = _parentWindow
+  def name: String = entryName
+}
 
-  def parentWindow_=(newParent: Window): Unit = {
-    _parentWindow = newParent
-  }
+object AveragingMode extends Enum[AveragingMode] {
+
+  case object Mean extends AveragingMode("Mean")
+
+  case object Median extends AveragingMode("Median")
+
+  /** All refined reference color spaces. */
+  val values: immutable.IndexedSeq[AveragingMode] = findValues
 }

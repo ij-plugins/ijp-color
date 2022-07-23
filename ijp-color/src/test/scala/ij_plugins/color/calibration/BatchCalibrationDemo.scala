@@ -33,15 +33,15 @@ import ij_plugins.color.util.ImagePlusType
 import java.io.File
 
 /**
-  * Example of batch color calibration.
-  */
+ * Example of batch color calibration.
+ */
 object BatchCalibrationDemo {
 
-  val baseDir: File = new File("../test/data/batch_correction")
-  val srcDir: File = new File(baseDir, "src")
-  val dstDir: File = new File(baseDir, "dst")
+  val baseDir: File  = new File("../test/data/batch_correction")
+  val srcDir: File   = new File(baseDir, "src")
+  val dstDir: File   = new File(baseDir, "dst")
   val chartImageFile = new File(srcDir, "im_1.jpg")
-  val chartRoiFile = new File(srcDir, "im_1_chart.roi")
+  val chartRoiFile   = new File(srcDir, "im_1_chart.roi")
 
   def main(args: Array[String]): Unit = {
 
@@ -68,11 +68,11 @@ object BatchCalibrationDemo {
     val chart = ColorCharts.ImageScienceColorGaugeMatte.copyAlignedTo(chartRoi)
 
     val refColorSpace: ReferenceColorSpace = ReferenceColorSpace.sRGB
-    val mappingMethod: MappingMethod = MappingMethod.LinearCrossBand
-    val clipReferenceRGB = false
-    val colorCalibrator = new ColorCalibrator(chart, refColorSpace, mappingMethod, clipReferenceRGB)
-    val calibrationFit = colorCalibrator.computeCalibrationMapping(chartImage)
-    val imageType = ImagePlusType.withValue(chartImage.getType)
+    val mappingMethod: MappingMethod       = MappingMethod.LinearCrossBand
+    val clipReferenceRGB                   = false
+    val colorCalibrator                    = new ColorCalibrator(chart, refColorSpace, mappingMethod, clipReferenceRGB)
+    val calibrationFit                     = colorCalibrator.computeCalibrationMapping(chartImage)
+    val imageType                          = ImagePlusType.withValue(chartImage.getType)
 
     CorrectionRecipe(calibrationFit.corrector, chart.colorConverter, refColorSpace, imageType)
   }

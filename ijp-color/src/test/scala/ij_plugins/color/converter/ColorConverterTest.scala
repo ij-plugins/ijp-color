@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2021 Jarek Sacha
+ * Copyright (C) 2002-2022 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -25,11 +25,13 @@ package ij_plugins.color.converter
 import ij_plugins.color.converter.ColorTriple.{Lab, RGB, XYZ}
 import ij_plugins.color.converter.RGBWorkingSpace.AdobeRGB1998
 import org.scalatest.flatspec.AnyFlatSpec
-import org.scalatest.matchers.should.Matchers._
+import org.scalatest.matchers.should.Matchers.*
 
 /**
- * @author Jarek Sacha
- * @since 10/16/12 8:14 PM
+ * @author
+ *   Jarek Sacha
+ * @since 10/16/12
+ *   8:14 PM
  */
 class ColorConverterTest extends AnyFlatSpec {
 
@@ -63,8 +65,7 @@ class ColorConverterTest extends AnyFlatSpec {
   )
 
   /**
-   * Converted to XYZ from using http://www.brucelindbloom.com/iPhone/ColorConv.html
-   * D65, no adaptation, x100.
+   * Converted to XYZ from using http://www.brucelindbloom.com/iPhone/ColorConv.html D65, no adaptation, x100.
    */
   private val xyzColorChecker: Array[XYZ] = Array(
     XYZ(0.108176, 0.096773, 0.062064),
@@ -135,7 +136,7 @@ class ColorConverterTest extends AnyFlatSpec {
   it should "convert RGB to XYZ with scaled RGB" in {
     val converter = new ColorConverter(ReferenceWhite.D50, AdobeRGB1998, None, rgbScale = 255, xyzScale = 1)
 
-    val rgb = RGB(178, 217, 18)
+    val rgb = RGB(Array[Double](178, 217, 18))
     val xyz = converter.rgbToXYZ(rgb.r, rgb.g, rgb.b)
     xyz.x should be(0.392179 +- 0.00001)
     xyz.y should be(0.574946 +- 0.00001)

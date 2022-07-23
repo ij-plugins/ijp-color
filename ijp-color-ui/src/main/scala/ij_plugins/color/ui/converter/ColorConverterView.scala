@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2021 Jarek Sacha
+ * Copyright (C) 2002-2022 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -23,11 +23,11 @@
 package ij_plugins.color.ui.converter
 
 import ij.plugin.BrowserLauncher
-import ij_plugins.color.converter._
+import ij_plugins.color.converter.*
 import ij_plugins.color.ui.converter.ColorConverterModel.Update
 import ij_plugins.color.ui.util.IJPUtils
-import javafx.beans.{binding => jfxbb}
-import scalafx.Includes._
+import javafx.beans.binding as jfxbb
+import scalafx.Includes.*
 import scalafx.beans.property.ObjectProperty
 import scalafx.collections.ObservableBuffer
 import scalafx.event.ActionEvent
@@ -49,7 +49,7 @@ object ColorConverterView {
 
 class ColorConverterView(val model: ColorConverterModel) {
 
-  import ColorConverterView._
+  import ColorConverterView.*
 
   private val nbColumns = 5
   private val xyzUI     = new ColorValueUI()
@@ -157,10 +157,10 @@ class ColorConverterView(val model: ColorConverterModel) {
     addColorUI(row, buttonRGB, rgbUI.control, Some("[0-255]"))
     row += 1
 
-    addChoiceBox(row, "Ref. White", model.referenceWhite, ReferenceWhite.values)
+    addChoiceBox(row, "Ref. White", model.referenceWhite, ReferenceWhite.values.toSeq)
     row += 1
 
-    addChoiceBox(row, "RGB Model", model.rgbWorkingSpace, RGBWorkingSpace.values)
+    addChoiceBox(row, "RGB Model", model.rgbWorkingSpace, RGBWorkingSpace.values.toSeq)
     gp.add(
       new Label {
         id = "ijp-label"

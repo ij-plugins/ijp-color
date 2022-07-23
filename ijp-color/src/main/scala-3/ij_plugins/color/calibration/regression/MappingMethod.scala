@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2021 Jarek Sacha
+ * Copyright (C) 2002-2022 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -22,10 +22,12 @@
 
 package ij_plugins.color.calibration.regression
 
+import ij_plugins.color.util.EnumCompanion.{WithName, WithNameCompanion}
+
 /**
  * Polynomial function mapping methods used by `MappingFactory`.
  */
-enum MappingMethod(val name: String) {
+enum MappingMethod(val name: String) extends WithName:
 
   /** First order polynomial with no intercept term, within single color band - single input. */
   case LinearNoIntercept extends MappingMethod("Linear No-intercept")
@@ -51,26 +53,4 @@ enum MappingMethod(val name: String) {
   /** Third order polynomial within with three input for each color band. */
   case CubicCrossBand extends MappingMethod("Cubic Cross-band")
 
-  override def toString: String = name
-}
-
-object MappingMethod {
-
-  /**
-    * Tries to get an item by the supplied name.
-    * @param name
-    *   name of the item
-    * @throws NoSuchElementException
-    *   if enum has no item with given name
-    */
-  def withName(name: String): MappingMethod =
-    withNameOption(name).getOrElse(throw new NoSuchElementException(s"No MappingMethod with name: $name"))
-
-  /**
-    * Optionally returns an item for a given name.
-    * @param name
-    *   name of the item
-    */
-  def withNameOption(name: String): Option[MappingMethod] =
-    MappingMethod.values.find(_.name == name)
-}
+object MappingMethod extends WithNameCompanion[MappingMethod]

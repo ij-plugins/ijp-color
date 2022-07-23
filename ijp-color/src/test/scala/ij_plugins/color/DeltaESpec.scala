@@ -22,10 +22,10 @@
 
 package ij_plugins.color
 
-import ij_plugins.color.DeltaE._
+import ij_plugins.color.DeltaE.*
 import ij_plugins.color.converter.ColorTriple
 import org.scalatest.flatspec.AnyFlatSpec
-import org.scalatest.matchers.should.Matchers._
+import org.scalatest.matchers.should.Matchers.*
 
 class DeltaESpec extends AnyFlatSpec {
   private final val LAB_1                 = Array(59.8, 13.0, 19.4)

@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2021 Jarek Sacha
+ * Copyright (C) 2002-2022 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -26,11 +26,11 @@ import ij_plugins.color.calibration.chart.{ColorChartType, ReferenceColorSpace}
 import ij_plugins.color.calibration.regression.MappingMethod
 import ij_plugins.color.ui.util.{IJPUtils, ImageJUIColors}
 import org.scalafx.extras.mvcfx.ControllerFX
-import scalafx.Includes._
+import scalafx.Includes.*
 import scalafx.collections.ObservableBuffer
 import scalafx.geometry.Pos
+import scalafx.scene.control.*
 import scalafx.scene.control.SpinnerValueFactory.IntegerSpinnerValueFactory
-import scalafx.scene.control._
 import scalafx.scene.layout.GridPane
 
 import java.util.concurrent.atomic.AtomicBoolean
@@ -39,11 +39,11 @@ import javafx.scene.{control as jfxsc, layout as jfxsl}
 import javafx.{event as jfxe, fxml as jfxf}
 
 /**
-  * Binds ColorCalibrator FXML to UI model.
-  */
+ * Binds ColorCalibrator FXML to UI model.
+ */
 class ColorCalibratorUIController(
-                                   private val model: ColorCalibratorUIModel
-                                 ) extends ControllerFX {
+  private val model: ColorCalibratorUIModel
+) extends ControllerFX {
 
   @jfxf.FXML
   private var imageTitleLabel: jfxsc.Label = _
@@ -59,6 +59,8 @@ class ColorCalibratorUIController(
   private var marginsSpinner: jfxsc.Spinner[java.lang.Integer] = _
   @jfxf.FXML
   private var chipOverlayColorChoiceBox: jfxsc.ChoiceBox[String] = _
+  @jfxf.FXML
+  private var overlayStrokeWidthSpinner: jfxsc.Spinner[java.lang.Integer] = _
   @jfxf.FXML
   private var enabledChipsChoiceBox: jfxsc.ChoiceBox[ChipsEnabledType] = _
   @jfxf.FXML
@@ -140,6 +142,11 @@ class ColorCalibratorUIController(
     }
     model.chipOverlayColorName.onChange { (_, _, newValue) =>
       chipOverlayColorChoiceBox.selectionModel.value.select(newValue)
+    }
+
+    overlayStrokeWidthSpinner.valueFactory = new IntegerSpinnerValueFactory(0, 100) {
+      value = model.chipOverlayStrokeWidth()
+      value <==> model.chipOverlayStrokeWidth
     }
 
     // Enabled chips type choice

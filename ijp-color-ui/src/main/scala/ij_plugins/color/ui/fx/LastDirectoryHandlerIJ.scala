@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2021 Jarek Sacha
+ * Copyright (C) 2002-2022 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -20,24 +20,32 @@
  * Latest release available at https://github.com/ij-plugins/ijp-color/
  */
 
-package ij_plugins.color.ui.calibration
+package ij_plugins.color.ui.fx
 
-import ij.ImagePlus
-import org.scalafx.extras.mvcfx.MVCfx
-import scalafx.stage.Window
+import ij.io.OpenDialog
+import org.scalafx.extras.generic_dialog.LastDirectoryHandler
+
+import java.io.File
 
 /**
- * Creates Color Calibrator UI.
- *
- * @author Jarek Sacha
- */
-class ColorCalibratorUI(val image: ImagePlus, private var _parentWindow: Window) extends MVCfx("ColorCalibrator.fxml") {
+  * Integrates last directory handling with ImageJ
+  */
+object LastDirectoryHandlerIJ extends LastDirectoryHandler {
 
-  lazy val model = new ColorCalibratorUIModel(image, _parentWindow)
+  def lastDirectory: java.io.File = {
+    Option(OpenDialog.getDefaultDirectory) match {
+      case Some(dir) =>
+        val f = new File(dir)
+        if (f.exists() & f.isFile) f.getParentFile else f
+      case None => new File(".")
+    }
+  }
 
-  def parentWindow: Window = _parentWindow
-
-  def parentWindow_=(newParent: Window): Unit = {
-    _parentWindow = newParent
+  def lastDirectory_=(newDir: java.io.File): Unit = {
+    Option(newDir).foreach { f =>
+      val dir = if (f.exists() & f.isFile) f.getParentFile else f
+      OpenDialog.setLastDirectory(dir.getAbsolutePath)
+      OpenDialog.setDefaultDirectory(dir.getAbsolutePath)
+    }
   }
 }

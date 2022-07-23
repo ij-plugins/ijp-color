@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2021 Jarek Sacha
+ * Copyright (C) 2002-2022 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -22,10 +22,12 @@
 
 package ij_plugins.color.converter
 
+import ij_plugins.color.util.EnumCompanion.{WithName, WithNameCompanion}
+
 import scala.collection.immutable
 
 /** Concrete reference values values for selected illuminants. */
-enum ReferenceWhite(val name: String, val x: Double, val z: Double) {
+enum ReferenceWhite(val name: String, val x: Double, val z: Double) extends WithName:
 
   val y: Double = 1
 
@@ -62,26 +64,4 @@ enum ReferenceWhite(val name: String, val x: Double, val z: Double) {
   /** F11 (ASTM E308-01) */
   case F11 extends ReferenceWhite("F11", x = 1.00962, z = 0.64350)
 
-  override def toString: String = name
-}
-
-object ReferenceWhite {
-
-  /**
-    * Tries to get an item by the supplied name.
-    * @param name
-    *   name of the item
-    * @throws NoSuchElementException
-    *   if enum has no item with given name
-    */
-  def withName(name: String): ReferenceWhite =
-    withNameOption(name).getOrElse(throw new NoSuchElementException(s"No ReferenceWhite with name: $name"))
-
-  /**
-    * Optionally returns an item for a given name.
-    * @param name
-    *   name of the item
-    */
-  def withNameOption(name: String): Option[ReferenceWhite] =
-    ReferenceWhite.values.find(_.name == name)
-}
+object ReferenceWhite extends WithNameCompanion[ReferenceWhite]

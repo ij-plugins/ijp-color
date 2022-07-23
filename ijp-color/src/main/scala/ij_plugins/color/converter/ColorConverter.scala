@@ -38,18 +38,21 @@ object ColorConverter {
  * Color converter based on information given at [[http://www.brucelindbloom.com brucelindbloom.com]].
  *
  * Conversion between CIE XYZ and sRGB is defined in the IEC 619602-1 standard
- * [[http://www.colour.org/tc8-05/Docs/colorspace/61966-2-1.pdf]],
- * though it uses approximated coefficients (compared to Lindbloom).
+ * [[http://www.colour.org/tc8-05/Docs/colorspace/61966-2-1.pdf]], though it uses approximated coefficients (compared to
+ * Lindbloom).
  *
  * Conversion between CIE XYZ and reference white points are defined in NIST E308 standard.
  *
- * @param refWhite reference white for CIE XYZ color space.
- * @param rgbSpace RGB working space (may have different reference white).
- * @param chromaticAdaptation chromatic adaptation used for conversions from/to RGB.
- * @param rgbScale scale used for RGB values, for instance, if scale is 255 the range of RGB values will be between
- *                 0 and 255.
- * @param xyzScale scale used for CIE XYZ values, for instance, if scale is 100 the range of CIE XYZ values will
- *                 be between 0 and 100.
+ * @param refWhite
+ *   reference white for CIE XYZ color space.
+ * @param rgbSpace
+ *   RGB working space (may have different reference white).
+ * @param chromaticAdaptation
+ *   chromatic adaptation used for conversions from/to RGB.
+ * @param rgbScale
+ *   scale used for RGB values, for instance, if scale is 255 the range of RGB values will be between 0 and 255.
+ * @param xyzScale
+ *   scale used for CIE XYZ values, for instance, if scale is 100 the range of CIE XYZ values will be between 0 and 100.
  */
 final class ColorConverter(
   val refWhite: ReferenceWhite = ReferenceWhite.D65,
@@ -59,7 +62,7 @@ final class ColorConverter(
   val xyzScale: Double = 100
 ) {
 
-  import ColorConverter._
+  import ColorConverter.*
 
   /** Convert color from CIE L*a*b* to CIE XYZ color space. */
   def labToXYZ(l: Double, a: Double, b: Double): XYZ = {
@@ -208,21 +211,21 @@ final class ColorConverter(
       }
 
     val xyz2rgb = rgbSpace.xyz2rgb
-    val r = compand(x2 * xyz2rgb.m00 + y2 * xyz2rgb.m10 + z2 * xyz2rgb.m20) * rgbScale
-    val g = compand(x2 * xyz2rgb.m01 + y2 * xyz2rgb.m11 + z2 * xyz2rgb.m21) * rgbScale
-    val b = compand(x2 * xyz2rgb.m02 + y2 * xyz2rgb.m12 + z2 * xyz2rgb.m22) * rgbScale
+    val r       = compand(x2 * xyz2rgb.m00 + y2 * xyz2rgb.m10 + z2 * xyz2rgb.m20) * rgbScale
+    val g       = compand(x2 * xyz2rgb.m01 + y2 * xyz2rgb.m11 + z2 * xyz2rgb.m21) * rgbScale
+    val b       = compand(x2 * xyz2rgb.m02 + y2 * xyz2rgb.m12 + z2 * xyz2rgb.m22) * rgbScale
 
     RGB(r, g, b)
   }
 
   /** Create copy of this object with a modified field. */
   def copyWith(
-                refWhite: ReferenceWhite = refWhite,
-                rgbSpace: RGBWorkingSpace = rgbSpace,
-                chromaticAdaptation: Option[ChromaticAdaptation] = chromaticAdaptation,
-                rgbScale: Double = rgbScale,
-                xyzScale: Double = xyzScale
-              ): ColorConverter = {
+    refWhite: ReferenceWhite = refWhite,
+    rgbSpace: RGBWorkingSpace = rgbSpace,
+    chromaticAdaptation: Option[ChromaticAdaptation] = chromaticAdaptation,
+    rgbScale: Double = rgbScale,
+    xyzScale: Double = xyzScale
+  ): ColorConverter = {
     new ColorConverter(refWhite, rgbSpace, chromaticAdaptation, rgbScale, xyzScale)
   }
 
@@ -231,7 +234,7 @@ final class ColorConverter(
       case RGBWorkingSpace.sRGB =>
         assert(rgbSpace.gamma < 0)
         val (l, sign) = if (linear < 0.0) (-linear, -1.0) else (linear, 1.0)
-        val c = if (l <= 0.0031308) l * 12.92 else 1.055 * math.pow(l, 1.0 / 2.4) - 0.055
+        val c         = if (l <= 0.0031308) l * 12.92 else 1.055 * math.pow(l, 1.0 / 2.4) - 0.055
         c * sign
       case RGBWorkingSpace.ECIRGBv2 =>
         assert(rgbSpace.gamma == 0)

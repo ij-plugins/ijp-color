@@ -20,24 +20,25 @@
  * Latest release available at https://github.com/ij-plugins/ijp-color/
  */
 
-package ij_plugins.color.ui.fx
+package ij_plugins.color.ui.calibration
 
-import scalafx.scene.control.{TextField, TextFormatter}
-import scalafx.util.converter.FormatStringConverter
+import ij.ImagePlus
+import org.scalafx.extras.mvcfx.MVCfx
+import scalafx.stage.Window
 
-import java.text.DecimalFormat
+/**
+ * Creates Color Calibrator UI.
+ *
+ * @author
+ *   Jarek Sacha
+ */
+class ColorCalibratorUI(val image: ImagePlus, private var _parentWindow: Window) extends MVCfx("ColorCalibrator.fxml") {
 
-class NumberTextField(decimalPlaces: Int = 6) extends TextField {
-  private val format = {
-    val pattern =
-      if (decimalPlaces > 0) {
-        "0." + ("0" * decimalPlaces)
-      } else
-        "0"
+  lazy val model = new ColorCalibratorUIModel(image, _parentWindow)
 
-    new DecimalFormat(pattern)
+  def parentWindow: Window = _parentWindow
+
+  def parentWindow_=(newParent: Window): Unit = {
+    _parentWindow = newParent
   }
-  private val converter = new FormatStringConverter[Number](format)
-  val model = new TextFormatter(converter)
-  textFormatter = model
 }

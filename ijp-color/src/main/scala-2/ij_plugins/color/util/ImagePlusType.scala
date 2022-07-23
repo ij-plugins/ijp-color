@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2021 Jarek Sacha
+ * Copyright (C) 2002-2022 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -29,34 +29,59 @@ import scala.collection.immutable
 sealed abstract class ImagePlusType(val value: Int, val name: String) extends IntEnumEntry
 
 /**
-  * Make ImagePlus image types integer IDs to be type-safe.
-  */
+ * Make ImagePlus image types integer IDs to be type-safe.
+ */
 object ImagePlusType extends IntEnum[ImagePlusType] {
 
   /**
-    * ImagePlus.GRAY8
-    */
+   * ImagePlus.GRAY8
+   */
   case object Gray8 extends ImagePlusType(0, "8-bit gray")
 
   /**
-    * ImagePlus.GRAY16
-    */
+   * ImagePlus.GRAY16
+   */
   case object Gray16 extends ImagePlusType(1, "16-bit gray")
 
   /**
-    * ImagePlus.GRAY32
-    */
+   * ImagePlus.GRAY32
+   */
   case object Gray32 extends ImagePlusType(2, "32-bit gray")
 
   /**
-    * ImagePlus.COLOR_256
-    */
+   * ImagePlus.COLOR_256
+   */
   case object Color256 extends ImagePlusType(3, "Indexed color 256")
 
   /**
-    * ImagePlus.COLOR_RGB
-    */
+   * ImagePlus.COLOR_RGB
+   */
   case object ColorRGB extends ImagePlusType(4, "24-bit color")
 
   override def values: immutable.IndexedSeq[ImagePlusType] = findValues
+
+
+  /**
+    * Tries to get an item by the supplied name.
+    * @param name
+    *   name of the item
+    * @throws NoSuchElementException
+    *   if enum has no item with given name
+    */
+  def withName(name: String): ImagePlusType =
+    withNameOption(name).getOrElse(throw new NoSuchElementException(s"No ImagePlusType with name: $name"))
+
+  /**
+    * Optionally returns [[ImagePlusType]] for a given name.
+    * @param name
+    *   name of the item
+    */
+  def withNameOption(name: String): Option[ImagePlusType] =
+    values.find(_.name == name)
+
+
+  /**
+    * Optionally returns an [[ImagePlusType]] for a given value.
+    */
+  def withValueOption(v:Int) : Option[ImagePlusType] = ImagePlusType.withValueOpt(v)
 }

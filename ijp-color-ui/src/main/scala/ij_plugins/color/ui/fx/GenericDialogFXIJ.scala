@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2021 Jarek Sacha
+ * Copyright (C) 2002-2022 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -20,28 +20,19 @@
  * Latest release available at https://github.com/ij-plugins/ijp-color/
  */
 
-package ij_plugins.color.ui.util
+package ij_plugins.color.ui.fx
 
-import enumeratum.{Enum, EnumEntry}
+import org.scalafx.extras.generic_dialog.GenericDialogFX
+import scalafx.stage.Window
 
-import scala.collection.immutable
-
-sealed abstract class Gamma(override val entryName: String, val value: Double) extends EnumEntry {
-  def name: String              = entryName
-  override def toString: String = entryName
-}
-
-case object Gamma extends Enum[Gamma] {
-
-  case object v10 extends Gamma("1.0", 1.0)
-
-  case object v18 extends Gamma("1.8", 1.8)
-
-  case object v22 extends Gamma("2.2", 2.2)
-
-  case object sRGB extends Gamma("sRGB", -2.2)
-
-  case object L extends Gamma("L*", 0.0)
-
-  val values: immutable.IndexedSeq[Gamma] = findValues
-}
+/**
+  * GenericDialogFX that integrates the LastDirectoryHandler with ImageJ directory handling
+  *
+  * @param title        dialog title
+  * @param header       dialog header
+  * @param parentWindow optional parent window
+  */
+class GenericDialogFXIJ(title: String,
+                        header: String,
+                        parentWindow: Option[Window] = None)
+  extends GenericDialogFX(title, header, parentWindow, LastDirectoryHandlerIJ)

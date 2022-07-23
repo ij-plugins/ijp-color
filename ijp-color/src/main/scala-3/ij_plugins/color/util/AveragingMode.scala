@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2021 Jarek Sacha
+ * Copyright (C) 2002-2022 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -20,16 +20,11 @@
  * Latest release available at https://github.com/ij-plugins/ijp-color/
  */
 
-package ij_plugins.color.ui.util.batch
+package ij_plugins.color.util
 
-import scala.collection.parallel.CollectionConverters._
-import scala.collection.parallel.ParSeq
+import ij_plugins.color.util.EnumCompanion.WithName
 
-/**
-  * Scala 2.13+ specific way of creating a parallel collection
-  *
-  * Scala 2.13+ requires import `scala.collection.parallel.CollectionConverters._` that is not supported in Scala 2.12-
-  */
-object ParHelper {
-  def par[T](seq: Seq[T]): ParSeq[T] = seq.par
+enum AveragingMode(val name: String) extends WithName {
+  case Mean extends AveragingMode("Mean")
+  case Median extends AveragingMode("Median")
 }

@@ -44,8 +44,10 @@ object ColorFXUI {
   /**
    * Show `node` in a new window.
    *
-   * @param node        node to show.
-   * @param windowTitle window title.
+   * @param node
+   *   node to show.
+   * @param windowTitle
+   *   window title.
    */
   def showInNewWindow(node: Node, windowTitle: String): Unit = {
     Platform.runLater {

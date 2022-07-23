@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2021 Jarek Sacha
+ * Copyright (C) 2002-2022 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -23,21 +23,26 @@
 package ij_plugins.color.util
 
 import ij.gui.{PolygonRoi, Roi}
+import ij.io.RoiEncoder
 import ij.plugin.frame.RoiManager
 import ij.process.{ByteProcessor, ColorProcessor, FloatProcessor, ImageProcessor}
 import ij.{IJ, ImageJ}
 
 import java.awt.geom.Point2D
-import scala.collection.compat._
+import java.io.{BufferedOutputStream, DataOutputStream, File, FileOutputStream}
+import java.util.zip.{ZipEntry, ZipOutputStream}
+import scala.collection.compat.*
+import scala.util.Using
 
 /** Helper methods for working with ImageJ. */
 object ImageJUtils {
 
   /**
-    * Returns icon used by ImageJ main frame. Returns `null` if main frame is not instantiated or has no icon.
-    *
-    * @return ImageJ icon or `null`.
-    */
+   * Returns icon used by ImageJ main frame. Returns `null` if main frame is not instantiated or has no icon.
+   *
+   * @return
+   *   ImageJ icon or `null`.
+   */
   def imageJIconAsAWTImage: java.awt.Image = {
     val imageJ: ImageJ = IJ.getInstance
     if (imageJ != null) imageJ.getIconImage else null
@@ -46,8 +51,10 @@ object ImageJUtils {
   /**
    * Splits ColorProcessor into ByteProcessors representing each of three bands (red, green, and blue).
    *
-   * @param cp input color processor
-   * @return ByteProcessor for each band.
+   * @param cp
+   *   input color processor
+   * @return
+   *   ByteProcessor for each band.
    */
   def splitRGB(cp: ColorProcessor): Array[ByteProcessor] = {
     val width       = cp.getWidth
@@ -65,9 +72,12 @@ object ImageJUtils {
   /**
    * Merges RGB bands into a ColorProcessor.
    *
-   * @param src ByteProcessor for red, green, and blue band.
-   * @return merged bands
-   * @see #splitRGB
+   * @param src
+   *   ByteProcessor for red, green, and blue band.
+   * @return
+   *   merged bands
+   * @see
+   *   #splitRGB
    */
   def mergeRGB(src: Array[ByteProcessor]): ColorProcessor = {
     validateSameTypeAndDimensions(src, 3)
@@ -88,9 +98,12 @@ object ImageJUtils {
    *
    * Floating point values are assumed in the range 0 to 255.
    *
-   * @param src ByteProcessor for red, green, and blue band.
-   * @return merged bands
-   * @see #splitRGB
+   * @param src
+   *   ByteProcessor for red, green, and blue band.
+   * @return
+   *   merged bands
+   * @see
+   *   #splitRGB
    */
   def mergeRGB(src: Array[FloatProcessor]): ColorProcessor = {
     validateSameTypeAndDimensions(src, 3)
@@ -125,25 +138,36 @@ object ImageJUtils {
   }
 
   /**
-   * Measure color within ROI.
-   *
-   * @param tri     three bands of an image, may represent only color space.
-   * @param outline outline of the region of interest.
-   * @return average color in the ROI.
-   * @see #measureColorXY(ij.process.ImageProcessor[], ij.gui.Roi)
-   */
+    * Measure color within ROI.
+    *
+    * @param tri
+    * three bands of an image, may represent only color space.
+    * @param outline
+    * outline of the region of interest.
+    * @return
+    * average color in the ROI.
+    * @see
+    * #measureColorXY(ij.process.ImageProcessor[], ij.gui.Roi)
+    */
   def measureColor[T <: ImageProcessor](tri: Array[T], outline: Array[Point2D]): Array[Double] = {
     measureColor(tri, toRoi(outline.toSeq))
   }
 
+  def measureColor[T <: ImageProcessor](tri: IndexedSeq[T], outline: IndexedSeq[Point2D]): IndexedSeq[Double] =
+    measureColor(tri, toRoi(outline))
+
   /**
-   * Measure color within ROI.
-   *
-   * @param tri three bands of an image, may represent only color space.
-   * @param roi region of interest.
-   * @return average color in the ROI.
-   * @see #measureColorXY(ij.process.ImageProcessor[], ij.gui.Roi)
-   */
+    * Measure color within ROI.
+    *
+    * @param tri
+    * three bands of an image, may represent only color space.
+    * @param roi
+    * region of interest.
+    * @return
+    * average color in the ROI.
+    * @see
+    * #measureColorXY(ij.process.ImageProcessor[], ij.gui.Roi)
+    */
   def measureColor[T <: ImageProcessor](tri: Array[T], roi: Roi): Array[Double] = {
     val color: Array[Double] = new Array[Double](tri.length)
     for (i <- tri.indices) {
@@ -153,12 +177,23 @@ object ImageJUtils {
     color
   }
 
+  def measureColor[T <: ImageProcessor](tri: IndexedSeq[T], roi: Roi): IndexedSeq[Double] = {
+    tri.map { ip =>
+      ip.setRoi(roi)
+      ip.getStatistics.mean
+    }
+  }
+
   /**
-   * @param src    images to validate
-   * @param length expected number of images
-   * @tparam T image processor type
-   * @throws java.lang.IllegalArgumentException if the images in the array are not of the same dimension.
-   */
+    * @param src
+    * images to validate
+    * @param length
+    * expected number of images
+    * @tparam T
+    * image processor type
+    * @throws java.lang.IllegalArgumentException
+    * if the images in the array are not of the same dimension.
+    */
   @inline
   def validateSameDimensions[T <: ImageProcessor](src: Array[T], length: Int): Unit = {
     require(src != null, "Input cannot be null.")
@@ -177,10 +212,14 @@ object ImageJUtils {
   }
 
   /**
-   * @param src    images to validate
-   * @param length expected number of images
-   * @tparam T image processor type
-   * @throws java.lang.IllegalArgumentException if the images in the array are not of the same dimension.
+   * @param src
+   *   images to validate
+   * @param length
+   *   expected number of images
+   * @tparam T
+   *   image processor type
+   * @throws java.lang.IllegalArgumentException
+   *   if the images in the array are not of the same dimension.
    */
   @inline
   def validateSameTypeAndDimensions[T <: ImageProcessor](src: Array[T], length: Int): Unit = {
@@ -194,7 +233,8 @@ object ImageJUtils {
   /**
    * Get the singleton instance of ImageJ `RoiManager`
    *
-   * @return RoiManager instance
+   * @return
+   *   RoiManager instance
    */
   def roiManagerInstance: RoiManager = { // Workaround for ImageJ bug.
     // RoiManger is a singleton in function, but it has constructors.
@@ -208,12 +248,37 @@ object ImageJUtils {
   /**
    * Add result ROIs to ROI Manager, replacing current content. If ROI Manager is not visible it will be opened.
    *
-   * @param rois         ROI's to be added.
-   * @param clearContent if `true` ROI Manager content will be cleared before new rois will be added
+   * @param rois
+   *   ROI's to be added.
+   * @param clearContent
+   *   if `true` ROI Manager content will be cleared before new rois will be added
    */
   def addToROIManager(rois: IterableOnce[Roi], clearContent: Boolean = false): Unit = {
     val roiManager = roiManagerInstance
     if (clearContent) roiManager.runCommand("Reset")
     rois.iterator.foreach(roiManager.addRoi)
+  }
+
+  /** Save ROI to a file */
+  def saveROI(roi: Roi, file: File): Unit = {
+    val encoder = new RoiEncoder(file.getPath)
+    encoder.write(roi)
+  }
+
+  /** Save collection of ROIs to a file as a set in a format that ImageJ can read back - ZIP of individual ROI files. */
+  def saveRoiZip(rois: Seq[(String, Roi)], file: File): Unit = {
+    Using.resource(new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(file)))) { zos =>
+      Using.resource(new DataOutputStream(new BufferedOutputStream(zos))) { out =>
+        val encoder = new RoiEncoder(out)
+        for (case (_name, roi) <- rois) {
+          val name: String = if (_name.endsWith(".roi")) _name else _name + ".roi"
+          zos.putNextEntry(new ZipEntry(name))
+          encoder.write(roi)
+          out.flush()
+        }
+
+        out.close()
+      }
+    }
   }
 }

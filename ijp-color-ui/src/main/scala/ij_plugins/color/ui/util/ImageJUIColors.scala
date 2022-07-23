@@ -25,34 +25,36 @@ package ij_plugins.color.ui.util
 import ij.plugin.Colors
 
 /**
-  * Helper for managing color names as in ImageJ UI - front end to `ij.plugin.Color`.
-  */
+ * Helper for managing color names as in ImageJ UI - front end to `ij.plugin.Color`.
+ */
 object ImageJUIColors {
 
   /**
-    * Get a valid color with given name - the AWT version of the color.
-    *
-    * @throws IllegalArgumentException is color is not one of the listed ImageJ UI colors
-    */
+   * Get a valid color with given name - the AWT version of the color.
+   *
+   * @throws IllegalArgumentException
+   *   is color is not one of the listed ImageJ UI colors
+   */
   def colorWithNameAWT(name: String): java.awt.Color = {
     Option(Colors.getColor(name, null)) match {
       case Some(c) => c
       case None => throw new IllegalArgumentException(
-        s"Invalid color name: '$name'. Valid names: ${listColorNames.mkString(", ")}."
-      )
+          s"Invalid color name: '$name'. Valid names: ${listColorNames.mkString(", ")}."
+        )
     }
   }
 
   /**
-    * List names of colors in ImageJ UI.
-    */
+   * List names of colors in ImageJ UI.
+   */
   def listColorNames: Array[String] = Colors.colors
 
   /**
-    * Validate color name and correct character case. If 'name' is not valid use 'defaultName'
-    *
-    * @throws IllegalArgumentException if both 'name' and 'defaultName' do not correspond to a valid color name.
-    */
+   * Validate color name and correct character case. If 'name' is not valid use 'defaultName'
+   *
+   * @throws IllegalArgumentException
+   *   if both 'name' and 'defaultName' do not correspond to a valid color name.
+   */
   def validNameOr(name: String, defaultName: String): String = {
     listColorNames.find(_.toLowerCase.trim == name.toLowerCase()) match {
       case Some(n) => n
@@ -60,8 +62,8 @@ object ImageJUIColors {
         listColorNames.find(_.toLowerCase.trim == defaultName.toLowerCase()) match {
           case Some(d) => d
           case None => throw new IllegalArgumentException(
-            s"Neither name [$name] or defaultName [$defaultName] are valid color names."
-          )
+              s"Neither name [$name] or defaultName [$defaultName] are valid color names."
+            )
         }
     }
   }

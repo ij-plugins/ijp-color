@@ -24,7 +24,7 @@ package ij_plugins.color.util
 
 import ij_plugins.color.calibration.CalibrationUtils.point2D
 import org.scalatest.flatspec.AnyFlatSpec
-import org.scalatest.matchers.should.Matchers._
+import org.scalatest.matchers.should.Matchers.*
 
 class PerspectiveTransformTest extends AnyFlatSpec {
 

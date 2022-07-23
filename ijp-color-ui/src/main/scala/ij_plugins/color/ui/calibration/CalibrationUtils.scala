@@ -32,17 +32,17 @@ import ij_plugins.color.converter.ReferenceWhite
 object CalibrationUtils {
 
   case class ApplyCalibrationOutput(
-                                     correctedInReferenceSpace: Option[CompositeImage],
-                                     correctedInSRGB: Option[ImagePlus],
-                                     correctedBands: Array[FloatProcessor]
-                                   )
+    correctedInReferenceSpace: Option[CompositeImage],
+    correctedInSRGB: Option[ImagePlus],
+    correctedBands: Array[FloatProcessor]
+  )
 
   def applyCorrection(
-                       recipe: CorrectionRecipe,
-                       imp: ImagePlus,
-                       computeInReference: Boolean,
-                       computeInSRGB: Boolean
-                     ): Either[IJPError, ApplyCalibrationOutput] = {
+    recipe: CorrectionRecipe,
+    imp: ImagePlus,
+    computeInReference: Boolean,
+    computeInSRGB: Boolean
+  ): Either[IJPError, ApplyCalibrationOutput] = {
 
     val correctedBandsE =
       try {
@@ -83,11 +83,12 @@ object CalibrationUtils {
     }
   }
 
-  def showImageInLab(colorSpace: ReferenceColorSpace,
-                     refWhite: ReferenceWhite,
-                     correctedBands: Array[FloatProcessor],
-                     title: String
-                    ): Unit = {
+  def showImageInLab(
+    colorSpace: ReferenceColorSpace,
+    refWhite: ReferenceWhite,
+    correctedBands: Array[FloatProcessor],
+    title: String
+  ): Unit = {
     val imp = convertToLab(correctedBands, colorSpace, refWhite)
     imp.setTitle(title)
     imp.show()

@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2021 Jarek Sacha
+ * Copyright (C) 2002-2022 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -22,18 +22,21 @@
 
 package ij_plugins.color.ui.charttool
 
-import ij.gui._
+import ij.gui.*
+import ij.io.SaveDialog
 import ij.measure.ResultsTable
 import ij.plugin.PlugIn
 import ij.process.ImageStatistics
 import ij.{IJ, ImagePlus}
-import ij_plugins.color.calibration.chart.{GridChartFrame, GridChartFrameUtils}
-import ij_plugins.color.ui.util._
+import ij_plugins.color.calibration.chart.{ChartFrameUtils, GridChartFrame}
+import ij_plugins.color.ui.util.*
+import ij_plugins.color.util.ImageJUtils.{saveROI, saveRoiZip}
 import ij_plugins.color.util.{ImageJUtils, PerspectiveTransform}
 import scalafx.beans.property.ObjectProperty
 
+import java.awt.*
 import java.awt.event.{WindowAdapter, WindowEvent}
-import java.awt.{AWTEvent, Color}
+import java.io.*
 import scala.collection.immutable.ListMap
 
 object ColorChartToolPlugin {
@@ -43,18 +46,20 @@ object ColorChartToolPlugin {
   object Config {
     def loadFromIJPref(): Option[Config] = {
       for {
-        nbColumns <- IJPrefs.getIntOption(ReferencePrefix + ".nbColumns")
-        nbRows <- IJPrefs.getIntOption(ReferencePrefix + ".nbRows")
-        chipMargin <- IJPrefs.getDoubleOption(ReferencePrefix + ".chipMargin")
-        chipOverlayColorName <- IJPrefs.getStringOption(ReferencePrefix + ".chipOverlayColorName")
-        sendToROIManager <- IJPrefs.getBooleanOption(ReferencePrefix + ".sendToROIManager")
-        measureChips <- IJPrefs.getBooleanOption(ReferencePrefix + ".measureChips")
-        listChipVertices <- IJPrefs.getBooleanOption(ReferencePrefix + ".listChipVertices")
+        nbColumns              <- IJPrefs.getIntOption(ReferencePrefix + ".nbColumns")
+        nbRows                 <- IJPrefs.getIntOption(ReferencePrefix + ".nbRows")
+        chipMargin             <- IJPrefs.getDoubleOption(ReferencePrefix + ".chipMargin")
+        chipOverlayColorName   <- IJPrefs.getStringOption(ReferencePrefix + ".chipOverlayColorName")
+        chipOverlayStrokeWidth <- IJPrefs.getIntOption(ReferencePrefix + ".chipOverlayStrokeWidth")
+        sendToROIManager       <- IJPrefs.getBooleanOption(ReferencePrefix + ".sendToROIManager")
+        measureChips           <- IJPrefs.getBooleanOption(ReferencePrefix + ".measureChips")
+        listChipVertices       <- IJPrefs.getBooleanOption(ReferencePrefix + ".listChipVertices")
       } yield Config(
         nbColumns = nbColumns,
         nbRows = nbRows,
         chipMargin = chipMargin,
         chipOverlayColorName = chipOverlayColorName,
+        chipOverlayStrokeWidth = chipOverlayStrokeWidth,
         sendToROIManager = sendToROIManager,
         measureChips = measureChips,
         listChipVertices = listChipVertices
@@ -63,14 +68,15 @@ object ColorChartToolPlugin {
   }
 
   case class Config(
-                     nbColumns: Int = 6,
-                     nbRows: Int = 4,
-                     chipMargin: Double = 0.2,
-                     chipOverlayColorName: String = "magenta",
-                     sendToROIManager: Boolean = true,
-                     measureChips: Boolean = true,
-                     listChipVertices: Boolean = false
-                   ) {
+    nbColumns: Int = 6,
+    nbRows: Int = 4,
+    chipMargin: Double = 0.2,
+    chipOverlayColorName: String = "magenta",
+    chipOverlayStrokeWidth: Int = 1,
+    sendToROIManager: Boolean = true,
+    measureChips: Boolean = true,
+    listChipVertices: Boolean = false
+  ) {
     require(ImageJUIColors.listColorNames.contains(chipOverlayColorName))
 
     def saveToIJPref(): Unit = {
@@ -78,6 +84,7 @@ object ColorChartToolPlugin {
       IJPrefs.set(ReferencePrefix + ".nbRows", nbRows)
       IJPrefs.set(ReferencePrefix + ".chipMargin", chipMargin)
       IJPrefs.set(ReferencePrefix + ".chipOverlayColorName", chipOverlayColorName)
+      IJPrefs.set(ReferencePrefix + ".chipOverlayStrokeWidth", chipOverlayStrokeWidth)
       IJPrefs.set(ReferencePrefix + ".sendToROIManager", sendToROIManager)
       IJPrefs.set(ReferencePrefix + ".measureChips", measureChips)
       IJPrefs.set(ReferencePrefix + ".listChipVertices", listChipVertices)
@@ -88,10 +95,10 @@ object ColorChartToolPlugin {
 }
 
 /**
- * Send tiles of the chart to ROI Manager
- * User indicates chart location by pointing to chart corners.
+ * Send tiles of the chart to ROI Manager User indicates chart location by pointing to chart corners.
  */
-class ColorChartToolPlugin extends PlugIn with DialogListener with ImageListenerHelper with LiveChartROIHelper {
+class ColorChartToolPlugin extends PlugIn with DialogListener with ImageListenerHelper
+    with LiveChartROIHelper[GridChartFrame] {
 
   import ColorChartToolPlugin.Config
 
@@ -101,7 +108,7 @@ class ColorChartToolPlugin extends PlugIn with DialogListener with ImageListener
     "Measures color of each chip."
 
   private var dialog: Option[NonBlockingGenericDialog] = None
-  private var config: Config = Config.loadFromIJPref().getOrElse(Config())
+  private var config: Config                           = Config.loadFromIJPref().getOrElse(Config())
 
   private val referenceChartOption = {
     val chart =
@@ -125,10 +132,13 @@ class ColorChartToolPlugin extends PlugIn with DialogListener with ImageListener
     dialog = Option(gd)
 
     setupImageListener()
-    setupLiveChartROI(new LiveChartROI(image.get, referenceChartOption))
+    setupLiveChartROI(
+      new LiveChartROI[GridChartFrame](image.get, referenceChartOption)
+    )
 
     liveChartROIOption.foreach { l =>
       l.overlyColor = config.chipOverlayColor
+      l.overlayStrokeWidth = config.chipOverlayStrokeWidth
     }
 
     // Show dialog and wait
@@ -157,18 +167,33 @@ class ColorChartToolPlugin extends PlugIn with DialogListener with ImageListener
   }
 
   private def createDialog(): NonBlockingGenericDialog = {
+
+    def makeHeader(text: String) = {
+//      text + " " + ("-" * 10)
+      text
+    }
+
     val gd = new NonBlockingGenericDialog(Title) {
       addPanel(IJPUtils.createInfoPanel(Title, Description))
-      addMessage("Chart Layout")
+
+      addMessage(makeHeader("Chart Layout"))
       addNumericField("Rows", referenceChart.nbRows, 0, 3, "")
       addNumericField("Columns", referenceChart.nbColumns, 0, 3, "")
       addSlider("Chip margin", 0, 0.49, referenceChart.chipMargin, 0.01)
+
       addMessage("")
-      addChoice("Chip_overlay_color:", ImageJUIColors.listColorNames, config.chipOverlayColorName)
+      addMessage(makeHeader("Chip Overlay"))
+      addChoice("Overlay_color", ImageJUIColors.listColorNames, config.chipOverlayColorName)
+      addNumericField("Overlay_stroke_width", config.chipOverlayStrokeWidth, 0, 3, "")
+
       addMessage("")
+      addMessage(makeHeader("Closing Options"))
       addCheckbox("Send chip ROI to ROI Manager", config.sendToROIManager)
       addCheckbox("Measure chips", config.measureChips)
       addCheckbox("List_chip_vertices", config.listChipVertices)
+
+      addMessage("")
+      addButton("Save Chart ROIs...", (_) => saveROIs())
 
       addHelp("https://github.com/ij-plugins/ijp-color/wiki/Color-Chart-ROI-Tool")
     }
@@ -200,10 +225,11 @@ class ColorChartToolPlugin extends PlugIn with DialogListener with ImageListener
     }
     val chipMargin = math.max(0, math.min(0.49, gd.getNextNumber))
 
-    val colorName = gd.getNextChoice
+    val colorName              = gd.getNextChoice
+    val chipOverlayStrokeWidth = math.round(gd.getNextNumber).toInt
 
     val sendToROIManager = gd.getNextBoolean
-    val measureChips = gd.getNextBoolean
+    val measureChips     = gd.getNextBoolean
     val listChipVertices = gd.getNextBoolean
 
     config = Config(
@@ -211,6 +237,7 @@ class ColorChartToolPlugin extends PlugIn with DialogListener with ImageListener
       nbRows = nbRows,
       chipMargin = chipMargin,
       chipOverlayColorName = ImageJUIColors.validNameOr(colorName, Config().chipOverlayColorName),
+      chipOverlayStrokeWidth = chipOverlayStrokeWidth,
       sendToROIManager = sendToROIManager,
       measureChips = measureChips,
       listChipVertices = listChipVertices
@@ -223,14 +250,15 @@ class ColorChartToolPlugin extends PlugIn with DialogListener with ImageListener
 
     liveChartROIOption.foreach { l =>
       l.overlyColor = config.chipOverlayColor
+      l.overlayStrokeWidth = config.chipOverlayStrokeWidth
     }
 
     true
   }
 
   override protected def handleImageUpdated(): Unit = {
-    // TODO: Review correctness, this code seems to do nothing
-    liveChartROIOption.foreach(v => v.locatedChart)
+    // Update ROI in the new image
+    liveChartROIOption.foreach(_.updateOverlay())
   }
 
   override protected def handleImageClosed(): Unit = {
@@ -252,7 +280,7 @@ class ColorChartToolPlugin extends PlugIn with DialogListener with ImageListener
 
   private def doMeasureChips(imp: ImagePlus, chart: GridChartFrame): Unit = {
 
-    val roiBandStats = GridChartFrameUtils.measureRois(imp, chart)
+    val roiBandStats = ChartFrameUtils.measureRois(imp, chart)
 
     val rt = new ResultsTable()
 
@@ -289,14 +317,43 @@ class ColorChartToolPlugin extends PlugIn with DialogListener with ImageListener
 
   private def statsToMap(stats: ImageStatistics): ListMap[String, Double] = {
     ListMap(
-      "Area" -> stats.area,
-      "Mean" -> stats.mean,
-      "Median" -> stats.median,
-      "Min" -> stats.min,
-      "Max" -> stats.max,
-      "StdDev" -> stats.stdDev,
+      "Area"     -> stats.area,
+      "Mean"     -> stats.mean,
+      "Median"   -> stats.median,
+      "Min"      -> stats.min,
+      "Max"      -> stats.max,
+      "StdDev"   -> stats.stdDev,
       "Kurtosis" -> stats.kurtosis,
       "Skewness" -> stats.skewness
     )
+  }
+
+  def saveROIs(): Unit = {
+    var saved = false
+    image.foreach { imp =>
+      chartOption.foreach { chart =>
+        val name       = imp.getTitle
+        val roiName    = SaveDialog.setExtension(name, ".roi")
+        val saveDialog = new SaveDialog(Title + " - Save Chart ROIs", roiName, ".roi")
+        Option(saveDialog.getFileName).foreach { selectedName =>
+          Option(saveDialog.getDirectory).foreach { directoryName =>
+            try {
+              // Save chart outline
+              saveROI(chart.alignedOutlineROI, new File(directoryName, selectedName))
+
+              // Save chip ROIs
+              val dst = chart.alignedChipROIs.map(roi => (roi.getName, roi))
+              saveRoiZip(dst, new File(directoryName, SaveDialog.setExtension(name, ".RoiSet.zip")))
+              saved = true
+            } catch {
+              case e: IOException =>
+                IJ.error(Title, s"Error saving ROIs.\n${e.getMessage}")
+            }
+          }
+        }
+      }
+    }
+
+    IJ.showMessage(Title, "ROIs " + (if (saved) "" else "not ") + "saved")
   }
 }

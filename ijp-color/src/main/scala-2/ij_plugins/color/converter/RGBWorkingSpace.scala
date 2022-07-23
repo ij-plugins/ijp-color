@@ -27,23 +27,19 @@ import ij_plugins.color.converter.ColorTriple.XYZ
 import ij_plugins.color.converter.ReferenceWhite.{C, D50, D65, E}
 
 import scala.collection.immutable
-import scala.math._
+import scala.math.*
 
 /**
  * An RGB working space, including conversions between that RGB and CIE XYZ color space.
  *
- * The conversion from an RGB to CIE XYZ (and its inverse) are defined by:
- * <ul>
- * <li>red, green, and blue primaries,</li>
- * <li>gamma</li>
- * <li>reference white (or white point)</li>
- * </ul>
+ * The conversion from an RGB to CIE XYZ (and its inverse) are defined by: <ul> <li>red, green, and blue primaries,</li>
+ * <li>gamma</li> <li>reference white (or white point)</li> </ul>
  *
  * Detailed information can be found on the
  * [[http://www.brucelindbloom.com/index.html?WorkingSpaceInfo.html RGB Working Space Information]] page.
  *
- * Concrete RGB working spaces are defined in the companion [[ij_plugins.color.converter.RGBWorkingSpace]] object,
- * for instance [[ij_plugins.color.converter.RGBWorkingSpace.sRGB]].
+ * Concrete RGB working spaces are defined in the companion [[ij_plugins.color.converter.RGBWorkingSpace]] object, for
+ * instance [[ij_plugins.color.converter.RGBWorkingSpace.sRGB]].
  */
 sealed abstract class RGBWorkingSpace(
   override val entryName: String,

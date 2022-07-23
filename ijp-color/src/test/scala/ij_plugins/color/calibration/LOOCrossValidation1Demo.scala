@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2021 Jarek Sacha
+ * Copyright (C) 2002-2022 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -25,7 +25,7 @@ package ij_plugins.color.calibration
 import ij.IJ
 import ij.io.RoiDecoder
 import ij_plugins.color.calibration.LOOCrossValidation.CrossValidationData
-import ij_plugins.color.calibration.chart._
+import ij_plugins.color.calibration.chart.*
 import ij_plugins.color.calibration.regression.MappingMethod
 import ij_plugins.color.converter.ReferenceWhite
 
@@ -40,13 +40,13 @@ object LOOCrossValidation1Demo {
 
     // Image to calibrate
     val imageFile = new File(dataDir, "Color_Gauge_Sample_3.png")
-    val roiFile = new File(dataDir, "Color_Gauge_Sample_3.roi")
+    val roiFile   = new File(dataDir, "Color_Gauge_Sample_3.roi")
 
     // Custom chart params
-    val nbRows = 5
-    val nbColumns = 6
-    val chipMargin = 0.2
-    val refWhite = ReferenceWhite.D50
+    val nbRows        = 5
+    val nbColumns     = 6
+    val chipMargin    = 0.2
+    val refWhite      = ReferenceWhite.D50
     val refValuesFile = new File(dataDir, "Color_Gauge_Chart_3.csv")
 
     // Load image
@@ -73,17 +73,16 @@ object LOOCrossValidation1Demo {
 
     // LOO-CV with all chips enabled
     val crossValidations =
-      LOOCrossValidation.crossValidationStatsAll(chart, imp, ReferenceColorSpace.values, MappingMethod.values)
+      LOOCrossValidation.crossValidationStatsAll(chart, imp, ReferenceColorSpace.values.toSeq, MappingMethod.values.toSeq)
 
     println("All chips enables")
     printBestInfo(crossValidations)
 
     // LOO-CV with invalid-reference-chips disabled
-    val enabled2 = chart.enabled.toArray
-    enabled2(6) = false
+    val enabled2 = chart.enabled.updated(6, false)
     val chart2 = chart.copyWithEnabled(enabled2)
     val crossValidations2 =
-      LOOCrossValidation.crossValidationStatsAll(chart2, imp, ReferenceColorSpace.values, MappingMethod.values)
+      LOOCrossValidation.crossValidationStatsAll(chart2, imp, ReferenceColorSpace.values.toSeq, MappingMethod.values.toSeq)
     println("\nWith invalid reference disabled")
     printBestInfo(crossValidations2)
   }

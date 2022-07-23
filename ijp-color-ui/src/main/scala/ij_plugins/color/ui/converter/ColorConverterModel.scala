@@ -22,7 +22,7 @@
 
 package ij_plugins.color.ui.converter
 
-import ij_plugins.color.converter._
+import ij_plugins.color.converter.*
 import ij_plugins.color.ui.util.Gamma
 import scalafx.beans.property.ObjectProperty
 
@@ -34,7 +34,7 @@ object ColorConverterModel {
 
 class ColorConverterModel {
 
-  import ColorConverterModel._
+  import ColorConverterModel.*
 
   val referenceWhite  = new ObjectProperty[ReferenceWhite](this, "referenceWhite", ReferenceWhite.D65)
   val rgbWorkingSpace = new ObjectProperty[RGBWorkingSpace](this, "rgbWorkingSpace", RGBWorkingSpace.sRGB)

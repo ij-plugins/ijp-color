@@ -23,16 +23,17 @@
 package ij_plugins.color.ui.util
 
 import ij.gui.Roi
+import ij_plugins.color.calibration.chart.ChartFrame
 
 /**
  * Helps using LiveChartROI. Handles adding and removing ROI Listener
  */
-trait LiveChartROIHelper {
-  private var _liveChartROIOption: Option[LiveChartROI] = None
+trait LiveChartROIHelper[T <: ChartFrame] {
+  private var _liveChartROIOption: Option[LiveChartROI[T]] = None
 
-  protected def liveChartROIOption: Option[LiveChartROI] = _liveChartROIOption
+  protected def liveChartROIOption: Option[LiveChartROI[T]] = _liveChartROIOption
 
-  final protected def setupLiveChartROI(liveChartROI: LiveChartROI): Unit = {
+  final protected def setupLiveChartROI(liveChartROI: LiveChartROI[T]): Unit = {
 
     if (liveChartROIOption.nonEmpty) {
       throw new IllegalStateException("RoiListener already created")

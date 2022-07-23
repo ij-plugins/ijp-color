@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2021 Jarek Sacha
+ * Copyright (C) 2002-2022 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -35,23 +35,24 @@ object LOOCrossValidation2Demo extends App {
   def main(): Unit = {
     // Read chart values
     val tableFile = "../test/data/Passport-linear-25_color_values.csv"
-    val srcRT = ResultsTable.open(tableFile)
+    val srcRT     = ResultsTable.open(tableFile)
 
     // Extract chart values as an array
-    val observed = new Array[Array[Double]](srcRT.getCounter)
-    for (i <- observed.indices) {
-      observed(i) = new Array[Double](3)
-      observed(i)(0) = srcRT.getValue("Observed X", i)
-      observed(i)(1) = srcRT.getValue("Observed Y", i)
-      observed(i)(2) = srcRT.getValue("Observed Z", i)
-    }
+    val observed =
+      (0 until srcRT.getCounter).map { i =>
+        IndexedSeq(
+          srcRT.getValue("Observed X", i),
+          srcRT.getValue("Observed Y", i),
+          srcRT.getValue("Observed Z", i)
+        )
+      }
 
     // Reference chart
     val chart = ColorCharts.XRitePassportColorChecker
 
     // Do LOO validation
     val crossValidations =
-      LOOCrossValidation.crossValidationStatsAll(chart, observed, ReferenceColorSpace.values, MappingMethod.values)
+      LOOCrossValidation.crossValidationStatsAll(chart, observed, ReferenceColorSpace.values.toSeq, MappingMethod.values.toSeq)
 
     val bestByMean = crossValidations.minBy(v => v.statsDeltaE.getMean)
     println(

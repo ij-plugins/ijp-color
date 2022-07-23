@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2021 Jarek Sacha
+ * Copyright (C) 2002-2022 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -25,12 +25,15 @@ package ij_plugins.color.util
 object Utils {
 
   /**
-    * Distance between points. For points in CIE L*a*b* color space it is equivalent to delta E 1974.
-    *
-    * @param a first point.
-    * @param b second point.
-    * @return distance
-    */
+   * Distance between points. For points in CIE L*a*b* color space it is equivalent to delta E 1974.
+   *
+   * @param a
+   *   first point.
+   * @param b
+   *   second point.
+   * @return
+   *   distance
+   */
   def delta(a: Array[Double], b: Array[Double]): Double = {
     assert(a != null)
     assert(b != null)
@@ -43,12 +46,14 @@ object Utils {
     math.sqrt(sum)
   }
 
+  def delta(a: IndexedSeq[Double], b: IndexedSeq[Double]): Double = delta(a.toArray, b.toArray)
+
+
   /**
     * Clip all elements of the input array to range suitable for an 8-bit unsigned integer: 0 to 255.
     *
-    * Values in the range will be rounded to the closest integer.
-    * Values less than 0 will be set to 0.
-    * Values greater than 255 will be set to 255.
+    * Values in the range will be rounded to the closest integer. Values less than 0 will be set to 0. Values greater
+    * than 255 will be set to 255.
     */
   def clipUInt8(a: Array[Double]): Array[Int] = {
     assert(a != null)
@@ -60,12 +65,12 @@ object Utils {
   }
 
   /**
-    * Clip input value to the range if an 8-bit unsigned integer: 0 to 255, but do not modify decimal places within the range.
-    *
-    * Values in the range will not be changed.
-    * Values less than 0 will be set to 0.
-    * Values greater than 255 will be set to 255.
-    */
+   * Clip input value to the range if an 8-bit unsigned integer: 0 to 255, but do not modify decimal places within the
+   * range.
+   *
+   * Values in the range will not be changed. Values less than 0 will be set to 0. Values greater than 255 will be set
+   * to 255.
+   */
   def clipUInt8D(a: Array[Double]): Array[Double] = {
     assert(a != null)
     val r = new Array[Double](a.length)
@@ -76,22 +81,21 @@ object Utils {
   }
 
   /**
-    * Clip input value to range suitable for an 8-bit unsigned integer: 0 to 255.
-    *
-    * Values in the range will be rounded to the closest integer.
-    * Values less than 0 will be set to 0.
-    * Values greater than 255 will be set to 255.
-    */
+   * Clip input value to range suitable for an 8-bit unsigned integer: 0 to 255.
+   *
+   * Values in the range will be rounded to the closest integer. Values less than 0 will be set to 0. Values greater
+   * than 255 will be set to 255.
+   */
   @inline
   def clipUInt8(v: Double): Int = math.max(math.min(math.round(v).toInt, 255), 0)
 
   /**
-    * Clip input value to the range if an 8-bit unsigned integer: 0 to 255, but do not modify decimal places within the range.
-    *
-    * Values in the range will not be changed.
-    * Values less than 0 will be set to 0.
-    * Values greater than 255 will be set to 255.
-    */
+   * Clip input value to the range if an 8-bit unsigned integer: 0 to 255, but do not modify decimal places within the
+   * range.
+   *
+   * Values in the range will not be changed. Values less than 0 will be set to 0. Values greater than 255 will be set
+   * to 255.
+   */
   @inline
   def clipUInt8D(v: Double): Double = math.max(math.min(v, 255), 0)
 }

@@ -26,41 +26,41 @@ import ij_plugins.color.calibration.chart.{ColorChartType, ReferenceColorSpace}
 import ij_plugins.color.calibration.regression.MappingMethod
 import ij_plugins.color.ui.util.{IJPUtils, ImageJUIColors}
 import org.scalafx.extras.mvcfx.ControllerFX
-import scalafx.Includes._
+import scalafx.Includes.*
 import scalafx.collections.ObservableBuffer
 import scalafx.geometry.Pos
+import scalafx.scene.control.*
 import scalafx.scene.control.SpinnerValueFactory.IntegerSpinnerValueFactory
-import scalafx.scene.control._
 import scalafx.scene.layout.GridPane
 import scalafxml.core.macros.sfxml
 
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
-  * Binds ColorCalibrator FXML to UI model.
-  */
+ * Binds ColorCalibrator FXML to UI model.
+ */
 @sfxml
 class ColorCalibratorUIController(
-                                   private val imageTitleLabel: Label,
-                                   private val chartTypeChoiceBox: ChoiceBox[ColorChartType],
-                                   private val renderReferenceChartSplitButton: SplitMenuButton,
-                                   private val chartInfoLabel: Label,
-                                   private val editChartButton: Button,
-                                   private val marginsSpinner: Spinner[java.lang.Integer],
-                                   private val chipOverlayColorChoiceBox: ChoiceBox[String],
-                                   private val enabledChipsChoiceBox: ChoiceBox[ChipsEnabledType],
-                                   private val selectChipsButton: Button,
-                                   private val referenceColorSpaceChoiceBox: ChoiceBox[ReferenceColorSpace],
-                                   private val mappingMethodChoiceBox: ChoiceBox[MappingMethod],
-                                   private val suggestCalibrationOptionsButton: Button,
-                                   private val selectOutputsButton: Button,
-                                   private val calibrateButton: Button,
-                                   private val applyToCurrentImageButton: Button,
-                                   private val applyInBatchButton: Button,
-                                   private val helpButton: Button,
-                                   private val rootGridPane: GridPane,
-                                   private val model: ColorCalibratorUIModel
-                                 ) extends ControllerFX {
+  private val imageTitleLabel: Label,
+  private val chartTypeChoiceBox: ChoiceBox[ColorChartType],
+  private val renderReferenceChartSplitButton: SplitMenuButton,
+  private val chartInfoLabel: Label,
+  private val editChartButton: Button,
+  private val marginsSpinner: Spinner[java.lang.Integer],
+  private val chipOverlayColorChoiceBox: ChoiceBox[String],
+  private val enabledChipsChoiceBox: ChoiceBox[ChipsEnabledType],
+  private val selectChipsButton: Button,
+  private val referenceColorSpaceChoiceBox: ChoiceBox[ReferenceColorSpace],
+  private val mappingMethodChoiceBox: ChoiceBox[MappingMethod],
+  private val suggestCalibrationOptionsButton: Button,
+  private val selectOutputsButton: Button,
+  private val calibrateButton: Button,
+  private val applyToCurrentImageButton: Button,
+  private val applyInBatchButton: Button,
+  private val helpButton: Button,
+  private val rootGridPane: GridPane,
+  private val model: ColorCalibratorUIModel
+) extends ControllerFX {
 
   // Dialog header
   private val headerNode = IJPUtils.createHeaderNode(

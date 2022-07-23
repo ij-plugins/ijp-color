@@ -25,7 +25,7 @@ package ij_plugins.color
 import ij_plugins.color.converter.ColorTriple
 import ij_plugins.color.converter.ColorTriple.Lab
 
-import scala.math._
+import scala.math.*
 
 /** Formulas for computation of color differences. */
 object DeltaE {
@@ -68,13 +68,15 @@ object DeltaE {
   private val DeltaE94Textiles    = DeltaE94(kL = 2, k1 = 0.048, k2 = 0.014)
 
   /**
-   * Compute color deference between color using CIE Delta E 1976 formula
-   * (equivalent to Euclidean distance in L*a*b* space).
-   * See http://www.brucelindbloom.com/index.html?Eqn_DeltaE_CIE94.html
+   * Compute color deference between color using CIE Delta E 1976 formula (equivalent to Euclidean distance in L*a*b*
+   * space). See http://www.brucelindbloom.com/index.html?Eqn_DeltaE_CIE94.html
    *
-   * @param lab1 CIE L*a*b* reference
-   * @param lab2 CIE L*a*b* sample
-   * @return delta E
+   * @param lab1
+   *   CIE L*a*b* reference
+   * @param lab2
+   *   CIE L*a*b* sample
+   * @return
+   *   delta E
    */
   def e76(lab1: Array[Double], lab2: Array[Double]): Double = {
     validateLab(lab1)
@@ -89,73 +91,94 @@ object DeltaE {
   }
 
   /**
-   * Compute color deference between color using CIE Delta E 1976 formula
-   * (equivalent to Euclidean distance in L*a*b* space).
-   * See http://www.brucelindbloom.com/index.html?Eqn_DeltaE_CIE94.html
+   * Compute color deference between color using CIE Delta E 1976 formula (equivalent to Euclidean distance in L*a*b*
+   * space). See http://www.brucelindbloom.com/index.html?Eqn_DeltaE_CIE94.html
    *
-   * @param lab1 CIE L*a*b* reference
-   * @param lab2 CIE L*a*b* sample
-   * @return delta E
+   * @param lab1
+   *   CIE L*a*b* reference
+   * @param lab2
+   *   CIE L*a*b* sample
+   * @return
+   *   delta E
    */
   def e76(lab1: Lab, lab2: ColorTriple.Lab): Double = e76(lab1.toArray, lab2.toArray)
 
   /**
-   * Compute color deference between color using CIE Delta E 1994 formula, assuming graphic arts constants.
-   * See [[http://www.brucelindbloom.com/index.html?Eqn_DeltaE_CIE94.html]]
+   * Compute color deference between color using CIE Delta E 1994 formula, assuming graphic arts constants. See
+   * [[http://www.brucelindbloom.com/index.html?Eqn_DeltaE_CIE94.html]]
    *
-   * @param referenceLab CIE L*a*b* reference
-   * @param sampleLab    CIE L*a*b* sample
-   * @return delta E
-   * @see #e94Textiles
+   * @param referenceLab
+   *   CIE L*a*b* reference
+   * @param sampleLab
+   *   CIE L*a*b* sample
+   * @return
+   *   delta E
+   * @see
+   *   #e94Textiles
    */
   def e94GraphicArts(referenceLab: Array[Double], sampleLab: Array[Double]): Double = {
     DeltaE94GraphicArts(referenceLab, sampleLab)
   }
 
   /**
-   * Compute color deference between color using CIE Delta E 1994 formula, assuming graphic arts constants.
-   * See [[http://www.brucelindbloom.com/index.html?Eqn_DeltaE_CIE94.html]]
+   * Compute color deference between color using CIE Delta E 1994 formula, assuming graphic arts constants. See
+   * [[http://www.brucelindbloom.com/index.html?Eqn_DeltaE_CIE94.html]]
    *
-   * @param referenceLab CIE L*a*b* reference
-   * @param sampleLab    CIE L*a*b* sample
-   * @return delta E
-   * @see #e94Textiles
+   * @param referenceLab
+   *   CIE L*a*b* reference
+   * @param sampleLab
+   *   CIE L*a*b* sample
+   * @return
+   *   delta E
+   * @see
+   *   #e94Textiles
    */
   def e94GraphicArts(referenceLab: ColorTriple.Lab, sampleLab: ColorTriple.Lab): Double =
     e94GraphicArts(referenceLab.toArray, sampleLab.toArray)
 
   /**
-   * Compute color deference between color using CIE Delta E 1994 formula, assuming textile constants.
-   * See [[http://www.brucelindbloom.com/index.html?Eqn_DeltaE_CIE94.html]]
+   * Compute color deference between color using CIE Delta E 1994 formula, assuming textile constants. See
+   * [[http://www.brucelindbloom.com/index.html?Eqn_DeltaE_CIE94.html]]
    *
-   * @param referenceLab CIE L*a*b* reference
-   * @param sampleLab    CIE L*a*b* sample
-   * @return delta E
-   * @see #e94GraphicArts
+   * @param referenceLab
+   *   CIE L*a*b* reference
+   * @param sampleLab
+   *   CIE L*a*b* sample
+   * @return
+   *   delta E
+   * @see
+   *   #e94GraphicArts
    */
   def e94Textiles(referenceLab: Array[Double], sampleLab: Array[Double]): Double = {
     DeltaE94Textiles(referenceLab, sampleLab)
   }
 
   /**
-   * Compute color deference between color using CIE Delta E 1994 formula, assuming textile constants.
-   * See [[http://www.brucelindbloom.com/index.html?Eqn_DeltaE_CIE94.html]]
+   * Compute color deference between color using CIE Delta E 1994 formula, assuming textile constants. See
+   * [[http://www.brucelindbloom.com/index.html?Eqn_DeltaE_CIE94.html]]
    *
-   * @param referenceLab CIE L*a*b* reference
-   * @param sampleLab    CIE L*a*b* sample
-   * @return delta E
-   * @see #e94GraphicArts
+   * @param referenceLab
+   *   CIE L*a*b* reference
+   * @param sampleLab
+   *   CIE L*a*b* sample
+   * @return
+   *   delta E
+   * @see
+   *   #e94GraphicArts
    */
   def e94Textiles(referenceLab: ColorTriple.Lab, sampleLab: ColorTriple.Lab): Double =
     e94Textiles(referenceLab.toArray, sampleLab.toArray)
 
   /**
-   * Compute color deference between color using CIE Delta E 200 formula.
-   * See [[http://www.brucelindbloom.com/Eqn_DeltaE_CIE2000.html]]
+   * Compute color deference between color using CIE Delta E 200 formula. See
+   * [[http://www.brucelindbloom.com/Eqn_DeltaE_CIE2000.html]]
    *
-   * @param lab1 CIE L*a*b* sample 1
-   * @param lab2 CIE L*a*b* sample 2
-   * @return delta E 2000
+   * @param lab1
+   *   CIE L*a*b* sample 1
+   * @param lab2
+   *   CIE L*a*b* sample 2
+   * @return
+   *   delta E 2000
    */
   def e2000(lab1: Array[Double], lab2: Array[Double]): Double = {
     validateLab(lab1)
@@ -167,12 +190,15 @@ object DeltaE {
   }
 
   /**
-   * Compute color deference between color using CIE Delta E 200 formula.
-   * See [[http://www.brucelindbloom.com/Eqn_DeltaE_CIE2000.html]]
+   * Compute color deference between color using CIE Delta E 200 formula. See
+   * [[http://www.brucelindbloom.com/Eqn_DeltaE_CIE2000.html]]
    *
-   * @param lab1 CIE L*a*b* sample 1
-   * @param lab2 CIE L*a*b* sample 2
-   * @return delta E 2000
+   * @param lab1
+   *   CIE L*a*b* sample 1
+   * @param lab2
+   *   CIE L*a*b* sample 2
+   * @return
+   *   delta E 2000
    */
   def e2000(
     lab1: ColorTriple.Lab,
@@ -238,15 +264,21 @@ object DeltaE {
   }
 
   /**
-   * Compute color deference between color using Delta CMC(l:c) formula,
-   * see [[http://www.brucelindbloom.com/Eqn_DeltaE_CMC.html]]
+   * Compute color deference between color using Delta CMC(l:c) formula, see
+   * [[http://www.brucelindbloom.com/Eqn_DeltaE_CMC.html]]
    *
-   * @param referenceLab CIE L*a*b* reference
-   * @param sampleLab    CIE L*a*b* sample
-   * @param l            lightness weight, typically equal 1 (for imperceptibility) or 2 (for acceptability).
-   * @param c            chroma weight, typically equal 1.
-   * @see #cmcAcceptability
-   * @see #cmcPerceptibility
+   * @param referenceLab
+   *   CIE L*a*b* reference
+   * @param sampleLab
+   *   CIE L*a*b* sample
+   * @param l
+   *   lightness weight, typically equal 1 (for imperceptibility) or 2 (for acceptability).
+   * @param c
+   *   chroma weight, typically equal 1.
+   * @see
+   *   #cmcAcceptability
+   * @see
+   *   #cmcPerceptibility
    */
   def cmc(referenceLab: Array[Double], sampleLab: Array[Double], l: Double, c: Double): Double = {
     validateLab(referenceLab)
@@ -292,39 +324,53 @@ object DeltaE {
   }
 
   /**
-   * Compute color deference between color using Delta CMC(l:c) formula,
-   * see [[http://www.brucelindbloom.com/Eqn_DeltaE_CMC.html]]
+   * Compute color deference between color using Delta CMC(l:c) formula, see
+   * [[http://www.brucelindbloom.com/Eqn_DeltaE_CMC.html]]
    *
-   * @param referenceLab CIE L*a*b* reference
-   * @param sampleLab    CIE L*a*b* sample
-   * @param l            lightness weight, typically equal 1 (for imperceptibility) or 2 (for acceptability).
-   * @param c            chroma weight, typically equal 1.
-   * @see #cmcAcceptability
-   * @see #cmcPerceptibility
+   * @param referenceLab
+   *   CIE L*a*b* reference
+   * @param sampleLab
+   *   CIE L*a*b* sample
+   * @param l
+   *   lightness weight, typically equal 1 (for imperceptibility) or 2 (for acceptability).
+   * @param c
+   *   chroma weight, typically equal 1.
+   * @see
+   *   #cmcAcceptability
+   * @see
+   *   #cmcPerceptibility
    */
   def cmc(referenceLab: ColorTriple.Lab, sampleLab: ColorTriple.Lab, l: Double, c: Double): Double =
     cmc(referenceLab.toArray, sampleLab.toArray, l, c)
 
   /**
-   * Compute color deference between color using Delta CMC(2:1) formula "for acceptability",
-   * see [[http://www.brucelindbloom.com/Eqn_DeltaE_CMC.html]]
+   * Compute color deference between color using Delta CMC(2:1) formula "for acceptability", see
+   * [[http://www.brucelindbloom.com/Eqn_DeltaE_CMC.html]]
    *
-   * @param referenceLab CIE L*a*b* reference
-   * @param sampleLab    CIE L*a*b* sample
-   * @see #cmc
-   * @see #cmcPerceptibility
+   * @param referenceLab
+   *   CIE L*a*b* reference
+   * @param sampleLab
+   *   CIE L*a*b* sample
+   * @see
+   *   #cmc
+   * @see
+   *   #cmcPerceptibility
    */
   def cmcAcceptability(referenceLab: Array[Double], sampleLab: Array[Double]): Double =
     cmc(referenceLab, sampleLab, 2, 1)
 
   /**
-   * Compute color deference between color using Delta CMC(1:c) formula "for imperceptibility",
-   * see [[http://www.brucelindbloom.com/Eqn_DeltaE_CMC.html]]
+   * Compute color deference between color using Delta CMC(1:c) formula "for imperceptibility", see
+   * [[http://www.brucelindbloom.com/Eqn_DeltaE_CMC.html]]
    *
-   * @param referenceLab CIE L*a*b* reference
-   * @param sampleLab    CIE L*a*b* sample
-   * @see #cmcAcceptability
-   * @see #cmc
+   * @param referenceLab
+   *   CIE L*a*b* reference
+   * @param sampleLab
+   *   CIE L*a*b* sample
+   * @see
+   *   #cmcAcceptability
+   * @see
+   *   #cmc
    */
   def cmcPerceptibility(referenceLab: Array[Double], sampleLab: Array[Double]): Double =
     cmc(referenceLab, sampleLab, 1, 1)

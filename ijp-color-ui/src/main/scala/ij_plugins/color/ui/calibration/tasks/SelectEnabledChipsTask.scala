@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2021 Jarek Sacha
+ * Copyright (C) 2002-2022 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -25,7 +25,7 @@ package ij_plugins.color.ui.calibration.tasks
 import ij_plugins.color.calibration.chart.GridColorChart
 import ij_plugins.color.converter.ColorConverter
 import ij_plugins.color.converter.ColorTriple.{Lab, RGB, XYZ}
-import ij_plugins.color.ui.fx.GenericDialogFX
+import ij_plugins.color.ui.fx.GenericDialogFXIJ
 import org.scalafx.extras.BusyWorker.SimpleTask
 import org.scalafx.extras.onFXAndWait
 import scalafx.beans.property.{BooleanProperty, ObjectProperty, StringProperty}
@@ -42,25 +42,25 @@ import scalafx.stage.Window
 object SelectEnabledChipsTask {
 
   class ColorChipData(
-                       val index: Int,
-                       val name: String,
-                       val colorLab: Lab,
-                       val enabled0: Boolean,
-                       colorConverter: ColorConverter
-                     ) {
-    val enabled = new BooleanProperty(this, "selected", enabled0)
+    val index: Int,
+    val name: String,
+    val colorLab: Lab,
+    val enabled0: Boolean,
+    colorConverter: ColorConverter
+  ) {
+    val enabled       = new BooleanProperty(this, "selected", enabled0)
     val colorRGB: RGB = colorConverter.copyWith(rgbScale = 1).toRGB(colorLab)
     val colorXYZ: XYZ = colorConverter.copyWith(xyzScale = 100).toXYZ(colorLab)
   }
 
   def createTableView(
-                       data: ObservableBuffer[ColorChipData]
-                     ): TableView[ColorChipData] = {
+    data: ObservableBuffer[ColorChipData]
+  ): TableView[ColorChipData] = {
 
     def bandColumn(
-                    header: String,
-                    f: ColorChipData => Double
-                  ): TableColumn[ColorChipData, Number] =
+      header: String,
+      f: ColorChipData => Double
+    ): TableColumn[ColorChipData, Number] =
       new TableColumn[ColorChipData, Number] {
         text = header
         cellValueFactory =
@@ -125,9 +125,9 @@ object SelectEnabledChipsTask {
 }
 
 class SelectEnabledChipsTask(chart: GridColorChart, parentWindow: Option[Window])
-  extends SimpleTask[Option[GridColorChart]] {
+    extends SimpleTask[Option[GridColorChart]] {
 
-  import SelectEnabledChipsTask._
+  import SelectEnabledChipsTask.*
 
   private val Title = "Select Enabled Chips"
 
@@ -147,10 +147,10 @@ class SelectEnabledChipsTask(chart: GridColorChart, parentWindow: Option[Window]
     onFXAndWait {
 
       val dialog =
-        new GenericDialogFX(
+        new GenericDialogFXIJ(
           title = Title,
-          header = Option("An attempt to emulate ImageJ's GenericDialog."),
-          parentWindowOption = parentWindow
+          header = "An attempt to emulate ImageJ's GenericDialog.",
+          parentWindow = parentWindow
         ) {
           addNode(createTableView(data))
           addHelp("https://github.com/ij-plugins/ijp-color/wiki/Select-Enabled-Chips")
@@ -159,7 +159,7 @@ class SelectEnabledChipsTask(chart: GridColorChart, parentWindow: Option[Window]
       dialog.showDialog()
 
       if (dialog.wasOKed) {
-        val enabled: Array[Boolean] = data.sortBy(_.index).map(_.enabled.value).toArray
+        val enabled = data.sortBy(_.index).map(_.enabled.value).toIndexedSeq
         val c = chart.copyWithEnabled(enabled)
         Option(c)
       } else {

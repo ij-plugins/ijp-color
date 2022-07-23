@@ -29,10 +29,10 @@ import scalafx.scene.control.Label
 import scalafx.scene.image.ImageView
 import scalafx.scene.layout.GridPane
 
-import java.awt._
+import java.awt.*
 import java.io.IOException
 import java.net.URISyntaxException
-import javax.swing._
+import javax.swing.*
 import javax.swing.border.EmptyBorder
 import javax.swing.event.HyperlinkEvent.EventType.ACTIVATED
 import javax.swing.event.{HyperlinkEvent, HyperlinkListener}
@@ -47,9 +47,12 @@ object IJPUtils {
   /**
    * Load icon as a resource for given class without throwing exceptions.
    *
-   * @param aClass Class requesting resource.
-   * @param path   Icon file path.
-   * @return Icon or null if loading failed.
+   * @param aClass
+   *   Class requesting resource.
+   * @param path
+   *   Icon file path.
+   * @return
+   *   Icon or null if loading failed.
    */
   def loadIcon(aClass: Class[_], path: String): ImageIcon = {
     try {
@@ -69,9 +72,12 @@ object IJPUtils {
   /**
    * Create pane for displaying a message that may contain HTLM formatting, including links.
    *
-   * @param message the message.
-   * @param title   used in error dialogs.
-   * @return component containg the message.
+   * @param message
+   *   the message.
+   * @param title
+   *   used in error dialogs.
+   * @return
+   *   component containg the message.
    */
   def createHTMLMessageComponent(message: String, title: String): JComponent = {
     val pane = new JEditorPane()
@@ -102,9 +108,12 @@ object IJPUtils {
   /**
    * Create simple info panel for a plugin dialog. Intended to be displayed at the top.
    *
-   * @param title   title displayed in bold font larger than default.
-   * @param message message that can contain HTML formatting.
-   * @return a panel containing the message with a title and a default icon.
+   * @param title
+   *   title displayed in bold font larger than default.
+   * @param message
+   *   message that can contain HTML formatting.
+   * @return
+   *   a panel containing the message with a title and a default icon.
    */
   def createInfoPanel(title: String, message: String): Panel = {
     // TODO: use icon with rounded corners

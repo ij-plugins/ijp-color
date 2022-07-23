@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2021 Jarek Sacha
+ * Copyright (C) 2002-2022 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -29,7 +29,11 @@ trait ColorTriple {
   def apply(index: Int): Double
 
   /** Convert color representation to an Array */
+  @inline
   def toArray: Array[Double] = Array(apply(0), apply(1), apply(2))
+
+  @inline
+  def toIndexedSeq: IndexedSeq[Double] = toArray.toIndexedSeq
 }
 
 /** Color triples with band/channel names specific to color spaces. */
@@ -38,7 +42,8 @@ object ColorTriple {
   /**
    * Generic color coordinates in an arbitrary color space.
    *
-   * @author Jarek Sacha
+   * @author
+   *   Jarek Sacha
    */
   case class Color123(_1: Double = 0, _2: Double = 0, _3: Double = 0) extends ColorTriple {
 

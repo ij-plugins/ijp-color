@@ -58,6 +58,6 @@ case object MappingMethod extends Enum[MappingMethod] {
 }
 
 sealed abstract class MappingMethod(override val entryName: String) extends EnumEntry {
-  val name: String = entryName
+  val name: String              = entryName
   override def toString: String = entryName
 }

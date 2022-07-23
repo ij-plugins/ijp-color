@@ -29,11 +29,13 @@ import scalafx.stage.Window
 /**
  * Creates Color Calibrator UI.
  *
- * @author Jarek Sacha
+ * @author
+ *   Jarek Sacha
  */
-class ColorCalibratorUI(val image: ImagePlus, private var _parentWindow: Window) extends MVCfx[ColorCalibratorUIController]("ColorCalibrator.fxml") {
+class ColorCalibratorUI(val image: ImagePlus, private var _parentWindow: Window)
+    extends MVCfx[ColorCalibratorUIController]("ColorCalibrator.fxml") {
 
-  lazy val model:ColorCalibratorUIModel = new ColorCalibratorUIModel(image, _parentWindow)
+  lazy val model: ColorCalibratorUIModel = new ColorCalibratorUIModel(image, _parentWindow)
 
   def parentWindow: Window = _parentWindow
 

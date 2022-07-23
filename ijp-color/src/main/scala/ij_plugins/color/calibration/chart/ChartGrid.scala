@@ -29,32 +29,42 @@ import java.awt.geom.Point2D
 /**
  * Rectangular grid for color reference chart.
  *
- * Each chip has size of 1x1.
- * The chart top left corner is located at (0,0), bottom right corner at (nbColumns, nbRows).
+ * Each chip has size of 1x1. The chart top left corner is located at (0,0), bottom right corner at (nbColumns, nbRows).
  *
- * @param nbColumns number of columns in the chart
- * @param nbRows    number of rows in the chart
+ * @param nbColumns
+ *   number of columns in the chart
+ * @param nbRows
+ *   number of rows in the chart
  */
 final class ChartGrid(nbColumns: Int, nbRows: Int) {
 
   /**
-   * Compute outline of a chip located in (column, row).  Chip size will be decreased by the `margin` on ech side.
+   * Compute outline of a chip located in (column, row). Chip size will be decreased by the `margin` on ech side.
    *
-   * @param column chip's column.
-   * @param row    chip's row.
-   * @param margin chip border (same on all 4 sides), as fraction of width or height.
-   * @return points defining chip outline.
+   * @param column
+   *   chip's column.
+   * @param row
+   *   chip's row.
+   * @param margin
+   *   chip border (same on all 4 sides), as fraction of width or height.
+   * @return
+   *   points defining chip outline.
    */
   def chipAt(column: Int, row: Int, margin: Double): Array[Point2D] = chipAt(column, row, margin, margin)
 
   /**
    * Compute outline of a chip located in (column, row).
    *
-   * @param column       chip's column.
-   * @param row          chip's row.
-   * @param columnMargin chip border in column (same on both sides), as fraction of height.
-   * @param rowMargin    chip border in row (same on both sides), as fraction of width.
-   * @return points defining chip outline.
+   * @param column
+   *   chip's column.
+   * @param row
+   *   chip's row.
+   * @param columnMargin
+   *   chip border in column (same on both sides), as fraction of height.
+   * @param rowMargin
+   *   chip border in row (same on both sides), as fraction of width.
+   * @return
+   *   points defining chip outline.
    */
   def chipAt(column: Int, row: Int, columnMargin: Double, rowMargin: Double): Array[Point2D] = {
     val x0 = column + columnMargin

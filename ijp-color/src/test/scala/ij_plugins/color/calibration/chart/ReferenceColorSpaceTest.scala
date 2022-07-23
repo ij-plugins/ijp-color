@@ -23,7 +23,7 @@
 package ij_plugins.color.calibration.chart
 
 import org.scalatest.flatspec.AnyFlatSpec
-import org.scalatest.matchers.should.Matchers._
+import org.scalatest.matchers.should.Matchers.*
 
 class ReferenceColorSpaceTest extends AnyFlatSpec {
 

@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2021 Jarek Sacha
+ * Copyright (C) 2002-2022 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -25,4 +25,6 @@ package ij_plugins.color.calibration
 /**
   * Color correction mappings based on polynomial regression.
   */
-package object regression
+package object regression {
+  private[regression] def toArrayArray(s: IndexedSeq[IndexedSeq[Double]]): Array[Array[Double]] = s.map(_.toArray).toArray
+}

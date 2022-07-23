@@ -25,11 +25,12 @@ package ij_plugins.color.ui.calibration
 import ij.ImagePlus.{COLOR_RGB, GRAY16, GRAY32, GRAY8}
 import ij.plugin.PlugIn
 import ij.{IJ, ImagePlus}
+import ij_plugins.color.calibration.chart.GridColorChart
 import ij_plugins.color.ui.calibration.ColorCalibratorUIModel.Config
 import ij_plugins.color.ui.fx.{ColorFXUI, imageJIconAsFXImage, initializeFX}
 import ij_plugins.color.ui.util.{ImageListenerHelper, LiveChartROIHelper}
-import org.scalafx.extras._
-import scalafx.Includes._
+import org.scalafx.extras.*
+import scalafx.Includes.*
 import scalafx.scene.Scene
 import scalafx.stage.Stage
 
@@ -42,9 +43,9 @@ object ColorCalibratorPlugin {
 /**
  * ImageJ plugin for running image color calibration.
  */
-class ColorCalibratorPlugin extends PlugIn with ImageListenerHelper with LiveChartROIHelper {
+class ColorCalibratorPlugin extends PlugIn with ImageListenerHelper with LiveChartROIHelper[GridColorChart] {
 
-  import ColorCalibratorPlugin._
+  import ColorCalibratorPlugin.*
 
   private var model: Option[ColorCalibratorUIModel] = None
   private var dialogStage: Option[Stage]            = None

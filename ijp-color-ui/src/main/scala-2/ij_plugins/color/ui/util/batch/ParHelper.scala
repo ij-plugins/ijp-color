@@ -20,24 +20,16 @@
  * Latest release available at https://github.com/ij-plugins/ijp-color/
  */
 
-package ij_plugins.color.ui.calibration
+package ij_plugins.color.ui.util.batch
 
-import enumeratum.{Enum, EnumEntry}
+import scala.collection.parallel.CollectionConverters.*
+import scala.collection.parallel.ParSeq
 
-import scala.collection.immutable
-
-sealed abstract class ChipsEnabledType(override val entryName: String) extends EnumEntry {
-  def name: String              = entryName
-  override def toString: String = entryName
-}
-
-case object ChipsEnabledType extends Enum[ChipsEnabledType] {
-
-  case object All extends ChipsEnabledType("All")
-
-  case object Auto extends ChipsEnabledType("Auto")
-
-  case object Custom extends ChipsEnabledType("Custom")
-
-  override val values: immutable.IndexedSeq[ChipsEnabledType] = findValues
+/**
+ * Scala 2.13+ specific way of creating a parallel collection
+ *
+ * Scala 2.13+ requires import `scala.collection.parallel.CollectionConverters._` that is not supported in Scala 2.12-
+ */
+object ParHelper {
+  def par[T](seq: Seq[T]): ParSeq[T] = seq.par
 }

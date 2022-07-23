@@ -22,14 +22,14 @@
 
 package ij_plugins.color.ui.util.batch
 
-import scala.collection.parallel.CollectionConverters._
+import scala.collection.parallel.CollectionConverters.*
 import scala.collection.parallel.ParSeq
 
 /**
-  * Scala 2.13+ specific way of creating a parallel collection
-  *
-  * Scala 2.13+ requires import `scala.collection.parallel.CollectionConverters._` that is not supported in Scala 2.12-
-  */
+ * Scala 2.13+ specific way of creating a parallel collection
+ *
+ * Scala 2.13+ requires import `scala.collection.parallel.CollectionConverters._` that is not supported in Scala 2.12-
+ */
 object ParHelper {
   def par[T](seq: Seq[T]): ParSeq[T] = seq.par
 }

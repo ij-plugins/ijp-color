@@ -25,7 +25,7 @@ package ij_plugins.color.ui.calibration.tasks
 import ij.IJ
 import ij_plugins.color.calibration.chart.{ColorCharts, GridColorChart}
 import ij_plugins.color.converter.ReferenceWhite
-import ij_plugins.color.ui.fx.GenericDialogFX
+import ij_plugins.color.ui.fx.GenericDialogFXIJ
 import ij_plugins.color.ui.util.IJPrefs
 import org.scalafx.extras.BusyWorker.SimpleTask
 import scalafx.stage.Window
@@ -34,25 +34,25 @@ import java.io.File
 import scala.util.control.NonFatal
 
 class EditCustomChartTask(customChartOption: Option[GridColorChart], parentWindow: Option[Window])
-  extends SimpleTask[Option[GridColorChart]] {
+    extends SimpleTask[Option[GridColorChart]] {
 
-  private val Title = "Edit Custom Reference Chart"
-  private val ReferencePrefix = classOf[EditCustomChartTask].getName
+  private val Title               = "Edit Custom Reference Chart"
+  private val ReferencePrefix     = classOf[EditCustomChartTask].getName
   private val defaultPathPrefName = ReferencePrefix + ".defaultPath"
 
   override def call(): Option[GridColorChart] = {
 
-    val _nbRows = customChartOption.map(_.nbRows).getOrElse(5)
+    val _nbRows    = customChartOption.map(_.nbRows).getOrElse(5)
     val _nbColumns = customChartOption.map(_.nbColumns).getOrElse(6)
-    val _refWhite = customChartOption.map(_.refWhite).getOrElse(ReferenceWhite.D50)
+    val _refWhite  = customChartOption.map(_.refWhite).getOrElse(ReferenceWhite.D50)
     // Load last path from ImageJ preferences
     val _defaultPath = IJPrefs.getStringOption(defaultPathPrefName).getOrElse("")
 
     // Implement using JavaFX to preserve correct window order when dialog opens
     val gd =
-      new GenericDialogFX(
+      new GenericDialogFXIJ(
         Title,
-        Option("Define chart layout and select a CSV file with CIE L*a*b* reference colors."),
+        "Define chart layout and select a CSV file with CIE L*a*b* reference colors.",
         parentWindow
       ) {
         addNumericField("Rows", _nbRows, 0, 3, "")
@@ -67,21 +67,21 @@ class EditCustomChartTask(customChartOption: Option[GridColorChart], parentWindo
     if (gd.wasOKed) {
       try {
         val nbRows = {
-          val v = gd.getNextNumber()
+          val v = gd.nextNumber()
           math.max(1, math.round(v).toInt)
         }
 
         val nbCols = {
-          val v = gd.getNextNumber()
+          val v = gd.nextNumber()
           math.max(1, math.round(v).toInt)
         }
 
         val refWhite: ReferenceWhite = {
-          val v = gd.getNextChoice()
+          val v = gd.nextChoice()
           ReferenceWhite.withName(v)
         }
 
-        val filePath = gd.getNextString()
+        val filePath = gd.nextString()
         val file = new File(filePath)
 
         val chipsOpt =

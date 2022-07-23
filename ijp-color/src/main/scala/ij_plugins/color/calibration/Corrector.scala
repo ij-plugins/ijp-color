@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2021 Jarek Sacha
+ * Copyright (C) 2002-2022 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -23,9 +23,9 @@
 package ij_plugins.color.calibration
 
 import ij.ImagePlus
-import ij.ImagePlus._
+import ij.ImagePlus.*
 import ij.gui.{PolygonRoi, Roi}
-import ij.process._
+import ij.process.*
 import ij_plugins.color.util.ImageJUtils
 
 /** Performs color space mapping. Derived classes implement specific mapping methods. */
@@ -34,17 +34,21 @@ trait Corrector {
   /**
    * Map triplet `src` to triplet `dest`
    *
-   * @param src  array of size 3
-   * @param dest array of size 3
+   * @param src
+   *   array of size 3
+   * @param dest
+   *   array of size 3
    */
   protected def evaluate(src: Array[Double], dest: Array[Double]): Unit
 
   /**
-   * Map color triplet.
-   *
-   * @param src input color values. The array must be of size 3.
-   * @return new color triplet.
-   */
+    * Map color triplet.
+    *
+    * @param src
+    * input color values. The array must be of size 3.
+    * @return
+    * new color triplet.
+    */
   def map(src: Array[Double]): Array[Double] = {
     require(src.length == 3, "Color space mapping can only be done when input image has 3 color bands")
 
@@ -53,22 +57,27 @@ trait Corrector {
     dest
   }
 
+  def map(src: IndexedSeq[Double]): IndexedSeq[Double] = map(src.toArray).toIndexedSeq
+
   def map(a: Array[Array[Double]]): Array[Array[Double]] = {
     a.map(map)
   }
 
   /**
-   * Color calibrate input image `src`, convert result to sRGB color space.
-   *
-   * Calibration mapping must be set before calling this method.
-   * It is critical to only use this method on the same type of an image as it was used for
-   * computing the calibration mapping.
-   *
-   * @param src image to be calibrated.
-   * @return converted image in sRGB color space.
-   * @throws java.lang.IllegalArgumentException if the mapping was not set.
-   * @see #map[T <: ImageProcessor](src: Array[T])
-   */
+    * Color calibrate input image `src`, convert result to sRGB color space.
+    *
+    * Calibration mapping must be set before calling this method. It is critical to only use this method on the same type
+    * of an image as it was used for computing the calibration mapping.
+    *
+    * @param src
+    * image to be calibrated.
+    * @return
+    * converted image in sRGB color space.
+    * @throws java.lang.IllegalArgumentException
+    * if the mapping was not set.
+    * @see
+    * #map[T <: ImageProcessor](src: Array[T])
+    */
   def mapToFloat(src: ColorProcessor): Array[FloatProcessor] = {
     map(ImageJUtils.splitRGB(src))
   }
@@ -76,10 +85,14 @@ trait Corrector {
   /**
    * Map color space of the input image using this tri-polynomial.
    *
-   * @param src input image.
-   * @return Mapped image and information about clipped values.
-   * @see #map(ij.process.FloatProcessor[])
-   * @see #mapToFloat(ij.process.FloatProcessor[])
+   * @param src
+   *   input image.
+   * @return
+   *   Mapped image and information about clipped values.
+   * @see
+   *   #map(ij.process.FloatProcessor[])
+   * @see
+   *   #mapToFloat(ij.process.FloatProcessor[])
    */
   def map(src: ColorProcessor): RGBMappingResult = {
     require(src != null, "Argument 'src' cannot be null.")
@@ -90,17 +103,18 @@ trait Corrector {
   /**
    * Color calibrate input image `src` three-band image to the `referenceColorSpace`.
    *
-   * Calibration mapping must be computed or set before calling this method.
-   * It is critical to only use this method on the same type of an image as it was used for
-   * computing the calibration mapping.
+   * Calibration mapping must be computed or set before calling this method. It is critical to only use this method on
+   * the same type of an image as it was used for computing the calibration mapping.
    *
    * The input image slices must be of a a grey level type: `ByteProcessor`, `ShortProcessor`, or `FloatProcessor`.
    * Value calibration is ignored.
    *
-   * @param src image to be calibrated.
-   * @return calibrated image in the `referenceColorSpace`.
-   * @throws java.lang.IllegalArgumentException if the mapping is not set or
-   *                                            the images in the array are not of the same type and dimension.
+   * @param src
+   *   image to be calibrated.
+   * @return
+   *   calibrated image in the `referenceColorSpace`.
+   * @throws java.lang.IllegalArgumentException
+   *   if the mapping is not set or the images in the array are not of the same type and dimension.
    */
   def map[T <: ImageProcessor](src: Array[T]): Array[FloatProcessor] = {
     // Sanity checks
@@ -129,14 +143,17 @@ trait Corrector {
   /**
    * Color calibrate input `image`.
    *
-   * Calibration mapping must be computed before calling this method.
-   * It is critical to only use this method on the same type of an image as it was used for
-   * computing the calibration mapping.
+   * Calibration mapping must be computed before calling this method. It is critical to only use this method on the same
+   * type of an image as it was used for computing the calibration mapping.
    *
-   * @param image image to be calibrated.
-   * @return calibrated image.
-   * @throws java.lang.IllegalArgumentException if the mapping was not yet computed or input image of of incorrect type.
-   * @see #computeCalibrationMapping(chipMargin: Double, image: ColorProcessor)
+   * @param image
+   *   image to be calibrated.
+   * @return
+   *   calibrated image.
+   * @throws java.lang.IllegalArgumentException
+   *   if the mapping was not yet computed or input image of of incorrect type.
+   * @see
+   *   #computeCalibrationMapping(chipMargin: Double, image: ColorProcessor)
    */
   def map(image: ImagePlus): Array[FloatProcessor] = {
     (image.getType, image.getStackSize) match {
@@ -154,15 +171,18 @@ trait Corrector {
   /**
    * Color calibrate input `image`.
    *
-   * Image is cropped to the provided ROI and computation is done only for the cropped part.
-   * Calibration mapping must be computed before calling this method.
-   * It is critical to only use this method on the same type of an image as it was used for
-   * computing the calibration mapping.
+   * Image is cropped to the provided ROI and computation is done only for the cropped part. Calibration mapping must be
+   * computed before calling this method. It is critical to only use this method on the same type of an image as it was
+   * used for computing the calibration mapping.
    *
-   * @param image image to be calibrated.
-   * @return pair (calibrated cropped image, cropped roi)
-   * @throws java.lang.IllegalArgumentException if the mapping was not yet computed or input image of of incorrect type.
-   * @see #computeCalibrationMapping(chipMargin: Double, image: ColorProcessor)
+   * @param image
+   *   image to be calibrated.
+   * @return
+   *   pair (calibrated cropped image, cropped roi)
+   * @throws java.lang.IllegalArgumentException
+   *   if the mapping was not yet computed or input image of of incorrect type.
+   * @see
+   *   #computeCalibrationMapping(chipMargin: Double, image: ColorProcessor)
    */
   def map(image: ImagePlus, roi: PolygonRoi): (Array[FloatProcessor], PolygonRoi) = {
     val fps: Array[FloatProcessor] = (image.getType, image.getStackSize) match {
@@ -198,10 +218,14 @@ trait Corrector {
   /**
    * Map color space of the input image consisting of three bands. Each band must be of the same size.
    *
-   * @param src input image.
-   * @return Mapped image bands.
-   * @see #map(ij.process.ColorProcessor)
-   * @see #map(ij.process.FloatProcessor[])
+   * @param src
+   *   input image.
+   * @return
+   *   Mapped image bands.
+   * @see
+   *   #map(ij.process.ColorProcessor)
+   * @see
+   *   #map(ij.process.FloatProcessor[])
    */
   def mapToFloat(src: Array[FloatProcessor]): Array[FloatProcessor] = {
     require(src.length == 3, "Color space mapping can only be done when input image has 3 color bands.")
@@ -233,10 +257,14 @@ trait Corrector {
   /**
    * Map color space of the input image consisting of three bands. Each band must be of the same size.
    *
-   * @param src input image.
-   * @return Mapped image and information about clipped values.
-   * @see #map(ij.process.ColorProcessor)
-   * @see #mapToFloat(ij.process.FloatProcessor[])
+   * @param src
+   *   input image.
+   * @return
+   *   Mapped image and information about clipped values.
+   * @see
+   *   #map(ij.process.ColorProcessor)
+   * @see
+   *   #mapToFloat(ij.process.FloatProcessor[])
    */
   private def map(src: Array[FloatProcessor]): RGBMappingResult = {
     require(src != null)

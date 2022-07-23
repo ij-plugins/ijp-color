@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2021 Jarek Sacha
+ * Copyright (C) 2002-2022 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -32,16 +32,16 @@ import java.io.File
 object ColorCharts {
 
   /**
-    * GretagMacbeth ColorChecker with values measured by Robin D. Myers, average of two charts manufactured 2002-10.
-    *
-    * Illuminant D65.
-    * [[http://www.rmimaging.com/spectral_library/Reflective/Charts-Calibration/ColorChecker_2002-10_averaged.ss3.zip]]
-    */
+   * GretagMacbeth ColorChecker with values measured by Robin D. Myers, average of two charts manufactured 2002-10.
+   *
+   * Illuminant D65.
+   * [[http://www.rmimaging.com/spectral_library/Reflective/Charts-Calibration/ColorChecker_2002-10_averaged.ss3.zip]]
+   */
   val GretagMacbethColorChecker = new GridColorChart(
     ColorChartType.GretagMacbethColorChecker.name,
     6,
     4,
-    List(
+    IndexedSeq(
       ("Dark skin", Lab(40.59, 14.68, 16.83)),
       ("Light skin", Lab(68.22, 22.21, 20.33)),
       ("Blue sky", Lab(49.31, -9.20, -23.05)),
@@ -74,16 +74,14 @@ object ColorCharts {
   /**
    * X-Rite Passport ColorChecker chart, based on the values from "ColorChecker Passport Technical Review"
    *
-   * Illuminant D65.
-   * [[http://www.rmimaging.com/information/ColorChecker_Passport_Technical_Report.pdf]]
-   * alternate link location
-   * [[https://chromaxion.com/information/ColorChecker_Passport_Technical_Report.pdf]]
+   * Illuminant D65. [[http://www.rmimaging.com/information/ColorChecker_Passport_Technical_Report.pdf]] alternate link
+   * location [[https://chromaxion.com/information/ColorChecker_Passport_Technical_Report.pdf]]
    */
   val XRitePassportColorChecker = new GridColorChart(
     ColorChartType.XRitePassportColorChecker.name,
     6,
     4,
-    List(
+    IndexedSeq(
       ("Dark Skin", Lab(38.96, 12.13, 13.84)),
       ("Light Skin", Lab(65.50, 15.59, 16.81)),
       ("Blue Sky", Lab(50.69, -2.09, -21.75)),
@@ -114,17 +112,15 @@ object ColorCharts {
   )
 
   /**
-   * Image Science ColorGauge Matte Neutral Patch Versions
-   * Data retrieved on 2019/01/08.
+   * Image Science ColorGauge Matte Neutral Patch Versions Data retrieved on 2019/01/08.
    *
-   * Illuminant D50
-   * [[http://www.imagescienceassociates.com/mm5/pubs/Micro_Nano_Pico_Rez_TargetData.xls]]
+   * Illuminant D50 [[http://www.imagescienceassociates.com/mm5/pubs/Micro_Nano_Pico_Rez_TargetData.xls]]
    */
   val ImageScienceColorGaugeMatte = new GridColorChart(
     ColorChartType.ImageScienceColorGaugeMatte.name,
     6,
     5,
-    List(
+    IndexedSeq(
       ("1", Lab(38.76, 13.81, 14.69)),
       ("2", Lab(65.15, 19.21, 17.92)),
       ("3", Lab(49.61, -4.20, -21.33)),
@@ -161,7 +157,7 @@ object ColorCharts {
   )
 
   /** All pre-defined color charts */
-  val values = List(GretagMacbethColorChecker, XRitePassportColorChecker, ImageScienceColorGaugeMatte)
+  val values: Seq[GridColorChart] = Seq(GretagMacbethColorChecker, XRitePassportColorChecker, ImageScienceColorGaugeMatte)
 
   def withColorChartType(colorChartType: ColorChartType): Option[GridColorChart] = {
     require(colorChartType != null, "'colorChartType' cannot be null.")
@@ -171,8 +167,8 @@ object ColorCharts {
   /**
     * Load chart reference values from a CSV file represented in CIE L*a*b* color space.
     *
-    * The file is expected to have at least 4 columns: "SAMPLE_NAME", "LAB_L", "LAB_A", "LAB_B".
-    * Any additional columns will be ignored.
+    * The file is expected to have at least 4 columns: "SAMPLE_NAME", "LAB_L", "LAB_A", "LAB_B". Any additional columns
+    * will be ignored.
     *
     * Example of a file with 4 chips:
     *
@@ -184,9 +180,10 @@ object ColorCharts {
     * 4,43.697,-13.342,22.858,26.466
     * }}}
     *
-    * @return list of tuples representing chip name and reference value in CIE L*a*b*
+    * @return
+    * list of tuples representing chip name and reference value in CIE L*a*b*
     */
-  def loadReferenceValues(file: File): List[(String, ColorTriple.Lab)] = {
+  def loadReferenceValues(file: File): IndexedSeq[(String, ColorTriple.Lab)] = {
 
     require(file.exists(), "File must exist: " + file.getCanonicalPath)
     val rt = ResultsTable.open(file.getCanonicalPath)
@@ -211,7 +208,6 @@ object ColorCharts {
 
           (name, ColorTriple.Lab(l, a, b))
         }
-        .toList
 
     chips
   }

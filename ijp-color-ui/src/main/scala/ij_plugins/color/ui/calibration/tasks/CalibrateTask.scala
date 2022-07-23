@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2021 Jarek Sacha
+ * Copyright (C) 2002-2022 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -26,8 +26,8 @@ import ij.measure.ResultsTable
 import ij.process.FloatProcessor
 import ij.{IJ, ImagePlus}
 import ij_plugins.color.DeltaE
+import ij_plugins.color.calibration.*
 import ij_plugins.color.calibration.CalibrationUtils.toPolygonROI
-import ij_plugins.color.calibration._
 import ij_plugins.color.calibration.chart.{ColorChip, GridColorChart, ReferenceColorSpace}
 import ij_plugins.color.calibration.regression.MappingMethod
 import ij_plugins.color.converter.ColorTriple.Lab
@@ -39,11 +39,11 @@ import ij_plugins.color.ui.util.PlotUtils.ValueEntry
 import ij_plugins.color.ui.util.{IJPrefs, PlotUtils}
 import ij_plugins.color.util.ImagePlusType
 import ij_plugins.color.util.Utils.delta
-import javafx.scene.{chart => jfxsc}
+import javafx.scene.chart as jfxsc
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
 import org.scalafx.extras.BusyWorker.SimpleTask
 import org.scalafx.extras.ShowMessage
-import scalafx.Includes._
+import scalafx.Includes.*
 import scalafx.application.Platform
 import scalafx.beans.property.ObjectProperty
 import scalafx.collections.ObservableBuffer
@@ -62,13 +62,13 @@ object CalibrateTask {
 
     def loadFromIJPref(): Option[OutputConfig] = {
       for {
-        imageInSRGB <- IJPrefs.getBooleanOption(ReferencePrefix + ".imageInSRGB")
-        imageInReferenceColorSpace <- IJPrefs.getBooleanOption(ReferencePrefix + ".imageInReferenceColorSpace")
-        imageInLab <- IJPrefs.getBooleanOption(ReferencePrefix + ".imageInLab")
-        plotScatterFit <- IJPrefs.getBooleanOption(ReferencePrefix + ".plotScatterFit")
-        plotIndividualChipError <- IJPrefs.getBooleanOption(ReferencePrefix + ".plotIndividualChipError")
-        tableExpectedVsCorrected <- IJPrefs.getBooleanOption(ReferencePrefix + ".tableExpectedVsCorrected")
-        tableRegressionResults <- IJPrefs.getBooleanOption(ReferencePrefix + ".tableRegressionResults")
+        imageInSRGB                   <- IJPrefs.getBooleanOption(ReferencePrefix + ".imageInSRGB")
+        imageInReferenceColorSpace    <- IJPrefs.getBooleanOption(ReferencePrefix + ".imageInReferenceColorSpace")
+        imageInLab                    <- IJPrefs.getBooleanOption(ReferencePrefix + ".imageInLab")
+        plotScatterFit                <- IJPrefs.getBooleanOption(ReferencePrefix + ".plotScatterFit")
+        plotIndividualChipError       <- IJPrefs.getBooleanOption(ReferencePrefix + ".plotIndividualChipError")
+        tableExpectedVsCorrected      <- IJPrefs.getBooleanOption(ReferencePrefix + ".tableExpectedVsCorrected")
+        tableRegressionResults        <- IJPrefs.getBooleanOption(ReferencePrefix + ".tableRegressionResults")
         tableIndividualChipDeltaInLab <- IJPrefs.getBooleanOption(ReferencePrefix + ".tableIndividualChipDeltaInLab")
         logDeltaInReferenceColorSpace <- IJPrefs.getBooleanOption(ReferencePrefix + ".logDeltaInReferenceColorSpace")
       } yield {
@@ -88,16 +88,16 @@ object CalibrateTask {
   }
 
   case class OutputConfig(
-                           imageInSRGB: Boolean = true,
-                           imageInReferenceColorSpace: Boolean = false,
-                           imageInLab: Boolean = false,
-                           plotScatterFit: Boolean = false,
-                           plotIndividualChipError: Boolean = false,
-                           tableExpectedVsCorrected: Boolean = false,
-                           tableRegressionResults: Boolean = false,
-                           tableIndividualChipDeltaInLab: Boolean = false,
-                           logDeltaInReferenceColorSpace: Boolean = false
-                         ) {
+    imageInSRGB: Boolean = true,
+    imageInReferenceColorSpace: Boolean = false,
+    imageInLab: Boolean = false,
+    plotScatterFit: Boolean = false,
+    plotIndividualChipError: Boolean = false,
+    tableExpectedVsCorrected: Boolean = false,
+    tableRegressionResults: Boolean = false,
+    tableIndividualChipDeltaInLab: Boolean = false,
+    logDeltaInReferenceColorSpace: Boolean = false
+  ) {
 
     def saveToIJPref(): Unit = {
       import OutputConfig.ReferencePrefix
@@ -114,11 +114,10 @@ object CalibrateTask {
 
   }
 
-  private def showScatterChart(
-                                x: Array[Array[Double]],
-                                y: Array[Array[Double]],
-                                seriesLabels: Array[String],
-                                chartTitle: String
+  private def showScatterChart(x: IndexedSeq[IndexedSeq[Double]],
+                               y: IndexedSeq[IndexedSeq[Double]],
+                               seriesLabels: Array[String],
+                               chartTitle: String
                               ): Unit = {
 
     require(x.length == y.length)
@@ -134,8 +133,8 @@ object CalibrateTask {
     ).flatMap(check(_).map(_.toExternalForm))
 
     // Create plot
-    val xAxis = new NumberAxis()
-    val yAxis = new NumberAxis()
+    val xAxis        = new NumberAxis()
+    val yAxis        = new NumberAxis()
     val scatterChart = ScatterChart(xAxis, yAxis)
     scatterChart.data = {
       val answer = new ObservableBuffer[jfxsc.XYChart.Series[Number, Number]]()
@@ -168,20 +167,20 @@ object CalibrateTask {
 }
 
 class CalibrateTask(
-                     referenceColorSpace: ObjectProperty[ReferenceColorSpace],
-                     mappingMethod: ObjectProperty[MappingMethod],
-                     image: ImagePlus,
-                     chart: GridColorChart,
-                     outputConfig: OutputConfig,
-                     val parentWindow: Option[Window]
-                   ) extends SimpleTask[Option[CorrectionRecipe]]
-  with ShowMessage {
+  referenceColorSpace: ObjectProperty[ReferenceColorSpace],
+  mappingMethod: ObjectProperty[MappingMethod],
+  image: ImagePlus,
+  chart: GridColorChart,
+  outputConfig: OutputConfig,
+  val parentWindow: Option[Window]
+) extends SimpleTask[Option[CorrectionRecipe]]
+    with ShowMessage {
 
   def call(): Option[CorrectionRecipe] = {
 
     // Compute color mapping coefficients
     val clipReferenceRGB = false
-    val colorCalibrator = new ColorCalibrator(chart, referenceColorSpace(), mappingMethod(), clipReferenceRGB)
+    val colorCalibrator  = new ColorCalibrator(chart, referenceColorSpace(), mappingMethod(), clipReferenceRGB)
 
     // Compute calibration mapping
     val fitLR =
@@ -214,7 +213,7 @@ class CalibrateTask(
       correctionOutputLR.foreach { co =>
         val titlePrefix = s"${image.getTitle} - ${colorCalibrator.referenceColorSpace}+${colorCalibrator.mappingMethod}"
         val chips: Seq[ColorChip] = chart.referenceChipsEnabled
-        val bands: Array[String] = recipe.referenceColorSpace.bandsNames
+        val bands: Array[String]  = recipe.referenceColorSpace.bandsNames
 
         co.correctedInSRGB.foreach { imp =>
           imp.setTitle(s"$titlePrefix - sRGB")
@@ -275,11 +274,11 @@ class CalibrateTask(
   }
 
   private def showExpectedVsCorrected(
-                                       chips: Seq[ColorChip],
-                                       bands: Array[String],
-                                       fit: ColorCalibrator.CalibrationFit,
-                                       titlePrefix: String
-                                     ): Unit = {
+    chips: Seq[ColorChip],
+    bands: Array[String],
+    fit: ColorCalibrator.CalibrationFit,
+    titlePrefix: String
+  ): Unit = {
 
     // Show table with expected measured and corrected values
     val rtColor = new ResultsTable()
@@ -305,10 +304,10 @@ class CalibrateTask(
   }
 
   private def showTableWithRegressionResults(
-                                              bands: Array[String],
-                                              fit: ColorCalibrator.CalibrationFit,
-                                              title: String
-                                            ): Unit = {
+    bands: Array[String],
+    fit: ColorCalibrator.CalibrationFit,
+    title: String
+  ): Unit = {
 
     // Show table with regression results
     val rtFit = new ResultsTable()
@@ -378,15 +377,15 @@ class CalibrateTask(
   }
 
   private def tableIndividualChipDeltaInLab(
-                                             refWhite: ReferenceWhite,
-                                             correctedBands: Array[FloatProcessor],
-                                             titlePrefix: String
-                                           ): Unit = {
+    refWhite: ReferenceWhite,
+    correctedBands: Array[FloatProcessor],
+    titlePrefix: String
+  ): Unit = {
 
     // Delta in L*a*b*
     val deltaEStats = {
-      val rt = new ResultsTable()
-      val stats = new DescriptiveStatistics()
+      val rt     = new ResultsTable()
+      val stats  = new DescriptiveStatistics()
       val labFPs = referenceColorSpace().toLab(correctedBands, refWhite)
       IJ.log(titlePrefix)
       for (chip <- chart.alignedChips) {
@@ -431,12 +430,11 @@ class CalibrateTask(
       "\n")
   }
 
-  private def showColorErrorChart(
-                                   x: Array[Array[Double]],
-                                   y: Array[Array[Double]],
-                                   columnNames: Array[String],
-                                   seriesLabels: Array[String],
-                                   titlePrefix: String
+  private def showColorErrorChart(x: IndexedSeq[IndexedSeq[Double]],
+                                  y: IndexedSeq[IndexedSeq[Double]],
+                                  columnNames: Array[String],
+                                  seriesLabels: Array[String],
+                                  titlePrefix: String
                                  ): Unit = {
 
     assert(x.length == y.length)
@@ -454,18 +452,15 @@ class CalibrateTask(
     PlotUtils.createBarPlot(titlePrefix + " - Individual Chip Error", data, "Chip", "Error", barColors)
   }
 
-  private def showResidualScatterChart(x: Array[Array[Double]], y: Array[Array[Double]], chartTitle: String): Unit = {
+  private def showResidualScatterChart(x: IndexedSeq[IndexedSeq[Double]], y: IndexedSeq[IndexedSeq[Double]], chartTitle: String): Unit = {
 
-    val dy = new Array[Array[Double]](x.length)
-    for (i <- x.indices) {
-      val xi = x(i)
-      val yi = y(i)
-      val dd = new Array[Double](xi.length)
-      for (j <- xi.indices) {
-        dd(j) = math.abs(yi(j) - xi(j))
-      }
-      dy(i) = dd
-    }
+    val dy =
+      x.zipWithIndex
+        .map { case (xi, i) =>
+          val yi = y(i)
+          xi.zipWithIndex
+            .map { case (xij, j) => math.abs(yi(j) - xij) }
+        }
     showScatterChart(x, dy, referenceColorSpace().bandsNames, chartTitle)
   }
 

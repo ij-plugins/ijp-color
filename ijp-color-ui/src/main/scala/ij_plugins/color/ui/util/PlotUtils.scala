@@ -32,7 +32,7 @@ import org.jfree.chart.ui.TextAnchor
 import org.jfree.chart.{ChartFactory, ChartUtils}
 import org.jfree.data.category.DefaultCategoryDataset
 import org.jfree.data.statistics.DefaultStatisticalCategoryDataset
-import scalafx.Includes._
+import scalafx.Includes.*
 import scalafx.scene.paint.Color
 
 object PlotUtils {
