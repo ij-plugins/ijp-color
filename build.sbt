@@ -1,8 +1,6 @@
 import xerial.sbt.Sonatype.GitHubHosting
 
 import java.net.URL
-import scala.xml.transform.{RewriteRule, RuleTransformer}
-import scala.xml.{Node => XmlNode, NodeSeq => XmlNodeSeq, _}
 
 // @formatter:off
 
@@ -11,7 +9,7 @@ name := "ijp-color-project"
 val Scala2_13 = "2.13.8"
 val Scala3_0  = "3.0.2"
 
-val _version       = "0.11.4.3-SNAPSHOT"
+val _version       = "0.11.4.7-SNAPSHOT"
 val _scalaVersions = Seq(Scala2_13, Scala3_0)
 //val _scalaVersion  = _scalaVersions.head
 val _scalaVersion  = Scala3_0
@@ -34,41 +32,10 @@ def isScala2(scalaVersion: String): Boolean =
     case _            => false
   }
 
-// Helper to determine Scala version-dependent settings
-def isScala2_12(scalaVersion: String): Boolean =
-  CrossVersion.partialVersion(scalaVersion) match {
-    case Some((2, 12)) => true
-    case _             => false
-  }
-
-def isScala2_13(scalaVersion: String): Boolean =
-  CrossVersion.partialVersion(scalaVersion) match {
-    case Some((2, 13)) => true
-    case _             => false
-  }
-
 def isScala3(scalaVersion: String): Boolean =
   CrossVersion.partialVersion(scalaVersion) match {
     case Some((3, _)) => true
     case _            => false
-  }
-
-
-// Add src/main/scala-2.13+ for Scala 2.13 and newer
-//   and src/main/scala-2.12- for Scala versions older than 2.13
-def versionSubDir(scalaVersion: String): String =
-  CrossVersion.partialVersion(scalaVersion) match {
-    case Some((2, n)) if n < 13  => "scala-2.12-"
-    case Some((2, n)) if n >= 13 => "scala-2.13+"
-    case Some((3, _))            => "scala-3"
-    case _ => throw new Exception(s"Unsupported Scala version $scalaVersion")
-  }
-
-def versionSubDir2v3(scalaVersion: String): String =
-  CrossVersion.partialVersion(scalaVersion) match {
-    case Some((2, _)) => "scala-2"
-    case Some((3, _)) => "scala-3"
-    case _            => throw new Exception(s"Unsupported Scala version $scalaVersion")
   }
 
 
@@ -146,9 +113,6 @@ lazy val ijp_color = (project in file("ijp-color"))
     name        := "ijp-color",
     description := "IJP Color Core",
     commonSettings,
-    // Use different directories for code that is not source compatible between Scala versions
-    Compile / unmanagedSourceDirectories += (Compile / sourceDirectory).value / versionSubDir2v3(scalaVersion.value),
-    Test / unmanagedSourceDirectories += (Test / sourceDirectory).value / versionSubDir2v3(scalaVersion.value),
     //
     libraryDependencies ++= Seq(
       "net.imagej"              % "ij"                      % "1.53s",
@@ -157,14 +121,7 @@ lazy val ijp_color = (project in file("ijp-color"))
       // Test
       "org.scalatest"          %% "scalatest"               % "3.2.11" % "test"
     ),
-    libraryDependencies ++= (
-      if (isScala2_13(scalaVersion.value) || isScala3(scalaVersion.value)) {
-        Seq("org.scala-lang.modules" %% "scala-parallel-collections" % "1.0.4")
-      }
-      else {
-        Seq.empty[ModuleID]
-      }
-    ),
+    libraryDependencies += "org.scala-lang.modules" %% "scala-parallel-collections" % "1.0.4",
     libraryDependencies ++= (
       if(isScala2(scalaVersion.value)) {
         Seq("com.beachape" %% "enumeratum" % "1.7.0")
@@ -181,17 +138,8 @@ lazy val ijp_color_ui = (project in file("ijp-color-ui"))
     name        := "ijp-color-ui",
     description := "IJP Color UI and ImageJ plugins",
     commonSettings,
-    // Use different directories for code that is not source compatible between Scala versions
-    Compile / unmanagedSourceDirectories += (Compile / sourceDirectory).value / versionSubDir(scalaVersion.value),
-    Test / unmanagedSourceDirectories += (Test / sourceDirectory).value / versionSubDir(scalaVersion.value),
     // Enable macro annotation processing for ScalaFXML
-    scalacOptions += (if(isScala2_13(scalaVersion.value)) "-Ymacro-annotations" else ""),
-    libraryDependencies ++= (
-      if (isScala2_12(scalaVersion.value)) {
-        Seq(compilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full))
-      } else {
-        Seq.empty[ModuleID]
-      }),
+    scalacOptions += (if(isScala2(scalaVersion.value)) "-Ymacro-annotations" else ""),
     // Other dependencies
     libraryDependencies ++= Seq(
       "org.jfree"           % "jfreechart-fx"       % "1.0.1",
