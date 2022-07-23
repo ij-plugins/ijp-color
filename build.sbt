@@ -148,7 +148,12 @@ lazy val ijp_color_ui = (project in file("ijp-color-ui"))
       "org.scalafx"        %% "scalafx-extras"      % "0.7.0",
       // Test
       "org.scalatest"      %% "scalatest"           % "3.2.11"  % "test"
-    )
+    ),
+    // Customize `sbt-imagej` plugin
+    ijRuntimeSubDir         := "sandbox",
+    ijPluginsSubDir         := "ij-plugins",
+    ijCleanBeforePrepareRun := true,
+    cleanFiles += ijPluginsDir.value,
   )
   .dependsOn(ijp_color)
 
