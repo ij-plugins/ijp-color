@@ -212,6 +212,33 @@ object ImageJUtils {
   }
 
   /**
+    * @param src
+    * images to validate
+    * @param length
+    * expected number of images
+    * @tparam T
+    * image processor type
+    * @throws java.lang.IllegalArgumentException
+    * if the images in the array are not of the same dimension.
+    */
+  @inline
+  def validateSameDimensions[T <: ImageProcessor](src: IndexedSeq[T], length: Int): Unit = {
+    require(src != null, "Input cannot be null.")
+    require(src.length == length, "Input array has to have " + length + " elements.")
+    require(!src.contains(null.asInstanceOf[T]), "Input array cannot have null entries.")
+    val width = src(0).getWidth
+    val height = src(0).getHeight
+    require(
+      src.forall(width == _.getWidth),
+      "All input images have to have the same width: " + src.map(_.getWidth).mkString(",")
+    )
+    require(
+      src.forall(height == _.getHeight),
+      "All input images have to have the same height: " + src.map(_.getHeight).mkString(",")
+    )
+  }
+
+  /**
    * @param src
    *   images to validate
    * @param length
@@ -223,6 +250,25 @@ object ImageJUtils {
    */
   @inline
   def validateSameTypeAndDimensions[T <: ImageProcessor](src: Array[T], length: Int): Unit = {
+    validateSameDimensions(src, length)
+    if (length > 1) {
+      val t = src(0).getClass
+      require(src.tail.forall(_.getClass == t), "All input images must be of the same type.")
+    }
+  }
+
+  /**
+    * @param src
+    * images to validate
+    * @param length
+    * expected number of images
+    * @tparam T
+    * image processor type
+    * @throws java.lang.IllegalArgumentException
+    * if the images in the array are not of the same dimension.
+    */
+  @inline
+  def validateSameTypeAndDimensions[T <: ImageProcessor](src: IndexedSeq[T], length: Int): Unit = {
     validateSameDimensions(src, length)
     if (length > 1) {
       val t = src(0).getClass
@@ -276,8 +322,6 @@ object ImageJUtils {
           encoder.write(roi)
           out.flush()
         }
-
-        out.close()
       }
     }
   }
