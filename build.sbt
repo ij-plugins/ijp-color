@@ -6,8 +6,8 @@ import java.net.URL
 
 name := "ijp-color-project"
 
-val Scala2_13 = "2.13.8"
-val Scala3_0  = "3.0.2"
+val Scala2_13 = "2.13.10"
+val Scala3_0  = "3.2.1"
 
 val _version       = "0.12.0.1-SNAPSHOT"
 val _scalaVersions = Seq(Scala2_13, Scala3_0)
@@ -115,11 +115,11 @@ lazy val ijp_color = (project in file("ijp-color"))
     commonSettings,
     //
     libraryDependencies ++= Seq(
-      "net.imagej"              % "ij"                      % "1.53t",
+      "net.imagej"              % "ij"                      % "1.53u",
       "org.apache.commons"      % "commons-math3"           % "3.6.1",
-      "org.scala-lang.modules" %% "scala-collection-compat" % "2.7.0",
+      "org.scala-lang.modules" %% "scala-collection-compat" % "2.8.1",
       // Test
-      "org.scalatest"          %% "scalatest"               % "3.2.11" % "test"
+      "org.scalatest"          %% "scalatest"               % "3.2.14" % "test"
     ),
     libraryDependencies += "org.scala-lang.modules" %% "scala-parallel-collections" % "1.0.4",
     libraryDependencies ++= (
@@ -147,7 +147,7 @@ lazy val ijp_color_ui = (project in file("ijp-color-ui"))
       "org.scalafx"        %% "scalafx"             % "19.0.0-R30",
       "org.scalafx"        %% "scalafx-extras"      % "0.7.0",
       // Test
-      "org.scalatest"      %% "scalatest"           % "3.2.11"  % "test"
+      "org.scalatest"      %% "scalatest"           % "3.2.14"  % "test"
     ),
     // Customize `sbt-imagej` plugin
     ijRuntimeSubDir         := "sandbox",
