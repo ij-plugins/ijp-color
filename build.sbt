@@ -6,13 +6,13 @@ import java.net.URL
 
 name := "ijp-color-project"
 
-val Scala2_13 = "2.13.10"
-val Scala3_0  = "3.2.1"
+val Scala2 = "2.13.10"
+val Scala3  = "3.2.1"
 
 val _version       = "0.12.0.1-SNAPSHOT"
-val _scalaVersions = Seq(Scala2_13, Scala3_0)
+val _scalaVersions = Seq(Scala2, Scala3)
 //val _scalaVersion  = _scalaVersions.head
-val _scalaVersion  = Scala3_0
+val _scalaVersion  = Scala3
 
 ThisBuild / version             := _version
 ThisBuild / scalaVersion        := _scalaVersion
