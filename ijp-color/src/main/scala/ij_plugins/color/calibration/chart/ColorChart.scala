@@ -57,37 +57,37 @@ trait ColorChart {
   def alignmentTransform: PerspectiveTransform
 
   /**
-    * Compute average color within aligned chips from an RGB image.
-    *
-    * @param cp
-    * RGB image
-    */
+   * Compute average color within aligned chips from an RGB image.
+   *
+   * @param cp
+   * RGB image
+   */
   def averageChipColor(cp: ColorProcessor): IndexedSeq[IndexedSeq[Double]] =
     averageChipColor(ImageJUtils.splitRGB(cp).toIndexedSeq)
 
   def averageChipColorEnabled(cp: ColorProcessor): IndexedSeq[IndexedSeq[Double]] = filterEnabled(averageChipColor(cp))
 
   /**
-    * Compute average color within aligned chips from an an image.
-    *
-    * Input images is represented by 3 bands. There is no assumption made about image color space.
-    *
-    * @param src
-    * image represented by 3 bands
-    */
+   * Compute average color within aligned chips from an an image.
+   *
+   * Input images is represented by 3 bands. There is no assumption made about image color space.
+   *
+   * @param src
+   * image represented by 3 bands
+   */
   def averageChipColor[T <: ImageProcessor](src: IndexedSeq[T]): IndexedSeq[IndexedSeq[Double]]
 
   def averageChipColorEnabled[T <: ImageProcessor](src: IndexedSeq[T]): IndexedSeq[IndexedSeq[Double]] =
     filterEnabled(averageChipColor(src))
 
   /**
-    * Compute average color within aligned chips from an an image.
-    *
-    * @param image
-    * is either single slice RGB image (ColorProcessor) or three slices of gray processors representing color bands.
-    * @return
-    * average for each band in each color chip (array of triples).
-    */
+   * Compute average color within aligned chips from an an image.
+   *
+   * @param image
+   * is either single slice RGB image (ColorProcessor) or three slices of gray processors representing color bands.
+   * @return
+   * average for each band in each color chip (array of triples).
+   */
   def averageChipColor(image: ImagePlus): IndexedSeq[IndexedSeq[Double]] = {
     (image.getType, image.getStackSize) match {
       case (COLOR_RGB, 1) =>
@@ -107,7 +107,7 @@ trait ColorChart {
 
   /** Return reference colors represented in given color space. */
   def referenceColor(colorSpace: ReferenceColorSpace): IndexedSeq[IndexedSeq[Double]] = colorSpace match {
-    case ReferenceColorSpace.XYZ => referenceColorXYZ
+    case ReferenceColorSpace.XYZ  => referenceColorXYZ
     case ReferenceColorSpace.sRGB => referenceColorSRGB
   }
 
@@ -124,23 +124,23 @@ trait ColorChart {
   }
 
   /**
-    * Creates a copy of this chart in which some chips cn be enabled/disabled.
-    *
-    * @param enabled
-    * array with indexes corresponding to ones returned by `referenceColor` methods. If value is `true` chip with
-    * corresponding index is enabled, if `false` it is disabled.
-    * @return
-    */
+   * Creates a copy of this chart in which some chips cn be enabled/disabled.
+   *
+   * @param enabled
+   * array with indexes corresponding to ones returned by `referenceColor` methods. If value is `true` chip with
+   * corresponding index is enabled, if `false` it is disabled.
+   * @return
+   */
   def copyWithEnabled(enabled: IndexedSeq[Boolean]): ColorChart
 
   /**
-    * Create a copy with all chips enabled
-    */
+   * Create a copy with all chips enabled
+   */
   def copyWithEnabledAll: ColorChart = copyWithEnabled(IndexedSeq.fill(enabled.length)(true))
 
   /**
-    * Which chips should be used in computations. If value is 'true' chip is active' if 'false' not used in computations.
-    */
+   * Which chips should be used in computations. If value is 'true' chip is active' if 'false' not used in computations.
+   */
   def enabled: IndexedSeq[Boolean]
 
   /** Reference chips without transform applied to their coordinates. */
@@ -154,12 +154,6 @@ trait ColorChart {
 
   private def filterEnabled[T](s: immutable.IndexedSeq[T]): immutable.IndexedSeq[T] = {
     require(s.length == enabled.length)
-    s.zip(enabled).filter(_._2).map(_._1)
-  }
-
-  private def filterEnabled(s: Array[Array[Double]]): Array[Array[Double]] = {
-    require(s.length == enabled.length)
-    //    s.zipWithIndex.filter(v => enabled(v._2)).map(_._1)
     s.zip(enabled).filter(_._2).map(_._1)
   }
 }
