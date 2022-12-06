@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2021 Jarek Sacha
+ * Copyright (C) 2002-2022 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -34,7 +34,7 @@ import scalafx.stage.Window
  */
 class ColorCalibratorUI(val image: ImagePlus, private var _parentWindow: Window) extends MVCfx("ColorCalibrator.fxml") {
 
-  lazy val model = new ColorCalibratorUIModel(image, _parentWindow)
+  override lazy val model: ColorCalibratorUIModel = new ColorCalibratorUIModel(image, _parentWindow)
 
   def parentWindow: Window = _parentWindow
 

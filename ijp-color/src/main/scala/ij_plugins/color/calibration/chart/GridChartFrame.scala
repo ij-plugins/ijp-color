@@ -27,17 +27,16 @@ import ij_plugins.color.calibration.CalibrationUtils.point2D
 import ij_plugins.color.util.PerspectiveTransform
 
 import java.awt.geom.Point2D
-import scala.collection.compat.immutable.ArraySeq
 
 object GridChartFrame {
   private def createChipOutlines(nbColumns: Int, nbRows: Int, chipMargin: Double): IndexedSeq[IndexedSeq[Point2D]] = {
     require(nbColumns > 0)
     require(nbRows > 0)
 
-    for {
-      row <- 0 until nbRows
+    for (
+      row    <- 0 until nbRows;
       column <- 0 until nbColumns
-    } yield {
+    ) yield {
       Seq(
         point2D(column + chipMargin, row + chipMargin),
         point2D(column + 1 - chipMargin, row + chipMargin),
@@ -69,7 +68,7 @@ class GridChartFrame(
   alignmentTransform: PerspectiveTransform = new PerspectiveTransform()
 ) extends ChartFrame(
       refOutline =
-        ArraySeq(point2D(0, 0), point2D(nbColumns, 0), point2D(nbColumns, nbRows), point2D(0, nbRows)),
+        IndexedSeq(point2D(0, 0), point2D(nbColumns, 0), point2D(nbColumns, nbRows), point2D(0, nbRows)),
       refChipOutlines = GridChartFrame.createChipOutlines(nbColumns, nbRows, chipMargin),
       alignmentTransform = alignmentTransform
     ) {

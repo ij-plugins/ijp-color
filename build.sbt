@@ -6,13 +6,13 @@ import java.net.URL
 
 name := "ijp-color-project"
 
-val Scala2_13 = "2.13.8"
-val Scala3_0  = "3.0.2"
+val Scala2 = "2.13.10"
+val Scala3  = "3.2.1"
 
-val _version       = "0.12.0"
-val _scalaVersions = Seq(Scala2_13, Scala3_0)
+val _version       = "0.12.0.1-SNAPSHOT"
+val _scalaVersions = Seq(Scala2, Scala3)
 //val _scalaVersion  = _scalaVersions.head
-val _scalaVersion  = Scala3_0
+val _scalaVersion  = Scala3
 
 ThisBuild / version             := _version
 ThisBuild / scalaVersion        := _scalaVersion
@@ -115,16 +115,15 @@ lazy val ijp_color = (project in file("ijp-color"))
     commonSettings,
     //
     libraryDependencies ++= Seq(
-      "net.imagej"              % "ij"                      % "1.53s",
+      "net.imagej"              % "ij"                      % "1.53v",
       "org.apache.commons"      % "commons-math3"           % "3.6.1",
-      "org.scala-lang.modules" %% "scala-collection-compat" % "2.7.0",
       // Test
-      "org.scalatest"          %% "scalatest"               % "3.2.11" % "test"
+      "org.scalatest"          %% "scalatest"               % "3.2.14" % "test"
     ),
     libraryDependencies += "org.scala-lang.modules" %% "scala-parallel-collections" % "1.0.4",
     libraryDependencies ++= (
       if(isScala2(scalaVersion.value)) {
-        Seq("com.beachape" %% "enumeratum" % "1.7.0")
+        Seq("com.beachape" %% "enumeratum" % "1.7.2")
       }
       else {
         Seq.empty[ModuleID]
@@ -144,10 +143,10 @@ lazy val ijp_color_ui = (project in file("ijp-color-ui"))
     libraryDependencies ++= Seq(
       "org.jfree"           % "jfreechart-fx"       % "1.0.1",
       "org.jfree"           % "fxgraphics2d"        % "1.8",
-      "org.scalafx"        %% "scalafx"             % "18.0.2-R29",
+      "org.scalafx"        %% "scalafx"             % "19.0.0-R30",
       "org.scalafx"        %% "scalafx-extras"      % "0.7.0",
       // Test
-      "org.scalatest"      %% "scalatest"           % "3.2.11"  % "test"
+      "org.scalatest"      %% "scalatest"           % "3.2.14"  % "test"
     ),
     // Customize `sbt-imagej` plugin
     ijRuntimeSubDir         := "sandbox",
