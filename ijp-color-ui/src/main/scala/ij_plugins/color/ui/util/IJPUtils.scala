@@ -23,6 +23,7 @@
 package ij_plugins.color.ui.util
 
 import ij.IJ
+import ij_plugins.color.BuildInfo
 import scalafx.geometry.Insets
 import scalafx.scene.Node
 import scalafx.scene.control.Label
@@ -152,7 +153,7 @@ object IJPUtils {
     }
 
     val ijpLogoView = new ImageView("/ij_plugins/color/ui/IJP-48.png")
-    headerGP.add(ijpLogoView, 0, 0)
+    headerGP.add(ijpLogoView, 0, 0, 1, 2)
 
     val pluginTitleLabel = new Label {
       text = title
@@ -161,12 +162,19 @@ object IJPUtils {
     }
     headerGP.add(pluginTitleLabel, 1, 0)
 
+    val pluginVersionLabel = new Label {
+      text = BuildInfo.version
+      id = "ijp-version-string"
+      padding = Insets(0, 0, 0, 7)
+    }
+    headerGP.add(pluginVersionLabel, 1, 1)
+
     val descriptionLabel = new Label {
       text = message
       id = "ijp-header-message"
       wrapText = true
     }
-    headerGP.add(descriptionLabel, 0, 1, GridPane.Remaining, 1)
+    headerGP.add(descriptionLabel, 0, 2, GridPane.Remaining, 1)
 
     headerGP
   }
