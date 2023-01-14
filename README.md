@@ -87,16 +87,20 @@ Installing Plugins in ImageJ
 
 Prebuild binaries are published with each [Release](https://github.com/ij-plugins/ijp-color/releases).
 
-1. Look for in the asset section for an "ijp-color_plugins_*_win.zip" file,
-2. Download and unzip into ImageJ's `plugins` directory. It should create subdirectory "ij-plugins".
+1. Look for in the asset section for an "ijp-color_plugins_\*\_win.zip" file assuming you are using Windows,
+   or "ijp-color_plugins_\*\_mac\*.zip" for MacOS. Do now download the "Source code".
+2. Download and unzip into ImageJ's `plugins` directory. It should create subdirectory "ij-plugins". There should be
+   several files with extension `*.jar`
 3. Restart ImageJ
 
-#### Option 2
+#### Option 2 (less frequently updated)
 
 IJP Color is also a part of the ij-plugins-bundle. You can download from
 its [Release](https://github.com/ij-plugins/ij-plugins-bundle/releases) page.
 
 ### ImageJ2/FIJI
+
+NOTE: no recent updates with this method, due to issues with FIJI and JavaFX updates.
 
 IJP Color is a part of the ij-plugins-bundle that is also distributed for FIJI/ImageJ2
 as [IJ-Plugins Update Site](https://sites.imagej.net/IJ-Plugins/): "https://sites.imagej.net/IJ-Plugins/"
