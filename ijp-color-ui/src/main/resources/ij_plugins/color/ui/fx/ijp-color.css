@@ -68,11 +68,12 @@
 }
 
 #ijp-label {
+    -fx-padding: 0 0 0 1em;
     -fx-text-fill: derive(-fx-text-background-color, 50%);
 }
 
 #ijp-separator {
-    -fx-padding: 0.5em 0.0833em 0em 0.0833em;
+    -fx-padding: 0.750em 0.0833em 0.25em 0.0833em;
     -fx-font-size: 1.333em;
     -fx-font-style: oblique;
     -fx-text-fill: derive(-fx-text-background-color, 90%);
