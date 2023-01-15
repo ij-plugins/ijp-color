@@ -16,12 +16,15 @@ val _scalaVersion  = Scala3
 
 ThisBuild / version             := _version
 ThisBuild / scalaVersion        := _scalaVersion
+ThisBuild / versionScheme       := Some("early-semver")
 ThisBuild / organization        := "net.sf.ij-plugins"
 ThisBuild / sonatypeProfileName := "net.sf.ij-plugins"
 ThisBuild / homepage            := Some(new URL("https://github.com/ij-plugins/ijp-color"))
 ThisBuild / startYear           := Some(2002)
 ThisBuild / licenses            := Seq(("LGPL-2.1", new URL("https://opensource.org/licenses/LGPL-2.1")))
-
+ThisBuild / developers          := List(
+  Developer(id="jpsacha", name="Jarek Sacha", email="jpsacha@gmail.com", url=url("https://github.com/jpsacha"))
+)
 
 publishArtifact     := false
 publish / skip      := true
@@ -98,12 +101,8 @@ val commonSettings = Seq(
   manifestSetting,
   // Setup publishing
   publishMavenStyle := true,
-  sonatypeProfileName := "net.sf.ij-plugins",
   sonatypeProjectHosting := Some(GitHubHosting("ij-plugins", "ijp-color", "jpsacha@gmail.com")),
   publishTo := sonatypePublishToBundle.value,
-  developers := List(
-    Developer(id="jpsacha", name="Jarek Sacha", email="jpsacha@gmail.com", url=url("https://github.com/jpsacha"))
-  )
 )
 
 
