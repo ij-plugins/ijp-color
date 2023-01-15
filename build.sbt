@@ -114,10 +114,10 @@ lazy val ijp_color = (project in file("ijp-color"))
     commonSettings,
     //
     libraryDependencies ++= Seq(
-      "net.imagej"              % "ij"                      % "1.53v",
+      "net.imagej"              % "ij"                      % "1.54b",
       "org.apache.commons"      % "commons-math3"           % "3.6.1",
       // Test
-      "org.scalatest"          %% "scalatest"               % "3.2.14" % "test"
+      "org.scalatest"          %% "scalatest"               % "3.2.15" % "test"
     ),
     libraryDependencies += "org.scala-lang.modules" %% "scala-parallel-collections" % "1.0.4",
     libraryDependencies ++= (
@@ -145,7 +145,7 @@ lazy val ijp_color_ui = (project in file("ijp-color-ui"))
       "org.scalafx"        %% "scalafx"             % "19.0.0-R30",
       "org.scalafx"        %% "scalafx-extras"      % "0.7.0",
       // Test
-      "org.scalatest"      %% "scalatest"           % "3.2.14"  % "test"
+      "org.scalatest"      %% "scalatest"           % "3.2.15"  % "test"
     ),
     // Customize `sbt-imagej` plugin
     ijRuntimeSubDir         := "sandbox",
