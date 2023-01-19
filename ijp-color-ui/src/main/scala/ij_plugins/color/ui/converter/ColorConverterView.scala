@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2022 Jarek Sacha
+ * Copyright (C) 2002-2023 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -145,7 +145,7 @@ class ColorConverterView(val model: ColorConverterModel) {
 
     var row = 0
 
-    gp.add(IJPUtils.createHeaderNode(Title, About), 0, row, GridPane.Remaining, 1)
+    gp.add(IJPUtils.createHeaderFX(Title, About), 0, row, GridPane.Remaining, 1)
     row += 1
 
     addColorUI(row, buttonXYZ, xyzUI.control, Some("[0-100]"))

@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2022 Jarek Sacha
+ * Copyright (C) 2002-2023 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -106,7 +106,7 @@ class WhiteBalancePlugIn extends PlugIn {
 
   def showOptionsDialog(): Boolean = {
     val gd = new GenericDialog(TITLE, IJ.getInstance)
-    gd.addPanel(IJPUtils.createInfoPanel(TITLE, ABOUT))
+    gd.addPanel(IJPUtils.createHeaderAWT(TITLE, ABOUT))
     gd.addChoice("Averaging method", AveragingMode.values.map(_.name).toArray, averagingMode.name)
     gd.addCheckbox("Show correction factor", showCorrectionFactor)
 
