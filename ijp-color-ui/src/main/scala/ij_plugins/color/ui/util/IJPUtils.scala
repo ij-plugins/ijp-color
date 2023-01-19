@@ -45,6 +45,8 @@ import scala.util.control.NonFatal
  */
 object IJPUtils {
 
+  private val LogoIconPath = "/ij_plugins/color/ui/IJP-48-rounded.png"
+
   /**
    * Load icon as a resource for given class without throwing exceptions.
    *
@@ -152,7 +154,7 @@ object IJPUtils {
       hgap = 3
     }
 
-    val ijpLogoView = new ImageView("/ij_plugins/color/ui/IJP-48.png")
+    val ijpLogoView = new ImageView(LogoIconPath)
     headerGP.add(ijpLogoView, 0, 0, 1, 2)
 
     val pluginTitleLabel = new Label {
