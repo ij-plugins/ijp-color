@@ -7,7 +7,7 @@ import java.net.URL
 name := "ijp-color-project"
 
 val Scala2 = "2.13.10"
-val Scala3  = "3.2.1"
+val Scala3 = "3.3.0-RC3"
 
 val _version       = "0.12.1.1-SNAPSHOT"
 val _scalaVersions = Seq(Scala2, Scala3)
