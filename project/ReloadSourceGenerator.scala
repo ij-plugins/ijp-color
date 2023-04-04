@@ -21,7 +21,7 @@
  */
 
 import sbt.plugins.JvmPlugin
-import sbt.{Def, _}
+import sbt.{Def, *}
 
 /**
   * A workaround for Build-Info source generation in IntelliJ. It is not happening automatically in IntelliJ.
@@ -29,6 +29,8 @@ import sbt.{Def, _}
   *
   * Sometimes IDEA will add multiple instances of the same "[generated]" directory.
   * It will have to be manually removed under "Project Structure".
+  *
+  * [[https://youtrack.jetbrains.com/issue/SCL-18993/IntelliJ-still-does-not-support-sbt-buildinfo-plugin]]
   *
   * See also [[https://youtrack.jetbrains.com/issue/SCL-19660/sbt-buildinfo-support]]
   */
