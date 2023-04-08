@@ -5,8 +5,8 @@ Operations on color spaces and color images. Can be used as a stand-alone librar
 for [ImageJ](http://rsb.info.nih.gov/ij)
 
 [![Actions Status](https://github.com/ij-plugins/ijp-color/workflows/Scala%20CI/badge.svg)](https://github.com/ij-plugins/ijp-color/actions)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/net.sf.ij-plugins/ijp-color_2.13/badge.svg)](https://maven-badges.herokuapp.com/maven-central/net.sf.ij-plugins/ijp-color_2.13)
-[![Scaladoc](https://javadoc.io/badge2/net.sf.ij-plugins/ijp-color_2.13/scaladoc.svg)](https://javadoc.io/doc/net.sf.ij-plugins/ijp-color_2.13)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/net.sf.ij-plugins/ijp-color_3/badge.svg)](https://maven-badges.herokuapp.com/maven-central/net.sf.ij-plugins/ijp-color_3)
+[![Scaladoc](https://javadoc.io/badge2/net.sf.ij-plugins/ijp-color_3/scaladoc.svg)](https://javadoc.io/doc/net.sf.ij-plugins/ijp-color_3)
 
 
 <!-- TOC -->
