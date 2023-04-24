@@ -23,7 +23,7 @@
 package ij_plugins.color.ui.fx
 
 import ij.io.OpenDialog
-import org.scalafx.extras.generic_dialog.LastDirectoryHandler
+import org.scalafx.extras.generic_pane.LastDirectoryHandler
 
 import java.io.File
 
