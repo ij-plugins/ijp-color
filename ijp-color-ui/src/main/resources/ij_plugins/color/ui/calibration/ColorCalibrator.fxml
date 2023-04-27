@@ -37,9 +37,9 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.StackPane?>
 
-<StackPane xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ij_plugins.color.ui.calibration.ColorCalibratorUIController">
+<StackPane xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ij_plugins.color.ui.calibration.ColorCalibratorUIController">
     <children>
-        <GridPane fx:id="rootGridPane" hgap="10.0" vgap="10.0">
+        <GridPane fx:id="rootGridPane" hgap="7.0" vgap="3.0">
             <padding>
                 <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
             </padding>
@@ -54,11 +54,8 @@
                             </HBox.margin>
                         </Separator>
                     </children>
-                    <padding>
-                        <Insets bottom="5.0" top="10.0" />
-                    </padding>
                 </HBox>
-                <Label id="ijp-label" alignment="CENTER_RIGHT" text="Type" GridPane.halignment="RIGHT" GridPane.rowIndex="3" GridPane.valignment="CENTER" />
+                <Label id="ijp-label" alignment="CENTER_RIGHT" text="Type" GridPane.rowIndex="3" />
                 <ChoiceBox fx:id="chartTypeChoiceBox" maxWidth="1.7976931348623157E308" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                 <SplitMenuButton fx:id="renderReferenceChartSplitButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Render" GridPane.columnIndex="2" GridPane.rowIndex="4">
                     <items>
@@ -75,9 +72,6 @@
                             </HBox.margin>
                         </Separator>
                     </children>
-                    <padding>
-                        <Insets bottom="5.0" top="10.0" />
-                    </padding>
                 </HBox>
                 <Label id="ijp-label" text="Chip margin %" GridPane.rowIndex="6" />
                 <Spinner fx:id="marginsSpinner" max="100" maxWidth="1.7976931348623157E308" min="0" GridPane.columnIndex="1" GridPane.rowIndex="6" />
@@ -91,11 +85,8 @@
                             </HBox.margin>
                         </Separator>
                     </children>
-                    <padding>
-                        <Insets bottom="5.0" top="10.0" />
-                    </padding>
                 </HBox>
-                <Label id="ijp-label" alignment="CENTER_RIGHT" text="Reference" GridPane.halignment="RIGHT" GridPane.rowIndex="11" />
+                <Label id="ijp-label" alignment="CENTER_RIGHT" text="Reference" GridPane.rowIndex="11" />
                 <ChoiceBox fx:id="referenceColorSpaceChoiceBox" maxWidth="1.7976931348623157E308" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="11" />
                 <Label id="ijp-label" text="Mapping method" GridPane.rowIndex="12" />
                 <ChoiceBox fx:id="mappingMethodChoiceBox" maxWidth="1.7976931348623157E308" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="12" />
@@ -114,18 +105,15 @@
                             </HBox.margin>
                         </Separator>
                     </children>
-                    <padding>
-                        <Insets bottom="5.0" top="10.0" />
-                    </padding>
                 </HBox>
-                <Label id="ijp-label" text="Info" GridPane.halignment="RIGHT" GridPane.rowIndex="4" GridPane.valignment="CENTER" />
-                <Label id="ijp-label" fx:id="chartInfoLabel" text="???" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                <Label id="ijp-label" text="Info" GridPane.rowIndex="4" />
+                <Label fx:id="chartInfoLabel" text="???" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                 <Button fx:id="editChartButton" disable="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Edit Chart" GridPane.columnIndex="2" GridPane.rowIndex="3" />
                 <Button fx:id="selectOutputsButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Select Outputs..." GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="13" />
-                <Label alignment="CENTER_RIGHT" text="Enabled Chips" GridPane.halignment="RIGHT" GridPane.rowIndex="10" />
+                <Label id="ijp-label" alignment="CENTER_RIGHT" text="Enabled chips" GridPane.rowIndex="10" />
                 <ChoiceBox fx:id="enabledChipsChoiceBox" maxWidth="1.7976931348623157E308" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="10" />
                 <Button fx:id="selectChipsButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Select Chips" GridPane.columnIndex="2" GridPane.rowIndex="10" />
-                <Label text="Chip overlay color" GridPane.rowIndex="7" />
+                <Label id="ijp-label" text="Chip overlay color" GridPane.rowIndex="7" />
                 <ChoiceBox fx:id="chipOverlayColorChoiceBox" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="7" />
                 <HBox alignment="CENTER_RIGHT" maxWidth="1.7976931348623157E308" spacing="10.0" GridPane.columnSpan="2147483647" GridPane.halignment="LEFT" GridPane.rowIndex="16">
                     <children>
@@ -146,7 +134,7 @@
                         </Button>
                     </children>
                 </HBox>
-            <Label text="Overlay stroke width" GridPane.rowIndex="8" />
+            <Label id="ijp-label" text="Overlay stroke width" GridPane.rowIndex="8" />
             <Spinner fx:id="overlayStrokeWidthSpinner" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="8" />
             </children>
             <rowConstraints>

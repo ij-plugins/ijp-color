@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2021 Jarek Sacha
+ * Copyright (C) 2002-2023 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -39,12 +39,18 @@
 }
 
 #ijp-header-title {
-    -fx-font-size: 2em;
-    -fx-font-style: oblique;
+    -fx-font-size: 1.777em;
+    /*-fx-font-style: oblique;*/
     -fx-font-weight: bold;
     /*-fx-text-fill: #ddd;*/
     -fx-text-fill: derive(-fx-text-background-color, 50%);
     /*-fx-padding: 1;*/
+}
+
+#ijp-version-string {
+    /*-fx-font-style: italic;*/
+    -fx-font-size: 0.750em;
+    -fx-text-fill: derive(-fx-text-background-color, 50%);
 }
 
 #ijp-header-message {
@@ -55,19 +61,20 @@
 }
 
 #ijp-image-title {
-    -fx-font-size: 1.5em;
+    -fx-font-size: 1.333em;
     /*-fx-text-fill: #ddd;*/
     -fx-text-fill: derive(-fx-text-background-color, 50%);
     -fx-padding: 1;
 }
 
 #ijp-label {
+    -fx-padding: 0 0 0 1em;
     -fx-text-fill: derive(-fx-text-background-color, 50%);
 }
 
 #ijp-separator {
-    -fx-padding: 0.5em 0.0833em 0em 0.0833em;
-    -fx-font-size: 1.25em;
+    -fx-padding: 0.750em 0.0833em 0.25em 0.0833em;
+    -fx-font-size: 1.333em;
     -fx-font-style: oblique;
     -fx-text-fill: derive(-fx-text-background-color, 90%);
 }

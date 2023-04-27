@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2021 Jarek Sacha
+ * Copyright (C) 2002-2023 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -29,9 +29,9 @@ import scala.math.pow
 /** Color conversion constants */
 object ColorConverter {
 
-  val kE: Double  = 216.0 / 24389.0
-  val kK: Double  = 24389.0 / 27.0
-  val kKE: Double = 8.0
+  private val kE: Double = 216.0 / 24389.0
+  private val kK: Double = 24389.0 / 27.0
+  private val kKE: Double = 8.0
 }
 
 /**
@@ -220,26 +220,32 @@ final class ColorConverter(
 
   /** Create copy of this object with a modified field. */
   def copyWith(
-    refWhite: ReferenceWhite = refWhite,
-    rgbSpace: RGBWorkingSpace = rgbSpace,
-    chromaticAdaptation: Option[ChromaticAdaptation] = chromaticAdaptation,
-    rgbScale: Double = rgbScale,
-    xyzScale: Double = xyzScale
-  ): ColorConverter = {
+                refWhite: ReferenceWhite = refWhite,
+                rgbSpace: RGBWorkingSpace = rgbSpace,
+                chromaticAdaptation: Option[ChromaticAdaptation] = chromaticAdaptation,
+                rgbScale: Double = rgbScale,
+                xyzScale: Double = xyzScale
+              ): ColorConverter = {
     new ColorConverter(refWhite, rgbSpace, chromaticAdaptation, rgbScale, xyzScale)
   }
 
+  /**
+    * De-linearize
+    *
+    * @param linear linear value
+    * @return
+    */
   private def compand(linear: Double): Double = {
     rgbSpace match {
       case RGBWorkingSpace.sRGB =>
         assert(rgbSpace.gamma < 0)
         val (l, sign) = if (linear < 0.0) (-linear, -1.0) else (linear, 1.0)
-        val c         = if (l <= 0.0031308) l * 12.92 else 1.055 * math.pow(l, 1.0 / 2.4) - 0.055
+        val c = if (l <= 0.0031308) l * 12.92 else 1.055 * math.pow(l, 1.0 / 2.4) - 0.055
         c * sign
       case RGBWorkingSpace.ECIRGBv2 =>
         assert(rgbSpace.gamma == 0)
         val (l, sign) = if (linear < 0.0) (-linear, -1.0) else (linear, 1.0)
-        val c         = if (l <= (216.0 / 24389.0)) l * 24389.0 / 2700.0 else 1.16 * math.pow(l, 1.0 / 3.0) - 0.16
+        val c = if (l <= (216.0 / 24389.0)) l * 24389.0 / 2700.0 else 1.16 * math.pow(l, 1.0 / 3.0) - 0.16
         c * sign
       case _ =>
         assert(rgbSpace.gamma > 0)
@@ -247,30 +253,39 @@ final class ColorConverter(
     }
   }
 
+  /**
+    * Linearize
+    *
+    * @param companded de-linearized valuer
+    * @return
+    */
   private def invCompand(companded: Double): Double =
-    if (rgbSpace.gamma > 0.0) {
-      if (companded >= 0.0) pow(companded, rgbSpace.gamma) else -pow(-companded, rgbSpace.gamma)
-    } else if (rgbSpace.gamma < 0.0) {
-      /* sRGB */
-      val (c, sign) =
-        if (companded < 0.0) {
-          (-companded, -1.0d)
+    rgbSpace match {
+      case RGBWorkingSpace.sRGB =>
+        assert(rgbSpace.gamma < 0)
+        val (c, sign) =
+          if (companded < 0.0) {
+            (-companded, -1.0d)
+          } else {
+            (companded, 1.0d)
+          }
+        sign * (if (c <= 0.04045) c / 12.92 else pow((c + 0.055) / 1.055, 2.4))
+      case RGBWorkingSpace.ECIRGBv2 =>
+        assert(rgbSpace.gamma == 0)
+        /* L* */
+        val (c, sign) =
+          if (companded < 0.0) {
+            (-companded, -1)
+          } else {
+            (companded, 1)
+          }
+        sign * (if (c <= 0.08) {
+          2700.0 * companded / 24389.0
         } else {
-          (companded, 1.0d)
-        }
-      sign * (if (c <= 0.04045) c / 12.92 else pow((c + 0.055) / 1.055, 2.4))
-    } else {
-      /* L* */
-      val (c, sign) =
-        if (companded < 0.0) {
-          (-companded, -1)
-        } else {
-          (companded, 1)
-        }
-      sign * (if (c <= 0.08) {
-                2700.0 * companded / 24389.0
-              } else {
-                (((1000000.0 * c + 480000.0) * c + 76800.0) * c + 4096.0) / 1560896.0
-              })
+          (((1000000.0 * c + 480000.0) * c + 76800.0) * c + 4096.0) / 1560896.0
+        })
+      case _ =>
+        assert(rgbSpace.gamma > 0)
+        if (companded >= 0.0) pow(companded, rgbSpace.gamma) else -pow(-companded, rgbSpace.gamma)
     }
 }

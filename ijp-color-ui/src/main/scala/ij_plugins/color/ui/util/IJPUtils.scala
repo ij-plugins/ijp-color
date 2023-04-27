@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2021 Jarek Sacha
+ * Copyright (C) 2002-2023 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -23,6 +23,7 @@
 package ij_plugins.color.ui.util
 
 import ij.IJ
+import ij_plugins.color.BuildInfo
 import scalafx.geometry.Insets
 import scalafx.scene.Node
 import scalafx.scene.control.Label
@@ -44,17 +45,19 @@ import scala.util.control.NonFatal
  */
 object IJPUtils {
 
+  private val LogoIconPath = "/ij_plugins/color/ui/IJP-48-rounded.png"
+
   /**
-   * Load icon as a resource for given class without throwing exceptions.
-   *
-   * @param aClass
-   *   Class requesting resource.
-   * @param path
-   *   Icon file path.
-   * @return
-   *   Icon or null if loading failed.
-   */
-  def loadIcon(aClass: Class[_], path: String): ImageIcon = {
+    * Load icon as a resource for given class without throwing exceptions.
+    *
+    * @param aClass
+    * Class requesting resource.
+    * @param path
+    * Icon file path.
+    * @return
+    * Icon or null if loading failed.
+    */
+  private def loadIcon(aClass: Class[?], path: String): ImageIcon = {
     try {
       val url = aClass.getResource(path)
       if (url == null) {
@@ -70,24 +73,24 @@ object IJPUtils {
   }
 
   /**
-   * Create pane for displaying a message that may contain HTLM formatting, including links.
-   *
-   * @param message
-   *   the message.
-   * @param title
-   *   used in error dialogs.
-   * @return
-   *   component containg the message.
-   */
-  def createHTMLMessageComponent(message: String, title: String): JComponent = {
+    * Create pane for displaying a message that may contain HTML formatting, including links.
+    *
+    * @param message
+    * the message.
+    * @param title
+    * used in error dialogs.
+    * @return
+    * component containg the message.
+    */
+  private def createHTMLMessageComponent(message: String, title: String): JComponent = {
     val pane = new JEditorPane()
     pane.setContentType("text/html")
     pane.setEditable(false)
     pane.setOpaque(false)
     pane.setBorder(null)
     val htmlDocument = pane.getDocument.asInstanceOf[HTMLDocument]
-    val font         = UIManager.getFont("Label.font")
-    val bodyRule     = "body { font-family: " + font.getFamily + "; " + "font-size: " + font.getSize + "pt; }"
+    val font = UIManager.getFont("Label.font")
+    val bodyRule = "body { font-family: " + font.getFamily + "; " + "font-size: " + font.getSize + "pt; }"
     htmlDocument.getStyleSheet.addRule(bodyRule)
     pane.addHyperlinkListener(new HyperlinkListener() {
       def hyperlinkUpdate(e: HyperlinkEvent): Unit = {
@@ -106,30 +109,40 @@ object IJPUtils {
   }
 
   /**
-   * Create simple info panel for a plugin dialog. Intended to be displayed at the top.
-   *
-   * @param title
-   *   title displayed in bold font larger than default.
-   * @param message
-   *   message that can contain HTML formatting.
-   * @return
-   *   a panel containing the message with a title and a default icon.
-   */
-  def createInfoPanel(title: String, message: String): Panel = {
+    * Create simple info panel for a plugin dialog. Intended to be displayed at the top.
+    *
+    * @param title
+    * title displayed in bold font larger than default.
+    * @param message
+    * message that can contain HTML formatting.
+    * @return
+    * a panel containing the message with a title and a default icon.
+    */
+  def createHeaderAWT(title: String, message: String): Panel = {
     // TODO: use icon with rounded corners
-    val rootPanel  = new Panel(new BorderLayout(7, 7))
-    val titlePanel = new Panel(new BorderLayout(7, 7))
-    val logo       = IJPUtils.loadIcon(this.getClass, "/ij_plugins/color/ui/IJP-48.png")
+    val titlePanel = new JPanel(new BorderLayout(10, 10))
+    val logo = IJPUtils.loadIcon(this.getClass, LogoIconPath)
     if (logo != null) {
       val logoLabel = new JLabel(logo, SwingConstants.CENTER)
       logoLabel.setAlignmentX(Component.CENTER_ALIGNMENT)
       titlePanel.add(logoLabel, BorderLayout.WEST)
     }
-    val titleLabel = new JLabel(title)
-    val font       = titleLabel.getFont
-    titleLabel.setFont(font.deriveFont(Font.BOLD, font.getSize.toFloat * 2))
-    titlePanel.add(titleLabel, BorderLayout.CENTER)
 
+    val centerTitlePanel = new JPanel(new BorderLayout(7, 0))
+
+    val titleLabel = new JLabel(title)
+    val titleFont = titleLabel.getFont
+    titleLabel.setFont(titleFont.deriveFont(Font.BOLD, titleFont.getSize.toFloat * 1.777f))
+    centerTitlePanel.add(titleLabel, BorderLayout.CENTER)
+
+    val versionLabel = new JLabel(BuildInfo.version)
+    val versionFont = versionLabel.getFont
+    versionLabel.setFont(versionFont.deriveFont(Font.PLAIN, versionFont.getSize.toFloat * 0.750f))
+    centerTitlePanel.add(versionLabel, BorderLayout.SOUTH)
+
+    titlePanel.add(centerTitlePanel, BorderLayout.CENTER)
+
+    val rootPanel = new Panel(new BorderLayout(7, 10))
     rootPanel.add(titlePanel, BorderLayout.NORTH)
 
     val messageComponent = IJPUtils.createHTMLMessageComponent(message, title)
@@ -144,15 +157,15 @@ object IJPUtils {
     rootPanel
   }
 
-  def createHeaderNode(title: String, message: String): Node = {
+  def createHeaderFX(title: String, message: String): Node = {
     // Create header with logo, title, and a brief description
     val headerGP = new GridPane {
       vgap = 3
       hgap = 3
     }
 
-    val ijpLogoView = new ImageView("/ij_plugins/color/ui/IJP-48.png")
-    headerGP.add(ijpLogoView, 0, 0)
+    val ijpLogoView = new ImageView(LogoIconPath)
+    headerGP.add(ijpLogoView, 0, 0, 1, 2)
 
     val pluginTitleLabel = new Label {
       text = title
@@ -161,14 +174,20 @@ object IJPUtils {
     }
     headerGP.add(pluginTitleLabel, 1, 0)
 
+    val pluginVersionLabel = new Label {
+      text = BuildInfo.version
+      id = "ijp-version-string"
+      padding = Insets(0, 0, 0, 7)
+    }
+    headerGP.add(pluginVersionLabel, 1, 1)
+
     val descriptionLabel = new Label {
       text = message
       id = "ijp-header-message"
       wrapText = true
     }
-    headerGP.add(descriptionLabel, 0, 1, GridPane.Remaining, 1)
+    headerGP.add(descriptionLabel, 0, 2, GridPane.Remaining, 1)
 
     headerGP
   }
-
 }

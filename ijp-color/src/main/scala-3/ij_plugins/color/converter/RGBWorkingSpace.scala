@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2022 Jarek Sacha
+ * Copyright (C) 2002-2023 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -22,12 +22,8 @@
 
 package ij_plugins.color.converter
 
-import ij_plugins.color.converter.ColorTriple.XYZ
 import ij_plugins.color.converter.ReferenceWhite.{C, D50, D65, E}
 import ij_plugins.color.util.EnumCompanion.{WithName, WithNameCompanion}
-
-import scala.collection.immutable
-import scala.math.*
 
 /**
  * Predefined RGB color working spaces.
@@ -249,7 +245,13 @@ enum RGBWorkingSpace(
         gamma = 2.2
       )
 
-  /** sRGB */
+  /**
+   * sRGB
+   *
+   * Note: The gamma of sRGB is not exactly 2.2, but rather, is a grafting together of two different functions,
+   * that when viewed together, may be approximated by a simple 2.2 gamma curve.
+   * See [[http://www.brucelindbloom.com/index.html?WorkingSpaceInfo.html Bruce Lindbloom's RGB Working Space Information]]
+   */
   case sRGB
       extends RGBWorkingSpace(
         "sRGB",
@@ -307,48 +309,6 @@ enum RGBWorkingSpace(
   ).transpose
 
   val xyz2rgb: Matrix3x3 = rgb2xyz.inverse
-
-  /** Convert a value in this RGB color space to XYZ with the same reference white. */
-  def convertRGB2XYZ(r: Double, g: Double, b: Double): XYZ = {
-    val r1 = invCompand(r)
-    val g1 = invCompand(g)
-    val b1 = invCompand(b)
-
-    val x = r1 * rgb2xyz.m00 + g1 * rgb2xyz.m10 + b1 * rgb2xyz.m20
-    val y = r1 * rgb2xyz.m01 + g1 * rgb2xyz.m11 + b1 * rgb2xyz.m21
-    val z = r1 * rgb2xyz.m02 + g1 * rgb2xyz.m12 + b1 * rgb2xyz.m22
-
-    XYZ(x, y, z)
-  }
-
-  final private def invCompand(companded: Double): Double = {
-    if (gamma > 0.0) {
-      if (companded >= 0.0) pow(companded, gamma) else -pow(-companded, gamma)
-    } else if (gamma < 0.0) {
-      /* sRGB */
-      val (c, sign) =
-        if (companded < 0.0) {
-          (-companded, -1.0d)
-        } else {
-          (companded, 1.0d)
-        }
-      sign * (if (c <= 0.04045) c / 12.92 else pow((c + 0.055) / 1.055, 2.4))
-    } else {
-      /* L* */
-      val (c, sign) =
-        if (companded < 0.0) {
-          (-companded, -1)
-        } else {
-          (companded, 1)
-        }
-      sign * (if (c <= 0.08) {
-                2700.0 * companded / 24389.0
-              } else {
-                (((1000000.0 * c + 480000.0) * c + 76800.0) * c + 4096.0) / 1560896.0
-              })
-    }
-  }
-
 }
 
 object RGBWorkingSpace extends WithNameCompanion[RGBWorkingSpace]

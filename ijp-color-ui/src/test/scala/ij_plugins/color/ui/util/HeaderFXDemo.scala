@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2022 Jarek Sacha
+ * Copyright (C) 2002-2023 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -20,32 +20,30 @@
  * Latest release available at https://github.com/ij-plugins/ijp-color/
  */
 
-package ij_plugins.color.ui.fx
+package ij_plugins.color.ui.util
 
-import ij.io.OpenDialog
-import org.scalafx.extras.generic_pane.LastDirectoryHandler
+import ij_plugins.color.ui.fx.ColorFXUI
+import scalafx.Includes.*
+import scalafx.application.JFXApp3
+import scalafx.geometry.Insets
+import scalafx.scene.Scene
+import scalafx.scene.layout.BorderPane
 
-import java.io.File
-
-/**
-  * Integrates last directory handling with ImageJ
-  */
-object LastDirectoryHandlerIJ extends LastDirectoryHandler {
-
-  def lastDirectory: java.io.File = {
-    Option(OpenDialog.getDefaultDirectory) match {
-      case Some(dir) =>
-        val f = new File(dir)
-        if (f.exists() & f.isFile) f.getParentFile else f
-      case None => new File(".")
-    }
-  }
-
-  def lastDirectory_=(newDir: java.io.File): Unit = {
-    Option(newDir).foreach { f =>
-      val dir = if (f.exists() & f.isFile) f.getParentFile else f
-      OpenDialog.setLastDirectory(dir.getAbsolutePath)
-      OpenDialog.setDefaultDirectory(dir.getAbsolutePath)
+object HeaderFXDemo extends JFXApp3 {
+  override def start(): Unit = {
+    stage = new JFXApp3.PrimaryStage {
+      title = "InfoHeader Demo"
+      scene = new Scene {
+        content = new BorderPane {
+          center = IJPUtils.createHeaderFX(
+            title = "My Plugin Name",
+            message = "Fancy, but brief, description what this plugin does"
+          )
+          margin = Insets(14)
+          padding = Insets(14)
+        }
+        stylesheets ++= ColorFXUI.stylesheets
+      }
     }
   }
 }

@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2022 Jarek Sacha
+ * Copyright (C) 2002-2023 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -23,8 +23,6 @@
 package ij_plugins.color.converter
 
 import ij_plugins.color.util.EnumCompanion.{WithName, WithNameCompanion}
-
-import scala.collection.immutable
 
 /** Concrete reference values values for selected illuminants. */
 enum ReferenceWhite(val name: String, val x: Double, val z: Double) extends WithName:

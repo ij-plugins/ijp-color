@@ -20,29 +20,34 @@
  * Latest release available at https://github.com/ij-plugins/ijp-color/
  */
 
-package ij_plugins.color.util
+package ij_plugins.color.ui.util
 
-import ij.ImagePlus
-import ij_plugins.color.util.EnumCompanion.{WithName, WithNameCompanion, WithValue, WithValueCompanion}
+import java.awt.BorderLayout
+import javax.swing.border.EmptyBorder
+import javax.swing.{JFrame, JPanel, SwingUtilities, WindowConstants}
 
-/**
- * Type-safe dealing with ImagePlus image types (integer IDs).
- */
-enum ImagePlusType(val name: String, val value: Int) extends WithName with WithValue[Int]:
+object HeaderAWTDemo {
 
-  /** ImagePlus.GRAY8 */
-  case Gray8 extends ImagePlusType("8-bit gray", ImagePlus.GRAY8)
+  def main(args: Array[String]): Unit = {
+    SwingUtilities.invokeLater(() => {
 
-  /** ImagePlus.GRAY16 */
-  case Gray16 extends ImagePlusType("16-bit gray", ImagePlus.GRAY16)
+      val panel = IJPUtils.createHeaderAWT(
+        title = "My Plugin Name",
+        message = "Fancy, but brief, description what this plugin does"
+      )
 
-  /** ImagePlus.GRAY32 */
-  case Gray32 extends ImagePlusType("32-bit gray", ImagePlus.GRAY32)
+      val rootPanel = new JPanel(new BorderLayout(7, 7))
+      rootPanel.add(panel, BorderLayout.CENTER)
+      rootPanel.setBorder(new EmptyBorder(10, 10, 10, 10))
 
-  /** ImagePlus.COLOR_256 */
-  case Color256 extends ImagePlusType("Indexed color 256", ImagePlus.COLOR_256)
+      val frame = new JFrame()
+      frame.setTitle("InfoPanel Demo")
+      frame.getContentPane.add(rootPanel)
+      frame.pack()
+      frame.setLocationRelativeTo(null)
+      frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE)
+      frame.setVisible(true)
 
-  /** ImagePlus.COLOR_RGB */
-  case ColorRGB extends ImagePlusType("24-bit color", ImagePlus.COLOR_RGB)
-
-object ImagePlusType extends WithNameCompanion[ImagePlusType] with WithValueCompanion[Int, ImagePlusType]
+    })
+  }
+}

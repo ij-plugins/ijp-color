@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2022 Jarek Sacha
+ * Copyright (C) 2002-2023 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -25,6 +25,8 @@ package ij_plugins.color.ui.calibration
 import ij_plugins.color.calibration.chart.{ColorChartType, ReferenceColorSpace}
 import ij_plugins.color.calibration.regression.MappingMethod
 import ij_plugins.color.ui.util.{IJPUtils, ImageJUIColors}
+import javafx.fxml as jfxf
+import javafx.scene.{control as jfxsc, layout as jfxsl}
 import org.scalafx.extras.mvcfx.ControllerFX
 import scalafx.Includes.*
 import scalafx.collections.ObservableBuffer
@@ -34,9 +36,6 @@ import scalafx.scene.control.SpinnerValueFactory.IntegerSpinnerValueFactory
 import scalafx.scene.layout.GridPane
 
 import java.util.concurrent.atomic.AtomicBoolean
-
-import javafx.scene.{control as jfxsc, layout as jfxsl}
-import javafx.{event as jfxe, fxml as jfxf}
 
 /**
  * Binds ColorCalibrator FXML to UI model.
@@ -88,7 +87,7 @@ class ColorCalibratorUIController(
   def initialize(): Unit = {
 
     // Dialog header
-    val headerNode = IJPUtils.createHeaderNode(
+    val headerNode = IJPUtils.createHeaderFX(
       "Color Calibrator",
       "Performs color calibration of an image using a color chart."
     )
