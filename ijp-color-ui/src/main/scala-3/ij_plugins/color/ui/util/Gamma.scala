@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2022 Jarek Sacha
+ * Copyright (C) 2002-2023 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -22,8 +22,7 @@
 
 package ij_plugins.color.ui.util
 
-import ij_plugins.color.util.EnumCompanion.{WithName, WithNameCompanion, WithValueCompanion}
-import ij_plugins.color.util.ImagePlusType
+import ij_plugins.color.util.EnumCompanion.{WithName, WithNameCompanion}
 
 enum Gamma(val name: String, val value: Double) extends WithName:
 

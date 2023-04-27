@@ -25,6 +25,8 @@ package ij_plugins.color.ui.calibration
 import ij_plugins.color.calibration.chart.{ColorChartType, ReferenceColorSpace}
 import ij_plugins.color.calibration.regression.MappingMethod
 import ij_plugins.color.ui.util.{IJPUtils, ImageJUIColors}
+import javafx.fxml as jfxf
+import javafx.scene.{control as jfxsc, layout as jfxsl}
 import org.scalafx.extras.mvcfx.ControllerFX
 import scalafx.Includes.*
 import scalafx.collections.ObservableBuffer
@@ -34,9 +36,6 @@ import scalafx.scene.control.SpinnerValueFactory.IntegerSpinnerValueFactory
 import scalafx.scene.layout.GridPane
 
 import java.util.concurrent.atomic.AtomicBoolean
-
-import javafx.scene.{control as jfxsc, layout as jfxsl}
-import javafx.{event as jfxe, fxml as jfxf}
 
 /**
  * Binds ColorCalibrator FXML to UI model.

@@ -22,12 +22,8 @@
 
 package ij_plugins.color.converter
 
-import ij_plugins.color.converter.ColorTriple.XYZ
 import ij_plugins.color.converter.ReferenceWhite.{C, D50, D65, E}
 import ij_plugins.color.util.EnumCompanion.{WithName, WithNameCompanion}
-
-import scala.collection.immutable
-import scala.math.*
 
 /**
  * Predefined RGB color working spaces.
@@ -250,22 +246,22 @@ enum RGBWorkingSpace(
       )
 
   /**
-    * sRGB
-    *
-    * Note: The gamma of sRGB is not exactly 2.2, but rather, is a grafting together of two different functions,
-    * that when viewed together, may be approximated by a simple 2.2 gamma curve.
-    * See [[http://www.brucelindbloom.com/index.html?WorkingSpaceInfo.html Bruce Lindbloom's RGB Working Space Information]]
-    */
+   * sRGB
+   *
+   * Note: The gamma of sRGB is not exactly 2.2, but rather, is a grafting together of two different functions,
+   * that when viewed together, may be approximated by a simple 2.2 gamma curve.
+   * See [[http://www.brucelindbloom.com/index.html?WorkingSpaceInfo.html Bruce Lindbloom's RGB Working Space Information]]
+   */
   case sRGB
-    extends RGBWorkingSpace(
-      "sRGB",
-      xR = 0.64,
-      yR = 0.33,
-      xG = 0.30,
-      yG = 0.60,
-      xB = 0.15,
-      yB = 0.06,
-      refWhite = D65,
+      extends RGBWorkingSpace(
+        "sRGB",
+        xR = 0.64,
+        yR = 0.33,
+        xG = 0.30,
+        yG = 0.60,
+        xB = 0.15,
+        yB = 0.06,
+        refWhite = D65,
         gamma = -2.2
       )
 
