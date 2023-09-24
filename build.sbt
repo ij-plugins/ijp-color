@@ -1,9 +1,5 @@
 import xerial.sbt.Sonatype.GitHubHosting
 
-import java.net.URL
-
-// @formatter:off
-
 name := "ijp-color-project"
 
 val Scala2 = "2.13.12"
@@ -19,11 +15,11 @@ ThisBuild / scalaVersion        := _scalaVersion
 ThisBuild / versionScheme       := Some("early-semver")
 ThisBuild / organization        := "net.sf.ij-plugins"
 ThisBuild / sonatypeProfileName := "net.sf.ij-plugins"
-ThisBuild / homepage            := Some(new URL("https://github.com/ij-plugins/ijp-color"))
+ThisBuild / homepage            := Some(new URI("https://github.com/ij-plugins/ijp-color").toURL)
 ThisBuild / startYear           := Some(2002)
-ThisBuild / licenses            := Seq(("LGPL-2.1", new URL("https://opensource.org/licenses/LGPL-2.1")))
-ThisBuild / developers          := List(
-  Developer(id="jpsacha", name="Jarek Sacha", email="jpsacha@gmail.com", url=url("https://github.com/jpsacha"))
+ThisBuild / licenses            := Seq(("LGPL-2.1", new URI("https://opensource.org/licenses/LGPL-2.1").toURL))
+ThisBuild / developers := List(
+  Developer(id = "jpsacha", name = "Jarek Sacha", email = "jpsacha@gmail.com", url = url("https://github.com/jpsacha"))
 )
 
 publishArtifact     := false
@@ -100,11 +96,10 @@ val commonSettings = Seq(
   //
   manifestSetting,
   // Setup publishing
-  publishMavenStyle := true,
+  publishMavenStyle      := true,
   sonatypeProjectHosting := Some(GitHubHosting("ij-plugins", "ijp-color", "jpsacha@gmail.com")),
-  publishTo := sonatypePublishToBundle.value,
+  publishTo              := sonatypePublishToBundle.value
 )
-
 
 // The core ijp-color module
 lazy val ijp_color = (project in file("ijp-color"))
@@ -127,7 +122,7 @@ lazy val ijp_color = (project in file("ijp-color"))
       else {
         Seq.empty[ModuleID]
       }
-    ),
+    )
   )
 
 // The ijp-color UI and ImageJ plugins module
@@ -140,10 +135,10 @@ lazy val ijp_color_ui = (project in file("ijp-color-ui"))
     scalacOptions += (if(isScala2(scalaVersion.value)) "-Ymacro-annotations" else ""),
     // Other dependencies
     libraryDependencies ++= Seq(
-      "org.jfree"           % "jfreechart-fx"       % "1.0.1",
-      "org.jfree"           % "fxgraphics2d"        % "1.8",
-      "org.scalafx"        %% "scalafx"             % "20.0.0-R31",
-      "org.scalafx"        %% "scalafx-extras"      % "0.8.0",
+      "org.jfree"    % "jfreechart-fx"  % "1.0.1",
+      "org.jfree"    % "fxgraphics2d"   % "1.8",
+      "org.scalafx" %% "scalafx"        % "20.0.0-R31",
+      "org.scalafx" %% "scalafx-extras" % "0.8.0",
       // Test
       "org.scalatest"      %% "scalatest"           % "3.2.15"  % "test"
     ),
@@ -151,7 +146,7 @@ lazy val ijp_color_ui = (project in file("ijp-color-ui"))
     ijRuntimeSubDir         := "sandbox",
     ijPluginsSubDir         := "ij-plugins",
     ijCleanBeforePrepareRun := true,
-    cleanFiles += ijPluginsDir.value,
+    cleanFiles += ijPluginsDir.value
   )
   .dependsOn(ijp_color)
 
@@ -168,7 +163,7 @@ lazy val experimental = (project in file("experimental"))
     ijRuntimeSubDir         := "sandbox",
     ijPluginsSubDir         := "ij-plugins",
     ijCleanBeforePrepareRun := true,
-    cleanFiles += ijPluginsDir.value,
+    cleanFiles += ijPluginsDir.value
   )
   .dependsOn(ijp_color_ui)
 
