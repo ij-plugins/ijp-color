@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2022 Jarek Sacha
+ * Copyright (C) 2002-2023 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -116,7 +116,7 @@ object CalibrateTask {
 
   private def showScatterChart(x: IndexedSeq[IndexedSeq[Double]],
                                y: IndexedSeq[IndexedSeq[Double]],
-                               seriesLabels: Array[String],
+                               seriesLabels: IndexedSeq[String],
                                chartTitle: String
                               ): Unit = {
 
@@ -213,7 +213,7 @@ class CalibrateTask(
       correctionOutputLR.foreach { co =>
         val titlePrefix = s"${image.getTitle} - ${colorCalibrator.referenceColorSpace}+${colorCalibrator.mappingMethod}"
         val chips: Seq[ColorChip] = chart.referenceChipsEnabled
-        val bands: Array[String]  = recipe.referenceColorSpace.bandsNames
+        val bands: IndexedSeq[String]  = recipe.referenceColorSpace.bandsNames
 
         co.correctedInSRGB.foreach { imp =>
           imp.setTitle(s"$titlePrefix - sRGB")
@@ -242,13 +242,13 @@ class CalibrateTask(
           showColorErrorChart(
             fit.reference,
             fit.corrected,
-            chips.map(_.name).toArray,
+            chips.map(_.name),
             referenceColorSpace().bandsNames,
             titlePrefix
           )
 
         if (outputConfig.tableExpectedVsCorrected)
-          showExpectedVsCorrected(chips: Seq[ColorChip], bands: Array[String], fit, titlePrefix)
+          showExpectedVsCorrected(chips: Seq[ColorChip], bands, fit, titlePrefix)
 
         if (outputConfig.tableRegressionResults)
           showTableWithRegressionResults(bands, fit, s"$titlePrefix - Regression Coefficients")
@@ -275,7 +275,7 @@ class CalibrateTask(
 
   private def showExpectedVsCorrected(
     chips: Seq[ColorChip],
-    bands: Array[String],
+    bands: IndexedSeq[String],
     fit: ColorCalibrator.CalibrationFit,
     titlePrefix: String
   ): Unit = {
@@ -304,7 +304,7 @@ class CalibrateTask(
   }
 
   private def showTableWithRegressionResults(
-    bands: Array[String],
+    bands: IndexedSeq[String],
     fit: ColorCalibrator.CalibrationFit,
     title: String
   ): Unit = {
@@ -432,8 +432,8 @@ class CalibrateTask(
 
   private def showColorErrorChart(x: IndexedSeq[IndexedSeq[Double]],
                                   y: IndexedSeq[IndexedSeq[Double]],
-                                  columnNames: Array[String],
-                                  seriesLabels: Array[String],
+                                  columnNames: Seq[String],
+                                  seriesLabels: IndexedSeq[String],
                                   titlePrefix: String
                                  ): Unit = {
 

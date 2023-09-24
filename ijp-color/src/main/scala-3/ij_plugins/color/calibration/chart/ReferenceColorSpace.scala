@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2022 Jarek Sacha
+ * Copyright (C) 2002-2023 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -36,17 +36,16 @@ object ReferenceColorSpace extends WithNameCompanion[ReferenceColorSpace]
  * Note that for proper correction to L*a*b* you need to keep track of the reference white (illuminant) of the reference
  * color values.
  */
-enum ReferenceColorSpace(val name: String, bands: Array[String]) extends WithName {
+enum ReferenceColorSpace(val name: String, val bands: IndexedSeq[String]) extends WithName {
 
   /** CIE XYZ color space */
-  case XYZ extends ReferenceColorSpace("XYZ", Array("X", "Y", "Z"))
+  case XYZ extends ReferenceColorSpace("XYZ", IndexedSeq("X", "Y", "Z"))
 
   /** sRGB color space */
-  case sRGB extends ReferenceColorSpace("sRGB", Array("Red", "Green", "Blue"))
+  case sRGB extends ReferenceColorSpace("sRGB", IndexedSeq("Red", "Green", "Blue"))
 
-  private val _bands: Array[String] = bands.clone()
 
-  def bandsNames: Array[String] = _bands.clone()
+  def bandsNames: IndexedSeq[String] = bands
 
   /**
    * Convert color value from the current color space to CIE L*a*b*
