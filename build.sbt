@@ -124,10 +124,9 @@ lazy val ijp_color = (project in file("ijp-color"))
     ),
     libraryDependencies += "org.scala-lang.modules" %% "scala-parallel-collections" % "1.0.4",
     libraryDependencies ++= (
-      if(isScala2(scalaVersion.value)) {
-        Seq("com.beachape" %% "enumeratum" % "1.7.2")
-      }
-      else {
+      if (isScala2(scalaVersion.value)) {
+        Seq("com.beachape" %% "enumeratum" % "1.7.3")
+      } else {
         Seq.empty[ModuleID]
       }
     )
