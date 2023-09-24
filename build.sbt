@@ -8,7 +8,7 @@ val Scala3 = "3.3.1"
 val _version       = "0.12.2.1-SNAPSHOT"
 val _scalaVersions = Seq(Scala2, Scala3)
 //val _scalaVersion  = _scalaVersions.head
-val _scalaVersion  = Scala3
+val _scalaVersion = Scala3
 
 ThisBuild / version             := _version
 ThisBuild / scalaVersion        := _scalaVersion
@@ -22,11 +22,11 @@ ThisBuild / developers := List(
   Developer(id = "jpsacha", name = "Jarek Sacha", email = "jpsacha@gmail.com", url = url("https://github.com/jpsacha"))
 )
 
-publishArtifact     := false
-publish / skip      := true
+publishArtifact := false
+publish / skip  := true
 
 def isScala2(scalaVersion: String): Boolean =
-      CrossVersion.partialVersion(scalaVersion) match {
+  CrossVersion.partialVersion(scalaVersion) match {
     case Some((2, _)) => true
     case _            => false
   }
@@ -37,14 +37,14 @@ def isScala3(scalaVersion: String): Boolean =
     case _            => false
   }
 
-
 val commonSettings = Seq(
   //
   crossScalaVersions := _scalaVersions,
   scalaVersion       := _scalaVersion,
   //
   scalacOptions ++= Seq(
-    "-encoding", "UTF-8",
+    "-encoding",
+    "UTF-8",
     "-unchecked",
     "-deprecation",
     "-feature",
@@ -52,36 +52,44 @@ val commonSettings = Seq(
     "-release",
     "8"
   ) ++ (
-    if(isScala2(scalaVersion.value))
+    if (isScala2(scalaVersion.value))
       Seq(
         "-explaintypes",
         "-Xsource:3",
         "-Xlint",
         "-Xcheckinit",
         "-Xlint:missing-interpolator",
+//        "-Xmigration",
         "-Ywarn-dead-code",
-        "-Ywarn-unused:-patvars,_",
+        "-Ywarn-unused:-patvars,_"
       )
     else
       Seq(
         "-explain",
-        "-explain-types"
+        "-explain-types",
+        "-rewrite",
+        "-source:3.3-migration",
+        "-Wvalue-discard",
+        "-Wunused:all"
       )
   ),
   Compile / doc / scalacOptions ++= Opts.doc.title("IJP Color API"),
   Compile / doc / scalacOptions ++= Opts.doc.version(_version),
   Compile / doc / scalacOptions ++= Seq(
-    "-doc-footer", s"IJP Color API v.${_version}",
-    "-doc-root-content", baseDirectory.value + "/src/main/scala/root-doc.creole"
+    "-doc-footer",
+    s"IJP Color API v.${_version}",
+    "-doc-root-content",
+    baseDirectory.value + "/src/main/scala/root-doc.creole"
   ),
   Compile / doc / scalacOptions ++= (
     Option(System.getenv("GRAPHVIZ_DOT_PATH")) match {
       case Some(path) => Seq("-diagrams", "-diagrams-dot-path", path, "-diagrams-debug")
-      case None => Seq.empty[String]
-    }),
-  javacOptions  ++= Seq("-deprecation", "-Xlint"),
+      case None       => Seq.empty[String]
+    }
+  ),
+  javacOptions ++= Seq("-deprecation", "-Xlint"),
   //
-  resolvers  += Resolver.mavenLocal,
+  resolvers += Resolver.mavenLocal,
   resolvers ++= Resolver.sonatypeOssRepos("snapshots"),
   //
   exportJars := true,
@@ -132,7 +140,7 @@ lazy val ijp_color_ui = (project in file("ijp-color-ui"))
     description := "IJP Color UI and ImageJ plugins",
     commonSettings,
     // Enable macro annotation processing for ScalaFXML
-    scalacOptions += (if(isScala2(scalaVersion.value)) "-Ymacro-annotations" else ""),
+    scalacOptions += (if (isScala2(scalaVersion.value)) "-Ymacro-annotations" else ""),
     // Other dependencies
     libraryDependencies ++= Seq(
       "org.jfree"    % "jfreechart-fx"  % "1.0.1",
@@ -169,9 +177,9 @@ lazy val experimental = (project in file("experimental"))
 
 lazy val manifestSetting = packageOptions += {
   Package.ManifestAttributes(
-    "Created-By" -> "Simple Build Tool",
-    "Built-By"  -> Option(System.getenv("JAR_BUILT_BY")).getOrElse(System.getProperty("user.name")),
-    "Build-Jdk" -> System.getProperty("java.version"),
+    "Created-By"               -> "Simple Build Tool",
+    "Built-By"                 -> Option(System.getenv("JAR_BUILT_BY")).getOrElse(System.getProperty("user.name")),
+    "Build-Jdk"                -> System.getProperty("java.version"),
     "Specification-Title"      -> name.value,
     "Specification-Version"    -> version.value,
     "Specification-Vendor"     -> organization.value,
@@ -181,7 +189,6 @@ lazy val manifestSetting = packageOptions += {
     "Implementation-Vendor"    -> organization.value
   )
 }
-
 
 // Instruct `clean` to delete created plugins subdirectory created by `ijRun`/`ijPrepareRun`.
 enablePlugins(SbtImageJ)
