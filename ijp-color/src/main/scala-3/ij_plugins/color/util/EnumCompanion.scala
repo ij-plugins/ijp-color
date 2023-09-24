@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2022 Jarek Sacha
+ * Copyright (C) 2002-2023 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -31,7 +31,7 @@ import scala.reflect.ClassTag
 object EnumCompanion:
 
   /**
-   * Marks availability of member variable `name`. To bu used in an `enum`
+   * Marks availability of member variable `name`. To be used in an `enum`
    *
    * Example:
    * {{{
