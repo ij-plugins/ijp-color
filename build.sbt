@@ -117,8 +117,8 @@ lazy val ijp_color = (project in file("ijp-color"))
     commonSettings,
     //
     libraryDependencies ++= Seq(
-      "net.imagej"              % "ij"                      % "1.54d",
-      "org.apache.commons"      % "commons-math3"           % "3.6.1",
+      "net.imagej"         % "ij"            % "1.54f",
+      "org.apache.commons" % "commons-math3" % "3.6.1",
       // Test
       "org.scalatest"          %% "scalatest"               % "3.2.15" % "test"
     ),
