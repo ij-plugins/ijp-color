@@ -6,10 +6,10 @@ import java.net.URL
 
 name := "ijp-color-project"
 
-val Scala2 = "2.13.10"
-val Scala3 = "3.2.2"
+val Scala2 = "2.13.12"
+val Scala3 = "3.3.1"
 
-val _version       = "0.12.2"
+val _version       = "0.12.2-JVM11"
 val _scalaVersions = Seq(Scala2, Scala3)
 //val _scalaVersion  = _scalaVersions.head
 val _scalaVersion  = Scala3
@@ -114,15 +114,15 @@ lazy val ijp_color = (project in file("ijp-color"))
     commonSettings,
     //
     libraryDependencies ++= Seq(
-      "net.imagej"              % "ij"                      % "1.54d",
+      "net.imagej"              % "ij"                      % "1.54f",
       "org.apache.commons"      % "commons-math3"           % "3.6.1",
       // Test
-      "org.scalatest"          %% "scalatest"               % "3.2.15" % "test"
+      "org.scalatest"          %% "scalatest"               % "3.2.17" % "test"
     ),
     libraryDependencies += "org.scala-lang.modules" %% "scala-parallel-collections" % "1.0.4",
     libraryDependencies ++= (
       if(isScala2(scalaVersion.value)) {
-        Seq("com.beachape" %% "enumeratum" % "1.7.2")
+        Seq("com.beachape" %% "enumeratum" % "1.7.3")
       }
       else {
         Seq.empty[ModuleID]
@@ -142,10 +142,10 @@ lazy val ijp_color_ui = (project in file("ijp-color-ui"))
     libraryDependencies ++= Seq(
       "org.jfree"           % "jfreechart-fx"       % "1.0.1",
       "org.jfree"           % "fxgraphics2d"        % "1.8",
-      "org.scalafx"        %% "scalafx"             % "20.0.0-R31",
-      "org.scalafx"        %% "scalafx-extras"      % "0.8.0",
+      "org.scalafx"        %% "scalafx"             % "19.0.0-R30",
+      "org.scalafx"        %% "scalafx-extras"      % "0.8.0-JVM11",
       // Test
-      "org.scalatest"      %% "scalatest"           % "3.2.15"  % "test"
+      "org.scalatest"      %% "scalatest"           % "3.2.17"  % "test"
     ),
     // Customize `sbt-imagej` plugin
     ijRuntimeSubDir         := "sandbox",
