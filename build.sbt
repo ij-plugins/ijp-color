@@ -117,7 +117,7 @@ lazy val ijp_color = (project in file("ijp-color"))
     commonSettings,
     //
     libraryDependencies ++= Seq(
-      "net.imagej"         % "ij"            % "1.54f",
+      "net.imagej"         % "ij"            % "1.54g",
       "org.apache.commons" % "commons-math3" % "3.6.1",
       // Test
       "org.scalatest" %% "scalatest" % "3.2.17" % "test"
@@ -144,7 +144,7 @@ lazy val ijp_color_ui = (project in file("ijp-color-ui"))
     libraryDependencies ++= Seq(
       "org.jfree"    % "jfreechart-fx"  % "1.0.1",
       "org.jfree"    % "fxgraphics2d"   % "1.8",
-      "org.scalafx" %% "scalafx"        % "20.0.0-R31",
+      "org.scalafx" %% "scalafx"        % "21.0.0-R32",
       "org.scalafx" %% "scalafx-extras" % "0.8.0",
       // Test
       "org.scalatest" %% "scalatest" % "3.2.17" % "test"
