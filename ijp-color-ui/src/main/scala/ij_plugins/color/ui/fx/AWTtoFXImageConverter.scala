@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2021 Jarek Sacha
+ * Copyright (C) 2002-2023 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -20,7 +20,7 @@
  * Latest release available at https://github.com/ij-plugins/ijp-color/
  */
 
-package ij_plugins.color.util
+package ij_plugins.color.ui.fx
 
 import java.awt.image.BufferedImage
 

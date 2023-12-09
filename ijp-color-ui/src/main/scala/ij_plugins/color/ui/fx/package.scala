@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2022 Jarek Sacha
+ * Copyright (C) 2002-2023 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -23,7 +23,7 @@
 package ij_plugins.color.ui
 
 import ij.IJ
-import ij_plugins.color.util.AWTtoFXImageConverter.toBufferImage
+import ij_plugins.color.ui.fx.AWTtoFXImageConverter.toBufferImage
 import javafx.embed.swing as jfxes
 import org.scalafx.extras.*
 import scalafx.Includes.*
