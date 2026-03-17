@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2021 Jarek Sacha
+ * Copyright (C) 2002-2026 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -20,27 +20,16 @@
  * Latest release available at https://github.com/ij-plugins/ijp-color/
  */
 
-package ij_plugins.color.calibration.chart
+package ij_plugins.color.ui.util.batch
 
-import enumeratum.{Enum, EnumEntry}
+import scala.collection.parallel.CollectionConverters.*
+import scala.collection.parallel.ParSeq
 
-import scala.collection.immutable
-
-sealed abstract class ColorChartType(override val entryName: String) extends EnumEntry {
-  override def toString: String = entryName
-
-  def name: String = entryName
-}
-
-case object ColorChartType extends Enum[ColorChartType] {
-  case object GretagMacbethColorChecker extends ColorChartType("GretagMacbeth ColorChecker")
-
-  case object XRitePassportColorChecker extends ColorChartType("X-Rite Passport")
-
-  case object ImageScienceColorGaugeMatte extends ColorChartType("Image Science ColorGauge Matte")
-
-  case object Custom extends ColorChartType("Custom")
-
-  /** All refined reference color spaces. */
-  val values: immutable.IndexedSeq[ColorChartType] = findValues
+/**
+ * Scala 2.13+ specific way of creating a parallel collection
+ *
+ * Scala 2.13+ requires import `scala.collection.parallel.CollectionConverters._` that is not supported in Scala 2.12-
+ */
+object ParHelper {
+  def par[T](seq: Seq[T]): ParSeq[T] = seq.par
 }

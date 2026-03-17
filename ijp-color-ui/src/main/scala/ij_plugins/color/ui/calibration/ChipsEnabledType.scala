@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2022 Jarek Sacha
+ * Copyright (C) 2002-2026 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -22,23 +22,12 @@
 
 package ij_plugins.color.ui.calibration
 
-import ij.ImagePlus
-import org.scalafx.extras.mvcfx.MVCfx
-import scalafx.stage.Window
+import ij_plugins.color.util.EnumCompanion.{WithName, WithNameCompanion}
 
-/**
- * Creates Color Calibrator UI.
- *
- * @author
- *   Jarek Sacha
- */
-class ColorCalibratorUI(val image: ImagePlus, private var _parentWindow: Window) extends MVCfx("ColorCalibrator.fxml") {
+enum ChipsEnabledType(val name: String) extends WithName:
 
-  override lazy val model: ColorCalibratorUIModel = new ColorCalibratorUIModel(image, _parentWindow)
+  case All    extends ChipsEnabledType("All")
+  case Auto   extends ChipsEnabledType("Auto")
+  case Custom extends ChipsEnabledType("Custom")
 
-  def parentWindow: Window = _parentWindow
-
-  def parentWindow_=(newParent: Window): Unit = {
-    _parentWindow = newParent
-  }
-}
+object ChipsEnabledType extends WithNameCompanion[ChipsEnabledType]

@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2022 Jarek Sacha
+ * Copyright (C) 2002-2026 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -20,14 +20,28 @@
  * Latest release available at https://github.com/ij-plugins/ijp-color/
  */
 
-package ij_plugins.color.calibration.chart
+package ij_plugins.color.ui.calibration
 
-import ij_plugins.color.util.EnumCompanion.*
+import ij.ImagePlus
+import org.scalafx.extras.mvcfx.MVCfx
+import scalafx.stage.Window
 
-enum ColorChartType(val name: String) extends WithName:
-  case GretagMacbethColorChecker extends ColorChartType("GretagMacbeth ColorChecker")
-  case XRitePassportColorChecker extends ColorChartType("X-Rite Passport")
-  case ImageScienceColorGaugeMatte extends ColorChartType("Image Science ColorGauge Matte")
-  case Custom extends ColorChartType("Custom")
+/**
+ * Creates Color Calibrator UI.
+ *
+ * @author
+ *   Jarek Sacha
+ */
+class ColorCalibratorUI(val image: ImagePlus, private var _parentWindow: Window)
+    extends MVCfx[ColorCalibratorUIController]("ColorCalibrator.fxml") {
 
-object ColorChartType extends WithNameCompanion[ColorChartType]
+  lazy val model: ColorCalibratorUIModel = new ColorCalibratorUIModel(image, _parentWindow)
+
+  def parentWindow: Window = _parentWindow
+
+  def parentWindow_=(newParent: Window): Unit = {
+    _parentWindow = newParent
+  }
+
+  protected def controllerInstance: ColorCalibratorUIController = new ColorCalibratorUIController(model)
+}
