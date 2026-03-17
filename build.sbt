@@ -116,6 +116,11 @@ lazy val ijp_color_ui = (project in file("ijp-color-ui"))
       // Test
       libScalaTest % "test"
     ),
+    scalacOptions ++= Seq(
+      // To deal with classes implementing `ControllerFX` and using @FXML annotations to passing variables from FXML declarations
+      // or "-Wunused:-privates"
+      "-Wconf:msg=unset private var:s",
+    ),
     // Customize `sbt-imagej` plugin
     ijRuntimeSubDir         := "sandbox",
     ijPluginsSubDir         := "ij-plugins",
