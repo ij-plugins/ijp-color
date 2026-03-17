@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2022 Jarek Sacha
+ * Copyright (C) 2002-2026 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -44,7 +44,7 @@ object ImageJUtils {
    */
   def imageJIconAsAWTImage: java.awt.Image = {
     val imageJ: ImageJ = IJ.getInstance
-    if (imageJ != null) imageJ.getIconImage else null
+    if imageJ != null then imageJ.getIconImage else null
   }
 
   /**
@@ -72,7 +72,7 @@ object ImageJUtils {
    * Merges RGB bands into a ColorProcessor.
    *
    * @param src
-   *   ByteProcessor for red, green, and blue band.
+   *   ByteProcessor for the red, green, and blue band.
    * @return
    *   merged bands
    * @see
@@ -98,7 +98,7 @@ object ImageJUtils {
    * Floating point values are assumed in the range 0 to 255.
    *
    * @param src
-   *   ByteProcessor for red, green, and blue band.
+   *   ByteProcessor for the red, green, and blue band.
    * @return
    *   merged bands
    * @see
@@ -111,12 +111,12 @@ object ImageJUtils {
   }
 
   def convertToFloat(src: ImageProcessor): Array[FloatProcessor] = {
-    if (!src.isInstanceOf[ColorProcessor]) {
+    if !src.isInstanceOf[ColorProcessor] then {
       Array[FloatProcessor](src.convertToFloat.asInstanceOf[FloatProcessor])
     } else {
       val srcBps: Array[ByteProcessor]   = splitRGB(src.asInstanceOf[ColorProcessor])
       val destFps: Array[FloatProcessor] = new Array[FloatProcessor](3)
-      for (i <- srcBps.indices) {
+      for i <- srcBps.indices do {
         destFps(i) = srcBps(i).convertToFloat.asInstanceOf[FloatProcessor]
         srcBps(i) = null
       }
@@ -128,7 +128,7 @@ object ImageJUtils {
     val x = new Array[Float](outline.length)
     val y = new Array[Float](outline.length)
 
-    for (i <- outline.indices) {
+    for i <- outline.indices do {
       val p = outline(i)
       x(i) = p.getX.asInstanceOf[Float]
       y(i) = p.getY.asInstanceOf[Float]
@@ -140,7 +140,7 @@ object ImageJUtils {
    * Measure color within ROI.
    *
    * @param tri
-   * three bands of an image, may represent only color space.
+   * three bands of an image; may represent only color space.
    * @param outline
    * outline of the region of interest.
    * @return
@@ -159,7 +159,7 @@ object ImageJUtils {
    * Measure color within ROI.
    *
    * @param tri
-   * three bands of an image, may represent only color space.
+   * three bands of an image; may represent only color space.
    * @param roi
    * region of interest.
    * @return
@@ -169,7 +169,7 @@ object ImageJUtils {
    */
   def measureColor[T <: ImageProcessor](tri: Array[T], roi: Roi): Array[Double] = {
     val color: Array[Double] = new Array[Double](tri.length)
-    for (i <- tri.indices) {
+    for i <- tri.indices do {
       tri(i).setRoi(roi)
       color(i) = tri(i).getStatistics.mean
     }
@@ -250,7 +250,7 @@ object ImageJUtils {
   @inline
   def validateSameTypeAndDimensions[T <: ImageProcessor](src: Array[T], length: Int): Unit = {
     validateSameDimensions(src, length)
-    if (length > 1) {
+    if length > 1 then {
       val t = src(0).getClass
       require(src.tail.forall(_.getClass == t), "All input images must be of the same type.")
     }
@@ -269,7 +269,7 @@ object ImageJUtils {
   @inline
   def validateSameTypeAndDimensions[T <: ImageProcessor](src: IndexedSeq[T], length: Int): Unit = {
     validateSameDimensions(src, length)
-    if (length > 1) {
+    if length > 1 then {
       val t = src(0).getClass
       require(src.tail.forall(_.getClass == t), "All input images must be of the same type.")
     }
@@ -283,24 +283,25 @@ object ImageJUtils {
    */
   def roiManagerInstance: RoiManager = { // Workaround for ImageJ bug.
     // RoiManger is a singleton in function, but it has constructors.
-    // If a second instance of RoiManager is created it should not be used.
+    // If a second instance of RoiManager is created, it should not be used.
     // Make sure that RoiManager is created.
-    new RoiManager
-    // Get reference of primary instance, which may or may not be one created above.
+    new RoiManager()
+    // Get reference of the primary instance, which may or may not be the one created above.
     RoiManager.getInstance
   }
 
   /**
-   * Add result ROIs to ROI Manager, replacing current content. If ROI Manager is not visible it will be opened.
+   * Add result ROIs to ROI Manager, replacing current content. If ROI Manager is not visible, it will be opened.
    *
    * @param rois
    *   ROI's to be added.
    * @param clearContent
-   *   if `true` ROI Manager content will be cleared before new rois will be added
+   *   if `true` ROI Manager content will be cleared before new rois is added
    */
   def addToROIManager(rois: IterableOnce[Roi], clearContent: Boolean = false): Unit = {
     val roiManager = roiManagerInstance
-    if (clearContent) roiManager.runCommand("Reset")
+    if clearContent then
+      roiManager.reset()
     rois.iterator.foreach(roiManager.addRoi)
   }
 
@@ -310,13 +311,13 @@ object ImageJUtils {
     encoder.write(roi)
   }
 
-  /** Save collection of ROIs to a file as a set in a format that ImageJ can read back - ZIP of individual ROI files. */
+  /** Save a collection of ROIs to a file as a set in a format that ImageJ can read back - ZIP of individual ROI files. */
   def saveRoiZip(rois: Seq[(String, Roi)], file: File): Unit = {
     Using.resource(new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(file)))) { zos =>
       Using.resource(new DataOutputStream(new BufferedOutputStream(zos))) { out =>
         val encoder = new RoiEncoder(out)
-        for (case (_name, roi) <- rois) {
-          val name: String = if (_name.endsWith(".roi")) _name else _name + ".roi"
+        for case (_name, roi) <- rois do {
+          val name: String = if _name.endsWith(".roi") then _name else _name + ".roi"
           zos.putNextEntry(new ZipEntry(name))
           encoder.write(roi)
           out.flush()
