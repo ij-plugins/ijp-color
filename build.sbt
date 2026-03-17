@@ -109,7 +109,18 @@ lazy val ijp_color = (project in file("ijp-color"))
 lazy val ijp_color_ui = (project in file("ijp-color-ui"))
   .settings(
     name        := "ijp-color-ui",
-    description := "IJP Color UI and ImageJ plugins",
+    description :=
+      """
+        |<html>
+        |  IJP Color UI and ImageJ plugins. Operations on color spaces and color images.
+        |  <ul>
+        |    <li>Color Calibrator - Color calibrates images using a color chart.</li>
+        |    <li>Color Calculator - Tool for converting individual color values between different color spaces.</li>
+        |    <li>Color Chart ROI Tool - Converts color chart ROI to individual chip ROIs. Measures the color of each chip.</li>
+        |    <li>White Balance - Performs White Balance of an RGB image.</li>
+        |  </ul>
+        |</html>
+        """.stripMargin,
     commonSettings,
     // Other dependencies
     libraryDependencies ++= Seq(
