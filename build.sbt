@@ -1,41 +1,26 @@
-import xerial.sbt.Sonatype.GitHubHosting
-
 name := "ijp-color-project"
 
 val Scala2 = "2.13.14"
-val Scala3 = "3.3.3"
+val Scala3 = "3.3.7"
 
 val _version       = "0.12.2.1-SNAPSHOT"
 val _scalaVersions = Seq(Scala2, Scala3)
 //val _scalaVersion  = _scalaVersions.head
 val _scalaVersion = Scala3
 
-ThisBuild / version             := _version
-ThisBuild / scalaVersion        := _scalaVersion
-ThisBuild / versionScheme       := Some("early-semver")
-ThisBuild / organization        := "net.sf.ij-plugins"
-ThisBuild / sonatypeProfileName := "net.sf.ij-plugins"
-ThisBuild / homepage            := Some(new URI("https://github.com/ij-plugins/ijp-color").toURL)
-ThisBuild / startYear           := Some(2002)
-ThisBuild / licenses            := Seq(("LGPL-2.1", new URI("https://opensource.org/licenses/LGPL-2.1").toURL))
+ThisBuild / version       := _version
+ThisBuild / scalaVersion  := _scalaVersion
+ThisBuild / versionScheme := Some("early-semver")
+ThisBuild / organization  := "net.sf.ij-plugins"
+ThisBuild / homepage      := Some(new URI("https://github.com/ij-plugins/ijp-color").toURL)
+ThisBuild / startYear     := Some(2002)
+ThisBuild / licenses      := Seq(("LGPL-2.1", new URI("https://opensource.org/licenses/LGPL-2.1").toURL))
 ThisBuild / developers := List(
   Developer(id = "jpsacha", name = "Jarek Sacha", email = "jpsacha@gmail.com", url = url("https://github.com/jpsacha"))
 )
 
 publishArtifact := false
 publish / skip  := true
-
-def isScala2(scalaVersion: String): Boolean =
-  CrossVersion.partialVersion(scalaVersion) match {
-    case Some((2, _)) => true
-    case _            => false
-  }
-
-def isScala3(scalaVersion: String): Boolean =
-  CrossVersion.partialVersion(scalaVersion) match {
-    case Some((3, _)) => true
-    case _            => false
-  }
 
 val commonSettings = Seq(
   //
@@ -50,28 +35,13 @@ val commonSettings = Seq(
     "-feature",
     // Java 8 for compatibility with ImageJ/FIJI
     "-release",
-    "8"
-  ) ++ (
-    if (isScala2(scalaVersion.value))
-      Seq(
-        "-explaintypes",
-        "-Xsource:3",
-        "-Xlint",
-        "-Xcheckinit",
-        "-Xlint:missing-interpolator",
-//        "-Xmigration",
-        "-Ywarn-dead-code",
-        "-Ywarn-unused:-patvars,_"
-      )
-    else
-      Seq(
-        "-explain",
-        "-explain-types",
-        "-rewrite",
-        "-source:3.3-migration",
-        "-Wvalue-discard",
-        "-Wunused:all"
-      )
+    "8",
+    "-explain",
+    "-explain-types",
+    "-rewrite",
+    "-source:3.3-migration",
+    "-Wvalue-discard",
+    "-Wunused:all"
   ),
   Compile / doc / scalacOptions ++= Opts.doc.title("IJP Color API"),
   Compile / doc / scalacOptions ++= Opts.doc.version(_version),
@@ -104,10 +74,16 @@ val commonSettings = Seq(
   //
   manifestSetting,
   // Setup publishing
-  publishMavenStyle      := true,
-  sonatypeProjectHosting := Some(GitHubHosting("ij-plugins", "ijp-color", "jpsacha@gmail.com")),
-  publishTo              := sonatypePublishToBundle.value
+  publishMavenStyle := true
 )
+
+lazy val libImageJ        = "net.imagej"         % "ij"             % "1.54p"
+lazy val libCommonsMath   = "org.apache.commons" % "commons-math3"  % "3.6.1"
+lazy val libScalaTest     = "org.scalatest"     %% "scalatest"      % "3.2.19"
+lazy val libJFreeChartFX  = "org.jfree"          % "jfreechart-fx"  % "1.0.1"
+lazy val libFXGraphics2D  = "org.jfree"          % "fxgraphics2d"   % "1.8"
+lazy val libScalaFX       = "org.scalafx"       %% "scalafx"        % "25.0.2-R37"
+lazy val libScalaFXExtras = "org.scalafx"       %% "scalafx-extras" % "0.12.0"
 
 // The core ijp-color module
 lazy val ijp_color = (project in file("ijp-color"))
@@ -117,19 +93,12 @@ lazy val ijp_color = (project in file("ijp-color"))
     commonSettings,
     //
     libraryDependencies ++= Seq(
-      "net.imagej"         % "ij"            % "1.54k",
-      "org.apache.commons" % "commons-math3" % "3.6.1",
+      libImageJ,
+      libCommonsMath,
       // Test
-      "org.scalatest" %% "scalatest" % "3.2.19" % "test"
+      libScalaTest % "test"
     ),
-    libraryDependencies += "org.scala-lang.modules" %% "scala-parallel-collections" % "1.0.4",
-    libraryDependencies ++= (
-      if (isScala2(scalaVersion.value)) {
-        Seq("com.beachape" %% "enumeratum" % "1.7.4")
-      } else {
-        Seq.empty[ModuleID]
-      }
-    )
+    libraryDependencies += "org.scala-lang.modules" %% "scala-parallel-collections" % "1.2.0"
   )
 
 // The ijp-color UI and ImageJ plugins module
@@ -138,16 +107,14 @@ lazy val ijp_color_ui = (project in file("ijp-color-ui"))
     name        := "ijp-color-ui",
     description := "IJP Color UI and ImageJ plugins",
     commonSettings,
-    // Enable macro annotation processing for ScalaFXML
-    scalacOptions += (if (isScala2(scalaVersion.value)) "-Ymacro-annotations" else ""),
     // Other dependencies
     libraryDependencies ++= Seq(
-      "org.jfree"    % "jfreechart-fx"  % "1.0.1",
-      "org.jfree"    % "fxgraphics2d"   % "1.8",
-      "org.scalafx" %% "scalafx"        % "22.0.0-R33",
-      "org.scalafx" %% "scalafx-extras" % "0.10.0",
+      libJFreeChartFX,
+      libFXGraphics2D,
+      libScalaFX,
+      libScalaFXExtras,
       // Test
-      "org.scalatest" %% "scalatest" % "3.2.19" % "test"
+      libScalaTest % "test"
     ),
     // Customize `sbt-imagej` plugin
     ijRuntimeSubDir         := "sandbox",
