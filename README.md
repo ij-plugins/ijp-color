@@ -5,7 +5,7 @@ Operations on color spaces and color images. Can be used as a stand-alone librar
 for [ImageJ](http://rsb.info.nih.gov/ij)
 
 [![Actions Status](https://github.com/ij-plugins/ijp-color/workflows/Scala%20CI/badge.svg)](https://github.com/ij-plugins/ijp-color/actions)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/net.sf.ij-plugins/ijp-color_3/badge.svg)](https://maven-badges.herokuapp.com/maven-central/net.sf.ij-plugins/ijp-color_3)
+[![Maven Central](https://img.shields.io/maven-central/v/net.sf.ij-plugins/ijp-color_3)](https://img.shields.io/maven-central/v/net.sf.ij-plugins/ijp-color_3)
 [![Scaladoc](https://javadoc.io/badge2/net.sf.ij-plugins/ijp-color_3/scaladoc.svg)](https://javadoc.io/doc/net.sf.ij-plugins/ijp-color_3)
 
 
@@ -59,7 +59,7 @@ More details in [project Wiki] under [Color Calculator]
 
 ### IJP Color Chart ROI Tool
 
-Converts color chart ROI to individual chip ROIs. Measures color of each chip.
+Converts color chart ROI to individual chip ROIs. Measures the color of each chip.
 
 ![Chart Tool](https://github.com/ij-plugins/ijp-color/wiki/assets/Chart_Tool_0.9_01.png)
 
@@ -88,8 +88,8 @@ Installing Plugins in ImageJ
 Prebuild binaries are published with each [Release](https://github.com/ij-plugins/ijp-color/releases).
 
 1. Look for in the asset section for an "ijp-color_plugins_\*\_win.zip" file assuming you are using Windows,
-   or "ijp-color_plugins_\*\_mac\*.zip" for MacOS. Do now download the "Source code".
-2. Download and unzip into ImageJ's `plugins` directory. It should create subdirectory "ij-plugins". There should be
+   or "ijp-color_plugins_\*\_mac\*.zip" for macOS. Do now download the "Source code".
+2. Download and unzip into ImageJ's `plugins` directory. It should create a subdirectory "ij-plugins". There should be
    several files with extension `*.jar`
 3. Restart ImageJ
 
@@ -107,7 +107,7 @@ as [IJ-Plugins Update Site](https://sites.imagej.net/IJ-Plugins/): "https://site
 
 ### Troubleshooting
 
-Depending on your ImageJ installation there may be issues properly loading the ijp-color plugin components,
+Depending on your ImageJ installation, there may be issues properly loading the ijp-color plugin components,
 see [Troubleshooting Wiki] for some hints. Please post your experience or ask questions in
 the [Troubleshooting Discussions].
 
@@ -122,8 +122,8 @@ the [ijp-color/test](ijp-color/src/main/test/scala/net/ij/ij_plugins/color) dire
 Development Setup
 -----------------
 
-The minimum requirement to build an run the plugin in development environment is [Java](java.oracle.com)
-and [SBT](http://www.scala-sbt.org/). SBT will download all needed dependencies. Key libraries:
+The minimum requirement to build an run the plugin in a development environment is [Java](java.oracle.com)
+and [SBT](http://www.scala-sbt.org/). SBT will download all necessary dependencies. Key libraries:
 [ImageJ](https://imagej.nih.gov/ij/), [Scala](https://www.scala-lang.org/), and [ScalaFX](http://www.scalafx.org/).
 
 ### Command line
