@@ -1,92 +1,80 @@
-import xerial.sbt.Sonatype.GitHubHosting
-
-import java.net.URL
-
-// @formatter:off
-
 name := "ijp-color-project"
 
-val Scala2 = "2.13.10"
-val Scala3 = "3.2.2"
+//
+// Environment variables used by the build:
+// GRAPHVIZ_DOT_PATH - Full path to Graphviz dot utility. If not defined, Scaladoc will be built without diagrams.
+// JAR_BUILT_BY      - Name to be added to Jar metadata field "Built-By" (defaults to System.getProperty("user.name")
+//
 
-val _version       = "0.12.2"
-val _scalaVersions = Seq(Scala2, Scala3)
-//val _scalaVersion  = _scalaVersions.head
-val _scalaVersion  = Scala3
-
-ThisBuild / version             := _version
-ThisBuild / scalaVersion        := _scalaVersion
-ThisBuild / versionScheme       := Some("early-semver")
-ThisBuild / organization        := "net.sf.ij-plugins"
-ThisBuild / sonatypeProfileName := "net.sf.ij-plugins"
-ThisBuild / homepage            := Some(new URL("https://github.com/ij-plugins/ijp-color"))
-ThisBuild / startYear           := Some(2002)
-ThisBuild / licenses            := Seq(("LGPL-2.1", new URL("https://opensource.org/licenses/LGPL-2.1")))
-ThisBuild / developers          := List(
-  Developer(id="jpsacha", name="Jarek Sacha", email="jpsacha@gmail.com", url=url("https://github.com/jpsacha"))
+ThisBuild / version              := "0.12.2.1-SNAPSHOT"
+ThisBuild / scalaVersion         := "3.3.7"
+ThisBuild / organization         := "net.sf.ij-plugins"
+ThisBuild / organizationName     := "IJ-Plugins"
+ThisBuild / organizationHomepage := Some(url("https://github.com/ij-plugins"))
+ThisBuild / homepage             := Some(url("https://github.com/ij-plugins/ijp-color"))
+ThisBuild / startYear            := Some(2002)
+ThisBuild / licenses             := Seq("LGPL-2.1" -> url("https://opensource.org/licenses/LGPL-2.1"))
+ThisBuild / scmInfo              := Option(
+  ScmInfo(
+    url("https://github.com/ij-plugins/ijp-color"),
+    "scm:https://github.com/ij-plugins/ijp-color.git"
+  )
 )
+ThisBuild / versionScheme := Some("early-semver")
 
-publishArtifact     := false
-publish / skip      := true
+// Resolvers
+// Add snapshots to the root project to enable compilation with Scala SNAPSHOT compiler,
+// e.g., 2.11.0-SNAPSHOT
+ThisBuild / resolvers += Resolver.sonatypeCentralSnapshots
+ThisBuild / resolvers += Resolver.mavenLocal
 
-def isScala2(scalaVersion: String): Boolean =
-      CrossVersion.partialVersion(scalaVersion) match {
-    case Some((2, _)) => true
-    case _            => false
-  }
+publishArtifact := false
+publish / skip  := true
 
-def isScala3(scalaVersion: String): Boolean =
-  CrossVersion.partialVersion(scalaVersion) match {
-    case Some((3, _)) => true
-    case _            => false
-  }
+// Set the Java version target for compatibility for the current FIJI distribution
+// We do not want to be over the FIJI Java version.
+lazy val javaTargetVersion = "21"
 
+lazy val libCommonsMath              = "org.apache.commons"      % "commons-math3"              % "3.6.1"
+lazy val libFXGraphics2D             = "org.jfree"               % "fxgraphics2d"               % "1.8"
+lazy val libImageJ                   = "net.imagej"              % "ij"                         % "1.54p"
+lazy val libJFreeChartFX             = "org.jfree"               % "jfreechart-fx"              % "1.0.1"
+lazy val libScalaTest                = "org.scalatest"          %% "scalatest"                  % "3.2.19"
+lazy val libScalaFX                  = "org.scalafx"            %% "scalafx"                    % "25.0.2-R37"
+lazy val libScalaFXExtras            = "org.scalafx"            %% "scalafx-extras"             % "0.12.0"
+lazy val libScalaParallelCollections = "org.scala-lang.modules" %% "scala-parallel-collections" % "1.2.0"
 
 val commonSettings = Seq(
-  //
-  crossScalaVersions := _scalaVersions,
-  scalaVersion       := _scalaVersion,
-  //
   scalacOptions ++= Seq(
-    "-encoding", "UTF-8",
+    "-encoding",
+    "UTF-8",
     "-unchecked",
     "-deprecation",
     "-feature",
-    // Java 8 for compatibility with ImageJ/FIJI
+    "-explain",
+    "-explain-types",
+    "-rewrite",
+    "-source:3.3-migration",
+//    "-Wvalue-discard",
+    "-Wunused:all",
     "-release",
-    "8"
-  ) ++ (
-    if(isScala2(scalaVersion.value))
-      Seq(
-        "-explaintypes",
-        "-Xsource:3",
-        "-Xlint",
-        "-Xcheckinit",
-        "-Xlint:missing-interpolator",
-        "-Ywarn-dead-code",
-        "-Ywarn-unused:-patvars,_",
-      )
-    else
-      Seq(
-        "-explain",
-        "-explain-types"
-      )
+    javaTargetVersion
   ),
   Compile / doc / scalacOptions ++= Opts.doc.title("IJP Color API"),
-  Compile / doc / scalacOptions ++= Opts.doc.version(_version),
+  Compile / doc / scalacOptions ++= Opts.doc.version(version.value),
   Compile / doc / scalacOptions ++= Seq(
-    "-doc-footer", s"IJP Color API v.${_version}",
-    "-doc-root-content", baseDirectory.value + "/src/main/scala/root-doc.creole"
+    "-doc-footer",
+    s"IJP Color API v.${version.value}",
+    "-doc-root-content",
+    baseDirectory.value + "/src/main/scala/root-doc.creole"
   ),
   Compile / doc / scalacOptions ++= (
     Option(System.getenv("GRAPHVIZ_DOT_PATH")) match {
       case Some(path) => Seq("-diagrams", "-diagrams-dot-path", path, "-diagrams-debug")
-      case None => Seq.empty[String]
-    }),
-  javacOptions  ++= Seq("-deprecation", "-Xlint"),
-  //
-  resolvers  += Resolver.mavenLocal,
-  resolvers ++= Resolver.sonatypeOssRepos("snapshots"),
+      case None       => Seq.empty[String]
+    }
+  ),
+  Compile / compile / javacOptions ++= Seq("-deprecation", "-Xlint", "--release", javaTargetVersion),
   //
   exportJars := true,
   //
@@ -98,13 +86,8 @@ val commonSettings = Seq(
   // Instruct `clean` to delete created plugins subdirectory created by `ijRun`/`ijPrepareRun`.
   cleanFiles += ijPluginsDir.value,
   //
-  manifestSetting,
-  // Setup publishing
-  publishMavenStyle := true,
-  sonatypeProjectHosting := Some(GitHubHosting("ij-plugins", "ijp-color", "jpsacha@gmail.com")),
-  publishTo := sonatypePublishToBundle.value,
+  manifestSetting
 )
-
 
 // The core ijp-color module
 lazy val ijp_color = (project in file("ijp-color"))
@@ -114,20 +97,12 @@ lazy val ijp_color = (project in file("ijp-color"))
     commonSettings,
     //
     libraryDependencies ++= Seq(
-      "net.imagej"              % "ij"                      % "1.54d",
-      "org.apache.commons"      % "commons-math3"           % "3.6.1",
+      libImageJ,
+      libCommonsMath,
       // Test
-      "org.scalatest"          %% "scalatest"               % "3.2.15" % "test"
+      libScalaTest % "test"
     ),
-    libraryDependencies += "org.scala-lang.modules" %% "scala-parallel-collections" % "1.0.4",
-    libraryDependencies ++= (
-      if(isScala2(scalaVersion.value)) {
-        Seq("com.beachape" %% "enumeratum" % "1.7.2")
-      }
-      else {
-        Seq.empty[ModuleID]
-      }
-    ),
+    libraryDependencies += libScalaParallelCollections
   )
 
 // The ijp-color UI and ImageJ plugins module
@@ -136,22 +111,25 @@ lazy val ijp_color_ui = (project in file("ijp-color-ui"))
     name        := "ijp-color-ui",
     description := "IJP Color UI and ImageJ plugins",
     commonSettings,
-    // Enable macro annotation processing for ScalaFXML
-    scalacOptions += (if(isScala2(scalaVersion.value)) "-Ymacro-annotations" else ""),
     // Other dependencies
     libraryDependencies ++= Seq(
-      "org.jfree"           % "jfreechart-fx"       % "1.0.1",
-      "org.jfree"           % "fxgraphics2d"        % "1.8",
-      "org.scalafx"        %% "scalafx"             % "20.0.0-R31",
-      "org.scalafx"        %% "scalafx-extras"      % "0.8.0",
+      libJFreeChartFX,
+      libFXGraphics2D,
+      libScalaFX,
+      libScalaFXExtras,
       // Test
-      "org.scalatest"      %% "scalatest"           % "3.2.15"  % "test"
+      libScalaTest % "test"
+    ),
+    scalacOptions ++= Seq(
+      // To deal with classes implementing `ControllerFX` and using @FXML annotations to passing variables from FXML declarations
+      // or "-Wunused:-privates"
+      "-Wconf:msg=unset private var:s"
     ),
     // Customize `sbt-imagej` plugin
     ijRuntimeSubDir         := "sandbox",
     ijPluginsSubDir         := "ij-plugins",
     ijCleanBeforePrepareRun := true,
-    cleanFiles += ijPluginsDir.value,
+    cleanFiles += ijPluginsDir.value
   )
   .dependsOn(ijp_color)
 
@@ -168,15 +146,15 @@ lazy val experimental = (project in file("experimental"))
     ijRuntimeSubDir         := "sandbox",
     ijPluginsSubDir         := "ij-plugins",
     ijCleanBeforePrepareRun := true,
-    cleanFiles += ijPluginsDir.value,
+    cleanFiles += ijPluginsDir.value
   )
   .dependsOn(ijp_color_ui)
 
 lazy val manifestSetting = packageOptions += {
   Package.ManifestAttributes(
-    "Created-By" -> "Simple Build Tool",
-    "Built-By"  -> Option(System.getenv("JAR_BUILT_BY")).getOrElse(System.getProperty("user.name")),
-    "Build-Jdk" -> System.getProperty("java.version"),
+    "Created-By"               -> "Simple Build Tool",
+    "Built-By"                 -> Option(System.getenv("JAR_BUILT_BY")).getOrElse(System.getProperty("user.name")),
+    "Build-Jdk"                -> System.getProperty("java.version"),
     "Specification-Title"      -> name.value,
     "Specification-Version"    -> version.value,
     "Specification-Vendor"     -> organization.value,
@@ -187,9 +165,32 @@ lazy val manifestSetting = packageOptions += {
   )
 }
 
+//
+// Customize Java style publishing
+//
+// Enables publishing to maven repo
+ThisBuild / publishMavenStyle      := true
+ThisBuild / Test / publishArtifact := false
+ThisBuild / publishTo              := {
+  val centralSnapshots = "https://central.sonatype.com/repository/maven-snapshots/"
+  if (isSnapshot.value) Some("central-snapshots" at centralSnapshots)
+  else localStaging.value
+}
+ThisBuild / developers := List(
+  Developer(
+    id = "jpsacha",
+    name = "Jarek Sacha",
+    email = "jpsacha@gmail.com",
+    url = url("https://github.com/jpsacha")
+  )
+)
 
-// Instruct `clean` to delete created plugins subdirectory created by `ijRun`/`ijPrepareRun`.
+// Enable and customize `sbt-imagej` plugin
 enablePlugins(SbtImageJ)
+ijRuntimeSubDir         := "sandbox"
+ijPluginsSubDir         := "ij-plugins"
+ijCleanBeforePrepareRun := true
+// Instruct `clean` to delete created plugins subdirectory created by `ijRun`/`ijPrepareRun`.
 cleanFiles += ijPluginsDir.value
 
 addCommandAlias("ijRun", "experimental/ijRun")

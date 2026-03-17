@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2021 Jarek Sacha
+ * Copyright (C) 2002-2026 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -20,24 +20,16 @@
  * Latest release available at https://github.com/ij-plugins/ijp-color/
  */
 
-package ij_plugins.color.ui.calibration
+package ij_plugins.color.ui.util
 
-import enumeratum.{Enum, EnumEntry}
+import ij_plugins.color.util.EnumCompanion.{WithName, WithNameCompanion}
 
-import scala.collection.immutable
+enum Gamma(val name: String, val value: Double) extends WithName:
 
-sealed abstract class ChipsEnabledType(override val entryName: String) extends EnumEntry {
-  def name: String              = entryName
-  override def toString: String = entryName
-}
+  case v10  extends Gamma("1.0", 1.0)
+  case v18  extends Gamma("1.8", 1.8)
+  case v22  extends Gamma("2.2", 2.2)
+  case sRGB extends Gamma("sRGB", -2.2)
+  case L    extends Gamma("L*", 0.0)
 
-case object ChipsEnabledType extends Enum[ChipsEnabledType] {
-
-  case object All extends ChipsEnabledType("All")
-
-  case object Auto extends ChipsEnabledType("Auto")
-
-  case object Custom extends ChipsEnabledType("Custom")
-
-  override val values: immutable.IndexedSeq[ChipsEnabledType] = findValues
-}
+object Gamma extends WithNameCompanion[Gamma]

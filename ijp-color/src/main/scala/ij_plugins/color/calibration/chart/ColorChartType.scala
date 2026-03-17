@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2022 Jarek Sacha
+ * Copyright (C) 2002-2026 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -20,24 +20,14 @@
  * Latest release available at https://github.com/ij-plugins/ijp-color/
  */
 
-package ij_plugins.color.util
+package ij_plugins.color.calibration.chart
 
-import enumeratum.{Enum, EnumEntry}
+import ij_plugins.color.util.EnumCompanion.*
 
-import scala.collection.immutable
+enum ColorChartType(val name: String) extends WithName:
+  case GretagMacbethColorChecker extends ColorChartType("GretagMacbeth ColorChecker")
+  case XRitePassportColorChecker extends ColorChartType("X-Rite Passport")
+  case ImageScienceColorGaugeMatte extends ColorChartType("Image Science ColorGauge Matte")
+  case Custom extends ColorChartType("Custom")
 
-sealed abstract class AveragingMode(override val entryName: String) extends EnumEntry {
-  override def toString: String = entryName
-
-  def name: String = entryName
-}
-
-object AveragingMode extends Enum[AveragingMode] {
-
-  case object Mean extends AveragingMode("Mean")
-
-  case object Median extends AveragingMode("Median")
-
-  /** All refined reference color spaces. */
-  val values: immutable.IndexedSeq[AveragingMode] = findValues
-}
+object ColorChartType extends WithNameCompanion[ColorChartType]

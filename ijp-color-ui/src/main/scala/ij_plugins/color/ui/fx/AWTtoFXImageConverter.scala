@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2021 Jarek Sacha
+ * Copyright (C) 2002-2023 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -20,27 +20,35 @@
  * Latest release available at https://github.com/ij-plugins/ijp-color/
  */
 
-package ij_plugins.color.calibration.chart
+package ij_plugins.color.ui.fx
 
-import enumeratum.{Enum, EnumEntry}
+import java.awt.image.BufferedImage
 
-import scala.collection.immutable
+/** Tools for converting images between AWT and JavaFX. */
+object AWTtoFXImageConverter {
 
-sealed abstract class ColorChartType(override val entryName: String) extends EnumEntry {
-  override def toString: String = entryName
+  /**
+   * Convert AWT image to BufferedImage.
+   *
+   * @param image
+   *   AWT image.
+   */
+  def toBufferImage(image: java.awt.Image): BufferedImage = toBufferImage(image, BufferedImage.TYPE_INT_ARGB)
 
-  def name: String = entryName
-}
-
-case object ColorChartType extends Enum[ColorChartType] {
-  case object GretagMacbethColorChecker extends ColorChartType("GretagMacbeth ColorChecker")
-
-  case object XRitePassportColorChecker extends ColorChartType("X-Rite Passport")
-
-  case object ImageScienceColorGaugeMatte extends ColorChartType("Image Science ColorGauge Matte")
-
-  case object Custom extends ColorChartType("Custom")
-
-  /** All refined reference color spaces. */
-  val values: immutable.IndexedSeq[ColorChartType] = findValues
+  /**
+   * Convert AWT image to BufferedImage.
+   *
+   * @param image
+   *   image to convert
+   * @param imageType
+   *   `BufferedImage` type
+   * @see
+   *   [[java.awt.image.BufferedImage]]
+   */
+  def toBufferImage(image: java.awt.Image, imageType: Int): BufferedImage = {
+    val bi = new BufferedImage(image.getWidth(null), image.getHeight(null), imageType)
+    val g  = bi.createGraphics
+    g.drawImage(image, null, null)
+    bi
+  }
 }

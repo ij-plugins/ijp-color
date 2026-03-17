@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2021 Jarek Sacha
+ * Copyright (C) 2002-2026 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -20,35 +20,14 @@
  * Latest release available at https://github.com/ij-plugins/ijp-color/
  */
 
-package ij_plugins.color.util
+package ij_plugins.color.ui.calibration
 
-import java.awt.image.BufferedImage
+import ij_plugins.color.util.EnumCompanion.{WithName, WithNameCompanion}
 
-/** Tools for converting images between AWT and JavaFX. */
-object AWTtoFXImageConverter {
+enum ChipsEnabledType(val name: String) extends WithName:
 
-  /**
-   * Convert AWT image to BufferedImage.
-   *
-   * @param image
-   *   AWT image.
-   */
-  def toBufferImage(image: java.awt.Image): BufferedImage = toBufferImage(image, BufferedImage.TYPE_INT_ARGB)
+  case All    extends ChipsEnabledType("All")
+  case Auto   extends ChipsEnabledType("Auto")
+  case Custom extends ChipsEnabledType("Custom")
 
-  /**
-   * Convert AWT image to BufferedImage.
-   *
-   * @param image
-   *   image to convert
-   * @param imageType
-   *   `BufferedImage` type
-   * @see
-   *   [[java.awt.image.BufferedImage]]
-   */
-  def toBufferImage(image: java.awt.Image, imageType: Int): BufferedImage = {
-    val bi = new BufferedImage(image.getWidth(null), image.getHeight(null), imageType)
-    val g  = bi.createGraphics
-    g.drawImage(image, null, null)
-    bi
-  }
-}
+object ChipsEnabledType extends WithNameCompanion[ChipsEnabledType]
