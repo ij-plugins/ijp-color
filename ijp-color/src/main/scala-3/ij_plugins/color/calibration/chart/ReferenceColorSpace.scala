@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2023 Jarek Sacha
+ * Copyright (C) 2002-2026 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -26,8 +26,6 @@ import ij.process.FloatProcessor
 import ij_plugins.color.converter.{ColorConverter, ColorTriple, ReferenceWhite}
 import ij_plugins.color.util.EnumCompanion.{WithName, WithNameCompanion}
 
-import scala.collection.immutable
-
 object ReferenceColorSpace extends WithNameCompanion[ReferenceColorSpace]
 
 /**
@@ -43,7 +41,6 @@ enum ReferenceColorSpace(val name: String, val bands: IndexedSeq[String]) extend
 
   /** sRGB color space */
   case sRGB extends ReferenceColorSpace("sRGB", IndexedSeq("Red", "Green", "Blue"))
-
 
   def bandsNames: IndexedSeq[String] = bands
 
@@ -61,30 +58,29 @@ enum ReferenceColorSpace(val name: String, val bands: IndexedSeq[String]) extend
   }
 
   /**
-    * Convert color value from the current color space to CIE L*a*b*
-    *
-    * @param refWhite
-    * reference white of the reference color chart.
-    */
-  def toLab (c: Array[Double], refWhite: ReferenceWhite): ColorTriple.Lab = {
-    require (c.length == 3)
-    toLab (c (0), c (1), c (2), refWhite)
+   * Convert color value from the current color space to CIE L*a*b*
+   *
+   * @param refWhite
+   * reference white of the reference color chart.
+   */
+  def toLab(c: Array[Double], refWhite: ReferenceWhite): ColorTriple.Lab = {
+    require(c.length == 3)
+    toLab(c(0), c(1), c(2), refWhite)
   }
 
-  def toLab (c: IndexedSeq[Double], refWhite: ReferenceWhite): ColorTriple.Lab = toLab (c.toArray, refWhite)
-
+  def toLab(c: IndexedSeq[Double], refWhite: ReferenceWhite): ColorTriple.Lab = toLab(c.toArray, refWhite)
 
   /**
-    * Convert color value from the current color space to CIE L*a*b*
-    *
-    * @param refWhite
-    * reference white of the reference color chart.
-    */
-  def toLab (fps: Array[FloatProcessor], refWhite: ReferenceWhite): Array[FloatProcessor] = {
-    require (fps.length == 3)
-    val w = fps (0).getWidth
-    val h = fps (0).getHeight
-    val n = w * h
+   * Convert color value from the current color space to CIE L*a*b*
+   *
+   * @param refWhite
+   * reference white of the reference color chart.
+   */
+  def toLab(fps: Array[FloatProcessor], refWhite: ReferenceWhite): Array[FloatProcessor] = {
+    require(fps.length == 3)
+    val w       = fps(0).getWidth
+    val h       = fps(0).getHeight
+    val n       = w * h
     val lFP     = new FloatProcessor(w, h)
     val aFP     = new FloatProcessor(w, h)
     val bFP     = new FloatProcessor(w, h)
@@ -94,7 +90,7 @@ enum ReferenceColorSpace(val name: String, val bands: IndexedSeq[String]) extend
     val lPixels = lFP.getPixels.asInstanceOf[Array[Float]]
     val aPixels = aFP.getPixels.asInstanceOf[Array[Float]]
     val bPixels = bFP.getPixels.asInstanceOf[Array[Float]]
-    for (i <- 0 until n) {
+    for i <- 0 until n do {
       val lab = toLab(pixels0(i), pixels1(i), pixels2(i), refWhite)
       lPixels(i) = lab.l.toFloat
       aPixels(i) = lab.a.toFloat
