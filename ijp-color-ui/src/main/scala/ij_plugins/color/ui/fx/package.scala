@@ -1,6 +1,6 @@
 /*
  * Image/J Plugins
- * Copyright (C) 2002-2023 Jarek Sacha
+ * Copyright (C) 2002-2026 Jarek Sacha
  * Author's email: jpsacha at gmail dot com
  *
  * This library is free software; you can redistribute it and/or
@@ -68,26 +68,19 @@ package object fx {
   }
 
   /**
-   * Ensure that JavaFX thread is initialized and unhandled exceptions are caught.
+   * Ensure that the JavaFX thread is initialized and unhandled exceptions are caught.
    */
   def initializeFX(): Unit = {
 
     initFX()
 
-    onFXAndWait {
-      // Start is called on the FX Application Thread,
-      // so Thread.currentThread() is the FX application thread:
-      Thread.currentThread().setUncaughtExceptionHandler(
-        new Thread.UncaughtExceptionHandler {
-          override def uncaughtException(t: Thread, e: Throwable): Unit = {
-            println("FX handler caught exception: " + e.getMessage)
-            e.printStackTrace()
-            onFX {
-              ShowMessage.exception("ImageJ FX Exception Handler", "Unexpected error.", e)
-            }
-          }
-        }
+    onFX:
+      // Set up the uncaught exception handler for the JavaFX thread
+      Thread.currentThread().setUncaughtExceptionHandler((th: Thread, e: Throwable) =>
+        println(s"FX handler caught exception on thread ${th.getName}: " + e.getMessage)
+        e.printStackTrace()
+        onFX:
+          ShowMessage.exception("ImageJ FX Exception Handler", "Unexpected error.", e)
       )
-    }
   }
 }
