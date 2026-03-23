@@ -41,7 +41,7 @@ lazy val libImageJ                   = "net.imagej"              % "ij"         
 lazy val libJFreeChartFX             = "org.jfree"               % "jfreechart-fx"              % "1.0.1"
 lazy val libScalaTest                = "org.scalatest"          %% "scalatest"                  % "3.2.19"
 lazy val libScalaFX                  = "org.scalafx"            %% "scalafx"                    % "25.0.2-R37"
-lazy val libScalaFXExtras            = "org.scalafx"            %% "scalafx-extras"             % "0.12.0"
+lazy val libScalaFXExtras            = "org.scalafx"            %% "scalafx-extras"             % "0.12.1"
 lazy val libScalaParallelCollections = "org.scala-lang.modules" %% "scala-parallel-collections" % "1.2.0"
 
 val commonSettings = Seq(
